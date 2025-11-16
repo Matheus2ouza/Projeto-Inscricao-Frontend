@@ -21,7 +21,6 @@ export async function generateSelectedInscriptionsPdf({
   inscriptionIds,
 }: GenerateSelectedInscriptionsPdfInput) {
   try {
-    console.log(inscriptionIds)
     const { data } =
       await axiosInstance.post<GenerateSelectedInscriptionsPdfResponse>(
         `/events/pdf/${eventId}/list-inscription`,
