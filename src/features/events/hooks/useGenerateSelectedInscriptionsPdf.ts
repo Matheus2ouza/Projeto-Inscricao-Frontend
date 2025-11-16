@@ -1,9 +1,9 @@
-import { useCallback, useState } from "react";
-import { toast } from "sonner";
 import {
   generateSelectedInscriptionsPdf,
   type GenerateSelectedInscriptionsPdfResponse,
 } from "@/features/events/api/list-inscription/generateSelectedInscriptionsPdf";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
 type UseGenerateSelectedInscriptionsPdfOptions = {
   onSuccess?: () => void;
