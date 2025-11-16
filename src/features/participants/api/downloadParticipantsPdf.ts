@@ -1,6 +1,6 @@
 import axiosInstance from "@/shared/lib/apiClient";
 
-export type GenerateSelectedInscriptionsPdfResponse = {
+export type downloadParticipantsPdfResponse = {
   data?: {
     pdfBase64?: string;
     filename?: string;
@@ -11,25 +11,18 @@ export type GenerateSelectedInscriptionsPdfResponse = {
   message?: string;
 };
 
-export type GenerateSelectedInscriptionsPdfInput = {
+export type downloadParticipantsPdfInput = {
   eventId: string;
-  inscriptionIds: string[];
+  accountIds: string[];
 };
 
-export async function generateSelectedInscriptionsPdf({
-  eventId,
-  inscriptionIds,
-}: GenerateSelectedInscriptionsPdfInput) {
+export async function downloadParticipantsPdf({ eventId, accountIds }: downloadParticipantsPdfInput) {
   try {
-    const { data } =
-      await axiosInstance.post<GenerateSelectedInscriptionsPdfResponse>(
-        `/events/pdf/${eventId}/list-inscription`,
-        {
-          inscriptionIds,
-        }
-      );
+    const { data } = await axiosInstance.post<downloadParticipantsPdfResponse>(`/participants/pdf/${eventId}/list-participants`, {
+      accountIds,
+    })
 
-    return data;
+    return data
   } catch (error) {
     console.error("Error while trying to generate the report: ", error);
     const axiosError = error as {

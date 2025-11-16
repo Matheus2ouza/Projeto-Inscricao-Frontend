@@ -1,19 +1,25 @@
-import {
-  generateSelectedInscriptionsPdf,
-  type GenerateSelectedInscriptionsPdfResponse,
-} from "@/features/events/api/list-inscription/generateSelectedInscriptionsPdf";
+import { downloadParticipantsPdf } from "@/features/participants/api/downloadParticipantsPdf";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
-type UseGenerateSelectedInscriptionsPdfOptions = {
+type UseDownloadParticipantsPdfOptions = {
   onSuccess?: () => void;
 };
 
 const DEFAULT_ERROR_MESSAGE =
-  "Não foi possível gerar o PDF selecionado. Tente novamente.";
+  "Não foi possível gerar o PDF dos participantes. Tente novamente.";
 
 function extractPayload(
-  response: GenerateSelectedInscriptionsPdfResponse | undefined
+  response: {
+    data?: {
+      pdfBase64?: string;
+      filename?: string;
+      message?: string;
+    };
+    pdfBase64?: string;
+    filename?: string;
+    message?: string;
+  } | undefined
 ) {
   return response?.data ?? response;
 }
@@ -38,36 +44,36 @@ function downloadPdf(pdfBase64: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function useGenerateSelectedInscriptionsPdf(
+export function useDownloadParticipantsPdf(
   eventId: string,
-  options?: UseGenerateSelectedInscriptionsPdfOptions
+  options?: UseDownloadParticipantsPdfOptions
 ) {
   const [isGenerating, setIsGenerating] = useState(false);
   const onSuccess = options?.onSuccess;
 
   const generatePdf = useCallback(
-    async (inscriptionIds: string[]) => {
+    async (accountIds: string[]) => {
       if (!eventId) {
         toast.error("Evento não encontrado.");
         return;
       }
 
-      if (!inscriptionIds?.length) {
-        toast.error("Selecione pelo menos uma inscrição.");
+      if (!accountIds?.length) {
+        toast.error("Selecione pelo menos uma conta.");
         return;
       }
 
       try {
         setIsGenerating(true);
-        const response = await generateSelectedInscriptionsPdf({
+        const response = await downloadParticipantsPdf({
           eventId,
-          inscriptionIds,
+          accountIds,
         });
 
         const payload = extractPayload(response);
         const pdfBase64 = payload?.pdfBase64;
         const filename =
-          payload?.filename ?? `inscricoes-${eventId.slice(0, 8)}.pdf`;
+          payload?.filename ?? `participantes-${eventId.slice(0, 8)}.pdf`;
 
         if (!pdfBase64) {
           throw new Error(
@@ -79,7 +85,7 @@ export function useGenerateSelectedInscriptionsPdf(
         toast.success("PDF gerado com sucesso.");
         onSuccess?.();
       } catch (error) {
-        console.error("Erro ao gerar PDF das inscrições:", error);
+        console.error("Erro ao gerar PDF dos participantes:", error);
         const message =
           error instanceof Error ? error.message : DEFAULT_ERROR_MESSAGE;
         toast.error(message || DEFAULT_ERROR_MESSAGE);
@@ -95,3 +101,4 @@ export function useGenerateSelectedInscriptionsPdf(
     isGenerating,
   };
 }
+

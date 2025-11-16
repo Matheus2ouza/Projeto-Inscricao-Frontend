@@ -32,6 +32,7 @@ import {
   ChevronsUpDown,
   FileText,
   House,
+  ListOrdered,
   LogOut,
   Map,
   ScrollText,
@@ -249,6 +250,15 @@ export default function veAppSidebarSuper({
                             >
                               <FileText className="size-4" />
                               <span>Gerenciamento</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/super/participants/select-event"
+                              className="gap-2"
+                            >
+                              <ListOrdered className="size-4" />
+                              <span>Lista de Participantes</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>
