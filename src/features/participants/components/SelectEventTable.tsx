@@ -9,8 +9,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
-import { generateGradient } from "@/shared/utils/generateGradient";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
+import { generateGradient } from "@/shared/utils/getgenerateGradient";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
