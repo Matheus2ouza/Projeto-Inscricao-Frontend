@@ -12,6 +12,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Calendar, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
@@ -194,7 +195,12 @@ export default function AvulsaTable() {
                     </div>
                   </CardBody>
                   <CardFooter className="flex flex-col items-start p-4 gap-3">
-                    <h3 className="font-bold text-lg mb-1 line-clamp-2">
+                    <h3
+                      className={`font-bold ${getFontSizeClass(
+                        event.name,
+                        true
+                      )} mb-1 line-clamp-2 text-gray-900 dark:text-white`}
+                    >
                       {event.name}
                     </h3>
 
