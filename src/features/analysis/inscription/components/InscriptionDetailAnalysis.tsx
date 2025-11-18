@@ -1,7 +1,25 @@
 "use client";
 
+import { useUpdateInscription } from "@/features/inscriptions/hooks/useEditInscription";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/shared/components/ui/form";
+import { Input } from "@/shared/components/ui/input";
 import {
   Pagination,
   PaginationContent,
@@ -15,12 +33,14 @@ import {
   getStatusInscriptionColor,
   getStatusTypeInscriptionColor,
 } from "@/shared/utils/getStatusColor";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
   ArrowUp,
   Calendar,
   CheckCircle,
   Download,
+  Loader2,
   Mail,
   Menu,
   OctagonX,
@@ -32,6 +52,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { downloadParticipantsPdf } from "../api/downloadParticipantsPdf";
+import { analysisInscriptionsKeys } from "../hooks/useAnalysisInscriptionsQuery";
 import { AnalysisInscriptionResponse } from "../types/analysisTypes";
 import { ConfirmationModal } from "./ConfirmationModal";
 
@@ -93,6 +114,32 @@ export default function InscriptionDetailAnalysis({
 
   const [participantsDownloadLoading, setParticipantsDownloadLoading] =
     useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const {
+    form,
+    handleSubmit: handleUpdateSubmit,
+    isUpdating,
+  } = useUpdateInscription({
+    inscriptionId: inscriptionData?.id,
+    initialValues: {
+      responsible: inscriptionData?.responsible,
+      phone: inscriptionData?.phone,
+      email: inscriptionData?.email,
+    },
+    onSuccess: async () => {
+      setIsEditDialogOpen(false);
+      // Invalidar queries de análise também
+      await queryClient.invalidateQueries({
+        queryKey:
+          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: analysisInscriptionsKeys.all,
+      });
+    },
+  });
 
   const handleDownloadParticipants = async () => {
     if (!inscriptionData?.id) {
@@ -292,29 +339,118 @@ export default function InscriptionDetailAnalysis({
           )}
 
           {inscriptionData.status.toLowerCase() !== "paid" && (
-            <Button
-              variant="outline"
-              onClick={handleCancelInscription}
-              disabled={isCancelling}
-              className={`flex items-center gap-2 ${
-                inscriptionData.status.toLowerCase() === "cancelled"
-                  ? "border-green-500 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700"
-                  : "border-orange-500 text-orange-600 hover:bg-orange-50 hover:border-orange-600 hover:text-orange-700"
-              }`}
-            >
-              {inscriptionData.status.toLowerCase() === "cancelled" ? (
-                <CheckCircle className="h-4 w-4" />
-              ) : (
-                <X className="h-4 w-4" />
-              )}
-              {isCancelling
-                ? inscriptionData.status.toLowerCase() === "cancelled"
-                  ? "Reativando..."
-                  : "Cancelando..."
-                : inscriptionData.status.toLowerCase() === "cancelled"
-                  ? "Reativar Inscrição"
-                  : "Cancelar Inscrição"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Dialog
+                open={isEditDialogOpen}
+                onOpenChange={setIsEditDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline">Editar Inscrição</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Editar dados da inscrição</DialogTitle>
+                    <DialogDescription>
+                      Atualize as informações de contato do responsável.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <Form {...form}>
+                    <form onSubmit={handleUpdateSubmit} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="responsible"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Responsável</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Telefone</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>E-mail</FormLabel>
+                            <FormControl>
+                              <Input type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="flex justify-end gap-2 pt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsEditDialogOpen(false)}
+                          disabled={isUpdating}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="text-white"
+                          disabled={isUpdating}
+                        >
+                          {isUpdating ? (
+                            <span className="flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Salvando...
+                            </span>
+                          ) : (
+                            "Salvar alterações"
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="outline"
+                onClick={handleCancelInscription}
+                disabled={isCancelling}
+                className={`flex items-center gap-2 ${
+                  inscriptionData.status.toLowerCase() === "cancelled"
+                    ? "border-green-500 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700"
+                    : "border-orange-500 text-orange-600 hover:bg-orange-50 hover:border-orange-600 hover:text-orange-700"
+                }`}
+              >
+                {inscriptionData.status.toLowerCase() === "cancelled" ? (
+                  <CheckCircle className="h-4 w-4" />
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
+                {isCancelling
+                  ? inscriptionData.status.toLowerCase() === "cancelled"
+                    ? "Reativando..."
+                    : "Cancelando..."
+                  : inscriptionData.status.toLowerCase() === "cancelled"
+                    ? "Reativar Inscrição"
+                    : "Cancelar Inscrição"}
+              </Button>
+            </div>
           )}
 
           <Button
