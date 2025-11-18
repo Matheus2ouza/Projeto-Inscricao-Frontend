@@ -18,7 +18,7 @@ export async function getInscriptionDetails(
         },
       }
     );
-
+    console.log(data)
     return data;
   } catch (error) {
     const axiosError = error as {
