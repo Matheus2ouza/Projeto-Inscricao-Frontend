@@ -80,7 +80,7 @@ import {
   Trash2,
   User,
 } from "lucide-react";
-import { MouseEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
   InscriptionDetails,
@@ -123,12 +123,10 @@ export default function DetailsInscriptionsTable({
   const [selectedParticipant, setSelectedParticipant] =
     useState<Participant | null>(null);
   const resolvedEventId = eventId ?? data?.eventId ?? "";
-  const {
-    data: typeInscriptionList,
-    isLoading: isLoadingTypeInscriptions,
-  } = useTypeInscriptionsQuery(resolvedEventId, {
-    enabled: Boolean(resolvedEventId),
-  });
+  const { data: typeInscriptionList, isLoading: isLoadingTypeInscriptions } =
+    useTypeInscriptionsQuery(resolvedEventId, {
+      enabled: Boolean(resolvedEventId),
+    });
   const typeInscriptionOptions = useMemo<TypeInscriptionOption[]>(() => {
     if (!typeInscriptionList) return [];
     return typeInscriptionList.map((type) => ({
@@ -285,17 +283,7 @@ export default function DetailsInscriptionsTable({
     setRegisterPaymentOpen(true);
   };
   const handleTabChange = (value: string) => {
-    if (value === "payments" && data?.status === "UNDER_REVIEW") {
-      return;
-    }
     setActiveTab(value);
-  };
-
-  const handlePaymentsTriggerClick = (event: MouseEvent<HTMLButtonElement>) => {
-    if (data?.status === "UNDER_REVIEW") {
-      event.preventDefault();
-      showUnderReviewToast();
-    }
   };
 
   // Função para fazer download da imagem
@@ -731,7 +719,6 @@ export default function DetailsInscriptionsTable({
             <TabsTrigger
               value="payments"
               className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-3"
-              onClick={handlePaymentsTriggerClick}
             >
               <CreditCard className="h-3 w-3 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Pagamentos</span>
@@ -1010,6 +997,7 @@ export default function DetailsInscriptionsTable({
                   <Button
                     onClick={handleRegisterPayment}
                     className="dark:text-white"
+                    disabled={data.status === "UNDER_REVIEW"}
                   >
                     <Plus className="h-4 w-4 mr-2 dark:text-white" />
                     Registrar Pagamento
@@ -1232,6 +1220,7 @@ export default function DetailsInscriptionsTable({
                     <Button
                       onClick={handleRegisterPayment}
                       className="dark:text-white"
+                      disabled={data.status === "UNDER_REVIEW"}
                     >
                       <Plus className="h-4 w-4 mr-2 dark:text-white" />
                       Registrar Primeiro Pagamento
