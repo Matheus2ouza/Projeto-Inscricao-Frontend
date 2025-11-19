@@ -120,24 +120,10 @@ export function useInscriptionActions() {
     }
   };
 
-  // Função para download
-  const handleDownloadList = async (inscriptionId: string) => {
-    try {
-      // TODO: Implementar download do PDF
-      console.log("Baixando lista da inscrição:", inscriptionId);
-      // Simular download
-      toast.success("Download iniciado!");
-    } catch (error) {
-      console.error("Erro ao baixar lista:", error);
-      toast.error("Erro ao baixar lista. Tente novamente.");
-    }
-  };
-
   return {
     approveInscription: handleApproveInscription,
     cancelInscription: handleCancelInscription,
     deleteInscription: handleDeleteInscription,
-    downloadList: handleDownloadList,
     isApproving: updateStatusMutation.isPending,
     isCancelling: updateStatusMutation.isPending,
     isDeleting: deleteMutation.isPending,

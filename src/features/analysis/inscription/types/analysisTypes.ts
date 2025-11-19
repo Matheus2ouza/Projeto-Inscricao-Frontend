@@ -50,16 +50,19 @@ export type AnalysisInscriptionResponse = {
   email?: string;
   phone: string;
   status: string;
-  participants: {
-    id: string;
-    name: string;
-    birthDate: string; // String ISO format from backend
-    gender: string;
-  }[];
+  participants: Participants;
   total: number;
   page: number;
   pageCount: number;
 };
+
+export type Participants = {
+  id: string;
+  name: string;
+  birthDate: Date;
+  typeInscription?: string;
+  gender: string;
+}[];
 
 // Manter compatibilidade com nome antigo
 export type InscriptionDetailResponse = AnalysisInscriptionResponse;

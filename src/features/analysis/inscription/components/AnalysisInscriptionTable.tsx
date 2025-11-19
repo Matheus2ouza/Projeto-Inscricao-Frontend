@@ -10,6 +10,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -251,7 +252,12 @@ export default function AnalysisInscriptionTable() {
                     )}
                   </CardBody>
                   <CardFooter className="flex flex-col items-start p-4 gap-3 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
-                    <h3 className="font-bold text-lg mb-1 line-clamp-2 text-gray-900 dark:text-white">
+                    <h3
+                      className={`font-bold ${getFontSizeClass(
+                        event.name,
+                        true
+                      )} mb-1 line-clamp-2 text-gray-900 dark:text-white`}
+                    >
                       {event.name}
                     </h3>
 

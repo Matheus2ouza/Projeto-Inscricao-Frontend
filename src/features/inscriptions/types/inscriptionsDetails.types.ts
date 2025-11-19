@@ -11,6 +11,7 @@ export interface Payment {
 export interface Participant {
   id: string;
   typeInscription: string | undefined;
+  typeInscriptionId?: string;
   name: string;
   birthDate: Date | string;
   gender: string;

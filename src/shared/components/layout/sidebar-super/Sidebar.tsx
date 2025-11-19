@@ -191,14 +191,6 @@ export default function veAppSidebarSuper({
                               <span>Analizar Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
-                              href="/super/inscriptions/avulsa"
-                              className="gap-2"
-                            >
-                              <span>Inscrição Avulsas</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </Collapsible>

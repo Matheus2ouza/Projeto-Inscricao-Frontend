@@ -36,8 +36,11 @@ export function ComboboxAccount({
 }: ComboboxAccountProps) {
   const [open, setOpen] = React.useState(false);
   const shouldFetch = options === undefined;
-  const { accounts: fetched, loading: internalLoading, error } =
-    useAccount(shouldFetch);
+  const {
+    accounts: fetched,
+    loading: internalLoading,
+    error,
+  } = useAccount(shouldFetch);
   const loading = loadingProp ?? internalLoading;
 
   // Preferência: props.options > API; fallback: []

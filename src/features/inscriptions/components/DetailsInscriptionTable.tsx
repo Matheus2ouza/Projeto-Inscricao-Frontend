@@ -1,7 +1,13 @@
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { downloadParticipantsPdf } from "@/features/inscriptions/api/downloadParticipantsPdf";
 import { useUpdateInscription } from "@/features/inscriptions/hooks/useEditInscription";
+import { useParticipantActions } from "@/features/participants/hooks/useParticipantActions";
 import RegisterPaymentDialog from "@/features/payment/components/RegisterPaymentDialog";
+import {
+  ComboboxTypeInscription,
+  TypeInscriptionOption,
+} from "@/features/typeInscription/components/ComboboxTypeInscription";
+import { useTypeInscriptionsQuery } from "@/features/typeInscription/hook/useTypeInscriptionsQuery";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -20,6 +26,12 @@ import {
   DialogTrigger,
 } from "@/shared/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import {
   Form,
   FormControl,
   FormField,
@@ -37,6 +49,13 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -53,23 +72,30 @@ import {
 import {
   CreditCard,
   Download,
+  Edit,
   Eye,
   Loader2,
+  MoreVertical,
   Plus,
   Trash2,
   User,
 } from "lucide-react";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { InscriptionDetails } from "../types/inscriptionsDetails.types";
+import {
+  InscriptionDetails,
+  Participant,
+} from "../types/inscriptionsDetails.types";
 
 interface InscriptionDetailsProps {
+  eventId?: string;
   data?: InscriptionDetails;
   isLoading?: boolean;
   error?: string | null;
 }
 
 export default function DetailsInscriptionsTable({
+  eventId,
   data,
   isLoading = false,
   error = null,
@@ -90,6 +116,45 @@ export default function DetailsInscriptionsTable({
   const { setLoading } = useGlobalLoading();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditParticipantDialogOpen, setIsEditParticipantDialogOpen] =
+    useState(false);
+  const [isDeleteParticipantDialogOpen, setIsDeleteParticipantDialogOpen] =
+    useState(false);
+  const [selectedParticipant, setSelectedParticipant] =
+    useState<Participant | null>(null);
+  const resolvedEventId = eventId ?? data?.eventId ?? "";
+  const {
+    data: typeInscriptionList,
+    isLoading: isLoadingTypeInscriptions,
+  } = useTypeInscriptionsQuery(resolvedEventId, {
+    enabled: Boolean(resolvedEventId),
+  });
+  const typeInscriptionOptions = useMemo<TypeInscriptionOption[]>(() => {
+    if (!typeInscriptionList) return [];
+    return typeInscriptionList.map((type) => ({
+      label: `${type.description} - ${new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(type.value)}`,
+      value: type.id,
+      description: type.description,
+      price: type.value,
+    }));
+  }, [typeInscriptionList]);
+  const matchedTypeInscriptionId = useMemo(() => {
+    if (!selectedParticipant) return undefined;
+    const fallbackId = selectedParticipant.typeInscriptionId ?? "";
+    const participantDescription = selectedParticipant.typeInscription
+      ?.trim()
+      .toLowerCase();
+    if (!participantDescription || !typeInscriptionList?.length) {
+      return fallbackId;
+    }
+    const match = typeInscriptionList.find(
+      (type) => type.description.trim().toLowerCase() === participantDescription
+    );
+    return match?.id ?? fallbackId;
+  }, [selectedParticipant, typeInscriptionList]);
   const {
     form,
     handleSubmit: handleUpdateSubmit,
@@ -107,6 +172,54 @@ export default function DetailsInscriptionsTable({
     onDeleteSuccess: () => {
       setIsDeleteDialogOpen(false);
       window.history.back();
+    },
+  });
+
+  // Formatar data para o formato esperado pela API (YYYY-MM-DD)
+  const formatBirthDateForAPI = (date: Date | string): string => {
+    if (typeof date === "string") {
+      // Se já é string, verificar se está no formato correto
+      if (date.includes("T")) {
+        return date.split("T")[0];
+      }
+      // Se está no formato DD/MM/YYYY, converter
+      if (date.includes("/")) {
+        const [day, month, year] = date.split("/");
+        return `${year}-${month}-${day}`;
+      }
+      return date;
+    }
+    // Se é Date, converter para YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const {
+    form: participantForm,
+    handleSubmit: handleParticipantUpdateSubmit,
+    isUpdating: isUpdatingParticipant,
+    handleDelete: handleParticipantDelete,
+    isDeleting: isDeletingParticipant,
+  } = useParticipantActions({
+    participantId: selectedParticipant?.id,
+    inscriptionId: data?.id,
+    initialValues: selectedParticipant
+      ? {
+          name: selectedParticipant.name,
+          birthDate: formatBirthDateForAPI(selectedParticipant.birthDate),
+          gender: selectedParticipant.gender,
+          typeInscriptionId: matchedTypeInscriptionId ?? "",
+        }
+      : undefined,
+    onSuccess: () => {
+      setIsEditParticipantDialogOpen(false);
+      setSelectedParticipant(null);
+    },
+    onDeleteSuccess: () => {
+      setIsDeleteParticipantDialogOpen(false);
+      setSelectedParticipant(null);
     },
   });
 
@@ -258,6 +371,24 @@ export default function DetailsInscriptionsTable({
 
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString("pt-BR");
+  };
+
+  const formatDateForInput = (date: Date | string) => {
+    const dateObj = typeof date === "string" ? new Date(date) : date;
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleEditParticipant = (participant: Participant) => {
+    setSelectedParticipant(participant);
+    setIsEditParticipantDialogOpen(true);
+  };
+
+  const handleDeleteParticipant = (participant: Participant) => {
+    setSelectedParticipant(participant);
+    setIsDeleteParticipantDialogOpen(true);
   };
 
   const formatDateTime = (date: Date | string) => {
@@ -564,9 +695,9 @@ export default function DetailsInscriptionsTable({
               </div>
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Valor Total
+                  Saldo devedor
                 </p>
-                <p className="text-lg font-bold text-primary">
+                <p className="text-lg font-bold text-red-500">
                   {formatCurrency(data.totalValue)}
                 </p>
               </div>
@@ -637,16 +768,16 @@ export default function DetailsInscriptionsTable({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-xs sm:text-sm">
+                        <TableHead className="text-xs sm:text-sm w-auto">
                           Nome
                         </TableHead>
-                        <TableHead className="hidden sm:table-cell text-xs sm:text-sm">
+                        <TableHead className="hidden sm:table-cell text-xs sm:text-sm w-auto">
                           Tipo de Inscrição
                         </TableHead>
-                        <TableHead className="hidden md:table-cell text-xs sm:text-sm">
+                        <TableHead className="hidden md:table-cell text-xs sm:text-sm w-auto">
                           Data de Nascimento
                         </TableHead>
-                        <TableHead className="text-xs sm:text-sm">
+                        <TableHead className="text-xs sm:text-sm w-auto">
                           Idade
                         </TableHead>
                         <TableHead className="hidden lg:table-cell text-xs sm:text-sm">
@@ -693,13 +824,114 @@ export default function DetailsInscriptionsTable({
                             {calculateAge(participant.birthDate)} anos
                           </TableCell>
                           <TableCell className="hidden lg:table-cell">
-                            <Badge variant="outline" className="text-xs">
-                              {participant.gender === "MASCULINO"
-                                ? "Masculino"
-                                : participant.gender === "FEMININO"
-                                  ? "Feminino"
-                                  : participant.gender}
-                            </Badge>
+                            <div className="flex items-center justify-between gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {participant.gender === "MASCULINO"
+                                  ? "Masculino"
+                                  : participant.gender === "FEMININO"
+                                    ? "Feminino"
+                                    : participant.gender}
+                              </Badge>
+                              <DropdownMenu modal={false}>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 flex-shrink-0"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  onCloseAutoFocus={(e) => e.preventDefault()}
+                                >
+                                  <DropdownMenuItem
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      handleEditParticipant(participant);
+                                    }}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Editar
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    variant="destructive"
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      handleDeleteParticipant(participant);
+                                    }}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Deletar
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </TableCell>
+                          <TableCell className="lg:hidden">
+                            <div className="flex items-center justify-between gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {participant.gender === "MASCULINO"
+                                  ? "Masculino"
+                                  : participant.gender === "FEMININO"
+                                    ? "Feminino"
+                                    : participant.gender}
+                              </Badge>
+                              <DropdownMenu modal={false}>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 flex-shrink-0"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                    }}
+                                  >
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  onCloseAutoFocus={(e) => e.preventDefault()}
+                                >
+                                  <DropdownMenuItem
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      handleEditParticipant(participant);
+                                    }}
+                                  >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Editar
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    variant="destructive"
+                                    onSelect={(e) => {
+                                      e.preventDefault();
+                                      handleDeleteParticipant(participant);
+                                    }}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Deletar
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -1086,6 +1318,155 @@ export default function DetailsInscriptionsTable({
         cancelText="Cancelar"
         variant="destructive"
         isLoading={isDeleting}
+      />
+
+      {/* Dialog de Edição de Participante */}
+      <Dialog
+        open={isEditParticipantDialogOpen}
+        onOpenChange={setIsEditParticipantDialogOpen}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Participante</DialogTitle>
+            <DialogDescription>
+              Atualize as informações do participante.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...participantForm}>
+            <form
+              onSubmit={handleParticipantUpdateSubmit}
+              className="space-y-4"
+            >
+              <FormField
+                control={participantForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={participantForm.control}
+                name="birthDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data de Nascimento</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        value={
+                          field.value ? formatDateForInput(field.value) : ""
+                        }
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={participantForm.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gênero</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o gênero" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="MASCULINO">Masculino</SelectItem>
+                        <SelectItem value="FEMININO">Feminino</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={participantForm.control}
+                name="typeInscriptionId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Inscrição</FormLabel>
+                    <FormControl>
+                      {resolvedEventId ? (
+                        <ComboboxTypeInscription
+                          eventId={resolvedEventId}
+                          value={field.value}
+                          onChange={field.onChange}
+                          options={typeInscriptionOptions}
+                          loading={isLoadingTypeInscriptions}
+                        />
+                      ) : (
+                        <Input
+                          placeholder="Carregando tipos de inscrição..."
+                          disabled
+                        />
+                      )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditParticipantDialogOpen(false);
+                    setSelectedParticipant(null);
+                  }}
+                  disabled={isUpdatingParticipant}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="text-white"
+                  disabled={isUpdatingParticipant}
+                >
+                  {isUpdatingParticipant ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Salvando...
+                    </span>
+                  ) : (
+                    "Salvar alterações"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de Confirmação de Exclusão de Participante */}
+      <ConfirmationDialog
+        open={isDeleteParticipantDialogOpen}
+        onOpenChange={setIsDeleteParticipantDialogOpen}
+        onConfirm={handleParticipantDelete}
+        title="Excluir Participante"
+        message={`Tem certeza que deseja excluir o participante "${selectedParticipant?.name}"? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        variant="destructive"
+        isLoading={isDeletingParticipant}
       />
     </>
   );

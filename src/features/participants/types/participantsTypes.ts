@@ -72,3 +72,9 @@ export type UseParticipantsResult = {
   refetch: () => Promise<void>;
 };
 
+export type UpdateParticipantInput = {
+  name: string;
+  birthDate: string;
+  gender: string;
+  typeInscriptionId?: string;
+};
