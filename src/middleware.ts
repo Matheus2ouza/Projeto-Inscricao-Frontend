@@ -2,6 +2,10 @@ import { MiddlewareConfig, NextRequest, NextResponse } from "next/server";
 import { verifySession } from "./shared/lib/session";
 
 const REDIRECT_WHEN_NOT_AUTHENTICATED = "/login";
+const MAINTENANCE_MODE =
+  process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true" ||
+  process.env.MAINTENANCE_MODE === "true";
+const MAINTENANCE_PATH = "/maintenance";
 
 function isPublicPath(pathname: string): boolean {
   if (pathname === "/" || pathname === "/documentation") return true;
@@ -16,6 +20,17 @@ function shouldRedirectWhenAuthenticated(pathname: string): boolean {
 
 export default async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  if (MAINTENANCE_MODE) {
+    if (!pathname.startsWith(MAINTENANCE_PATH)) {
+      const maintenanceUrl = request.nextUrl.clone();
+      maintenanceUrl.pathname = MAINTENANCE_PATH;
+      maintenanceUrl.search = "";
+      return NextResponse.rewrite(maintenanceUrl);
+    }
+    return NextResponse.next();
+  }
+
   const authToken = request.cookies.get("authToken")?.value;
   const isPublic = isPublicPath(pathname);
 
