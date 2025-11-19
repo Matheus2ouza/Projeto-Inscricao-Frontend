@@ -29,7 +29,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useEventResponsible } from "../hooks/useEventResponsible";
 import { useInvalidateEventsQuery } from "../hooks/useEventsQuery";
@@ -51,6 +51,7 @@ export default function EventManagement({
   const [showAmount, setShowAmount] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentType, setCurrentType] = useState<TypeInscriptions | null>(null);
+  const dialogScrollPositionRef = useRef(0);
 
   const {
     isEditing,
@@ -121,13 +122,33 @@ export default function EventManagement({
 
   // Funções para gerenciar tipos de inscrição
   const handleCreateType = () => {
+    dialogScrollPositionRef.current =
+      typeof window !== "undefined" ? window.scrollY : 0;
     setCurrentType(null);
     setDialogOpen(true);
+    requestAnimationFrame(() => {
+      if (typeof window !== "undefined") {
+        window.scrollTo({
+          top: dialogScrollPositionRef.current,
+          behavior: "auto",
+        });
+      }
+    });
   };
 
   const handleEditType = (type: TypeInscriptions) => {
+    dialogScrollPositionRef.current =
+      typeof window !== "undefined" ? window.scrollY : 0;
     setCurrentType(type);
     setDialogOpen(true);
+    requestAnimationFrame(() => {
+      if (typeof window !== "undefined") {
+        window.scrollTo({
+          top: dialogScrollPositionRef.current,
+          behavior: "auto",
+        });
+      }
+    });
   };
 
   const handleDeleteType = async (type: TypeInscriptions) => {
@@ -148,6 +169,7 @@ export default function EventManagement({
   const handleSubmitType = async (data: {
     description: string;
     value: number;
+    specialType: boolean;
   }) => {
     try {
       if (currentType) {
@@ -576,9 +598,19 @@ export default function EventManagement({
                       className="flex items-center justify-between p-4 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
                     >
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900 dark:text-white">
-                          {type.description}
-                        </h4>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-medium text-gray-900 dark:text-white uppercase">
+                            {type.description}
+                          </h4>
+                          {type.specialType && (
+                            <Badge
+                              variant="secondary"
+                              className="flex items-center gap-1 text-xs uppercase tracking-wide"
+                            >
+                              Especial
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {formatCurrency(type.value)}
                         </p>
@@ -592,7 +624,7 @@ export default function EventManagement({
                           Editar
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="destructive"
                           size="sm"
                           onClick={() => handleDeleteType(type)}
                         >
