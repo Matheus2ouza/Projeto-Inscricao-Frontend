@@ -1,9 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
+import { Switch } from "@/shared/components/ui/switch";
+import React, { useEffect } from "react";
 import { TypeInscriptions } from "../types/typesInscriptionsTypes";
 
 interface TypeInscriptionDialogProps {
@@ -19,7 +20,11 @@ interface TypeInscriptionDialogProps {
   onOpenChange: (open: boolean) => void;
   typeInscription?: TypeInscriptions | null;
   eventId: string;
-  onSubmit: (data: { description: string; value: number }) => Promise<void>;
+  onSubmit: (data: {
+    description: string;
+    value: number;
+    specialType: boolean;
+  }) => Promise<void>;
   loading: boolean;
 }
 
@@ -33,14 +38,17 @@ export default function TypeInscriptionDialog({
 }: TypeInscriptionDialogProps) {
   const [description, setDescription] = React.useState("");
   const [value, setValue] = React.useState<number | string>("");
+  const [specialType, setSpecialType] = React.useState(false);
 
   useEffect(() => {
     if (typeInscription) {
       setDescription(typeInscription.description);
       setValue(typeInscription.value);
+      setSpecialType(Boolean(typeInscription.specialType));
     } else {
       setDescription("");
       setValue("");
+      setSpecialType(false);
     }
   }, [typeInscription, open]);
 
@@ -49,13 +57,14 @@ export default function TypeInscriptionDialog({
     await onSubmit({
       description,
       value: Number(value),
+      specialType,
     });
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
@@ -80,6 +89,7 @@ export default function TypeInscriptionDialog({
                 required
               />
             </div>
+
             <div className="grid gap-2">
               <Label htmlFor="value">Valor (R$)</Label>
               <Input
@@ -90,6 +100,22 @@ export default function TypeInscriptionDialog({
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="0,00"
                 required
+              />
+            </div>
+
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <Label htmlFor="specialType" className="font-medium">
+                  Tipo de inscrição especial
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Define se este tipo possui validação especial para inscrição.
+                </p>
+              </div>
+              <Switch
+                id="specialType"
+                checked={specialType}
+                onCheckedChange={setSpecialType}
               />
             </div>
           </div>
