@@ -1,5 +1,6 @@
 "use client";
 
+import { ComboboxTypeInscription } from "@/features/typeInscription/components/ComboboxTypeInscription";
 import { Button } from "@/shared/components/ui/button";
 import {
   Card,
@@ -260,84 +261,26 @@ export default function IndividualInscriptionForm({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="typeInscriptionId">Tipo de inscrição *</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="typeInscriptionId"
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-full justify-between",
-                        formErrors.typeInscriptionId &&
-                          "border-red-500 focus:border-red-500"
-                      )}
-                      aria-expanded={false}
-                    >
-                      <span
-                        className={cn(
-                          formData.typeInscriptionId
-                            ? "text-blue-700 dark:text-blue-300 font-semibold"
-                            : "text-gray-700 dark:text-gray-200"
-                        )}
-                      >
-                        {formData.typeInscriptionId
-                          ? (() => {
-                              const selected = typeInscriptions.find(
-                                (t) => t.id === formData.typeInscriptionId
-                              );
-                              return selected
-                                ? `${selected.description} - R$ ${selected.value?.toFixed(2) || "0.00"}`
-                                : "Selecione o tipo de inscrição";
-                            })()
-                          : "Selecione o tipo de inscrição"}
-                      </span>
-                      <ChevronsUpDown
-                        className={cn(
-                          "opacity-50",
-                          formData.typeInscriptionId ? "text-blue-700" : ""
-                        )}
-                      />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[260px] p-0">
-                    <Command>
-                      <CommandList>
-                        <CommandEmpty>Nenhum tipo encontrado.</CommandEmpty>
-                        <CommandGroup>
-                          {typeInscriptions.map((type) => (
-                            <CommandItem
-                              key={type.id}
-                              value={type.id}
-                              onSelect={(currentValue) => {
-                                const event = {
-                                  target: {
-                                    name: "typeInscriptionId",
-                                    value: currentValue,
-                                  },
-                                } as unknown as React.ChangeEvent<HTMLInputElement>;
-                                handleInputChange(event);
-                              }}
-                              className="flex items-center justify-between"
-                            >
-                              <span className="flex-1">
-                                {type.description} - R${" "}
-                                {type.value?.toFixed(2) || "0.00"}
-                              </span>
-                              <Check
-                                className={cn(
-                                  "h-4 w-4 ml-2",
-                                  formData.typeInscriptionId === type.id
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <div
+                  className={cn(
+                    formErrors.typeInscriptionId &&
+                      "[&_button]:border-red-500 [&_button]:focus:border-red-500"
+                  )}
+                >
+                  <ComboboxTypeInscription
+                    eventId={eventId}
+                    value={formData.typeInscriptionId}
+                    onChange={(selectedValue) => {
+                      const event = {
+                        target: {
+                          name: "typeInscriptionId",
+                          value: selectedValue,
+                        },
+                      } as unknown as React.ChangeEvent<HTMLInputElement>;
+                      handleInputChange(event);
+                    }}
+                  />
+                </div>
                 {formErrors.typeInscriptionId && (
                   <p className="text-red-500 text-sm mt-1">
                     {formErrors.typeInscriptionId.message}

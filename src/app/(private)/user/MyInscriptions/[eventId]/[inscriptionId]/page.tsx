@@ -14,7 +14,6 @@ export default function DetailsInscriptionsPage() {
   const { data, isLoading, error } = useInscriptionDetails({ inscriptionId });
 
   const handleBack = () => {
-    // Voltar para a página do evento
     router.back();
   };
 
@@ -36,6 +35,7 @@ export default function DetailsInscriptionsPage() {
       backButtonAction={handleBack}
     >
       <DetailsInscriptionsTable
+        eventId={eventId}
         data={data}
         isLoading={isLoading}
         error={error?.message || null}
