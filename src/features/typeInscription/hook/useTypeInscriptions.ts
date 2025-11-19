@@ -16,7 +16,6 @@ export function useTypeInscriptions(eventId: string) {
   const create = async (input: CreateTypeInscriptionInput) => {
     try {
       setLoading(true);
-      console.log(input);
       const newType = await createTypeInscription(input);
       toast.success("Tipo de inscrição criado com sucesso!");
       return newType;
