@@ -5,6 +5,7 @@ export type CreateTypeInscriptionInput = {
   description: string;
   value: number;
   eventId: string;
+  specialType: boolean;
 };
 
 export async function createTypeInscription(
