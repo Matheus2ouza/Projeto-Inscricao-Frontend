@@ -5,7 +5,7 @@ import { useEventsAll } from "@/features/events/hooks/useEventsAll";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@heroui/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 export const PAGE_SIZE = 4;
 
 export default function EventsSuperPage() {
