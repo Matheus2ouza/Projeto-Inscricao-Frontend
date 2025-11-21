@@ -5,6 +5,13 @@ export async function deleteEvent(eventId: string): Promise<void> {
     await axiosInstance.delete(`/events/${eventId}`);
   } catch (error) {
     console.error("Error deleting event:", error);
-    throw new Error("Falha ao excluir evento");
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
+    throw new Error(
+      axiosError.response?.data?.message ||
+      "Falha ao tentar deletar o evento"
+    );
   }
 }

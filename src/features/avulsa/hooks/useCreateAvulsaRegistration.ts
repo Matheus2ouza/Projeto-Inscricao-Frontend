@@ -1,13 +1,21 @@
 import { eventsKeys } from "@/features/events/hooks/useEventsQuery";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  UseMutationResult,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createAvulsaRegistration } from "../api/createAvulsaRegistration";
 import { avulsaKeys, CreateInscriptionAvulInput } from "../types/avulsaTypes";
 
-export function useCreateAvulsaRegistration() {
+export function useCreateAvulsaRegistration(): UseMutationResult<
+  { id: string },
+  Error,
+  CreateInscriptionAvulInput
+> {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<{ id: string }, Error, CreateInscriptionAvulInput>({
     mutationFn: (data: CreateInscriptionAvulInput) =>
       createAvulsaRegistration(data),
     onSuccess: (result, variables) => {

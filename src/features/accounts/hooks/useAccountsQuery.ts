@@ -6,15 +6,21 @@ import { getAccont, type AccountDto } from "../api/getUsersCombobox";
 export const accountsKeys = {
   all: ["accounts"] as const,
   lists: () => [...accountsKeys.all, "list"] as const,
-  combobox: () => [...accountsKeys.lists(), "combobox"] as const,
+  combobox: (rolesKey: string | null = null) =>
+    [...accountsKeys.lists(), "combobox", rolesKey] as const,
   details: () => [...accountsKeys.all, "detail"] as const,
   detail: (id: string) => [...accountsKeys.details(), id] as const,
 };
 
-export function useAccountsComboboxQuery(enabled: boolean = true) {
+export function useAccountsComboboxQuery(
+  enabled: boolean = true,
+  roles?: string[]
+) {
+  const rolesKey = roles?.length ? roles.slice().sort().join(",") : null;
+
   return useQuery<AccountDto[]>({
-    queryKey: accountsKeys.combobox(),
-    queryFn: () => getAccont(),
+    queryKey: accountsKeys.combobox(rolesKey),
+    queryFn: () => getAccont(roles),
     enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

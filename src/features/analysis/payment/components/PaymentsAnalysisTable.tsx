@@ -13,7 +13,6 @@ import {
   Menu,
   Users,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PaymentAnalysisResponse } from "../types/analysisTypes";
 
@@ -23,6 +22,7 @@ interface PaymentsAnalysisTableProps {
   analysisData: PaymentAnalysisResponse | null;
   loading: boolean;
   error: string | Error | null;
+  onViewPayment: (inscriptionId: string, eventStatus: string) => void;
 }
 
 export default function PaymentsAnalysisTable({
@@ -31,8 +31,8 @@ export default function PaymentsAnalysisTable({
   analysisData,
   loading,
   error,
+  onViewPayment,
 }: PaymentsAnalysisTableProps) {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<{
     field: string;
@@ -462,21 +462,15 @@ export default function PaymentsAnalysisTable({
                             <tbody>
                               {account.inscriptions.map(
                                 (inscription, index) => (
-                                  <tr
-                                    key={`${account.id}-${index}`}
-                                    className="border-t hover:bg-muted/50 cursor-pointer transition-colors"
-                                    onClick={() => {
-                                      const eventStatus =
-                                        event?.status || "OPEN";
-                                      const queryParams = new URLSearchParams({
-                                        eventId,
-                                        eventStatus,
-                                      });
-                                      router.push(
-                                        `/super/payments/payment/${inscription.id}?${queryParams.toString()}`
-                                      );
-                                    }}
-                                  >
+                                    <tr
+                                      key={`${account.id}-${index}`}
+                                      className="border-t hover:bg-muted/50 cursor-pointer transition-colors"
+                                      onClick={() => {
+                                        const eventStatus =
+                                          event?.status || "OPEN";
+                                        onViewPayment(inscription.id, eventStatus);
+                                      }}
+                                    >
                                     <td className="px-3 py-3">
                                       <span className="font-medium text-sm">
                                         {inscription.responsible}

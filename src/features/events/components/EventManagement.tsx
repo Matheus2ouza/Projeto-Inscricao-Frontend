@@ -11,8 +11,8 @@ import ImageCropDialog from "@/shared/components/ImageCropDialog";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import { useCurrentUser } from "@/shared/context/user-context";
 import {
-  ArrowLeft,
   Calendar,
   DollarSign,
   Edit3,
@@ -27,9 +27,8 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useEventResponsible } from "../hooks/useEventResponsible";
 import { useInvalidateEventsQuery } from "../hooks/useEventsQuery";
@@ -47,6 +46,7 @@ export default function EventManagement({
   refetch,
 }: EventManagementProps) {
   const router = useRouter();
+  const { user } = useCurrentUser();
   const { invalidateDetail } = useInvalidateEventsQuery();
   const [showAmount, setShowAmount] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -85,6 +85,7 @@ export default function EventManagement({
   const [responsiblesDialogOpen, setResponsiblesDialogOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [isDeleteEventOpen, setisDeleteEventOpen] = useState(false);
   const [deleteResponsibleDialog, setDeleteResponsibleDialog] = useState<{
     open: boolean;
     responsibleId: string | null;
@@ -107,13 +108,24 @@ export default function EventManagement({
   };
 
   const getEventStatus = () => {
-    const today = new Date();
+    const now = new Date();
     const start = new Date(event.startDate);
     const end = new Date(event.endDate);
 
-    if (today < start) return { label: "Agendado", color: "bg-green-600" };
-    if (today > end) return { label: "Realizado", color: "bg-red-600" };
-    return { label: "Em Andamento", color: "bg-blue-600" };
+    if (now >= start && now <= end) {
+      return { label: "Em Andamento", color: "bg-blue-600" };
+    }
+
+    switch (event.status) {
+      case "OPEN":
+        return { label: "Inscrições Abertas", color: "bg-green-600" };
+      case "CLOSE":
+        return { label: "Inscrições Fechadas", color: "bg-amber-600" };
+      case "FINALIZED":
+        return { label: "Finalizado", color: "bg-red-600" };
+      default:
+        return { label: "Status desconhecido", color: "bg-gray-600" };
+    }
   };
 
   const statusBadge = getEventStatus();
@@ -187,27 +199,34 @@ export default function EventManagement({
     }
   };
 
+  const roleSegment = user?.role?.toLowerCase() === "super" ? "super" : "admin";
+
+  const handleManagerEvent = (event: Event) => {
+    const params = new URLSearchParams();
+    if (event.latitude && event.longitude) {
+      params.append("lat", event.latitude.toString());
+      params.append("lng", event.longitude.toString());
+    }
+    if (event.location) {
+      params.append("address", event.location);
+    }
+    router.push(
+      `/${roleSegment}/events/manager/${event.id}/location?${params.toString()}`
+    );
+  };
+
+  const handleConfirmDelete = useCallback(async () => {
+    const success = await handleDelete();
+    if (success) {
+      setisDeleteEventOpen(false);
+    }
+  }, [handleDelete]);
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" asChild>
-              <Link href="/super/events/manager">
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Gerenciar Evento
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Edite e visualize os detalhes do evento
-              </p>
-            </div>
-          </div>
-
+        <div className="flex items-center justify-end mb-8">
           <div className="flex items-center gap-3">
             {!isEditing ? (
               <>
@@ -247,7 +266,7 @@ export default function EventManagement({
                 <Button
                   variant="destructive"
                   className="flex items-center gap-2"
-                  onClick={handleDelete}
+                  onClick={() => setisDeleteEventOpen(true)}
                   disabled={loading}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -281,7 +300,6 @@ export default function EventManagement({
             )}
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Coluna Principal */}
           <div className="lg:col-span-2 space-y-6">
@@ -380,17 +398,7 @@ export default function EventManagement({
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      const params = new URLSearchParams();
-                      if (event.latitude && event.longitude) {
-                        params.append("lat", event.latitude.toString());
-                        params.append("lng", event.longitude.toString());
-                      }
-                      if (event.location) {
-                        params.append("address", event.location);
-                      }
-                      router.push(
-                        `/super/events/${event.id}/location?${params.toString()}`
-                      );
+                      handleManagerEvent(event);
                     }}
                     className="flex items-center gap-2"
                   >
@@ -738,7 +746,6 @@ export default function EventManagement({
             </div>
           </div>
         </div>
-
         {/* Diálogo para tipos de inscrição */}
         <TypeInscriptionDialog
           open={dialogOpen}
@@ -748,7 +755,6 @@ export default function EventManagement({
           onSubmit={handleSubmitType}
           loading={typeInscriptionLoading}
         />
-
         {/* Diálogo para gerenciar responsáveis */}
         {isEditing && (
           <ResponsiblesDialog
@@ -797,7 +803,18 @@ export default function EventManagement({
             }}
           />
         )}
-
+        {/* Diálogo de confirmação para excluir evento */}
+        <ConfirmationDialog
+          open={isDeleteEventOpen}
+          onOpenChange={setisDeleteEventOpen}
+          onConfirm={handleConfirmDelete}
+          title="Excluir evento?"
+          message="Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita."
+          confirmText="Excluir evento"
+          cancelText="Cancelar"
+          isLoading={loading}
+          variant="destructive"
+        />
         {/* Diálogo de confirmação para excluir responsável */}
         <ConfirmationDialog
           open={deleteResponsibleDialog.open}

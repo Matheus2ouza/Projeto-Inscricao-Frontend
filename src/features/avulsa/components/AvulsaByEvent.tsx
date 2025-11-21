@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import {
   Pagination,
@@ -12,9 +12,8 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { useAvulsaRegistrations } from "../hooks/useAvulsaRegistrations";
+import { useMemo } from "react";
+import type { ListAvulsaResponse } from "../types/avulsaTypes";
 
 const formatStatusLabel = (status: string) => {
   const normalized = status?.toLowerCase();
@@ -50,13 +49,29 @@ const statusBadgeVariant = (
   }
 };
 
-export default function AvulsaByEvent() {
-  const params = useParams();
-  const router = useRouter();
-  const eventId = params.id as string;
-  const [page, setPage] = useState(1);
-  const pageSize = 15;
+interface AvulsaByEventProps {
+  data?: ListAvulsaResponse;
+  isLoading: boolean;
+  error: string | null;
+  page: number;
+  pageCount: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onCreate: () => void;
+  onViewDetails: (registrationId: string) => void;
+}
 
+export default function AvulsaByEvent({
+  data,
+  isLoading,
+  error,
+  page,
+  pageCount,
+  pageSize,
+  onPageChange,
+  onCreate,
+  onViewDetails,
+}: AvulsaByEventProps) {
   const currencyFormatter = useMemo(
     () =>
       new Intl.NumberFormat("pt-BR", {
@@ -75,16 +90,6 @@ export default function AvulsaByEvent() {
     []
   );
 
-  const { data, isLoading, error } = useAvulsaRegistrations(
-    eventId,
-    page,
-    pageSize
-  );
-
-  const goToCreate = () => {
-    router.push(`/super/inscriptions/avulsa/create/${eventId}`);
-  };
-
   const totals = data?.totals;
   const formatCreatedAt = (value: string) => {
     const createdAtDate = new Date(value);
@@ -95,29 +100,16 @@ export default function AvulsaByEvent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Inscrições Avulsas
-            </h1>
-            {data && (
-              <p className="text-sm text-muted-foreground">
-                {data.total} inscrição
-                {data.total === 1 ? "" : "ões"} registradas
-              </p>
-            )}
-          </div>
-          <Button onClick={goToCreate}>Nova Inscrição Avulsa</Button>
+        <div className="flex items-center justify-end gap-4 flex-wrap">
+          <Button onClick={onCreate}>Nova Inscrição Avulsa</Button>
         </div>
 
         {error && (
           <Card className="border-0 shadow-sm">
             <CardContent className="p-6 text-center text-red-600">
-              {error instanceof Error
-                ? error.message
-                : "Erro ao carregar inscrições avulsas"}
+              {error}
             </CardContent>
           </Card>
         )}
@@ -199,9 +191,7 @@ export default function AvulsaByEvent() {
                   </div>
                   <Button
                     variant="outline"
-                    onClick={() =>
-                      router.push(`/super/inscriptions/avulsa/${registration.id}`)
-                    }
+                    onClick={() => onViewDetails(registration.id)}
                   >
                     Detalhes
                   </Button>
@@ -209,22 +199,25 @@ export default function AvulsaByEvent() {
               </Card>
             ))}
 
-            {data.pageCount > 1 && (
+            {pageCount > 1 && (
               <div className="flex justify-center pt-2">
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        onClick={() => setPage(Math.max(1, page - 1))}
+                        onClick={() => onPageChange(Math.max(1, page - 1))}
                         href="#"
+                        className={
+                          page === 1 ? "pointer-events-none opacity-50" : ""
+                        }
                       />
                     </PaginationItem>
-                    {Array.from({ length: data.pageCount }, (_, i) => (
+                    {Array.from({ length: pageCount }, (_, i) => (
                       <PaginationItem key={i}>
                         <PaginationLink
                           isActive={page === i + 1}
                           href="#"
-                          onClick={() => setPage(i + 1)}
+                          onClick={() => onPageChange(i + 1)}
                         >
                           {i + 1}
                         </PaginationLink>
@@ -233,9 +226,14 @@ export default function AvulsaByEvent() {
                     <PaginationItem>
                       <PaginationNext
                         onClick={() =>
-                          setPage(Math.min(data.pageCount, page + 1))
+                          onPageChange(Math.min(pageCount, page + 1))
                         }
                         href="#"
+                        className={
+                          page === pageCount
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>

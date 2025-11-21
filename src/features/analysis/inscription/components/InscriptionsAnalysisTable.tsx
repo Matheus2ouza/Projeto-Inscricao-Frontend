@@ -4,8 +4,11 @@ import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import {
+  getStatusInscriptionColor,
+  getStatusInscriptionText,
+} from "@/shared/utils/getStatusColor";
+import {
   ArrowDown,
-  ArrowLeft,
   ArrowUp,
   Calendar,
   ChevronDown,
@@ -15,14 +18,32 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useInscriptionsForAnalysis } from "../hooks/useInscriptionsForAnalysis";
+import type { InscriptionAnalysisResponse } from "../types/analysisTypes";
 
-export default function InscriptionsAnalysisTable() {
-  const params = useParams();
-  const router = useRouter();
-  const eventId = params.id as string;
+interface InscriptionsAnalysisTableProps {
+  analysisData: InscriptionAnalysisResponse | null;
+  loading: boolean;
+  error: string | null;
+  page: number;
+  pageCount: number;
+  total: number;
+  onPageChange: (page: number) => void;
+  onViewInscription: (inscriptionId: string) => void;
+  listPath: string;
+}
+
+export default function InscriptionsAnalysisTable({
+  analysisData,
+  loading,
+  error,
+  page,
+  pageCount,
+  total,
+  onPageChange,
+  onViewInscription,
+  listPath,
+}: InscriptionsAnalysisTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<{
     field: string;
@@ -32,16 +53,8 @@ export default function InscriptionsAnalysisTable() {
     new Set()
   );
 
-  const { analysisData, loading, error, page, pageCount, total, setPage } =
-    useInscriptionsForAnalysis({
-      eventId,
-      initialPage: 1,
-      pageSize: 15,
-    });
-
-  // Vai para o app/(private)/super/inscriptions/analysis/inscription/[id]
   const handleInscriptionClick = (inscriptionId: string) => {
-    router.push(`/super/inscriptions/analysis/inscription/${inscriptionId}`);
+    onViewInscription(inscriptionId);
   };
 
   // Alternar expansão de uma conta
@@ -55,36 +68,6 @@ export default function InscriptionsAnalysisTable() {
       }
       return newSet;
     });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-      case "paid":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      case "under_review":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
-        return "PENDENTE";
-      case "paid":
-        return "APROVADA";
-      case "cancelled":
-        return "REJEITADA";
-      case "under_review":
-        return "EM ANÁLISE";
-      default:
-        return status.toUpperCase();
-    }
   };
 
   // Filtro local por nome do responsável ou telefone
@@ -194,9 +177,7 @@ export default function InscriptionsAnalysisTable() {
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
             <Button asChild className="w-full">
-              <Link href="/super/inscriptions/analysis">
-                Voltar para Análise
-              </Link>
+              <Link href={listPath}>Voltar para Análise</Link>
             </Button>
           </CardContent>
         </Card>
@@ -205,24 +186,8 @@ export default function InscriptionsAnalysisTable() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" asChild>
-              <Link href="/super/inscriptions/analysis">
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Análise de Inscrições
-              </h1>
-            </div>
-          </div>
-        </div>
-
         {/* Cards de Informações */}
         {analysisData && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -643,11 +608,13 @@ export default function InscriptionsAnalysisTable() {
                                       </td>
                                       <td className="px-3 py-3 text-center">
                                         <span
-                                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusInscriptionColor(
                                             inscription.status
                                           )}`}
                                         >
-                                          {getStatusText(inscription.status)}
+                                          {getStatusInscriptionText(
+                                            inscription.status
+                                          )}
                                         </span>
                                       </td>
                                     </tr>

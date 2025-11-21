@@ -14,7 +14,6 @@ import { generateGradient } from "@/shared/utils/getgenerateGradient";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Events } from "../types/participantsTypes";
 
@@ -23,6 +22,7 @@ interface SelectEventTableProps {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  onSelectEvent: (eventId: string) => void;
 }
 
 export default function SelectEventTable({
@@ -30,16 +30,11 @@ export default function SelectEventTable({
   page,
   pageCount,
   onPageChange,
+  onSelectEvent,
 }: SelectEventTableProps) {
-  const router = useRouter();
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
-
-  // Função para navegar para a página de participantes do evento
-  const handleSelectEvent = (eventId: string) => {
-    router.push(`/super/participants/${eventId}`);
-  };
 
   // Função para quando a imagem carregar
   const handleImageLoad = (eventId: string) => {
@@ -164,7 +159,7 @@ export default function SelectEventTable({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSelectEvent(event.id)}
+                    onClick={() => onSelectEvent(event.id)}
                   >
                     Ver Participantes
                   </Button>

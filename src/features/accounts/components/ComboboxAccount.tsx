@@ -19,13 +19,19 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 import { useAccount } from "../hooks/useAccount";
 
-export type AccountOption = { label: string; value: string };
+export type AccountOption = {
+  label: string;
+  value: string;
+  role?: string;
+};
 
 export type ComboboxAccountProps = {
   value: string[];
   onChange: (value: string[]) => void;
   options?: AccountOption[];
   loading?: boolean;
+  roles?: string[];
+  showRole?: boolean;
 };
 
 export function ComboboxAccount({
@@ -33,6 +39,8 @@ export function ComboboxAccount({
   onChange,
   options,
   loading: loadingProp,
+  roles,
+  showRole = true,
 }: ComboboxAccountProps) {
   const [open, setOpen] = React.useState(false);
   const shouldFetch = options === undefined;
@@ -40,7 +48,7 @@ export function ComboboxAccount({
     accounts: fetched,
     loading: internalLoading,
     error,
-  } = useAccount(shouldFetch);
+  } = useAccount(shouldFetch, roles);
   const loading = loadingProp ?? internalLoading;
 
   // Preferência: props.options > API; fallback: []
@@ -50,6 +58,7 @@ export function ComboboxAccount({
       return fetched.map((r) => ({
         label: r.username.toUpperCase(),
         value: r.id,
+        role: r.role,
       }));
     }
     return [];
@@ -67,9 +76,17 @@ export function ComboboxAccount({
   const selectedLabels = React.useMemo(() => {
     if (!value || value.length === 0) return [];
     return value
-      .map((selected) => accounts.find((r) => r.value === selected)?.label)
+      .map((selected) => {
+        const account = accounts.find((r) => r.value === selected);
+        if (!account) return null;
+
+        if (showRole && account.role) {
+          return `${account.label} (${account.role})`;
+        }
+        return account.label;
+      })
       .filter((label): label is string => Boolean(label));
-  }, [value, accounts]);
+  }, [value, accounts, showRole]);
 
   const buttonLabel = React.useMemo(() => {
     if (selectedLabels.length === 0) {
@@ -82,6 +99,12 @@ export function ComboboxAccount({
 
     return selectedLabels.join(", ");
   }, [selectedLabels, loading, accounts.length]);
+
+  // Função para formatar o role para exibição
+  const formatRole = (role?: string) => {
+    if (!role) return "";
+    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -110,7 +133,7 @@ export function ComboboxAccount({
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[180px] p-0">
+      <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[240px] p-0">
         <Command>
           <CommandInput
             placeholder={
@@ -135,21 +158,28 @@ export function ComboboxAccount({
                       toggleSelection(currentValue);
                     }}
                   >
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded text-xs font-semibold",
-                        value.includes(account.value)
-                          ? "ring-2 ring-blue-400"
-                          : ""
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span
+                        className={cn(
+                          "text-sm font-semibold",
+                          value.includes(account.value)
+                            ? "text-blue-600 dark:text-blue-400"
+                            : ""
+                        )}
+                      >
+                        {account.label}
+                      </span>
+                      {showRole && account.role && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {formatRole(account.role)}
+                        </span>
                       )}
-                    >
-                      {account.label}
-                    </span>
+                    </div>
                     <Check
                       className={cn(
-                        "ml-auto",
+                        "ml-2 flex-shrink-0",
                         value.includes(account.value)
-                          ? "opacity-100"
+                          ? "opacity-100 text-blue-600"
                           : "opacity-0"
                       )}
                     />
