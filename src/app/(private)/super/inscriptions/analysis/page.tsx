@@ -1,3 +1,5 @@
+"use client";
+
 import AnalysisInscriptionTable from "@/features/analysis/inscription/components/AnalysisInscriptionTable";
 import { useEventsForAnalysis } from "@/features/analysis/inscription/hooks/useEventsForAnalysis";
 import PageContainer from "@/shared/components/layout/PageContainer";

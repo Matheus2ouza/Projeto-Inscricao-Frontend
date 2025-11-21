@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { getEventInscriptions } from "../api/getEventInscriptions";
 import { UseEventsParams, UseEventsResult } from "../types/eventTypes";
