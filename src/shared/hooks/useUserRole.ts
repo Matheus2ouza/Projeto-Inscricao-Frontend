@@ -11,11 +11,16 @@ type UseUserRoleResult = {
   refetch: () => Promise<void>;
 };
 
-export function useUserRole(): UseUserRoleResult {
+type UseUserRoleOptions = {
+  revalidateOnFocus?: boolean;
+};
+
+export function useUserRole(options?: UseUserRoleOptions): UseUserRoleResult {
   const [role, setRole] = useState<RoleType>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const revalidateOnFocus = options?.revalidateOnFocus ?? false;
 
   const fetchRole = useCallback(async () => {
     abortRef.current?.abort();
@@ -58,6 +63,7 @@ export function useUserRole(): UseUserRoleResult {
 
   // Revalidar ao focar/visibilidade
   useEffect(() => {
+    if (!revalidateOnFocus) return;
     const onFocus = () => fetchRole();
     const onVisibility = () => {
       if (document.visibilityState === "visible") fetchRole();
