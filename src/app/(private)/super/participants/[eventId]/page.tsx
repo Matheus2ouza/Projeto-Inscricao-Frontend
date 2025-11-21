@@ -6,7 +6,7 @@ import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams } from "next/navigation";
 
-export default function ListParticipantsPage() {
+export default function ListParticipantsSuperPage() {
   const params = useParams();
   const eventId = params?.eventId as string;
 

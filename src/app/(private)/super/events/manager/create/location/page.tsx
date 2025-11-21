@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { Search, MapPin, ArrowLeft, Navigation } from "lucide-react";
+import { useCurrentUser } from "@/shared/context/user-context";
+import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
+import { ArrowLeft, MapPin, Navigation, Search } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
 
 const DEFAULT_POSITION = { lat: -23.55052, lng: -46.633308 };
 
@@ -14,6 +15,7 @@ const FORM_STORAGE_KEY = "event-form-data";
 
 export default function LocationPickerPage() {
   const router = useRouter();
+  const { user } = useCurrentUser();
   const searchParams = useSearchParams();
   const mapRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -42,7 +44,6 @@ export default function LocationPickerPage() {
 
   // Função para voltar mantendo o estado salvo
   const handleBack = () => {
-    // Manter o estado salvo para quando voltar ao formulário
     router.back();
   };
 
@@ -246,7 +247,7 @@ export default function LocationPickerPage() {
     sessionStorage.setItem("temp-location-data", JSON.stringify(tempState));
 
     // Voltar para a página de criação de evento
-    router.push(`/super/events/create`);
+    router.push(`/${user.role}/events/managar/create`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -259,7 +260,7 @@ export default function LocationPickerPage() {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleBack}>
+          <Button variant="outline" size="icon" onClick={handleBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -358,7 +359,8 @@ export default function LocationPickerPage() {
           z-index: 9999 !important;
           border-radius: 8px !important;
           border: 1px solid #e5e7eb !important;
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          box-shadow:
+            0 10px 15px -3px rgba(0, 0, 0, 0.1),
             0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
           background: white !important;
           font-family: inherit !important;

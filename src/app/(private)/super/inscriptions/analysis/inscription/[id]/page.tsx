@@ -11,7 +11,7 @@ import { FileText, OctagonX } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-export default function InscriptionDetailInsideAnalysisPage() {
+export default function InscriptionDetailInsideAnalysisSuperPage() {
   const params = useParams();
   const inscriptionId = params.id as string;
 

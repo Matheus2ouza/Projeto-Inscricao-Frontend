@@ -3,10 +3,13 @@
 import AccountsTable from "@/features/accounts/components/AccountsTable";
 import { useUsers } from "@/features/accounts/hooks/useUsers";
 import { useRegions } from "@/features/regions/hooks/useRegions";
+import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 export default function AccountsPage() {
+  const router = useRouter();
   const {
     users,
     total,
@@ -56,14 +59,25 @@ export default function AccountsPage() {
     );
   }
 
+  const handleBack = () => {
+    router.replace(`/admin/events/manager`);
+  };
+
   return (
-    <AccountsTable
-      users={users}
-      total={total}
-      page={page}
-      pageCount={pageCount}
-      onPageChange={setPage}
-      regions={regions}
-    />
+    <PageContainer
+      title="Contas"
+      description="Gerencie e visualize todos as contas cadastradas"
+      showBackButton={true}
+      backButtonAction={handleBack}
+    >
+      <AccountsTable
+        users={users}
+        total={total}
+        page={page}
+        pageCount={pageCount}
+        onPageChange={setPage}
+        regions={regions}
+      />
+    </PageContainer>
   );
 }

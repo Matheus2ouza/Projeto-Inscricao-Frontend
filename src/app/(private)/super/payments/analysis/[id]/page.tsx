@@ -9,10 +9,11 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { CreditCard } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-export default function EventInscriptionsAnalysisPage() {
+export default function EventInscriptionsAnalysisSuperPage() {
   const params = useParams();
+  const router = useRouter();
   const eventId = params.id as string;
 
   const { event, loading: eventLoading, error: eventError } = useEvent(eventId);
@@ -79,6 +80,16 @@ export default function EventInscriptionsAnalysisPage() {
     );
   }
 
+  const handleViewPayment = (inscriptionId: string, eventStatus: string) => {
+    const queryParams = new URLSearchParams({
+      eventId,
+      eventStatus,
+    });
+    router.push(
+      `/super/payments/payment/${inscriptionId}?${queryParams.toString()}`
+    );
+  };
+
   return (
     <PageContainer
       title="Análise de Pagamentos"
@@ -90,6 +101,7 @@ export default function EventInscriptionsAnalysisPage() {
         analysisData={analysisData || null}
         loading={loading}
         error={error}
+        onViewPayment={handleViewPayment}
       />
     </PageContainer>
   );

@@ -5,8 +5,10 @@ import { useEventsForParticipants } from "@/features/participants/hooks/useEvent
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
-export default function SelectEventPage() {
+export default function SelectEventSuperPage() {
+  const router = useRouter();
   const { events, loading, error, page, pageCount, setPage } =
     useEventsForParticipants({
       initialPage: 1,
@@ -58,6 +60,11 @@ export default function SelectEventPage() {
     );
   }
 
+  // Função para navegar para a página de participantes do evento
+  const handleSelectEvent = (eventId: string) => {
+    router.push(`/super/participants/${eventId}`);
+  };
+
   return (
     <PageContainer
       title="Selecionar Evento"
@@ -68,6 +75,7 @@ export default function SelectEventPage() {
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
+        onSelectEvent={handleSelectEvent}
       />
     </PageContainer>
   );
