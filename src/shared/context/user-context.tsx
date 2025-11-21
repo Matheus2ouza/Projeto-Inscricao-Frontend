@@ -5,8 +5,8 @@ import React from "react";
 import type { User } from "@/features/auth/types/loginTypes";
 
 type UserContextValue = {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  user: User;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
 };
 
 const UserContext = React.createContext<UserContextValue | undefined>(
@@ -14,7 +14,7 @@ const UserContext = React.createContext<UserContextValue | undefined>(
 );
 
 type UserContextProviderProps = {
-  initialUser: User | null;
+  initialUser: User;
   children: React.ReactNode;
 };
 
@@ -22,7 +22,7 @@ export function UserContextProvider({
   initialUser,
   children,
 }: UserContextProviderProps) {
-  const [user, setUser] = React.useState<User | null>(initialUser);
+  const [user, setUser] = React.useState<User>(initialUser);
 
   const value = React.useMemo(() => ({ user, setUser }), [user]);
 
@@ -33,10 +33,10 @@ export function useCurrentUser() {
   const context = React.useContext(UserContext);
 
   if (!context) {
-    throw new Error("useCurrentUser deve ser usado dentro de UserContextProvider");
+    throw new Error(
+      "useCurrentUser deve ser usado dentro de UserContextProvider"
+    );
   }
 
   return context;
 }
-
-
