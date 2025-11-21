@@ -1,5 +1,27 @@
-import RegisterFormEvent from "@/features/events/components/RegisterFormEvent";
+"use client";
 
-export default function CreateEventPage() {
-  return <RegisterFormEvent />;
+import RegisterFormEvent from "@/features/events/components/RegisterFormEvent";
+import PageContainer from "@/shared/components/layout/PageContainer";
+import { useCurrentUser } from "@/shared/context/user-context";
+import { useRouter } from "next/navigation";
+
+export default function CreateEventSuperPage() {
+  const router = useRouter();
+  const { user } = useCurrentUser();
+  const handleBack = () => {
+    router.replace("/super/events/manager");
+  };
+
+  return (
+    <PageContainer
+      title="Criar Novo Evento"
+      description="Preencha as informações para publicar um novo evento."
+      showBackButton={true}
+      backButtonAction={handleBack}
+    >
+      <RegisterFormEvent
+        roleSegment={user.role?.toLowerCase() as "admin" | "super" | "manager"}
+      />
+    </PageContainer>
+  );
 }

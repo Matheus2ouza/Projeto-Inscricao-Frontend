@@ -23,6 +23,7 @@ interface AnalysisPaymentTableProps {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  onIndividualInscription: (eventid: string) => void;
 }
 
 export default function AnalysisPaymentTable({
@@ -30,16 +31,12 @@ export default function AnalysisPaymentTable({
   page,
   pageCount,
   onPageChange,
+  onIndividualInscription,
 }: AnalysisPaymentTableProps) {
   const router = useRouter();
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
-
-  //Vai para o app/(private)/super/payments/analysis/[id]
-  const handleIndividualInscription = (eventId: string) => {
-    router.push(`/super/payments/analysis/${eventId}`);
-  };
 
   // Função para quando a imagem carregar
   const handleImageLoad = (eventId: string) => {
@@ -283,7 +280,7 @@ export default function AnalysisPaymentTable({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleIndividualInscription(event.id)}
+                    onClick={() => onIndividualInscription(event.id)}
                   >
                     Analisar Pagamentos
                   </Button>

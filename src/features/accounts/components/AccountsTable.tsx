@@ -34,9 +34,16 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { Switch } from "@/shared/components/ui/switch";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { AlertCircle, Check, CheckCircle2, Copy } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FormProvider } from "react-hook-form";
+const ROLE_RANK: Record<string, number> = {
+  USER: 0,
+  MANAGER: 1,
+  ADMIN: 2,
+  SUPER: 3,
+};
 
 type AccountsTableProps = {
   users: UserDto[];
@@ -55,6 +62,7 @@ export default function AccountsTable({
   onPageChange,
   regions,
 }: AccountsTableProps) {
+  const { user } = useCurrentUser();
   const [open, setOpen] = useState(false);
   const [openCreds, setOpenCreds] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -67,6 +75,15 @@ export default function AccountsTable({
   const { form, onSubmit, createdCredentials, clearCreatedCredentials } =
     useFormCreateAccount();
 
+  const currentRoleValue = user?.role?.toUpperCase() ?? "USER";
+  const currentRoleRank = ROLE_RANK[currentRoleValue] ?? 0;
+  const allowedRoleOptions = useMemo(() => {
+    const options = ROLES.filter(
+      (role) => (ROLE_RANK[role.value] ?? 0) <= currentRoleRank
+    );
+    return options.length > 0 ? options : [ROLES[ROLES.length - 1]];
+  }, [currentRoleRank]);
+
   // Transformar as regiões do hook no formato de Option
   const regionOptions = useMemo(() => {
     return regions.map((r) => ({
@@ -74,6 +91,11 @@ export default function AccountsTable({
       value: r.id,
     }));
   }, [regions]);
+
+  const defaultRoleValue =
+    allowedRoleOptions[allowedRoleOptions.length - 1]?.value ??
+    ROLES[ROLES.length - 1].value;
+  const isSuperUser = currentRoleValue === "SUPER";
 
   // Criar um mapa de id para nome da região para facilitar o filtro
   const regionMap = useMemo(() => {
@@ -138,43 +160,51 @@ export default function AccountsTable({
     }
   };
 
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        username: "",
+        password: "",
+        role: defaultRoleValue,
+        region: isSuperUser ? "" : user?.region?.id ?? "",
+      });
+      setHasRegion(isSuperUser);
+    }
+  }, [form, open, defaultRoleValue, isSuperUser, user?.region?.id]);
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              Contas
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-              Gerencie e visualize todos as contas cadastradas
-            </p>
-          </div>
-        </div>
-        <div className="flex justify-between items-center mb-6 gap-2 flex-wrap">
-          <div className="flex items-center gap-2 flex-wrap ">
-            <MultiSelectRegion
-              value={selectedRegions}
-              onChange={setSelectedRegions}
-              options={regionOptions}
-              label="Filtrar região"
-            />
-            <Button
-              variant="outline"
-              onClick={handleSearch}
-              type="button"
-              disabled={!hasUnsavedFilters}
-            >
-              Buscar {appliedRegions.length > 0 && `(${filteredTotal})`}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={clearFilters}
-              disabled={appliedRegions.length === 0}
-            >
-              Limpar
-            </Button>
-          </div>
+      <div className="max-w-7xl mx-auto px-6">
+        <div
+          className={`flex items-center mb-6 gap-2 flex-wrap ${
+            user.role === "super" ? "justify-between" : "justify-end"
+          }`}
+        >
+          {user.role === "super" && (
+            <div className="flex items-center gap-2 flex-wrap ">
+              <MultiSelectRegion
+                value={selectedRegions}
+                onChange={setSelectedRegions}
+                options={regionOptions}
+                label="Filtrar região"
+              />
+              <Button
+                variant="outline"
+                onClick={handleSearch}
+                type="button"
+                disabled={!hasUnsavedFilters}
+              >
+                Buscar {appliedRegions.length > 0 && `(${filteredTotal})`}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={clearFilters}
+                disabled={appliedRegions.length === 0}
+              >
+                Limpar
+              </Button>
+            </div>
+          )}
           <Button
             variant="default"
             className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80"
@@ -323,7 +353,7 @@ export default function AccountsTable({
                           <Input
                             id="username"
                             type="text"
-                            autoComplete="off"
+                            autoComplete="new-username"
                             placeholder="Digite sua localidade"
                             className="w-full rounded-xl border-gray-300 bg-white/50 dark:bg-gray-800/50 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 focus:ring-opacity-60 focus:shadow-md dark:border-gray-600 dark:text-white backdrop-blur-sm transition-all duration-300 pl-4 pr-4 py-3"
                             {...field}
@@ -353,6 +383,7 @@ export default function AccountsTable({
                             <Input
                               id="password"
                               type={showPassword ? "text" : "password"}
+                              autoComplete="new-password"
                               placeholder="Digite sua senha"
                               className="w-full rounded-xl border-gray-300 bg-white/50 dark:bg-gray-800/50 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 focus:ring-opacity-60 focus:shadow-md dark:border-gray-600 dark:text-white backdrop-blur-sm transition-all duration-300 pl-4 pr-12 py-3"
                               {...field}
@@ -389,6 +420,7 @@ export default function AccountsTable({
                           <ComboboxRole
                             value={field.value as string}
                             onChange={field.onChange}
+                            options={allowedRoleOptions}
                           />
                         </FormControl>
                         <FormMessage />
@@ -396,40 +428,44 @@ export default function AccountsTable({
                     )}
                   />
                 </div>
-                {/* Switch para adicionar região - layout padrão */}
-                <div className="flex items-center gap-2 mb-2">
-                  <label
-                    htmlFor="hasRegion"
-                    className="text-sm text-gray-700 dark:text-gray-300 select-none cursor-pointer"
-                  >
-                    Adicionar região
-                  </label>
-                  <Switch
-                    id="hasRegion"
-                    checked={hasRegion}
-                    onCheckedChange={setHasRegion}
-                  />
-                </div>
-                {hasRegion && (
-                  <FormField
-                    control={form.control}
-                    name={"region"}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="region" className="mb-2">
-                          Região
-                        </FormLabel>
-                        <FormControl>
-                          <ComboboxRegion
-                            value={field.value as string}
-                            onChange={field.onChange}
-                            options={regionOptions} // Passando as opções do hook
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                {/* Switch para adicionar região - apenas super pode alterar */}
+                {isSuperUser && (
+                  <>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label
+                        htmlFor="hasRegion"
+                        className="text-sm text-gray-700 dark:text-gray-300 select-none cursor-pointer"
+                      >
+                        Adicionar região
+                      </label>
+                      <Switch
+                        id="hasRegion"
+                        checked={hasRegion}
+                        onCheckedChange={setHasRegion}
+                      />
+                    </div>
+                    {hasRegion && (
+                      <FormField
+                        control={form.control}
+                        name={"region"}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel htmlFor="region" className="mb-2">
+                              Região
+                            </FormLabel>
+                            <FormControl>
+                              <ComboboxRegion
+                                value={field.value as string}
+                                onChange={field.onChange}
+                                options={regionOptions}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     )}
-                  />
+                  </>
                 )}
                 <DialogFooter>
                   <Button

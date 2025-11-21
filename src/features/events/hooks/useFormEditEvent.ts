@@ -1,3 +1,4 @@
+import { useCurrentUser } from "@/shared/context/user-context";
 import { useState } from "react";
 import { toast } from "sonner";
 import { deleteEvent } from "../api/deleteEvent";
@@ -8,12 +9,15 @@ import { useEventPayment } from "./useEventPayment";
 import { useInvalidateEventsQuery } from "./useEventsQuery";
 
 export function useFormEditEvent(event: Event) {
+  const { user } = useCurrentUser();
   const { invalidateDetail, invalidateList } = useInvalidateEventsQuery();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const { loading: paymentLoading, updatePayment } = useEventPayment();
   const { loading: inscriptionsLoading, updateInscriptions } =
     useEventInscriptions();
+
+  const roleSegment = user?.role?.toLowerCase() === "super" ? "super" : "admin";
 
   // IDs dos responsáveis originais do evento
   const originalResponsibleIds = event.responsibles?.map((r) => r.id) || [];
@@ -82,25 +86,19 @@ export function useFormEditEvent(event: Event) {
     }
   };
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        "Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita."
-      )
-    ) {
-      return;
-    }
-
+  const handleDelete = async (): Promise<boolean> => {
     try {
       setLoading(true);
       await deleteEvent(event.id);
       toast.success("Evento excluído com sucesso!");
 
       // Redirecionar para a lista de eventos
-      window.location.href = "/super/events";
+      window.location.href = `/${roleSegment}/events/manager`;
+      return true;
     } catch (error) {
       toast.error("Erro ao excluir evento");
       console.error("Error deleting event:", error);
+      return false;
     } finally {
       setLoading(false);
     }

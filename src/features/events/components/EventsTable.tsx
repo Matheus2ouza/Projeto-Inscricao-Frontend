@@ -1,5 +1,7 @@
 "use client";
 
+import { PAGE_SIZE } from "@/app/(private)/super/events/manager/page";
+import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -10,7 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { cn } from "@/shared/lib/utils";
 import {
   AlertTriangle,
@@ -26,21 +28,30 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useEventsAll } from "../hooks/useEventsAll";
 
-const PAGE_SIZE = 4;
+type EventsTableProps = {
+  events: ReturnType<typeof useEventsAll>["events"];
+  total: number;
+  page: number;
+  pageCount: number;
+  pageSize?: number;
+  onPageChange: (page: number) => void;
+};
 
-export default function EventsTableSuper() {
-  const [open, setOpen] = useState(false);
+export default function EventsTable({
+  events,
+  total,
+  page,
+  pageCount,
+  onPageChange,
+}: EventsTableProps) {
+  const { user } = useCurrentUser();
+  const router = useRouter();
   const [showAmount, setShowAmount] = useState<{ [key: string]: boolean }>({});
   const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
-
-  const { events, total, page, pageCount, loading, error, setPage, refetch } =
-    useEventsAll({
-      initialPage: 1,
-      pageSize: PAGE_SIZE,
-    });
 
   const toggleAmountVisibility = (eventId: string) => {
     setShowAmount((prev) => ({
@@ -60,32 +71,29 @@ export default function EventsTableSuper() {
     }).format(value);
   };
 
-  const getEventStatus = (startDate: string, endDate: string) => {
-    const today = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+  const getStatusBadge = (event: EventsTableProps["events"][number]) => {
+    const now = new Date();
+    const start = new Date(event.startDate);
+    const end = new Date(event.endDate);
 
-    if (today < start) return "futuro";
-    if (today > end) return "passado";
-    return "andamento";
-  };
+    if (start <= now && now <= end) {
+      return { label: "Em Andamento", color: "bg-blue-600" };
+    }
 
-  const getStatusBadge = (startDate: string, endDate: string) => {
-    const status = getEventStatus(startDate, endDate);
-    switch (status) {
-      case "futuro":
-        return { label: "Agendado", color: "bg-green-600" };
-      case "andamento":
-        return { label: "Em Andamento", color: "bg-blue-600" };
-      case "passado":
-        return { label: "Realizado", color: "bg-red-600" };
+    switch (event.status) {
+      case "OPEN":
+        return { label: "Inscrições Abertas", color: "bg-green-600" };
+      case "CLOSE":
+        return { label: "Inscrições Fechadas", color: "bg-amber-600" };
+      case "FINALIZED":
+        return { label: "Finalizado", color: "bg-red-600" };
       default:
-        return { label: "Agendado", color: "bg-green-600" };
+        return { label: "Status desconhecido", color: "bg-gray-600" };
     }
   };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    onPageChange(newPage);
   };
 
   const copyToClipboard = async (text: string, eventId: string) => {
@@ -106,98 +114,33 @@ export default function EventsTableSuper() {
     window.open(`/events/${eventId}`, "_blank");
   };
 
-  // Estados de loading e error
-  if (loading) {
-    return (
-      <div className="p-4 sm:p-6 relative">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div>
-            <Skeleton className="h-9 w-32 mb-2" />
-            <Skeleton className="h-5 w-64" />
-          </div>
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
-          {Array.from({ length: PAGE_SIZE }).map((_, index) => (
-            <div
-              key={index}
-              className="bg-card text-card-foreground flex flex-col transition-all duration-300 ease-in-out shadow-sm w-full overflow-hidden rounded-xl"
-            >
-              {/* Imagem do Evento */}
-              <div className="relative w-full aspect-[16/9] overflow-hidden">
-                <Skeleton className="w-full h-full" />
-              </div>
-              {/* Conteúdo do Card */}
-              <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6">
-                {/* Header do Card */}
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3 sm:gap-4 w-full">
-                    <Skeleton className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex-shrink-0" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-6 w-3/4" />
-                      <Skeleton className="h-5 w-24" />
-                    </div>
-                  </div>
-                </div>
-                {/* Estatísticas */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <Skeleton className="h-20 rounded-lg" />
-                  <Skeleton className="h-20 rounded-lg" />
-                </div>
-                {/* Informações Básicas */}
-                <div className="space-y-2 sm:space-y-3">
-                  <Skeleton className="h-10 rounded-lg" />
-                  <Skeleton className="h-10 rounded-lg" />
-                </div>
-                {/* Footer do Card */}
-                <div className="flex justify-between items-center pt-3 sm:pt-4">
-                  <Skeleton className="h-10 w-40" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const roleSegment = user?.role?.toLowerCase() === "super" ? "super" : "admin";
 
-  if (error) {
-    return (
-      <div className="p-6 flex items-center justify-center min-h-96">
-        <div className="text-center text-destructive">
-          <p className="mb-4">Erro ao carregar eventos: {error}</p>
-          <Button onClick={refetch}>Tentar Novamente</Button>
-        </div>
-      </div>
-    );
-  }
+  const handleManagerEvent = (eventId: string) => {
+    router.push(`/${roleSegment}/events/manager/${eventId}`);
+  };
 
-  const startIndex = (page - 1) * PAGE_SIZE;
+  const currentPageSize = PAGE_SIZE;
+  const startIndex = (page - 1) * currentPageSize;
 
   return (
-    <div className="p-4 sm:p-6 relative">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-            Eventos
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-            Gerencie e visualize todos os eventos cadastrados
-          </p>
-        </div>
+    <div className="p-4 sm:p-5 relative">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 mb-4">
         <Button
           asChild
+          className="w-full sm:w-auto dark:text-white"
           variant="default"
-          className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80 w-full sm:w-auto"
         >
-          <Link href="/super/events/create">Novo Evento</Link>
+          <Link href={`/${roleSegment}/events/manager/create`}>
+            Criar Evento
+          </Link>
         </Button>
       </div>
 
       {/* Grid de Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 relative">
         {events.map((event) => {
-          const statusBadge = getStatusBadge(event.startDate, event.endDate);
+          const statusBadge = getStatusBadge(event);
           const isCopied = copiedEventId === event.id;
           const hasTypeInscriptions = (event?.countTypeInscriptions ?? 0) > 0;
 
@@ -209,33 +152,35 @@ export default function EventsTableSuper() {
               {/* Card personalizado sem bordas do shadcn */}
               <div
                 className={cn(
-                  "bg-card text-card-foreground flex flex-col transition-all duration-300 ease-in-out shadow-sm w-full overflow-hidden rounded-xl hover:shadow-md hover:scale-[1.02] cursor-pointer"
+                  "bg-card text-card-foreground flex flex-col transition-all duration-300 ease-in-out shadow-sm w-full overflow-hidden rounded-xl hover:shadow-md cursor-pointer"
                 )}
               >
                 {/* Imagem do Evento - Ocupando toda a parte superior */}
-                <div className="relative w-full aspect-[16/9] overflow-hidden">
-                  {event.imageUrl ? (
-                    <Image
-                      src={event.imageUrl}
-                      alt={event.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      priority={events.indexOf(event) < 2}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500" />
-                  )}
-                  <div className="absolute inset-0 bg-black/20" />
-                  <Badge
-                    className={`absolute top-3 right-3 ${statusBadge.color} text-white min-w-[100px] flex items-center justify-center text-sm`}
-                  >
-                    {statusBadge.label}
-                  </Badge>
-                </div>
+                <AspectRatio ratio={16 / 8} className="w-full">
+                  <div className="relative w-full h-full overflow-hidden rounded-t-xl">
+                    {event.imageUrl ? (
+                      <Image
+                        src={event.imageUrl}
+                        alt={event.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        priority={events.indexOf(event) < 2}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500" />
+                    )}
+                    <div className="absolute inset-0 bg-black/20" />
+                    <Badge
+                      className={`absolute top-3 right-3 ${statusBadge.color} text-white min-w-[100px] flex items-center justify-center text-sm`}
+                    >
+                      {statusBadge.label}
+                    </Badge>
+                  </div>
+                </AspectRatio>
 
                 {/* Conteúdo do Card */}
-                <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6">
+                <div className="flex flex-col gap-3 sm:gap-4 p-4 sm:p-5">
                   {/* Header do Card */}
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3 sm:gap-4 w-full">
@@ -263,14 +208,14 @@ export default function EventsTableSuper() {
                   </div>
 
                   {/* Estatísticas - Responsivas */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Participantes */}
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                    <div className="flex items-center gap-3 p-2.5 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
                       <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                        <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+                        <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
+                        <p className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400">
                           {event.quantityParticipants}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -280,14 +225,14 @@ export default function EventsTableSuper() {
                     </div>
 
                     {/* Arrecadado */}
-                    <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+                    <div className="flex items-center gap-3 p-2.5 bg-green-50 dark:bg-green-950/30 rounded-lg">
                       <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                        <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
+                        <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <p className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
+                            <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
                               {showAmount[event.id]
                                 ? formatCurrency(event.amountCollected)
                                 : "****"}
@@ -305,9 +250,9 @@ export default function EventsTableSuper() {
                             className="ml-2 focus:outline-none flex-shrink-0"
                           >
                             {showAmount[event.id] ? (
-                              <Eye className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 dark:text-green-400" />
+                              <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 dark:text-green-400" />
                             ) : (
-                              <EyeClosed className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 dark:text-green-400" />
+                              <EyeClosed className="h-5 w-5 sm:h-6 sm:w-6 text-green-600 dark:text-green-400" />
                             )}
                           </button>
                         </div>
@@ -316,7 +261,7 @@ export default function EventsTableSuper() {
                   </div>
 
                   {/* Informações Básicas */}
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
@@ -362,58 +307,56 @@ export default function EventsTableSuper() {
 
                   {/* Link público do evento */}
                   <div className="pt-3 sm:pt-4 border-t">
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs text-muted-foreground">
                         URL pública:
                       </span>
-                      <div className="flex gap-2">
-                        <div className="flex-1 min-w-0">
-                          <input
-                            readOnly
-                            className="w-full text-xs bg-transparent border rounded px-2 py-1 truncate"
-                            value={`${
-                              typeof window !== "undefined"
-                                ? window.location.origin
-                                : ""
-                            }/events/${event.id}`}
-                          />
-                        </div>
-                        <div className="flex gap-1 sm:gap-2">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            className={cn(
-                              "p-1 sm:p-2 h-7 w-7 sm:h-8 sm:w-8 transition-all duration-300",
-                              isCopied
-                                ? "bg-green-50 text-green-600 border-green-200"
-                                : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
-                            )}
-                            onClick={() =>
-                              copyToClipboard(
-                                `${window.location.origin}/events/${event.id}`,
-                                event.id
-                              )
-                            }
-                            title={isCopied ? "Copiado!" : "Copiar URL"}
-                          >
-                            {isCopied ? (
-                              <Check className="h-3 w-3" />
-                            ) : (
-                              <Copy className="h-3 w-3" />
-                            )}
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            className="p-1 sm:p-2 h-7 w-7 sm:h-8 sm:w-8 bg-green-50 text-green-600 hover:bg-green-100 border-green-200"
-                            onClick={() => openEventPage(event.id)}
-                            title="Visualizar Evento"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </Button>
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <input
+                          readOnly
+                          className="w-full text-xs bg-transparent border rounded px-2 py-1 truncate"
+                          value={`${
+                            typeof window !== "undefined"
+                              ? window.location.origin
+                              : ""
+                          }/events/${event.id}`}
+                        />
+                      </div>
+                      <div className="flex gap-1 sm:gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className={cn(
+                            "p-1 h-7 w-7 sm:h-8 sm:w-8 transition-all duration-300",
+                            isCopied
+                              ? "bg-green-50 text-green-600 border-green-200"
+                              : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+                          )}
+                          onClick={() =>
+                            copyToClipboard(
+                              `${window.location.origin}/events/${event.id}`,
+                              event.id
+                            )
+                          }
+                          title={isCopied ? "Copiado!" : "Copiar URL"}
+                        >
+                          {isCopied ? (
+                            <Check className="h-3 w-3" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="p-1 h-7 w-7 sm:h-8 sm:w-8 bg-green-50 text-green-600 hover:bg-green-100 border-green-200"
+                          onClick={() => openEventPage(event.id)}
+                          title="Visualizar Evento"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -425,18 +368,18 @@ export default function EventsTableSuper() {
                       className="flex items-center gap-2 text-xs sm:text-sm dark:text-white"
                       asChild
                     >
-                      <Link href={`/super/events/list-inscription/${event.id}`}>
+                      <Link
+                        href={`/${roleSegment}/events/list-inscription/${event.id}`}
+                      >
                         Lista de Inscrições
                       </Link>
                     </Button>
                     <Button
-                      asChild
+                      onClick={() => handleManagerEvent(event.id)}
                       variant="default"
                       className="flex items-center gap-2 text-xs sm:text-sm dark:text-white"
                     >
-                      <Link href={`/super/events/manager/${event.id}`}>
-                        Gerenciar Evento
-                      </Link>
+                      Gerenciar Evento
                     </Button>
                   </div>
                 </div>
@@ -460,7 +403,9 @@ export default function EventsTableSuper() {
             </p>
           </div>
           <Button size="lg" asChild className="w-full sm:w-auto">
-            <Link href="/super/events/create">Criar Primeiro Evento</Link>
+            <Link href={`/${roleSegment}/events/create`}>
+              Criar Primeiro Evento
+            </Link>
           </Button>
         </div>
       )}

@@ -6,12 +6,14 @@ export type AccountDto = {
   role: string;
 };
 
-export async function getAccont(): Promise<AccountDto[]> {
+export async function getAccont(roles?: string[]): Promise<AccountDto[]> {
+  const roleParam = roles?.length ? roles.join(",") : "SUPER, ADMIN";
+
   const { data } = await axiosInstance.get<AccountDto[]>(
     "/users/all/usernames",
     {
       params: {
-        role: "SUPER, ADMIN",
+        role: roleParam,
       }
     }
   );

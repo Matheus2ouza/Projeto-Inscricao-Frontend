@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, {
   useCallback,
@@ -13,7 +12,6 @@ import React, {
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { ComboboxAccount } from "@/features/accounts/components/ComboboxAccount";
-import { useAccount } from "@/features/accounts/hooks/useAccount";
 import { ComboboxRegion } from "@/features/regions/components/ComboboxRegion";
 import { useRegions } from "@/features/regions/hooks/useRegions";
 import { CalendarRanger } from "@/shared/components/calendar-ranger";
@@ -26,14 +24,16 @@ import {
   FormMessage,
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { cn } from "@/shared/lib/utils";
-import { ArrowLeft, MapPin, Upload } from "lucide-react";
+import { MapPin, Upload } from "lucide-react";
 import { FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import useFormCreateEvent from "../hooks/useFormCreateEvent";
 
 interface RegisterFormEventProps {
   onSubmitSuccess?: () => void;
+  roleSegment: "admin" | "super" | "manager";
 }
 
 // Chave para armazenar o estado no sessionStorage
@@ -51,25 +51,42 @@ const clearCachedImage = () => {
 
 export default function RegisterFormEvent({
   onSubmitSuccess,
+  roleSegment,
 }: RegisterFormEventProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useCurrentUser();
   const { setLoading: setGlobalLoading } = useGlobalLoading();
   const { form, onSubmit, dateRange, setDateRange } = useFormCreateEvent();
   const { regions: fetchedRegions, loading: regionsLoading } = useRegions();
-  const { accounts: fetchedAccounts, loading: accountsLoading } = useAccount();
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasProcessedLocationParams, setHasProcessedLocationParams] =
     useState(false);
+  const resolvedRole = (roleSegment ??
+    (user?.role?.toLowerCase() === "super" ? "super" : "admin")) as
+    | "super"
+    | "admin"
+    | "manager";
 
   useEffect(() => {
-    setGlobalLoading(regionsLoading || accountsLoading);
+    // Usuários não-super já possuem região definida no contexto
+    if (resolvedRole !== "super" && user?.region?.id) {
+      const currentRegionId = form.getValues("regionId");
+
+      if (currentRegionId !== user.region.id) {
+        form.setValue("regionId", user.region.id);
+      }
+    }
+  }, [resolvedRole, user?.region?.id, form]);
+
+  useEffect(() => {
+    setGlobalLoading(regionsLoading);
     return () => {
       setGlobalLoading(false);
     };
-  }, [regionsLoading, accountsLoading, setGlobalLoading]);
+  }, [regionsLoading, setGlobalLoading]);
 
   // Salvar o estado do formulário no sessionStorage antes de navegar
   const saveFormState = useCallback(() => {
@@ -104,9 +121,15 @@ export default function RegisterFormEvent({
           form.setValue("openImmediately", state.openImmediately);
         }
 
-        // Restaurar dateRange
+        // Restaurar dateRange (converte strings em Date)
         if (state.dateRange) {
-          setDateRange(state.dateRange);
+          const parsedDateRange = {
+            from: state.dateRange.from
+              ? new Date(state.dateRange.from)
+              : undefined,
+            to: state.dateRange.to ? new Date(state.dateRange.to) : undefined,
+          };
+          setDateRange(parsedDateRange);
         }
 
         // Restaurar imagem do cache se disponível
@@ -220,13 +243,6 @@ export default function RegisterFormEvent({
     }));
   }, [fetchedRegions]);
 
-  const accountOptions = useMemo(() => {
-    return fetchedAccounts.map((account) => ({
-      label: account.username.toUpperCase(),
-      value: account.id,
-    }));
-  }, [fetchedAccounts]);
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -255,13 +271,9 @@ export default function RegisterFormEvent({
             </button>
           </div>
         ) as unknown as string,
-        duration: 6000,
       });
 
-      // Redirecionar para a tela de listagem de eventos após 2 segundos
-      setTimeout(() => {
-        router.push("/super/events");
-      }, 2000);
+      router.push(`/${resolvedRole}/events/manager`);
     }
   };
 
@@ -408,7 +420,9 @@ export default function RegisterFormEvent({
       params.append("address", locationValue.address);
     }
 
-    router.push(`/super/events/create/location?${params.toString()}`);
+    router.push(
+      `/${resolvedRole}/events/manager/create/location?${params.toString()}`
+    );
   };
 
   // Limpar todos os dados ao cancelar
@@ -433,74 +447,55 @@ export default function RegisterFormEvent({
     clearCachedImage();
 
     // Redirecionar para a lista de eventos
-    router.push("/super/events");
+    router.push(`/${resolvedRole}/events/manager`);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Cabeçalho */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" asChild>
-              <Link href="/super/events">
-                <ArrowLeft className="h-4 w-4" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                Criar Novo Evento
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Preencha as informações abaixo para criar um novo evento
-              </p>
-            </div>
-          </div>
-        </div>
+      <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10">
+        <div className="p-6">
+          <FormProvider {...form}>
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Seção: Informações Básicas */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Informações Básicas
+                </h2>
 
-        <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10">
-          <div className="p-6">
-            <FormProvider {...form}>
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Seção: Informações Básicas */}
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Informações Básicas
-                  </h2>
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                  {/* Coluna 1: Nome do Evento e Região */}
+                  <div className="space-y-6 xl:col-span-2">
+                    {/* Campo: Nome do Evento */}
+                    <div className="space-y-3">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">
+                              Nome do Evento *
+                            </FormLabel>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Escolha um nome claro e descritivo para o seu
+                              evento.
+                            </p>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="text"
+                                autoComplete="off"
+                                placeholder="Digite o nome do evento"
+                                className="w-full"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                  <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                    {/* Coluna 1: Nome do Evento e Região */}
-                    <div className="space-y-6 xl:col-span-2">
-                      {/* Campo: Nome do Evento */}
-                      <div className="space-y-3">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-base font-medium">
-                                Nome do Evento *
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  type="text"
-                                  autoComplete="off"
-                                  placeholder="Digite o nome do evento"
-                                  className="w-full"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Escolha um nome claro e descritivo para o seu
-                                evento.
-                              </p>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Campo: Região */}
+                    {/* Campo: Região */}
+                    {resolvedRole === "super" && (
                       <div className="space-y-3">
                         <FormField
                           control={form.control}
@@ -510,6 +505,9 @@ export default function RegisterFormEvent({
                               <FormLabel className="text-base font-medium">
                                 Região do Evento *
                               </FormLabel>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Selecione a região onde o evento será realizado.
+                              </p>
                               <FormControl>
                                 <ComboboxRegion
                                   value={field.value as string}
@@ -519,277 +517,273 @@ export default function RegisterFormEvent({
                                 />
                               </FormControl>
                               <FormMessage />
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Selecione a região onde o evento será realizado.
-                              </p>
                             </FormItem>
                           )}
                         />
                       </div>
+                    )}
 
-                      {/* Campo: Contas responsáveis */}
-                      <div className="space-y-3">
-                        <FormField
-                          control={form.control}
-                          name="accountIds"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-base font-medium">
-                                Contas responsáveis *
-                              </FormLabel>
-                              <FormControl>
-                                <ComboboxAccount
-                                  value={
-                                    Array.isArray(field.value)
-                                      ? field.value
-                                      : []
-                                  }
-                                  onChange={(selected) => {
-                                    field.onChange(selected);
-                                  }}
-                                  options={accountOptions}
-                                  loading={accountsLoading}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Escolha um ou mais usuários que ficarão
-                                responsáveis pelo evento.
-                              </p>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Coluna 2: Upload de Imagem */}
-                    <div className="space-y-6">
-                      {/* Campo: Upload de Imagem */}
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <FormLabel className="text-base font-medium">
-                            Imagem de Capa do Evento
-                          </FormLabel>
-                          {previewUrl && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={handleRemoveImage}
-                              className="h-8 px-3"
-                            >
-                              Limpar imagem
-                            </Button>
-                          )}
-                        </div>
-                        <FormField
-                          control={form.control}
-                          name="image"
-                          render={() => (
-                            <FormItem>
-                              <FormControl>
-                                <div className="flex flex-col items-center justify-center w-full">
-                                  <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    className="hidden"
-                                    accept="image/jpeg, image/png, image/webp"
-                                    onChange={handleFileChange}
-                                  />
-
-                                  {!previewUrl ? (
-                                    <div
-                                      className={cn(
-                                        "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300",
-                                        isDragging
-                                          ? "border-primary bg-primary/5"
-                                          : "border-border bg-background hover:bg-accent/50"
-                                      )}
-                                      onClick={handleAreaClick}
-                                      onDragOver={handleDragOver}
-                                      onDragLeave={handleDragLeave}
-                                      onDrop={handleDrop}
-                                    >
-                                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                                        <p className="text-sm text-muted-foreground">
-                                          <span className="font-semibold">
-                                            Clique para upload
-                                          </span>{" "}
-                                          ou arraste uma imagem
-                                        </p>
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                          PNG, JPG, WEBP até 5MB
-                                        </p>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="w-full space-y-3">
-                                      <div className="relative w-full h-48 rounded-lg overflow-hidden border">
-                                        <Image
-                                          src={previewUrl}
-                                          alt="Preview"
-                                          fill
-                                          className="object-cover"
-                                        />
-                                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-xs">
-                                          Imagem selecionada
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Formatos recomendados: JPG, PNG ou WebP. Tamanho
-                                ideal: 1200x600 pixels.
-                              </p>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Seção: Data do Evento */}
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Data do Evento
-                  </h2>
-
-                  <div className="max-w-md">
-                    {/* Campo: Período do Evento */}
+                    {/* Campo: Contas responsáveis */}
                     <div className="space-y-3">
-                      <FormLabel className="text-base font-medium">
-                        Período do Evento *
-                      </FormLabel>
-                      <div className="w-full">
-                        <CalendarRanger
-                          dateRange={dateRange}
-                          onDateRangeChange={setDateRange}
-                        />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Selecione a data inicial e final do evento.
-                      </p>
+                      <FormField
+                        control={form.control}
+                        name="accountIds"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">
+                              Contas responsáveis *
+                            </FormLabel>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Escolha um ou mais usuários que ficarão
+                              responsáveis pelo evento.
+                            </p>
+                            <FormControl>
+                              <ComboboxAccount
+                                value={
+                                  Array.isArray(field.value) ? field.value : []
+                                }
+                                onChange={(selected) => {
+                                  field.onChange(selected);
+                                }}
+                                showRole
+                                roles={
+                                  roleSegment === "super"
+                                    ? ["SUPER", "ADMIN", "MANAGER"]
+                                    : ["ADMIN", "MANAGER"]
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
-                </div>
 
-                {/* Seção: Localização */}
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Localização
-                  </h2>
+                  {/* Coluna 2: Upload de Imagem */}
+                  <div className="space-y-6">
+                    {/* Campo: Upload de Imagem */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <FormLabel className="text-base font-medium">
+                          Imagem de Capa do Evento
+                        </FormLabel>
+                        {previewUrl && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleRemoveImage}
+                            className="h-8 px-3"
+                          >
+                            Limpar imagem
+                          </Button>
+                        )}
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name="image"
+                        render={() => (
+                          <FormItem>
+                            <FormControl>
+                              <div className="flex flex-col items-center justify-center w-full">
+                                <input
+                                  ref={fileInputRef}
+                                  type="file"
+                                  className="hidden"
+                                  accept="image/jpeg, image/png, image/webp"
+                                  onChange={handleFileChange}
+                                />
 
-                  {/* Campo: Localização */}
-                  <div className="space-y-3">
-                    <FormLabel className="text-base font-medium">
-                      Localização do Evento *
-                    </FormLabel>
-                    <FormField
-                      control={form.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="space-y-3">
-                              <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handleSelectLocation}
-                                className="w-full h-12 border-dashed"
-                              >
-                                <MapPin className="h-4 w-4 mr-2" />
-                                {field.value?.address
-                                  ? "Alterar Localização"
-                                  : "Selecionar Localização"}
-                              </Button>
-
-                              {field.value?.address && (
-                                <div className="p-4 border rounded-lg bg-muted/50">
-                                  <div className="flex items-start gap-3">
-                                    <MapPin className="h-4 w-4 text-primary mt-0.5" />
-                                    <div className="flex-1">
-                                      <p className="text-sm font-medium text-foreground">
-                                        Local selecionado:
+                                {!previewUrl ? (
+                                  <div
+                                    className={cn(
+                                      "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300",
+                                      isDragging
+                                        ? "border-primary bg-primary/5"
+                                        : "border-border bg-background hover:bg-accent/50"
+                                    )}
+                                    onClick={handleAreaClick}
+                                    onDragOver={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={handleDrop}
+                                  >
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                      <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                                      <p className="text-sm text-muted-foreground">
+                                        <span className="font-semibold">
+                                          Clique para upload
+                                        </span>{" "}
+                                        ou arraste uma imagem
                                       </p>
-                                      <p className="text-sm text-muted-foreground mt-1">
-                                        {field.value.address}
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        PNG, JPG, WEBP até 5MB
                                       </p>
                                     </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      Clique no botão acima para abrir o mapa e selecionar a
-                      localização exata do evento.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Seção: Configurações */}
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Configurações
-                  </h2>
-
-                  {/* Campo: Abrir inscrições imediatamente */}
-                  <div className="space-y-3">
-                    <FormField
-                      control={form.control}
-                      name="openImmediately"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                          <FormControl>
-                            <Input
-                              type="checkbox"
-                              checked={field.value}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                              className="h-4 w-4 mt-1"
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-base font-medium">
-                              Abrir inscrições imediatamente
-                            </FormLabel>
-                            <p className="text-sm text-muted-foreground">
-                              Se marcado, as inscrições ficarão abertas assim
-                              que o evento for criado.
+                                ) : (
+                                  <div className="w-full space-y-3">
+                                    <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                                      <Image
+                                        src={previewUrl}
+                                        alt="Preview"
+                                        fill
+                                        className="object-cover"
+                                      />
+                                      <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-xs">
+                                        Imagem selecionada
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Formatos recomendados: JPG, PNG ou WebP. Tamanho
+                              ideal: 1200x600 pixels.
                             </p>
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Botões de Ação */}
-                <div className="flex gap-4 justify-start pt-6 border-t">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleCancel}
-                    className="min-w-24"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button type="submit" className="min-w-24 dark:text-white">
-                    Criar Evento
-                  </Button>
+              {/* Seção: Data do Evento */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Data do Evento
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Selecione a data inicial e final do evento.
+                </p>
+
+                <div className="w-full max-w-lg">
+                  {/* Campo: Período do Evento */}
+                  <div className="space-y-3">
+                    <div className="w-full">
+                      <CalendarRanger
+                        dateRange={dateRange}
+                        onDateRangeChange={setDateRange}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </form>
-            </FormProvider>
-          </div>
+              </div>
+
+              {/* Seção: Localização */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Localização
+                </h2>
+
+                {/* Campo: Localização */}
+                <div className="space-y-3">
+                  <FormLabel className="text-base font-medium">
+                    Localização do Evento *
+                  </FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="space-y-3">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={handleSelectLocation}
+                              className="w-full h-12 border-dashed"
+                            >
+                              <MapPin className="h-4 w-4 mr-2" />
+                              {field.value?.address
+                                ? "Alterar Localização"
+                                : "Selecionar Localização"}
+                            </Button>
+
+                            {field.value?.address && (
+                              <div className="p-4 border rounded-lg bg-muted/50">
+                                <div className="flex items-start gap-3">
+                                  <MapPin className="h-4 w-4 text-primary mt-0.5" />
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium text-foreground">
+                                      Local selecionado:
+                                    </p>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      {field.value.address}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Clique no botão acima para abrir o mapa e selecionar a
+                    localização exata do evento.
+                  </p>
+                </div>
+              </div>
+
+              {/* Seção: Configurações */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Configurações
+                </h2>
+
+                {/* Campo: Abrir inscrições imediatamente */}
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="openImmediately"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
+                            className="h-4 w-4 mt-1"
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-base font-medium">
+                            Abrir inscrições imediatamente
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Se marcado, as inscrições ficarão abertas assim que
+                            o evento for criado.
+                          </p>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex gap-4 justify-start pt-6 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  className="min-w-24"
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" className="min-w-24 dark:text-white">
+                  Criar Evento
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
         </div>
       </div>
     </div>

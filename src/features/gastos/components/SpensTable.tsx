@@ -1,6 +1,5 @@
 "use client";
 
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -15,23 +14,36 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Calendar, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Event } from "@/features/events/types/eventTypes";
 
-export default function SpensTable() {
-  const router = useRouter();
+interface SpensTableProps {
+  events: Event[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  onViewEvent: (eventId: string) => void;
+}
+
+export default function SpensTable({
+  events,
+  loading,
+  error,
+  page,
+  pageCount,
+  onPageChange,
+  onViewEvent,
+}: SpensTableProps) {
   const [imageLoading, setImageLoading] = useState(true);
-  const { events, loading, error, page, pageCount, setPage } = useEventsAll({
-    initialPage: 1,
-    pageSize: 8,
-  });
 
   const handleViewExpenses = (eventId: string) => {
-    router.push(`/super/gastos/${eventId}`);
+    onViewEvent(eventId);
   };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    onPageChange(newPage);
   };
 
   // Função para quando a imagem carregar

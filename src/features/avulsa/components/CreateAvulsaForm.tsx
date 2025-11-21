@@ -34,28 +34,20 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ArrowLeft,
-  CreditCard,
-  DollarSign,
-  Plus,
-  Trash2,
-  User,
-  Users,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { CreditCard, DollarSign, Plus, Trash2, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { useCreateAvulsaRegistration } from "../hooks/useCreateAvulsaRegistration";
 import {
   CreateAvulsaFormData,
   createAvulsaFormSchema,
   ParticipantFormData,
 } from "../schema/avulsaSchema";
-import type { CreateInscriptionAvulInput } from "../types/avulsaTypes";
 
 interface CreateAvulsaFormProps {
-  eventId: string;
+  onSubmit: (data: CreateAvulsaFormData) => void;
+  onCancel: () => void;
+  isSubmitting: boolean;
+  error?: string | null;
 }
 
 interface AddParticipantDialogProps {
@@ -321,9 +313,12 @@ function AddParticipantDialog({ onAddParticipant }: AddParticipantDialogProps) {
   );
 }
 
-export default function CreateAvulsaForm({ eventId }: CreateAvulsaFormProps) {
-  const router = useRouter();
-  const createAvulsaMutation = useCreateAvulsaRegistration();
+export default function CreateAvulsaForm({
+  onSubmit,
+  onCancel,
+  isSubmitting,
+  error,
+}: CreateAvulsaFormProps) {
   const defaultFormValues = useMemo<CreateAvulsaFormData>(
     () => ({
       responsible: "",
@@ -382,71 +377,15 @@ export default function CreateAvulsaForm({ eventId }: CreateAvulsaFormProps) {
     appendParticipant(participant);
   };
 
-  const onSubmit = async (data: CreateAvulsaFormData) => {
-    const participantTotals = data.participants.map((participant) =>
-      participant.payments.reduce(
-        (sum, payment) => sum + Number(payment.value || 0),
-        0
-      )
-    );
-
-    const totalValue = participantTotals.reduce((sum, participantTotal) => {
-      return sum + participantTotal;
-    }, 0);
-
-    const payload: CreateInscriptionAvulInput = {
-      eventId,
-      responsible: data.responsible,
-      phone: data.phone || undefined,
-      totalValue,
-      status: data.status,
-      participants: data.participants.map((participant) => ({
-        name: participant.name,
-        gender: participant.gender,
-        payments: participant.payments.map((payment) => ({
-          paymentMethod: payment.paymentMethod,
-          value: payment.value.trim(),
-        })),
-      })),
-    };
-
-    createAvulsaMutation.mutate(payload, {
-      onSuccess: () => {
-        form.reset({ ...defaultFormValues, participants: [] });
-        router.back();
-      },
-    });
-  };
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    await onSubmit(data);
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={() => router.back()}
-              className="border-gray-200 dark:border-gray-600"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-3">
-              <User className="h-8 w-8 text-gray-600 dark:text-gray-400" />
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Nova Inscrição Avulsa
-              </h1>
-            </div>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400">
-            Preencha os dados para criar uma nova inscrição avulsa para o evento
-          </p>
-        </div>
-
+    <div className="min-h-screen">
+      <div className="max-w-6xl mx-auto px-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={handleFormSubmit} className="space-y-8">
             {/* Informações do Responsável */}
             <Card className="border-0 shadow-sm bg-white dark:bg-gray-800">
               <CardHeader className="pb-4">
@@ -750,22 +689,17 @@ export default function CreateAvulsaForm({ eventId }: CreateAvulsaFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.back()}
+                onClick={onCancel}
                 className="border-gray-200 dark:border-gray-600"
               >
                 Cancelar
               </Button>
               <Button
                 type="submit"
-                disabled={
-                  createAvulsaMutation.isPending ||
-                  participantFields.length === 0
-                }
+                disabled={isSubmitting || participantFields.length === 0}
                 className="bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900"
               >
-                {createAvulsaMutation.isPending
-                  ? "Criando..."
-                  : "Criar Inscrição"}
+                {isSubmitting ? "Criando..." : "Criar Inscrição"}
               </Button>
             </div>
           </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
+import { Event } from "@/features/events/types/eventTypes";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -15,28 +15,39 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Calendar, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function TicketsTable() {
-  const router = useRouter();
+interface TicketsTableProps {
+  events: Event[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  onViewEvent: (eventId: string) => void;
+}
+
+export default function TicketsTable({
+  events,
+  loading,
+  error,
+  page,
+  pageCount,
+  onPageChange,
+  onViewEvent,
+}: TicketsTableProps) {
   const [imageLoading, setImageLoading] = useState(true);
-  const { events, loading, error, page, pageCount, setPage } = useEventsAll({
-    initialPage: 1,
-    pageSize: 8,
-  });
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
 
   const handleIndividualInscription = (eventId: string) => {
-    router.push(`/super/tickets/analysis/${eventId}`);
+    onViewEvent(eventId);
   };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  // Função para quando a imagem carregar
-  const handleImageLoad = () => {
-    setImageLoading(false);
+    onPageChange(newPage);
   };
 
   // Função para determinar o status do evento
@@ -107,16 +118,7 @@ export default function TicketsTable() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Tickets
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Crie e gerencie as vendas dos tickets de seu evento
-        </p>
-      </div>
-
+    <div className="container mx-auto px-4">
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, index) => (

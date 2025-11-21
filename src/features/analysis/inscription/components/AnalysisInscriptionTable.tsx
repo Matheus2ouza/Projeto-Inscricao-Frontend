@@ -14,28 +14,38 @@ import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useEventsForAnalysis } from "../hooks/useEventsForAnalysis";
+import type { Event } from "../types/eventTypes";
 
-export default function AnalysisInscriptionTable() {
-  const router = useRouter();
+interface AnalysisInscriptionTableProps {
+  events: Event[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  onViewEvent: (eventId: string) => void;
+}
+
+export default function AnalysisInscriptionTable({
+  events,
+  loading,
+  error,
+  page,
+  pageCount,
+  onPageChange,
+  onViewEvent,
+}: AnalysisInscriptionTableProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
-  const { events, loading, error, page, pageCount, setPage } =
-    useEventsForAnalysis({
-      initialPage: 1,
-      pageSize: 8,
-    });
 
-  //Vai para o app/(private)/super/inscriptions/analysis/[id]
   const handleIndividualInscription = (eventId: string) => {
-    router.push(`/super/inscriptions/analysis/${eventId}`);
+    onViewEvent(eventId);
   };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    onPageChange(newPage);
   };
 
   // Função para quando a imagem carregar
@@ -143,16 +153,7 @@ export default function AnalysisInscriptionTable() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Análise de Inscrições
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Monitore o progresso da análise das inscrições dos eventos
-        </p>
-      </div>
-
+    <div className="space-y-6">
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, index) => (

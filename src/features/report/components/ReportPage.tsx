@@ -1,6 +1,6 @@
 "use client";
 
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
+import { Event } from "@/features/events/types/eventTypes";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -15,31 +15,33 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Calendar, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function ReportTable() {
-  const router = useRouter();
+interface ReportTableProps {
+  events: Event[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  onViewReport: (eventId: string) => void;
+}
+
+export default function ReportTable({
+  events,
+  loading,
+  error,
+  page,
+  pageCount,
+  onPageChange,
+  onViewReport,
+}: ReportTableProps) {
   const [imageLoading, setImageLoading] = useState(true);
-  const { events, loading, error, page, pageCount, setPage } = useEventsAll({
-    initialPage: 1,
-    pageSize: 8,
-  });
 
-  const handleViewReport = (eventId: string) => {
-    router.push(`/super/report/${eventId}`);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  // Função para quando a imagem carregar
   const handleImageLoad = () => {
     setImageLoading(false);
   };
 
-  // Função para determinar o status do evento
   const getEventStatusInfo = (status: string) => {
     switch (status) {
       case "OPEN":
@@ -69,9 +71,7 @@ export default function ReportTable() {
     }
   };
 
-  // Função para gerar gradiente baseado no nome do evento
   const generateGradient = (eventName: string) => {
-    // Gerar cores baseadas no nome do evento para consistência
     const colors = [
       "from-purple-500 to-pink-500",
       "from-blue-500 to-cyan-500",
@@ -82,14 +82,11 @@ export default function ReportTable() {
       "from-yellow-500 to-orange-500",
       "from-pink-500 to-rose-500",
     ];
-
-    // Gerar índice baseado no nome do evento
     let hash = 0;
     for (let i = 0; i < eventName.length; i++) {
       hash = eventName.charCodeAt(i) + ((hash << 5) - hash);
     }
     const index = Math.abs(hash) % colors.length;
-
     return colors[index];
   };
 
@@ -107,16 +104,7 @@ export default function ReportTable() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Relatórios
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Consulte o desempenho financeiro completo de cada evento
-        </p>
-      </div>
-
+    <div className="container mx-auto px-4">
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, index) => (
@@ -138,7 +126,6 @@ export default function ReportTable() {
             {events.map((event) => {
               const statusInfo = getEventStatusInfo(event.status);
               const gradientClass = generateGradient(event.name);
-
               return (
                 <Card
                   key={event.id}
@@ -148,7 +135,6 @@ export default function ReportTable() {
                     <div className="w-full h-48 relative">
                       {event.imageUrl ? (
                         <>
-                          {/* Loading overlay para a imagem */}
                           {imageLoading && (
                             <div className="absolute inset-0 flex items-center justify-center bg-muted z-10">
                               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -158,10 +144,8 @@ export default function ReportTable() {
                             src={event.imageUrl}
                             alt={event.name}
                             fill
-                            sizes="(max-width: 768px) 100vw,
-                                (max-width: 1200px) 50vw,
-                                25vw"
-                            priority={true}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                            priority
                             loading="eager"
                             decoding="async"
                             className="object-cover rounded-t-xl"
@@ -181,7 +165,6 @@ export default function ReportTable() {
                           />
                         </>
                       ) : (
-                        // Gradiente quando não há imagem
                         <div
                           className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
                         ></div>
@@ -197,7 +180,6 @@ export default function ReportTable() {
                     <h3 className="font-bold text-lg mb-1 line-clamp-2">
                       {event.name}
                     </h3>
-
                     <div className="flex items-center text-sm dark:text-white mb-1">
                       <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="line-clamp-1">
@@ -205,24 +187,20 @@ export default function ReportTable() {
                         - {new Date(event.endDate).toLocaleDateString("pt-BR")}
                       </span>
                     </div>
-
                     <div className="flex items-center text-sm dark:text-white">
                       <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="line-clamp-1">{event.location}</span>
                     </div>
-
-                    {/* Botões de Inscrição */}
                     <div className="flex flex-col w-full gap-2 mt-2">
                       <Button
                         size="sm"
                         className="w-full dark:text-white rounded-lg"
-                        onClick={() => handleViewReport(event.id)}
+                        onClick={() => onViewReport(event.id)}
                         disabled={statusInfo.disabled}
                       >
                         Visualizar Relatório
                       </Button>
                     </div>
-
                     {event.typesInscriptions &&
                       event.typesInscriptions.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
@@ -250,7 +228,6 @@ export default function ReportTable() {
               );
             })}
           </div>
-
           {events.length === 0 && !loading && (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
@@ -261,38 +238,33 @@ export default function ReportTable() {
               </p>
             </div>
           )}
-
           {pageCount > 1 && (
             <div className="flex justify-center mt-8">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      onClick={() => page > 1 && handlePageChange(page - 1)}
+                      onClick={() => page > 1 && onPageChange(page - 1)}
                       href={page > 1 ? "#" : undefined}
                       className={
                         page === 1 ? "pointer-events-none opacity-50" : ""
                       }
                     />
                   </PaginationItem>
-
                   {Array.from({ length: pageCount }, (_, i) => (
                     <PaginationItem key={i}>
                       <PaginationLink
                         isActive={page === i + 1}
                         href="#"
-                        onClick={() => handlePageChange(i + 1)}
+                        onClick={() => onPageChange(i + 1)}
                       >
                         {i + 1}
                       </PaginationLink>
                     </PaginationItem>
                   ))}
-
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() =>
-                        page < pageCount && handlePageChange(page + 1)
-                      }
+                      onClick={() => page < pageCount && onPageChange(page + 1)}
                       href={page < pageCount ? "#" : undefined}
                       className={
                         page === pageCount

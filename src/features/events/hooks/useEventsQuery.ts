@@ -14,7 +14,7 @@ export const eventsKeys = {
 export function useEventsQuery(page: number = 1, pageSize: number = 8) {
   return useQuery({
     queryKey: eventsKeys.list(page, pageSize),
-    queryFn: () => getEvents({ page, pageSize, status: ['OPEN'] }),
+    queryFn: () => getEvents({ page, pageSize, status: ['OPEN', 'CLOSE'] }),
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
     retry: 2,

@@ -13,6 +13,7 @@ import {
   type CreateEventRequest,
   type StatusEvent,
 } from "../api/registerEvent";
+import { useInvalidateEventsQuery } from "./useEventsQuery";
 
 const EventSchema = z.object({
   name: z
@@ -34,17 +35,22 @@ const EventSchema = z.object({
   accountIds: z
     .array(z.string())
     .min(1, { message: "Selecione pelo menos um responsável" }),
-  location: z.object({
-    lat: z
-      .number()
-      .min(-90, { message: "Latitude mínima é -90" })
-      .max(90, { message: "Latitude máxima é 90" }),
-    lng: z
-      .number()
-      .min(-180, { message: "Longitude mínima é -180" })
-      .max(180, { message: "Longitude máxima é 180" }),
-    address: z.string().optional(),
-  }),
+    location: z
+      .object({
+        lat: z
+          .number()
+          .min(-90, { message: "Latitude mínima é -90" })
+          .max(90, { message: "Latitude máxima é 90" }),
+        lng: z
+          .number()
+          .min(-180, { message: "Longitude mínima é -180" })
+          .max(180, { message: "Longitude máxima é 180" }),
+        address: z.string().optional(),
+      })
+      .optional()
+      .refine((value) => Boolean(value), {
+        message: "Localização é obrigatória",
+      }),
   openImmediately: z.boolean(),
 });
 
@@ -85,6 +91,7 @@ export default function useFormCreateEvent(): useFormCreateEvent {
     from: new Date(),
     to: new Date(new Date().setDate(new Date().getDate() + 3)),
   });
+  const { invalidateList } = useInvalidateEventsQuery();
 
   const form = useForm<EventFormType>({
     resolver: zodResolver(EventSchema),
@@ -135,6 +142,11 @@ export default function useFormCreateEvent(): useFormCreateEvent {
         ? "OPEN"
         : "CLOSE";
 
+      if (!input.location) {
+        toast.error("Localização é obrigatória");
+        return { success: false };
+      }
+
       const responsibles = input.accountIds.map((accountId) => ({
         accountId,
       }));
@@ -154,6 +166,9 @@ export default function useFormCreateEvent(): useFormCreateEvent {
       };
 
       const { id } = await registerEvent(eventData);
+
+      // Invalidar cache da lista assim que um novo evento é criado
+      invalidateList();
 
       form.reset();
       setDateRange({

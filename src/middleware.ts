@@ -86,13 +86,13 @@ export default async function middleware(request: NextRequest) {
     }
 
     const role = session.user.role;
-    const roleHomePrefix: Record<string, string> = {
+    const rolePrefix: Record<string, string> = {
       SUPER: "/super/",
       ADMIN: "/admin/",
       MANAGER: "/admin/",
       USER: "/user/",
     };
-    const requiredPrefix = roleHomePrefix[role] ?? "/user/";
+    const requiredPrefix = rolePrefix[role] ?? "/user/";
 
     if (!pathname.startsWith(requiredPrefix)) {
       const redirectUrl = request.nextUrl.clone();

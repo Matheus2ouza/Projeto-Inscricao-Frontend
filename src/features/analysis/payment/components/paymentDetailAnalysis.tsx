@@ -49,8 +49,6 @@ interface PaymentDetailAnalysisProps {
   eventStatus: string;
   eventId: string;
   paymentData: AnalysisPaymentResponse | null;
-  loading: boolean;
-  error: Error | null;
   page: number;
   pageCount: number;
   total: number;
@@ -62,8 +60,6 @@ export default function PaymentDetailAnalysis({
   eventStatus,
   eventId,
   paymentData,
-  loading,
-  error,
   page,
   pageCount,
   total,

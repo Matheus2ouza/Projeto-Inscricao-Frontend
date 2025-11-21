@@ -19,49 +19,69 @@ import {
 } from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/shared/components/ui/pagination";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { cn } from "@/shared/lib/utils";
-import { DollarSign, Plus, Receipt, User } from "lucide-react";
-import { useParams } from "next/navigation";
+import { CardBody, CardFooter, Skeleton } from "@heroui/react";
+import { Badge, Calendar, DollarSign, Plus, User } from "lucide-react";
 import { useState } from "react";
-import { useCreateExpense } from "../hooks/useCreateExpense";
-import { useExpensesByEvent } from "../hooks/useExpensesByEvent";
-import { PaymentMethod } from "../types/expensesTypes";
+import { UseFormReturn } from "react-hook-form";
+import {
+  FindAllPaginatedEventExpensesResponse,
+  PaymentMethod,
+} from "../types/expensesTypes";
 
-export default function ExpensesByEvent() {
-  const params = useParams();
-  const eventId = params.id as string;
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
-
-  const {
-    data: expensesData,
-    isLoading,
-    error,
-    invalidate,
-  } = useExpensesByEvent({ eventId, page: currentPage, pageSize });
-
-  const [openCreate, setOpenCreate] = useState(false);
-  const { form, onSubmit, submitting } = useCreateExpense(eventId);
-
-  const handleCreateSuccess = () => {
-    setOpenCreate(false);
-    invalidate();
+interface ExpensesByEventProps {
+  expensesData: FindAllPaginatedEventExpensesResponse | null;
+  isLoading: boolean;
+  error: string | Error | null;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  createForm: {
+    form: UseFormReturn<any>;
+    onSubmit: (event?: React.BaseSyntheticEvent) => void;
+    submitting: boolean;
   };
+}
+
+const paymentMethodLabels: Record<PaymentMethod, string> = {
+  PIX: "PIX",
+  CARTÃO: "Cartão",
+  DINHEIRO: "Dinheiro",
+};
+
+export default function ExpensesByEvent({
+  expensesData,
+  isLoading,
+  error,
+  page,
+  pageCount,
+  onPageChange,
+  createForm,
+}: ExpensesByEventProps) {
+  const [openCreate, setOpenCreate] = useState(false);
+  const { form, onSubmit, submitting } = createForm;
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    onPageChange(newPage);
   };
 
-  const paymentMethodLabels: Record<PaymentMethod, string> = {
-    PIX: "PIX",
-    CARTÃO: "Cartão",
-    DINHEIRO: "Dinheiro",
+  const handleDialogClose = () => {
+    setOpenCreate(false);
+    form.reset();
   };
 
   return (
@@ -169,10 +189,7 @@ export default function ExpensesByEvent() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => {
-                      setOpenCreate(false);
-                      form.reset();
-                    }}
+                    onClick={handleDialogClose}
                   >
                     Cancelar
                   </Button>
@@ -188,9 +205,7 @@ export default function ExpensesByEvent() {
         {error && (
           <Card className="border-0 shadow-sm">
             <CardContent className="p-6 text-center text-red-600">
-              {error instanceof Error
-                ? error.message
-                : "Erro ao carregar gastos"}
+              {error instanceof Error ? error.message : error}
             </CardContent>
           </Card>
         )}
@@ -199,62 +214,45 @@ export default function ExpensesByEvent() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, index) => (
               <Card key={index} className="border-0 shadow-sm">
-                <CardContent className="p-5 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
-                </CardContent>
+                <CardBody className="p-0">
+                  <Skeleton className="w-full h-48 rounded-t-xl" />
+                </CardBody>
+                <CardFooter className="flex flex-col items-start p-4">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </CardFooter>
               </Card>
             ))}
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {(expensesData?.expenses || []).map((expense) => (
+              {expensesData?.expenses.map((expense) => (
                 <Card
                   key={expense.id}
-                  className="border-0 shadow-sm hover:shadow-md transition-shadow"
+                  className="border-0 shadow-md rounded-xl overflow-hidden"
                 >
-                  <CardContent className="p-5 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Receipt className="w-4 h-4 text-primary" />
-                        <h3 className="text-lg font-semibold line-clamp-2">
-                          {expense.description}
-                        </h3>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <User className="w-4 h-4" />
-                      <span className="line-clamp-1">
-                        {expense.responsible}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        {new Intl.NumberFormat("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(expense.value)}
-                      </span>
-                      <span
-                        className={cn(
-                          "px-2 py-1 text-xs rounded-md",
-                          "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                        )}
-                      >
-                        {paymentMethodLabels[expense.paymentMethod]}
-                      </span>
-                    </div>
-
-                    <div className="text-xs text-muted-foreground">
-                      Criado em:{" "}
+                  <CardBody className="p-4 relative">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {expense.description}
+                    </h3>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
                       {new Date(expense.createdAt).toLocaleDateString("pt-BR")}
-                    </div>
-                  </CardContent>
+                    </p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      {expense.responsible}
+                    </p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      <DollarSign className="w-4 h-4" />
+                      R$ {expense.value.toFixed(2)}
+                    </p>
+                    <Badge className="absolute top-4 right-4">
+                      {expense.paymentMethod}
+                    </Badge>
+                  </CardBody>
                 </Card>
               ))}
             </div>
@@ -262,39 +260,53 @@ export default function ExpensesByEvent() {
             {expensesData?.expenses.length === 0 && (
               <div className="text-center py-12">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  Nenhum gasto encontrado
+                  Nenhum gasto registrado
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Não há gastos registrados para este evento.
+                  Registre um gasto para aparecer aqui.
                 </p>
               </div>
             )}
 
-            {expensesData && expensesData.pageCount > 1 && (
-              <div className="flex justify-center mt-8">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Anterior
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    Página {currentPage} de {expensesData.pageCount}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === expensesData.pageCount}
-                  >
-                    Próxima
-                  </Button>
-                </div>
-              </div>
-            )}
+            <div className="flex justify-center mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => page > 1 && handlePageChange(page - 1)}
+                      href={page > 1 ? "#" : undefined}
+                      className={
+                        page === 1 ? "pointer-events-none opacity-50" : ""
+                      }
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: pageCount }, (_, i) => (
+                    <PaginationItem key={i}>
+                      <PaginationLink
+                        isActive={page === i + 1}
+                        href="#"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        page < pageCount && handlePageChange(page + 1)
+                      }
+                      href={page < pageCount ? "#" : undefined}
+                      className={
+                        page === pageCount
+                          ? "pointer-events-none opacity-50"
+                          : ""
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           </>
         )}
       </div>

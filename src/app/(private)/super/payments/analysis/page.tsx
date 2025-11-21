@@ -5,8 +5,10 @@ import { useEventsForAnalysis } from "@/features/analysis/payment/hooks/useEvent
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
-export default function AnalysisPaymentPage() {
+export default function AnalysisPaymentSuperPage() {
+  const router = useRouter();
   const { events, loading, error, page, pageCount, setPage } =
     useEventsForAnalysis({
       initialPage: 1,
@@ -58,16 +60,27 @@ export default function AnalysisPaymentPage() {
     );
   }
 
+  const handleBack = () => {
+    router.push("/super/inscriptions/avulsa");
+  };
+
+  const handleIndividualInscription = (eventId: string) => {
+    router.push(`/super/payments/analysis/${eventId}`);
+  };
+
   return (
     <PageContainer
       title="Análise de Pagamentos"
       description="Monitore o progresso da análise dos pagamentos dos eventos"
+      showBackButton={true}
+      backButtonAction={handleBack}
     >
       <AnalysisPaymentTable
         events={events}
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
+        onIndividualInscription={handleIndividualInscription}
       />
     </PageContainer>
   );

@@ -1,3 +1,18 @@
+export function getStatusInscriptionText(status: string): string {
+  switch (status.toLowerCase()) {
+    case "pending":
+      return "PENDENTE";
+    case "paid":
+      return "APROVADA";
+    case "cancelled":
+      return "REJEITADA";
+    case "under_review":
+      return "EM ANÁLISE";
+    default:
+      return status.toUpperCase();
+  }
+}
+
 export function getStatusInscriptionColor(status: string): string {
   switch (status.toLowerCase()) {
     case "pending":

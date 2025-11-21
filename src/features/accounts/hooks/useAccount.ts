@@ -10,9 +10,12 @@ type UseAccountResult = {
   refetch: () => Promise<void>;
 };
 
-export function useAccount(autoFetch: boolean = true): UseAccountResult {
+export function useAccount(
+  autoFetch: boolean = true,
+  roles?: string[]
+): UseAccountResult {
   const { data, isLoading, isFetching, error, refetch } =
-    useAccountsComboboxQuery(autoFetch);
+    useAccountsComboboxQuery(autoFetch, roles);
 
   return {
     accounts: data ?? [],

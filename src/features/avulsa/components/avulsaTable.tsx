@@ -1,6 +1,5 @@
 "use client";
 
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -16,23 +15,37 @@ import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Calendar, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function AvulsaTable() {
-  const router = useRouter();
+import type { Event } from "@/features/events/types/eventTypes";
+
+interface AvulsaTableProps {
+  events: Event[];
+  loading: boolean;
+  error: string | null;
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+  onViewEvent: (eventId: string) => void;
+}
+
+export default function AvulsaTable({
+  events,
+  loading,
+  error,
+  page,
+  pageCount,
+  onPageChange,
+  onViewEvent,
+}: AvulsaTableProps) {
   const [imageLoading, setImageLoading] = useState(true);
-  const { events, loading, error, page, pageCount, setPage } = useEventsAll({
-    initialPage: 1,
-    pageSize: 8,
-  });
 
   const handleIndividualInscription = (eventId: string) => {
-    router.push(`/super/inscriptions/avulsa/${eventId}`);
+    onViewEvent(eventId);
   };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    onPageChange(newPage);
   };
 
   // Função para quando a imagem carregar
@@ -108,16 +121,7 @@ export default function AvulsaTable() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Inscrições Avulsas
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          Crie e gerencie as inscrições avulsas do seu evento
-        </p>
-      </div>
-
+    <div className="container mx-auto px-4">
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, index) => (

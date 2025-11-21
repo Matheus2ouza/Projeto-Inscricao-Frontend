@@ -2,15 +2,21 @@
 
 import EventManagement from "@/features/events/components/EventManagement";
 import { useEvent } from "@/features/events/hooks/useEvent";
+import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-export default function EventManagementPage() {
+export default function EventManagementSuperPage() {
+  const router = useRouter();
   const params = useParams();
   const eventId = params.id as string;
   const { event, loading, error, refetch } = useEvent(eventId);
+
+  const handleBack = () => {
+    router.replace(`/super/home`);
+  };
 
   if (loading) {
     return (
@@ -74,5 +80,14 @@ export default function EventManagementPage() {
     );
   }
 
-  return <EventManagement event={event} refetch={refetch} />;
+  return (
+    <PageContainer
+      title="Gerenciar Evento"
+      description="Edite e visualize os detalhes do evento"
+      showBackButton={true}
+      backButtonAction={handleBack}
+    >
+      <EventManagement event={event} refetch={refetch} />;
+    </PageContainer>
+  );
 }

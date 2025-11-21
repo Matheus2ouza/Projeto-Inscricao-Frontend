@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
-export default function PaymentsDetailInsideAnalysisPage() {
+export default function PaymentsDetailInsideAnalysisSuperPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const inscriptionId = params.id as string;
@@ -117,8 +117,6 @@ export default function PaymentsDetailInsideAnalysisPage() {
         eventId={eventId}
         eventStatus={eventStatus}
         paymentData={paymentData || null}
-        loading={loading}
-        error={error || null}
         page={page}
         pageCount={pageCount}
         total={total}

@@ -66,9 +66,17 @@ export default function EventAccountsInscriptions({
   );
 
   useEffect(() => {
-    setSelectedInscriptionIds((prev) =>
-      prev.filter((id) => availableInscriptionIds.includes(id))
-    );
+    setSelectedInscriptionIds((prev) => {
+      const filtered = prev.filter((id) =>
+        availableInscriptionIds.includes(id)
+      );
+
+      if (filtered.length === prev.length) {
+        return prev;
+      }
+
+      return filtered;
+    });
   }, [availableInscriptionIds]);
 
   const totalSelected = selectedInscriptionIds.length;
@@ -420,10 +428,6 @@ export default function EventAccountsInscriptions({
           {accounts.map((account) => renderAccountRow(account))}
         </div>
       )}
-
-      <p className="text-left text-sm text-muted-foreground">
-        Dados atualizados em tempo real a partir das contas do evento.
-      </p>
     </div>
   );
 }
