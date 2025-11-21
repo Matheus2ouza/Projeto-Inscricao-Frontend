@@ -13,8 +13,12 @@ export default async function SessionUserProvider({
 }: SessionUserProviderProps) {
   const session = await verifySession();
 
+  if (!session?.user) {
+    throw new Error("SessionUserProvider requires authenticated session");
+  }
+
   return (
-    <UserContextProvider initialUser={session?.user ?? null}>
+    <UserContextProvider initialUser={session.user}>
       {children}
     </UserContextProvider>
   );
