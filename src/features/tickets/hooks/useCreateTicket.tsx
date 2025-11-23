@@ -7,50 +7,51 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { createTicket } from "../api/createTicket";
+import { schema } from "../schema/create-ticket.schema";
 import { ticketsKeys } from "../types/ticketsTypes";
 
-const createTicketSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Nome deve ter pelo menos 2 caracteres" })
-    .max(60, { message: "Nome deve ter no máximo 60 caracteres" }),
-  quantity: z.string().refine((v) => !isNaN(Number(v)) && Number(v) > 0, {
-    message: "Quantidade deve ser um número maior que 0",
-  }),
-  price: z.string().refine((v) => !isNaN(Number(v)) && Number(v) >= 0, {
-    message: "Preço deve ser um número válido",
-  }),
-  description: z.string().optional(),
-});
+export type CreateTicketFormType = z.input<typeof schema>;
+type CreateTicketFormValues = z.infer<typeof schema>;
 
-export type CreateTicketFormType = z.infer<typeof createTicketSchema>;
+const getTodayInputDate = () => {
+  const now = new Date();
+  const timezoneOffset = now.getTimezoneOffset();
+  const local = new Date(now.getTime() - timezoneOffset * 60 * 1000);
+  return local.toISOString().split("T")[0];
+};
 
 export function useCreateTicket(eventId: string) {
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
 
   const form = useForm<CreateTicketFormType>({
-    resolver: zodResolver(createTicketSchema),
+    resolver: zodResolver(schema, undefined, { raw: true }),
     defaultValues: {
       name: "",
       quantity: "",
       price: "",
+      validity: getTodayInputDate(),
       description: "",
     },
   });
 
-  async function onCreate(input: CreateTicketFormType) {
+  async function onCreate(values: CreateTicketFormType) {
     setSubmitting(true);
+
     try {
+      const input: CreateTicketFormValues = schema.parse(values);
+
       const payload = {
         eventId,
         name: input.name,
         description: input.description || undefined,
-        quantity: Number(input.quantity),
-        price: Number(input.price),
+        quantity: input.quantity,
+        price: input.price,
+        expirationDate: input.validity,
       };
 
       const result = await createTicket(payload);
+
       toast.success("Ticket criado com sucesso", {
         description: `ID: ${result.id}`,
       });
@@ -58,6 +59,7 @@ export function useCreateTicket(eventId: string) {
       await queryClient.invalidateQueries({
         queryKey: ticketsKeys.byEvent(eventId),
       });
+
       form.reset();
       return true;
     } catch (err) {
@@ -70,8 +72,20 @@ export function useCreateTicket(eventId: string) {
     }
   }
 
-  const onSubmit = (event?: React.BaseSyntheticEvent) =>
-    form.handleSubmit(onCreate)(event);
+  const onSubmit = async (event?: React.BaseSyntheticEvent) => {
+    let success = false;
+    const handler = form.handleSubmit(async (values) => {
+      success = (await onCreate(values)) ?? false;
+    });
+
+    if (event) {
+      await handler(event);
+    } else {
+      await handler();
+    }
+
+    return success;
+  };
 
   return { form, onSubmit, submitting };
 }
