@@ -14,7 +14,7 @@ export async function createTicket(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao criar ticket. Tente novamente."
+      "Falha ao criar ticket. Tente novamente."
     );
   }
 }
