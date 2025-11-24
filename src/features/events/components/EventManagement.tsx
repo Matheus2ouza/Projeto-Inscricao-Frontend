@@ -1,13 +1,17 @@
 "use client";
 
 import { useAccount } from "@/features/accounts/hooks/useAccount";
+import { deleteImageEvent } from "@/features/events/api/deleteImageEvent";
+import { deleteLogoEvent } from "@/features/events/api/deleteLogoEvent";
 import { updateEventImage } from "@/features/events/api/updateEventImage";
+import { updateEventLogo } from "@/features/events/api/updateEventLogo";
 import TypeInscriptionDialog from "@/features/typeInscription/components/TypeInscriptionDialog";
 import { useTypeInscriptions } from "@/features/typeInscription/hook/useTypeInscriptions";
 import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import EventMap from "@/shared/components/EventMap";
 import ImageCropDialog from "@/shared/components/ImageCropDialog";
+import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
@@ -84,7 +88,13 @@ export default function EventManagement({
 
   const [responsiblesDialogOpen, setResponsiblesDialogOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [deleteImage, setDeleteImage] = useState(false);
+  const [deleteLogo, setDeleteLogo] = useState(false);
+  const [isDeleteImageOpen, setIsDeleteImageOpen] = useState(false);
+  const [isDeleteLogoOpen, setIsDeleteLogoOpen] = useState(false);
   const [isDeleteEventOpen, setisDeleteEventOpen] = useState(false);
   const [deleteResponsibleDialog, setDeleteResponsibleDialog] = useState<{
     open: boolean;
@@ -127,6 +137,44 @@ export default function EventManagement({
         return { label: "Status desconhecido", color: "bg-gray-600" };
     }
   };
+
+  const handleConfirmDeleteImage = useCallback(async () => {
+    try {
+      setDeleteImage(true);
+      await deleteImageEvent(event.id);
+      toast.success("Imagem deletada com sucesso!");
+      setIsDeleteImageOpen(false);
+      invalidateDetail(event.id);
+      await refetch();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Falha ao tentar deletar a imagem do evento";
+      toast.error(message);
+    } finally {
+      setDeleteImage(false);
+    }
+  }, [event.id, invalidateDetail, refetch]);
+
+  const handleConfirmDeleteLogo = useCallback(async () => {
+    try {
+      setDeleteLogo(true);
+      await deleteLogoEvent(event.id);
+      toast.success("Logo deletada com sucesso!");
+      setIsDeleteLogoOpen(false);
+      invalidateDetail(event.id);
+      await refetch();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Falha ao tentar deletar o logo do evento";
+      toast.error(message);
+    } finally {
+      setDeleteLogo(false);
+    }
+  }, [event.id, invalidateDetail, refetch]);
 
   const statusBadge = getEventStatus();
   const totalRevenue = event.amountCollected;
@@ -711,18 +759,20 @@ export default function EventManagement({
 
             {/* Card de Imagem do Evento */}
             <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                 Imagem do Evento
               </h2>
-
-              <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden mb-4">
+              <AspectRatio
+                ratio={16 / 9}
+                className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden w-full max-w-[640px] mx-auto"
+              >
                 {event.imageUrl ? (
                   <Image
                     src={event.imageUrl}
                     alt={event.name}
                     width={400}
                     height={225}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -731,17 +781,76 @@ export default function EventManagement({
                     </p>
                   </div>
                 )}
-              </div>
-
+              </AspectRatio>
               {isEditing && (
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setImageDialogOpen(true)}
-                  disabled={uploadingImage}
-                >
-                  {uploadingImage ? "Enviando..." : "Alterar Imagem"}
-                </Button>
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setImageDialogOpen(true)}
+                    disabled={uploadingImage}
+                  >
+                    {uploadingImage ? "Enviando..." : "Alterar Imagem"}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => setIsDeleteImageOpen(true)}
+                    disabled={deleteImage}
+                  >
+                    {deleteImage ? "Deletando..." : "Deletar Imagem"}
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Card de Logo do Evento */}
+            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                Logo do Evento
+              </h2>
+              <div className="flex justify-center">
+                <div className="w-[180px]">
+                  <AspectRatio
+                    ratio={1}
+                    className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden"
+                  >
+                    {event.logoUrl ? (
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={event.logoUrl}
+                          alt={`Logo do evento ${event.name}`}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-gray-500 dark:text-gray-400 text-sm font-medium">
+                        SEM LOGO
+                      </span>
+                    )}
+                  </AspectRatio>
+                </div>
+              </div>
+              {isEditing && (
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setLogoDialogOpen(true)}
+                    disabled={uploadingLogo}
+                  >
+                    {uploadingLogo ? "Enviando..." : "Alterar Logo"}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => setIsDeleteLogoOpen(true)}
+                    disabled={deleteLogo}
+                  >
+                    {deleteLogo ? "Deletando..." : "Deletar Logo"}
+                  </Button>
+                </div>
               )}
             </div>
           </div>
@@ -774,35 +883,87 @@ export default function EventManagement({
 
         {/* Diálogo de crop de imagem 16:9 para salvar em 1920x1080 */}
         {isEditing && (
-          <ImageCropDialog
-            open={imageDialogOpen}
-            onOpenChange={setImageDialogOpen}
-            aspect={16 / 9}
-            targetWidth={1920}
-            targetHeight={1080}
-            title="Alterar imagem do evento"
-            description="Arraste/solte sua imagem, ajuste o zoom e posição. Salvaremos em 1920x1080."
-            confirmLabel={uploadingImage ? "Enviando..." : "Salvar imagem"}
-            onConfirm={async ({ base64 }) => {
-              try {
-                setUploadingImage(true);
-                await updateEventImage({
-                  eventId: event.id,
-                  imageBase64: base64,
-                });
-                toast.success("Imagem atualizada com sucesso!");
-                setImageDialogOpen(false);
-                // Atualizar caches
-                invalidateDetail(event.id);
-                await refetch();
-              } catch (err) {
-                toast.error("Falha ao atualizar imagem do evento");
-              } finally {
-                setUploadingImage(false);
-              }
-            }}
-          />
+          <>
+            <ImageCropDialog
+              open={imageDialogOpen}
+              onOpenChange={setImageDialogOpen}
+              aspect={16 / 9}
+              targetWidth={1920}
+              targetHeight={1080}
+              title="Alterar imagem do evento"
+              description="Arraste/solte sua imagem, ajuste o zoom e posição. Salvaremos em 1920x1080."
+              confirmLabel={uploadingImage ? "Enviando..." : "Salvar imagem"}
+              onConfirm={async ({ base64 }) => {
+                try {
+                  setUploadingImage(true);
+                  await updateEventImage({
+                    eventId: event.id,
+                    imageBase64: base64,
+                  });
+                  toast.success("Imagem atualizada com sucesso!");
+                  setImageDialogOpen(false);
+                  invalidateDetail(event.id);
+                  await refetch();
+                } catch (err) {
+                  toast.error("Falha ao atualizar imagem do evento");
+                } finally {
+                  setUploadingImage(false);
+                }
+              }}
+            />
+            <ImageCropDialog
+              open={logoDialogOpen}
+              onOpenChange={setLogoDialogOpen}
+              aspect={1}
+              targetWidth={500}
+              targetHeight={500}
+              title="Alterar logo do evento"
+              description="Faça upload da logo, ajustando no formato quadrado. Salvaremos em 500x500."
+              confirmLabel={uploadingLogo ? "Enviando..." : "Salvar logo"}
+              onConfirm={async ({ base64 }) => {
+                try {
+                  setUploadingLogo(true);
+                  await updateEventLogo({
+                    eventId: event.id,
+                    imageBase64: base64,
+                  });
+                  toast.success("Logo atualizada com sucesso!");
+                  setLogoDialogOpen(false);
+                  invalidateDetail(event.id);
+                  await refetch();
+                } catch (err) {
+                  toast.error("Falha ao atualizar logo do evento");
+                } finally {
+                  setUploadingLogo(false);
+                }
+              }}
+            />
+          </>
         )}
+        {/* Diálogo de confirmação para deletar imagem */}
+        <ConfirmationDialog
+          open={isDeleteImageOpen}
+          onOpenChange={setIsDeleteImageOpen}
+          onConfirm={handleConfirmDeleteImage}
+          title="Deletar imagem do evento?"
+          message="Tem certeza que deseja deletar a imagem do evento?"
+          confirmText="Deletar imagem"
+          cancelText="Cancelar"
+          isLoading={deleteImage}
+          variant="destructive"
+        />
+        {/* Diálogo de confirmação para deletar logo */}
+        <ConfirmationDialog
+          open={isDeleteLogoOpen}
+          onOpenChange={setIsDeleteLogoOpen}
+          onConfirm={handleConfirmDeleteLogo}
+          title="Deletar logo do evento?"
+          message="Tem certeza que deseja deletar o logo do evento?"
+          confirmText="Deletar logo"
+          cancelText="Cancelar"
+          isLoading={deleteLogo}
+          variant="destructive"
+        />
         {/* Diálogo de confirmação para excluir evento */}
         <ConfirmationDialog
           open={isDeleteEventOpen}
