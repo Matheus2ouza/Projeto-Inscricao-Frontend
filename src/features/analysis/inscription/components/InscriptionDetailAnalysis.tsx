@@ -30,8 +30,8 @@ import {
 } from "@/shared/components/ui/pagination";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import {
+  getStatusColor,
   getStatusInscriptionColor,
-  getStatusTypeInscriptionColor,
 } from "@/shared/utils/getStatusColor";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -746,7 +746,7 @@ export default function InscriptionDetailAnalysis({
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span
-                              className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusTypeInscriptionColor(participant.typeInscription)}`}
+                              className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(participant.typeInscription)}`}
                             >
                               {participant.typeInscription}
                             </span>
