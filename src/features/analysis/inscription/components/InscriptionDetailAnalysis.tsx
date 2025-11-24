@@ -29,10 +29,8 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import {
-  getStatusColor,
-  getStatusInscriptionColor,
-} from "@/shared/utils/getStatusColor";
+import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
+import { getStatusColor } from "@/shared/utils/getStatusColor";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowDown,
@@ -481,11 +479,11 @@ export default function InscriptionDetailAnalysis({
                 </div>
               </div>
               <span
-                className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusInscriptionColor(
+                className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
                   inscriptionData.status
                 )}`}
               >
-                {getStatusText(inscriptionData.status)}
+                {getConvertStatusInscription(inscriptionData.status)}
               </span>
             </div>
 
