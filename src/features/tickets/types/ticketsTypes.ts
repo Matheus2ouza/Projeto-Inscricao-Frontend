@@ -32,6 +32,8 @@ export type TicketDetails = {
   quantity: number;
   price: number;
   available: number;
+  expirationDate: string;
+  isActive: boolean;
   ticketSale: TicketSale[];
 };
 
