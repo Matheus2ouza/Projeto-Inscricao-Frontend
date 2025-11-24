@@ -69,6 +69,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/shared/components/ui/tabs";
+import { getcalculateAge } from "@/shared/utils/getCalculateAge";
+import {
+  getConvertStatusInscription,
+  getConvertStatusPayment,
+} from "@/shared/utils/getConvertStatus";
+import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
   CreditCard,
   Download,
@@ -383,58 +389,6 @@ export default function DetailsInscriptionsTable({
     return new Date(date).toLocaleString("pt-BR");
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "APPROVED":
-        return "PAGO";
-      case "UNDER_REVIEW":
-        return "EM ANÁLISE";
-      case "REFUSED":
-        return "RECUSADO";
-      case "PENDING":
-        return "PENDENTE";
-      case "PAID":
-        return "PAGO";
-      case "CANCELLED":
-        return "CANCELADO";
-      default:
-        return status.toUpperCase();
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "APPROVED":
-      case "PAID":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "UNDER_REVIEW":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      case "REFUSED":
-      case "CANCELLED":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
-    }
-  };
-
-  const calculateAge = (birthDate: Date | string) => {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
-  };
-
   const handleImageLoad = (paymentId: string) => {
     setImageLoading((prev) => ({ ...prev, [paymentId]: false }));
   };
@@ -661,7 +615,7 @@ export default function DetailsInscriptionsTable({
               <Badge
                 className={`self-start text-sm px-3 py-1.5 ${getStatusColor(data.status)}`}
               >
-                {getStatusText(data.status.toUpperCase())}
+                {getConvertStatusInscription(data.status.toUpperCase())}
               </Badge>
             </div>
           </CardHeader>
@@ -808,7 +762,7 @@ export default function DetailsInscriptionsTable({
                             {formatDate(participant.birthDate)}
                           </TableCell>
                           <TableCell className="text-xs sm:text-sm font-medium">
-                            {calculateAge(participant.birthDate)} anos
+                            {getcalculateAge(participant.birthDate)} anos
                           </TableCell>
                           <TableCell className="hidden lg:table-cell">
                             <div className="flex items-center justify-between gap-2">
@@ -1013,7 +967,7 @@ export default function DetailsInscriptionsTable({
                         <div key={payment.id} className="border rounded-lg p-3">
                           <div className="flex items-center justify-between">
                             <Badge className={getStatusColor(payment.status)}>
-                              {getStatusText(payment.status)}
+                              {getConvertStatusPayment(payment.status)}
                             </Badge>
                             <span className="text-sm font-medium">
                               {formatCurrency(payment.value)}
@@ -1122,7 +1076,7 @@ export default function DetailsInscriptionsTable({
                                 <Badge
                                   className={getStatusColor(payment.status)}
                                 >
-                                  {getStatusText(payment.status)}
+                                  {getConvertStatusPayment(payment.status)}
                                 </Badge>
                               </TableCell>
                               <TableCell>
