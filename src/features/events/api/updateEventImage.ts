@@ -12,8 +12,14 @@ export async function updateEventImage({ eventId, imageBase64 }: UpdateEventImag
     });
   } catch (error) {
     console.error("Error updating event image:", error);
-    throw new Error("Falha ao atualizar imagem do evento");
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
+    throw new Error(
+      axiosError.response?.data?.message ||
+      "Falha ao atualizar a imagem do evento."
+    );
   }
 }
-
 

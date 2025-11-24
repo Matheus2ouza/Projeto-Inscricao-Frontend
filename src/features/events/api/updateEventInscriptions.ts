@@ -27,7 +27,7 @@ export async function updateEventInscriptions(
     };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao atualizar status das inscrições do evento"
+      "Falha ao atualizar status das inscrições do evento"
     );
   }
 }
