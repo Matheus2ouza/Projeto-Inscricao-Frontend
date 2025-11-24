@@ -2,7 +2,7 @@
 
 import { Button } from "@/shared/components/ui/button";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 const cosmicMessages = [
@@ -112,6 +112,7 @@ function StarryBackground() {
 }
 
 export default function NotFound() {
+  const router = useRouter();
   const message =
     cosmicMessages[Math.floor(Math.random() * cosmicMessages.length)];
 
@@ -141,8 +142,13 @@ export default function NotFound() {
             Vamos voltar para o começo antes que a nave decole sem aviso.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Button asChild variant="outline">
-              <Link href="/">Voltar ao Dashboard</Link>
+            <Button
+              variant="outline"
+              onClick={() => {
+                router.back();
+              }}
+            >
+              Voltar para a área segura
             </Button>
             <Button
               variant="ghost"

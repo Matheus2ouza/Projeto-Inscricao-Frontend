@@ -10,7 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import { getConvertStatus } from "@/shared/utils/getConvertStatus";
+import { getConvertStatusEvent } from "@/shared/utils/getConvertStatus";
 import {
   addDays,
   addMonths,
@@ -458,7 +458,7 @@ export default function AdminManagerHomeDashboard({
                     <span
                       className={`h-2 w-2 rounded-full ${statusColors[evt.displayStatus] ?? "bg-emerald-500"}`}
                     />
-                    {getConvertStatus(evt.displayStatus)}
+                    {getConvertStatusEvent(evt.displayStatus)}
                   </Badge>
                 </div>
               ))}

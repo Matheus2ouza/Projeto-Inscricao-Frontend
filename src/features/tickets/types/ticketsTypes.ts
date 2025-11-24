@@ -1,13 +1,22 @@
 export type Ticket = {
   id: string;
-  eventId: string;
   name: string;
   description?: string;
   quantity: number;
   price: number;
+  expirationDate: Date;
   available: number;
-  createdAt: string;
-  updatedAt: string;
+};
+
+export type TicketsByEventTicket = Omit<Ticket, "description">;
+
+export type TicketsByEventResponse = {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  quantityTicketSale: number;
+  totalSalesValue: number;
+  tickets: TicketsByEventTicket[];
 };
 
 export type TicketSale = {
@@ -23,6 +32,8 @@ export type TicketDetails = {
   quantity: number;
   price: number;
   available: number;
+  expirationDate: string;
+  isActive: boolean;
   ticketSale: TicketSale[];
 };
 
@@ -32,6 +43,7 @@ export type CreateTicketInput = {
   description?: string;
   quantity: number;
   price: number;
+  expirationDate: string;
 };
 
 export type CreateTicketOutput = {

@@ -3,10 +3,8 @@
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import {
-  getStatusInscriptionColor,
-  getStatusInscriptionText,
-} from "@/shared/utils/getStatusColor";
+import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
+import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
   ArrowDown,
   ArrowUp,
@@ -608,11 +606,11 @@ export default function InscriptionsAnalysisTable({
                                       </td>
                                       <td className="px-3 py-3 text-center">
                                         <span
-                                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusInscriptionColor(
+                                          className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
                                             inscription.status
                                           )}`}
                                         >
-                                          {getStatusInscriptionText(
+                                          {getConvertStatusInscription(
                                             inscription.status
                                           )}
                                         </span>

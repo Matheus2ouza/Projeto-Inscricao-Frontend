@@ -13,6 +13,7 @@ export type Event = {
   quantityParticipants: number;
   amountCollected: number;
   imageUrl?: string;
+  logoUrl?: string;
   location?: string;
   latitude?: number | null;
   longitude?: number | null;

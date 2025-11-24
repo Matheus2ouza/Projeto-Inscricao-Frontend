@@ -12,7 +12,7 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Slider } from "@/shared/components/ui/slider";
 import { cn } from "@/shared/lib/utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type ImageCropDialogProps = {
   open: boolean;
@@ -82,6 +82,33 @@ export default function ImageCropDialog({
     lastOffsetRef.current = { x: 0, y: 0 };
   };
 
+  const getBaseScale = (viewportWidth: number, viewportHeight: number) => {
+    if (!imgRef.current) return 1;
+    const imageAspect = imgRef.current.naturalWidth / imgRef.current.naturalHeight;
+    const viewportAspect = viewportWidth / viewportHeight;
+    if (imageAspect > viewportAspect) {
+      return viewportWidth / imgRef.current.naturalWidth;
+    }
+    return viewportHeight / imgRef.current.naturalHeight;
+  };
+
+  const clampOffset = (
+    candidate: { x: number; y: number },
+    nextScale = scale
+  ) => {
+    if (!imgRef.current || !containerRef.current) return candidate;
+    const container = containerRef.current.getBoundingClientRect();
+    const base = getBaseScale(container.width, container.height);
+    const scaledWidth = imgRef.current.naturalWidth * base * nextScale;
+    const scaledHeight = imgRef.current.naturalHeight * base * nextScale;
+    const maxOffsetX = Math.max(0, (scaledWidth - container.width) / 2);
+    const maxOffsetY = Math.max(0, (scaledHeight - container.height) / 2);
+    return {
+      x: Math.min(maxOffsetX, Math.max(-maxOffsetX, candidate.x)),
+      y: Math.min(maxOffsetY, Math.max(-maxOffsetY, candidate.y)),
+    };
+  };
+
   const handleWheel: React.WheelEventHandler<HTMLDivElement> = (e) => {
     if (!imageUrl) return;
     e.preventDefault();
@@ -96,10 +123,10 @@ export default function ImageCropDialog({
     const cursorX = e.clientX - rect.left - rect.width / 2;
     const cursorY = e.clientY - rect.top - rect.height / 2;
     const scaleRatio = newScale / scale;
-    const newOffset = {
+    const newOffset = clampOffset({
       x: cursorX - (cursorX - offset.x) * scaleRatio,
       y: cursorY - (cursorY - offset.y) * scaleRatio,
-    };
+    }, newScale);
     setScale(newScale);
     setOffset(newOffset);
     lastOffsetRef.current = newOffset;
@@ -115,10 +142,10 @@ export default function ImageCropDialog({
     if (!isPanning || !panStartRef.current) return;
     const dx = e.clientX - panStartRef.current.x;
     const dy = e.clientY - panStartRef.current.y;
-    const newOffset = {
+    const newOffset = clampOffset({
       x: lastOffsetRef.current.x + dx,
       y: lastOffsetRef.current.y + dy,
-    };
+    });
     setOffset(newOffset);
   };
 
@@ -129,14 +156,6 @@ export default function ImageCropDialog({
     panStartRef.current = null;
   };
 
-  const viewportPadding = 0; // can add if needed
-  const viewportStyle = useMemo(
-    () => ({
-      paddingTop: `${(1 / aspect) * 100}%`,
-    }),
-    [aspect]
-  );
-
   const handleDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -146,6 +165,8 @@ export default function ImageCropDialog({
 
   const handleConfirm = async () => {
     if (!imageUrl || !imgRef.current) return;
+    const mimeType = file?.type?.startsWith("image/") ? file.type : "image/png";
+    const extension = mimeType.split("/")[1] ?? "png";
     // Render a fixed canvas of targetWidth x targetHeight
     // We want to preserve what's visible in the viewport, including black bars (contain mode)
     const canvas = document.createElement("canvas");
@@ -153,10 +174,6 @@ export default function ImageCropDialog({
     canvas.height = targetHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    // Fill canvas with black background first
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, targetWidth, targetHeight);
 
     const img = imgRef.current;
 
@@ -263,15 +280,19 @@ export default function ImageCropDialog({
     );
 
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob((b) => resolve(b), "image/jpeg", 0.92)
+      canvas.toBlob(
+        (b) => resolve(b),
+        mimeType,
+        mimeType === "image/jpeg" ? 0.92 : undefined
+      )
     );
     if (!blob) return;
 
     const base64 = await blobToBase64(blob);
-    const file = new File([blob], "event-image-1920x1080.jpg", {
-      type: "image/jpeg",
+    const outputFile = new File([blob], `event-image.${extension}`, {
+      type: mimeType,
     });
-    onConfirm({ blob, base64, file });
+    onConfirm({ blob, base64, file: outputFile });
   };
 
   return (
@@ -322,7 +343,7 @@ export default function ImageCropDialog({
             <div className="space-y-3 min-w-0">
               <div
                 ref={containerRef}
-                className="relative w-full max-w-full bg-black/70 rounded-md overflow-hidden select-none"
+                className="relative w-full max-w-[min(90vw,800px)] max-h-[70vh] bg-black/70 rounded-md overflow-hidden select-none mx-auto"
                 style={{ aspectRatio: `${aspect}` }}
                 onWheel={handleWheel}
                 onMouseDown={startPan}
@@ -364,7 +385,10 @@ export default function ImageCropDialog({
                   step={0.01}
                   onValueChange={(v) => {
                     const newScale = v[0] ?? 1;
+                    const clamped = clampOffset(offset, newScale);
                     setScale(newScale);
+                    setOffset(clamped);
+                    lastOffsetRef.current = clamped;
                   }}
                 />
                 <Button
