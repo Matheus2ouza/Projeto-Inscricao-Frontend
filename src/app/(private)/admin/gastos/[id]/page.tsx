@@ -21,7 +21,11 @@ export default function EventExpensesAdminPage() {
 
   if (!eventId) return null;
 
-  const { data: expensesData, isLoading, error } = useExpensesByEvent({
+  const {
+    data: expensesData,
+    isLoading,
+    error,
+  } = useExpensesByEvent({
     eventId,
     page,
     pageSize: PAGE_SIZE,
@@ -31,7 +35,11 @@ export default function EventExpensesAdminPage() {
 
   const loading = isLoading;
   const errorMessage =
-    error instanceof Error ? error : typeof error === "string" ? new Error(error) : null;
+    error instanceof Error
+      ? error
+      : typeof error === "string"
+        ? new Error(error)
+        : null;
 
   const handleBack = () => {
     router.push("/admin/gastos");
