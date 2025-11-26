@@ -13,7 +13,7 @@ export async function getTicketsByEvent(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao carregar tickets do evento"
+      "Falha ao carregar tickets do evento"
     );
   }
 }

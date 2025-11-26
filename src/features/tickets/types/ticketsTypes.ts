@@ -16,6 +16,7 @@ export type TicketsByEventResponse = {
   imageUrl?: string;
   quantityTicketSale: number;
   totalSalesValue: number;
+  ticketEnabled: boolean;
   tickets: TicketsByEventTicket[];
 };
 

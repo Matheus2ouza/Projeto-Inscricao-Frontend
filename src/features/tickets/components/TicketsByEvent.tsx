@@ -30,11 +30,12 @@ import { TicketsByEventResponse } from "../types/ticketsTypes";
 
 interface TicketsByEventProps {
   tickets?: TicketsByEventResponse;
-  loading: boolean;
   form: UseFormReturn<CreateTicketFormType>;
   onSubmit: (event?: BaseSyntheticEvent) => Promise<boolean | void> | void;
   submitting: boolean;
   onViewSales: (ticketId: string) => void;
+  onToggleTicketSale?: () => void;
+  ticketSaleLoading?: boolean;
 }
 
 export default function TicketsByEvent({
@@ -43,10 +44,15 @@ export default function TicketsByEvent({
   onSubmit,
   submitting,
   onViewSales,
-  loading,
+  onToggleTicketSale,
+  ticketSaleLoading,
 }: TicketsByEventProps) {
+  if (!tickets) {
+    return null;
+  }
+
   const [openCreate, setOpenCreate] = useState(false);
-  const ticketsList = tickets?.tickets ?? [];
+  const ticketsList = tickets.tickets ?? [];
   const hasTickets = ticketsList.length > 0;
   const handleFormSubmit = async (event?: BaseSyntheticEvent) => {
     const result = await onSubmit(event);
@@ -74,9 +80,9 @@ export default function TicketsByEvent({
           </Button>
         </div>
 
-        {tickets && (
-          <Card className="border-0 shadow-sm mb-6">
-            <CardContent className="p-6 flex flex-col gap-6 md:flex-row md:items-center">
+        <Card className="border-0 shadow-sm mb-6">
+          <CardContent className="p-6 flex flex-col gap-6">
+            <div className="flex flex-col gap-6 md:flex-row">
               <div className="w-full md:w-1/3">
                 {tickets.imageUrl ? (
                   <div className="relative h-48 w-full overflow-hidden rounded-xl">
@@ -96,41 +102,74 @@ export default function TicketsByEvent({
                   </div>
                 )}
               </div>
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl border bg-card">
-                  <p className="text-sm text-muted-foreground">Evento</p>
-                  <p className="text-xl font-semibold">{tickets.name}</p>
-                </div>
-                <div className="p-4 rounded-xl border bg-card flex items-center gap-3">
-                  <div className="p-3 rounded-full bg-green-100 dark:bg-green-900/30">
-                    <Users className="w-5 h-5 text-green-600 dark:text-green-300" />
-                  </div>
+              <div className="flex-1 flex flex-col gap-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      Tickets vendidos
-                    </p>
-                    <p className="text-xl font-semibold">
-                      {tickets.quantityTicketSale}
-                    </p>
+                    <p className="text-sm text-muted-foreground">Evento</p>
+                    <p className="text-2xl font-semibold">{tickets.name}</p>
                   </div>
+                  {onToggleTicketSale && (
+                    <div className="flex flex-col gap-2 sm:items-end">
+                      <span
+                        className={cn(
+                          "px-3 py-1 text-xs font-semibold rounded-full w-fit",
+                          tickets.ticketEnabled
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                            : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                        )}
+                      >
+                        {tickets.ticketEnabled
+                          ? "Vendas ativas"
+                          : "Vendas encerradas"}
+                      </span>
+                      <Button
+                        onClick={onToggleTicketSale}
+                        disabled={ticketSaleLoading}
+                        variant={tickets.ticketEnabled ? "outline" : "default"}
+                        className="dark:text-white"
+                      >
+                        {ticketSaleLoading
+                          ? "Atualizando..."
+                          : tickets.ticketEnabled
+                            ? "Encerrar vendas"
+                            : "Abrir vendas"}
+                      </Button>
+                    </div>
+                  )}
                 </div>
-                <div className="p-4 rounded-xl border bg-card flex items-center gap-3 sm:col-span-2">
-                  <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
-                    <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-300" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl border bg-card flex items-center gap-3">
+                    <div className="p-3 rounded-full bg-green-100 dark:bg-green-900/30">
+                      <Users className="w-5 h-5 text-green-600 dark:text-green-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Tickets vendidos
+                      </p>
+                      <p className="text-xl font-semibold">
+                        {tickets.quantityTicketSale}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Faturamento total
-                    </p>
-                    <p className="text-xl font-semibold">
-                      {currencyFormatter.format(tickets.totalSalesValue)}
-                    </p>
+                  <div className="p-4 rounded-xl border bg-card flex items-center gap-3">
+                    <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                      <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-300" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        Faturamento total
+                      </p>
+                      <p className="text-xl font-semibold">
+                        {currencyFormatter.format(tickets.totalSalesValue)}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          </CardContent>
+        </Card>
 
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
           <DialogContent>
@@ -237,15 +276,7 @@ export default function TicketsByEvent({
           </DialogContent>
         </Dialog>
 
-        {loading && !hasTickets && (
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6 text-center text-muted-foreground">
-              Carregando tickets...
-            </CardContent>
-          </Card>
-        )}
-
-        {!loading && (!tickets || !hasTickets) && (
+        {!hasTickets && (
           <Card className="border-0 shadow-sm">
             <CardContent className="p-12 text-center">
               <div className="flex flex-col items-center gap-4">
@@ -273,7 +304,7 @@ export default function TicketsByEvent({
           </Card>
         )}
 
-        {!loading && hasTickets && (
+        {hasTickets && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ticketsList.map((t) => (
               <Card
