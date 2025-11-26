@@ -2,6 +2,7 @@
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import UserHomeDashboard from "@/features/home/components/user/UserHomeDashboard";
+import { useUserDashboard } from "@/features/home/hook/user/useUserDashboard";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useCurrentUser } from "@/shared/context/user-context";
 import { useUserRole } from "@/shared/hooks/useUserRole";
@@ -9,17 +10,22 @@ import { RotateCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function UserHome() {
+export default function UserHomePage() {
   const router = useRouter();
   const { setLoading } = useGlobalLoading();
   const { loading } = useUserRole();
   const { user } = useCurrentUser();
   const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date());
   const [relativeTime, setRelativeTime] = useState("há instantes");
+  const dashboard = useUserDashboard();
+  const [refreshingAll, setRefreshingAll] = useState(false);
 
-  const refreshDashboard = () => {
+  const refreshDashboard = async () => {
+    setRefreshingAll(true);
+    await dashboard.refetchAll();
     setLastUpdated(new Date());
     router.refresh();
+    setRefreshingAll(false);
   };
 
   useEffect(() => {
@@ -56,14 +62,25 @@ export default function UserHome() {
         <button
           type="button"
           onClick={refreshDashboard}
-          className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
+          disabled={refreshingAll || dashboard.loading || dashboard.isFetching}
+          className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60 dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
         >
-          <RotateCw className="h-4 w-4 text-[#0C3DAD] transition-colors group-hover:text-white dark:text-[#9CC3FF]" />
+          <RotateCw
+            className={`h-4 w-4 text-[#0C3DAD] transition-colors group-hover:text-white dark:text-[#9CC3FF] ${
+              refreshingAll || dashboard.isFetching ? "animate-spin" : ""
+            }`}
+          />
           <span>Atualizado {relativeTime}</span>
         </button>
       }
     >
-      <UserHomeDashboard />
+      <UserHomeDashboard
+        data={dashboard.data}
+        loading={dashboard.loading}
+        isFetching={dashboard.isFetching}
+        refreshingMetric={dashboard.refreshingMetric}
+        onRefreshMetric={dashboard.refreshMetric}
+      />
     </PageContainer>
   );
 }

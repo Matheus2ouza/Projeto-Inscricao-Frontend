@@ -304,8 +304,8 @@ export default function AdminManagerHomeDashboard({
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -446,7 +446,7 @@ export default function AdminManagerHomeDashboard({
                   className="rounded-lg border border-gray-200 dark:border-gray-800 px-3 py-2 text-sm flex items-center justify-between"
                 >
                   <Link
-                    href={`/events/manager/${evt.id}`}
+                    href={`/admin/events/manager/${evt.id}`}
                     className="font-semibold text-foreground hover:underline cursor-pointer"
                   >
                     {evt.name}
@@ -466,7 +466,7 @@ export default function AdminManagerHomeDashboard({
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+        <div className="lg:col-span-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             Benefícios
           </h3>

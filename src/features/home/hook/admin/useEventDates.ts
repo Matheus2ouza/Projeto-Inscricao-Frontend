@@ -1,6 +1,6 @@
 "use client";
 
-import { getEventsDates } from "@/features/home/api/admin/eventsDates";
+import { getEventsDates } from "@/features/home/api/eventsDates";
 import { useQuery } from "@tanstack/react-query";
 
 export const eventDatesKeys = {
