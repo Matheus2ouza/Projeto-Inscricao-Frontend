@@ -1,11 +1,11 @@
 export function getConvertStatusEvent(status: string): string {
   switch (status.toLowerCase()) {
     case "open":
-      return "ABERTO";
+      return "Inscrições Abertas";
     case "close":
-      return "FECHADO";
+      return "Inscrições Fechadas";
     case "finalized":
-      return "FINALIZADO";
+      return "Evento Finalizado";
     default:
       return status
   }

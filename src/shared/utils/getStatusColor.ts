@@ -30,3 +30,17 @@ export function getStatusColor(status: string): string {
   }
 };
 
+export function getStatusEventColor(status?: string): string {
+  const normalizedStatus = status?.toLowerCase();
+
+  switch (normalizedStatus) {
+    case "open":
+      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
+    case "close":
+      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+    case "finalized":
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
+    default:
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
+  }
+}

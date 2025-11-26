@@ -5,7 +5,7 @@
  * @param eventName - Nome do evento
  * @returns String com a classe CSS do gradiente Tailwind
  */
-export function generateGradient(eventName: string): string {
+export function getGradientClass(eventName: string): string {
   // Gerar cores baseadas no nome do evento para consistência
   const colors = [
     "from-purple-500 to-pink-500",
