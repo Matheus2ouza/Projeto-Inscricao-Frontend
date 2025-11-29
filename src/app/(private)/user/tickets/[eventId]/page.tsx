@@ -29,8 +29,8 @@ export default function TicketsByEventPage() {
     router.push("/user/tickets");
   };
 
-  const handleSelectTicket = (ticketId: string) => {
-    router.push(`/user/tickets/${eventId}/ticket/${ticketId}`);
+  const handleSelectTicket = () => {
+    router.push(`/events/tickets/${eventId}`);
   };
 
   const renderLoading = () => (
