@@ -36,7 +36,7 @@ export function UserTicketsByEvent({
     if (typeof window === "undefined") {
       return "";
     }
-    return `${window.location.origin}/user/tickets/${event.id}`;
+    return `${window.location.origin}/events/tickets/${event.id}`;
   }, [event.id]);
 
   const handleCopyLink = async () => {
