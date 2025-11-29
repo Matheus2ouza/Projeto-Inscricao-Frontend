@@ -20,6 +20,25 @@ export type TicketsByEventResponse = {
   tickets: TicketsByEventTicket[];
 };
 
+export type PreSaleTicketInput = {
+  ticketId: string;
+  quantity: number;
+};
+
+export type PreSaleInput = {
+  eventId: string;
+  name: string;
+  email: string;
+  phone?: string;
+  totalValue: number;
+  image: string;
+  tickets: PreSaleTicketInput[];
+};
+
+export type PreSaleOutput = {
+  id: string;
+};
+
 export type TicketSale = {
   id: string;
   quantity: number;
@@ -54,6 +73,8 @@ export type CreateTicketOutput = {
 export const ticketsKeys = {
   all: ["tickets"] as const,
   byEvent: (eventId: string) => [...ticketsKeys.all, "event", eventId] as const,
+  publicByRoute: (publicRoute: string) =>
+    [...ticketsKeys.all, "public-route", publicRoute] as const,
   detail: (ticketId: string) =>
     [...ticketsKeys.all, "detail", ticketId] as const,
 };
