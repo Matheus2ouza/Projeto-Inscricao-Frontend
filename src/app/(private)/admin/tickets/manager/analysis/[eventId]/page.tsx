@@ -123,6 +123,7 @@ export default function TicketsAnalysisByEventAdminPage() {
 
     return (
       <TicketsByEvent
+        eventId={eventId}
         tickets={tickets}
         form={form}
         onSubmit={onSubmit}

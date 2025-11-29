@@ -123,6 +123,7 @@ export default function TicketsAnalysisByEventSuperPage() {
 
     return (
       <TicketsByEvent
+        eventId={eventId}
         tickets={tickets}
         form={form}
         onSubmit={onSubmit}

@@ -32,6 +32,7 @@ export function UserTicketsByEvent({
   const [copied, setCopied] = useState(false);
   const tickets = event.tickets ?? [];
   const canPurchase = Boolean(event.ticketEnabled);
+
   const ticketPageUrl = useMemo(() => {
     if (typeof window === "undefined") {
       return "";
@@ -93,7 +94,7 @@ export function UserTicketsByEvent({
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                Link direto
+                Link Público
               </span>
               <div className="flex-1 min-w-0">
                 <input
