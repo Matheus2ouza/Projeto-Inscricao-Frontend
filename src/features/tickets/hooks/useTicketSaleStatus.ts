@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 import { updateStatusTicket } from "../api/updateStatusTicket";
-import { ticketsKeys, TicketsByEventResponse } from "../types/ticketsTypes";
+import { TicketsByEventResponse, ticketsKeys } from "../types/ticketsTypes";
 
 export function useTicketSaleStatus() {
   const [loading, setLoading] = useState(false);
@@ -22,9 +22,9 @@ export function useTicketSaleStatus() {
         (previous: TicketsByEventResponse | undefined) =>
           previous
             ? {
-                ...previous,
-                ticketEnabled: saleTicketsEnabled,
-              }
+              ...previous,
+              ticketEnabled: saleTicketsEnabled,
+            }
             : previous
       );
       toast.success(
