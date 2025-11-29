@@ -22,7 +22,8 @@ export const checkoutBuyerSchema = z.object({
     }),
 });
 
-export type CheckoutBuyerFormValues = z.infer<typeof checkoutBuyerSchema>;
+export type CheckoutBuyerFormValues = z.input<typeof checkoutBuyerSchema>;
+export type CheckoutBuyerFormValuesOutput = z.infer<typeof checkoutBuyerSchema>;
 
 export const ticketsSelectionSchema = z.array(
   z.object({

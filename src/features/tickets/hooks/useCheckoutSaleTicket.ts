@@ -11,6 +11,7 @@ import {
   checkoutBuyerSchema,
   ticketsSelectionSchema,
   type CheckoutBuyerFormValues,
+  type CheckoutBuyerFormValuesOutput,
   type TicketsSelectionItem,
 } from "../schema/preSale.schema";
 
@@ -87,7 +88,11 @@ export function useCheckoutSaleTicket(
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [receiptImage, setReceiptImage] = useState<string | null>(null);
 
-  const form = useForm<CheckoutBuyerFormValues, any, CheckoutBuyerFormValues>({
+  const form = useForm<
+    CheckoutBuyerFormValues,
+    any,
+    CheckoutBuyerFormValuesOutput
+  >({
     resolver: zodResolver(checkoutBuyerSchema),
     defaultValues: {
       firstName: "",
@@ -132,7 +137,7 @@ export function useCheckoutSaleTicket(
         eventId,
         name: `${values.firstName.trim()} ${values.lastName.trim()}`.trim(),
         email: values.email.trim(),
-        phone: values.phone?.trim() || undefined,
+        phone: values.phone || undefined,
         totalValue: totalAmount,
         image: receiptImage,
         tickets: summaryItems.map((item) => ({
