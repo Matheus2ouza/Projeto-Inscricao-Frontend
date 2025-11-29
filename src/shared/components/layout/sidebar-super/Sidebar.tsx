@@ -300,6 +300,15 @@ export default function AppSidebarSuper({
                               <span>Analise de Vendas</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/super/tickets/list-sales"
+                              className="gap-2"
+                            >
+                              <ListOrdered className="size-4" />
+                              <span>Lista de Vendas</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </Collapsible>
