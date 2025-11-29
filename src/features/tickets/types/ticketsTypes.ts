@@ -39,10 +39,10 @@ export type PreSaleOutput = {
   id: string;
 };
 
-export type TicketSale = {
+export type TicketSaleItem = {
   id: string;
   quantity: number;
-  totalValue: number;
+  createdAt: string;
 };
 
 export type TicketDetails = {
@@ -54,7 +54,23 @@ export type TicketDetails = {
   available: number;
   expirationDate: string;
   isActive: boolean;
-  ticketSale: TicketSale[];
+  ticketSaleItems: TicketSaleItem[];
+};
+
+export type FindTicketDetailsResponse = {
+  id: string;
+  name: string;
+  description: string;
+  quantity: number;
+  price: number;
+  available: number;
+  expirationDate: string;
+  isActive: boolean;
+  TicketSaleItens: Array<{
+    id: string;
+    quantity: number;
+    createdAt: string;
+  }>;
 };
 
 export type CreateTicketInput = {
