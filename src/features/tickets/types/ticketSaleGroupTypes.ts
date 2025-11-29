@@ -27,7 +27,8 @@ export const STATUS_PAYMENT_OPTIONS: Array<{
   label: string;
   value: StatusPayment;
 }> = [
-    { label: "Pendente", value: "PENDING" },
-    { label: "Pago", value: "PAID" },
-    { label: "Cancelado", value: "CANCELLED" },
-  ];
+  { label: "Pendente", value: "PENDING" },
+  { label: "Em análise", value: "UNDER_REVIEW" },
+  { label: "Pago", value: "PAID" },
+  { label: "Cancelado", value: "CANCELLED" },
+];
