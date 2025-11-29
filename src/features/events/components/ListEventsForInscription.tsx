@@ -12,7 +12,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
-import { getGradientClass } from "@/shared/utils/getgenerateGradient";
+import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
