@@ -23,15 +23,21 @@ import {
   QrCode,
   X,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface RegisterPaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  inscriptionId: string;
+  inscriptionId?: string;
   totalValue: number;
   onPaymentRegistered?: () => void;
+  onSubmitPayment?: (payload: {
+    value: number;
+    image: string;
+  }) => Promise<void> | void;
+  autoRegisterOnExactAmount?: boolean;
+  allowCustomValue?: boolean;
 }
 
 export default function RegisterPaymentDialog({
@@ -40,6 +46,9 @@ export default function RegisterPaymentDialog({
   inscriptionId,
   totalValue,
   onPaymentRegistered,
+  onSubmitPayment,
+  autoRegisterOnExactAmount = false,
+  allowCustomValue = true,
 }: RegisterPaymentDialogProps) {
   const [paymentValue, setPaymentValue] = useState<string>("");
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
@@ -49,8 +58,7 @@ export default function RegisterPaymentDialog({
   const [isDragOver, setIsDragOver] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const registerPayment = useRegisterPayment(inscriptionId);
+  const registerPayment = useRegisterPayment(inscriptionId ?? "");
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB em bytes
   const ALLOWED_FILE_TYPES = [
@@ -147,28 +155,53 @@ export default function RegisterPaymentDialog({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!paymentValue || !receiptFile) {
+    if ((!paymentValue && allowCustomValue) || !receiptFile) {
       toast.error("Campos obrigatórios", {
         description: "Por favor, preencha todos os campos obrigatórios.",
       });
       return;
     }
 
-    const value = parseFloat(paymentValue);
-    if (value <= 0 || value > totalValue) {
+    const resolvedValue = allowCustomValue
+      ? parseFloat(paymentValue)
+      : totalValue;
+    if (Number.isNaN(resolvedValue)) {
       toast.error("Valor inválido", {
-        description: `Por favor, insira um valor entre R$ 0,01 e ${formatCurrency(totalValue)}.`,
+        description: "Não foi possível identificar o valor pago.",
       });
       return;
     }
 
+    if (allowCustomValue) {
+      if (resolvedValue <= 0 || resolvedValue > totalValue) {
+        toast.error("Valor inválido", {
+          description: `Por favor, insira um valor entre R$ 0,01 e ${formatCurrency(totalValue)}.`,
+        });
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
-    try {
-      // Usar preview (Data URL) como imagem para envio
-      const imageData = receiptPreview as string;
+    const imageData = receiptPreview as string;
+    const isExactAmount = Math.abs(resolvedValue - totalValue) < 0.01;
+    const shouldRegisterWithBackend =
+      !onSubmitPayment || (autoRegisterOnExactAmount && isExactAmount);
 
-      await registerPayment.mutateAsync({ value, image: imageData });
+    try {
+      if (shouldRegisterWithBackend) {
+        if (!inscriptionId) {
+          throw new Error("Inscrição inválida para registrar pagamento.");
+        }
+        await registerPayment.mutateAsync({
+          value: resolvedValue,
+          image: imageData,
+        });
+      }
+
+      if (onSubmitPayment) {
+        await onSubmitPayment({ value: resolvedValue, image: imageData });
+      }
 
       // Limpar formulário
       setPaymentValue("");
@@ -183,13 +216,19 @@ export default function RegisterPaymentDialog({
         onPaymentRegistered();
       }
 
-      toast.success("Pagamento registrado!", {
-        description:
-          "O pagamento foi registrado com sucesso e está aguardando aprovação.",
-      });
+      if (!onSubmitPayment || shouldRegisterWithBackend) {
+        toast.success("Pagamento registrado!", {
+          description:
+            "O pagamento foi registrado com sucesso e está aguardando aprovação.",
+        });
+      }
     } catch (error) {
       console.error("Erro ao registrar pagamento:", error);
-      toast.error("Erro ao registrar pagamento", {
+      const errorMessage = shouldRegisterWithBackend
+        ? "Erro ao registrar pagamento"
+        : "Erro ao processar comprovante";
+
+      toast.error(errorMessage, {
         description: "Tente novamente.",
       });
     } finally {
@@ -226,14 +265,24 @@ export default function RegisterPaymentDialog({
     setIsFlipped(!isFlipped);
   };
 
+  useEffect(() => {
+    if (open) {
+      setIsFlipped(false);
+      if (!allowCustomValue) {
+        setPaymentValue(String(totalValue));
+      }
+    }
+  }, [open, allowCustomValue, totalValue]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl p-0 border-0 bg-transparent overflow-visible">
         <DialogHeader className="sr-only">
           <DialogTitle>Registrar Pagamento</DialogTitle>
           <DialogDescription>
-            Registre um novo pagamento para a inscrição #
-            {inscriptionId.slice(0, 8)}...
+            {inscriptionId
+              ? `Registre um novo pagamento para a inscrição #${inscriptionId.slice(0, 8)}...`
+              : "Envie o comprovante de pagamento para continuar."}
           </DialogDescription>
         </DialogHeader>
 
@@ -440,23 +489,40 @@ export default function RegisterPaymentDialog({
                           htmlFor="paymentValue"
                           className="text-sm font-medium"
                         >
-                          Valor Pago *
+                          Valor Pago*
                         </Label>
-                        <Input
-                          id="paymentValue"
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          max={totalValue}
-                          placeholder="0,00"
-                          value={paymentValue}
-                          onChange={(e) => setPaymentValue(e.target.value)}
-                          required
-                          className="text-lg font-medium"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Valor entre R$ 0,01 e {formatCurrency(totalValue)}
-                        </p>
+                        {allowCustomValue ? (
+                          <>
+                            <Input
+                              id="paymentValue"
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              max={totalValue}
+                              placeholder="0,00"
+                              value={paymentValue}
+                              onChange={(e) => setPaymentValue(e.target.value)}
+                              required
+                              className="text-lg font-medium"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              Valor entre R$ 0,01 e {formatCurrency(totalValue)}
+                            </p>
+                          </>
+                        ) : (
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between rounded-lg border px-4 py-2 text-lg font-semibold">
+                              <span>{formatCurrency(totalValue)}</span>
+                              <span className="text-xs text-muted-foreground">
+                                Valor fixo
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              O valor é definido automaticamente para este
+                              pedido.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <Separator />
@@ -467,8 +533,8 @@ export default function RegisterPaymentDialog({
                           htmlFor="receipt"
                           className="text-sm font-medium"
                         >
-                          Comprovante de Pagamento * (Somente um Comporvante de
-                          cada vez)
+                          Comprovante de Pagamento* (Envie somente um
+                          comprovante)
                         </Label>
 
                         {receiptFile ? (
