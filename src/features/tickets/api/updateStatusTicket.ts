@@ -11,7 +11,6 @@ export async function updateStatusTicket(
         ticketEnabled: saleTicketsEnabled,
       }
     );
-    console.log(data)
     return data;
   } catch (error) {
     const axiosError = error as {

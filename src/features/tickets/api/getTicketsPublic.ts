@@ -1,12 +1,13 @@
-import axiosInstance from "@/shared/lib/apiClient";
 import { TicketsByEventResponse } from "../types/ticketsTypes";
 
-export async function getTicketsByEvent(
+import axiosInstance from "@/shared/lib/apiClient";
+
+export async function getTicketsPublic(
   eventId: string
 ): Promise<TicketsByEventResponse> {
   try {
     const { data } = await axiosInstance.get<TicketsByEventResponse>(
-      `/tickets/${eventId}/`
+      `/tickets/public/${eventId}`
     );
     return data;
   } catch (error) {
