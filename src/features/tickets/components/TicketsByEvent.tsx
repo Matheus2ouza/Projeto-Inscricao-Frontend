@@ -20,8 +20,9 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { cn } from "@/shared/lib/utils";
+import { getAvailabilityState } from "@/shared/utils/getAvailabilityState";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
-import { Plus, Ticket, TrendingUp, Users, Wallet } from "lucide-react";
+import { Frown, Plus, Ticket, TrendingUp, Users, Wallet } from "lucide-react";
 import Image from "next/image";
 import { BaseSyntheticEvent, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -71,15 +72,6 @@ export default function TicketsByEvent({
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-end mb-6">
-          <Button
-            onClick={() => setOpenCreate(true)}
-            className="flex items-center gap-2 dark:text-white"
-          >
-            <Plus className="w-4 h-4" /> Novo Ticket
-          </Button>
-        </div>
-
         <Card className="border-0 shadow-sm mb-6">
           <CardContent className="p-6 flex flex-col gap-6">
             <div className="flex flex-col gap-6 md:flex-row">
@@ -276,6 +268,15 @@ export default function TicketsByEvent({
           </DialogContent>
         </Dialog>
 
+        <div className="flex items-center justify-end mb-6">
+          <Button
+            onClick={() => setOpenCreate(true)}
+            className="flex items-center gap-2 dark:text-white"
+          >
+            <Plus className="w-4 h-4" /> Novo Ticket
+          </Button>
+        </div>
+
         {!hasTickets && (
           <Card className="border-0 shadow-sm">
             <CardContent className="p-12 text-center">
@@ -306,74 +307,102 @@ export default function TicketsByEvent({
 
         {hasTickets && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ticketsList.map((t) => (
-              <Card
-                key={t.id}
-                className="h-full border border-border/40 shadow-sm hover:shadow-md transition-shadow rounded-2xl flex flex-col"
-              >
-                <CardContent className="flex flex-col h-full flex-1">
-                  <div className="flex flex-col gap-4 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="p-2 rounded-full bg-primary/10 text-primary">
-                          <Ticket className="w-4 h-4" />
-                        </span>
-                        <h3
+            {ticketsList.map((t) => {
+              const availabilityState = getAvailabilityState(
+                t.available,
+                t.quantity
+              );
+              const isSoldOut = availabilityState.isSoldOut;
+
+              return (
+                <Card
+                  key={t.id}
+                  className={cn(
+                    "h-full border border-border/40 shadow-sm hover:shadow-md transition-shadow rounded-2xl flex flex-col",
+                    isSoldOut &&
+                      "bg-muted/30 dark:bg-zinc-900/30 border-dashed border-border/60"
+                  )}
+                >
+                  <CardContent
+                    className={cn(
+                      "flex flex-col h-full flex-1",
+                      isSoldOut && "opacity-80"
+                    )}
+                  >
+                    <div className="flex flex-col gap-4 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="p-2 rounded-full bg-primary/10 text-primary">
+                            <Ticket className="w-4 h-4" />
+                          </span>
+                          <h3
+                            className={cn(
+                              "font-semibold leading-tight",
+                              getFontSizeClass(t.name, true)
+                            )}
+                          >
+                            {t.name}
+                          </h3>
+                        </div>
+                        <span
                           className={cn(
-                            "font-semibold leading-tight",
-                            getFontSizeClass(t.name, true)
+                            "px-2 py-1 text-xs rounded-md",
+                            availabilityState.badgeClass
                           )}
                         >
-                          {t.name}
-                        </h3>
+                          {availabilityState.label}
+                        </span>
                       </div>
-                      <span
-                        className={cn(
-                          "px-2 py-1 text-xs rounded-md",
-                          t.available > 0
-                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                            : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                        )}
-                      >
-                        {t.available} disp.
-                      </span>
+
+                      {isSoldOut ? (
+                        <div className="mt-6 flex-1 flex items-center">
+                          <div className="w-full rounded-xl border border-dashed border-border/60 px-4 py-6 text-center text-sm text-muted-foreground flex flex-col items-center gap-3">
+                            <Frown className="w-8 h-8 text-muted-foreground" />
+                            <span>Não há mais tickets disponíveis.</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <dl className="grid gap-3 text-sm text-muted-foreground">
+                            <div className="flex items-center justify-between">
+                              <dt>Quantidade:</dt>
+                              <dd className="font-medium text-foreground">
+                                {t.quantity}
+                              </dd>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <dt>Validade:</dt>
+                              <dd className="font-medium text-foreground">
+                                {dateFormatter.format(
+                                  new Date(t.expirationDate)
+                                )}
+                              </dd>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <dt>Preço:</dt>
+                              <dd className="font-medium text-foreground flex items-center gap-1">
+                                <Wallet className="w-4 h-4" />
+                                {currencyFormatter.format(t.price)}
+                              </dd>
+                            </div>
+                          </dl>
+
+                          <div className="mt-auto pt-4 flex justify-end">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onViewSales(t.id)}
+                            >
+                              Detalhes
+                            </Button>
+                          </div>
+                        </>
+                      )}
                     </div>
-
-                    <dl className="grid gap-3 text-sm text-muted-foreground">
-                      <div className="flex items-center justify-between">
-                        <dt>Quantidade:</dt>
-                        <dd className="font-medium text-foreground">
-                          {t.quantity}
-                        </dd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <dt>Validade:</dt>
-                        <dd className="font-medium text-foreground">
-                          {dateFormatter.format(new Date(t.expirationDate))}
-                        </dd>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <dt>Preço:</dt>
-                        <dd className="font-medium text-foreground flex items-center gap-1">
-                          <Wallet className="w-4 h-4" />
-                          {currencyFormatter.format(t.price)}
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-
-                  <div className="mt-auto pt-4 flex justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onViewSales(t.id)}
-                    >
-                      Detalhes
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

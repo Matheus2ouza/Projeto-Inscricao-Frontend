@@ -116,14 +116,14 @@ export default function TicketSalesDetails({
   );
 
   const totalSoldQuantity = useMemo(() => {
-    if (!data.ticketSale?.length) return 0;
-    return data.ticketSale.reduce((acc, sale) => acc + sale.quantity, 0);
-  }, [data]);
+    if (!data.ticketSaleItems?.length) return 0;
+    return data.ticketSaleItems.reduce((acc, sale) => acc + sale.quantity, 0);
+  }, [data.ticketSaleItems]);
 
   const totalRevenue = useMemo(() => {
-    if (!data.ticketSale?.length) return 0;
-    return data.ticketSale.reduce((acc, sale) => acc + sale.totalValue, 0);
-  }, [data]);
+    if (!data.ticketSaleItems?.length) return 0;
+    return data.price * totalSoldQuantity;
+  }, [data.price, data.ticketSaleItems, totalSoldQuantity]);
 
   function InfoBox({
     label,
@@ -429,7 +429,7 @@ export default function TicketSalesDetails({
           )}
         </CardHeader>
         <CardContent>
-          {data.ticketSale.length === 0 ? (
+          {data.ticketSaleItems.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
               Nenhuma venda registrada para este ticket.
             </p>
@@ -441,20 +441,27 @@ export default function TicketSalesDetails({
                     <TableHead>ID da Venda</TableHead>
                     <TableHead className="text-right">Quantidade</TableHead>
                     <TableHead className="text-right">Valor Total</TableHead>
+                    <TableHead className="text-right">Data</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.ticketSale.map((sale) => (
-                    <TableRow key={sale.id}>
-                      <TableCell className="font-medium">{sale.id}</TableCell>
-                      <TableCell className="text-right">
-                        {sale.quantity}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {currencyFormatter.format(sale.totalValue)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {data.ticketSaleItems.map((sale) => {
+                    const saleValue = sale.quantity * data.price;
+                    return (
+                      <TableRow key={sale.id}>
+                        <TableCell className="font-medium">{sale.id}</TableCell>
+                        <TableCell className="text-right">
+                          {sale.quantity}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {currencyFormatter.format(saleValue)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {dateFormatter.format(new Date(sale.createdAt))}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
