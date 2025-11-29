@@ -30,6 +30,7 @@ import {
   CalendarDays,
   ChevronRight,
   ChevronsUpDown,
+  DollarSign,
   FileText,
   House,
   ListOrdered,
@@ -58,7 +59,7 @@ import {
 import { useCurrentUser } from "@/shared/context/user-context";
 import { useLogout } from "@/shared/hooks/logout/logout";
 
-export default function veAppSidebarSuper({
+export default function AppSidebarSuper({
   children,
 }: {
   children?: React.ReactNode;
@@ -69,6 +70,8 @@ export default function veAppSidebarSuper({
   const [inscriptionsOpen, setInscriptionsOpen] = React.useState(true);
   const [paymentsOpen, setPaymentsOpen] = React.useState(true);
   const [eventsOpen, setEventsOpen] = React.useState(true);
+  const [ticketsOpen, setTicketsOpen] = React.useState(true);
+
   const isMobile = useIsMobile();
 
   const userInitials = React.useMemo(() => {
@@ -107,7 +110,7 @@ export default function veAppSidebarSuper({
       <div className="flex w-full">
         <Sidebar className="bg-sidebar">
           <SidebarHeader className="flex items-center justify-center border-b border-sidebar-border py-4">
-            <Logo className="h-10 w-10" showTitle={false} />
+            <Logo className="w-10" showTitle={false} />
           </SidebarHeader>
           <SidebarContent className="px-2 pb-4">
             <SidebarGroup className="gap-2">
@@ -257,16 +260,49 @@ export default function veAppSidebarSuper({
                       </CollapsibleContent>
                     </Collapsible>
                   </SidebarMenuItem>
+                  {/* <TICKETS> */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href="/super/tickets"
-                        className="flex items-center gap-2"
-                      >
-                        <Tickets className="size-4" />
-                        Tickets
-                      </a>
-                    </SidebarMenuButton>
+                    <Collapsible
+                      open={ticketsOpen}
+                      onOpenChange={setTicketsOpen}
+                    >
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="justify-between">
+                          <span className="flex items-center gap-2">
+                            <Tickets className="size-4" />
+                            Tickets
+                          </span>
+                          <ChevronRight
+                            className={cn(
+                              "size-4 text-muted-foreground transition-transform",
+                              eventsOpen && "rotate-90"
+                            )}
+                          />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub className="mt-1 border-0 pl-6">
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/super/tickets/manager"
+                              className="gap-2"
+                            >
+                              <FileText className="size-4" />
+                              <span>Gerenciamento</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/super/tickets/sales"
+                              className="gap-2"
+                            >
+                              <DollarSign className="size-4" />
+                              <span>Analise de Vendas</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>

@@ -1,10 +1,22 @@
 "use client";
 
 import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/shared/components/ui/avatar";
+import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/shared/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
 import Logo from "@/shared/components/ui/logo";
 import {
   Sidebar,
@@ -21,13 +33,16 @@ import {
   SidebarMenuSubItem,
   SidebarProvider,
 } from "@/shared/components/ui/sidebar";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { useLogout } from "@/shared/hooks/logout/logout";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
 import { cn } from "@/shared/lib/utils";
 import {
   BanknoteArrowDown,
   CalendarDays,
   ChevronRight,
   ChevronsUpDown,
+  DollarSign,
   FileText,
   House,
   ListOrdered,
@@ -42,21 +57,6 @@ import {
 import { useRouter } from "next/navigation";
 import React from "react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/shared/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { useIsMobile } from "@/shared/hooks/use-mobile";
-
 export default function AppSidebarAdminManager({
   children,
 }: {
@@ -68,6 +68,8 @@ export default function AppSidebarAdminManager({
   const [inscriptionsOpen, setInscriptionsOpen] = React.useState(true);
   const [paymentsOpen, setPaymentsOpen] = React.useState(true);
   const [eventsOpen, setEventsOpen] = React.useState(true);
+  const [ticketsOpen, setTicketsOpen] = React.useState(true);
+
   const isMobile = useIsMobile();
 
   const userInitials = React.useMemo(() => {
@@ -216,6 +218,7 @@ export default function AppSidebarAdminManager({
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+                  {/* <EVENTOS> */}
                   <SidebarMenuItem>
                     <Collapsible open={eventsOpen} onOpenChange={setEventsOpen}>
                       <CollapsibleTrigger asChild>
@@ -256,16 +259,49 @@ export default function AppSidebarAdminManager({
                       </CollapsibleContent>
                     </Collapsible>
                   </SidebarMenuItem>
+                  {/* <TICKETS> */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href="/admin/tickets"
-                        className="flex items-center gap-2"
-                      >
-                        <Tickets className="size-4" />
-                        Tickets
-                      </a>
-                    </SidebarMenuButton>
+                    <Collapsible
+                      open={ticketsOpen}
+                      onOpenChange={setTicketsOpen}
+                    >
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="justify-between">
+                          <span className="flex items-center gap-2">
+                            <Tickets className="size-4" />
+                            Tickets
+                          </span>
+                          <ChevronRight
+                            className={cn(
+                              "size-4 text-muted-foreground transition-transform",
+                              eventsOpen && "rotate-90"
+                            )}
+                          />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub className="mt-1 border-0 pl-6">
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/tickets/manager"
+                              className="gap-2"
+                            >
+                              <FileText className="size-4" />
+                              <span>Gerenciamento</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/tickets/sales"
+                              className="gap-2"
+                            >
+                              <DollarSign className="size-4" />
+                              <span>Analise de Vendas</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
