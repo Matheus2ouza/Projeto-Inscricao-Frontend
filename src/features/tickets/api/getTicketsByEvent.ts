@@ -6,14 +6,14 @@ export async function getTicketsByEvent(
 ): Promise<TicketsByEventResponse> {
   try {
     const { data } = await axiosInstance.get<TicketsByEventResponse>(
-      `/ticket/${eventId}`
+      `/tickets/${eventId}/`
     );
     return data;
   } catch (error) {
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao carregar tickets do evento"
+      "Falha ao carregar tickets do evento"
     );
   }
 }

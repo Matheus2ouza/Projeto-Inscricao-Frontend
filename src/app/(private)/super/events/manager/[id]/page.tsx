@@ -15,7 +15,7 @@ export default function EventManagementSuperPage() {
   const { event, loading, error, refetch } = useEvent(eventId);
 
   const handleBack = () => {
-    router.replace(`/super/home`);
+    router.replace(`/super/events/manager`);
   };
 
   if (loading) {

@@ -124,7 +124,7 @@ export default function EventsTable({
   const startIndex = (page - 1) * currentPageSize;
 
   return (
-    <div className="p-4 sm:p-5 relative">
+    <div className="pb-4 sm:p-5 relative">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 mb-4">
         <Button
           asChild
@@ -411,46 +411,48 @@ export default function EventsTable({
       )}
 
       {/* Paginação */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
-        <div className="text-sm text-muted-foreground text-center sm:text-left">
-          Mostrando {startIndex + 1}-{Math.min(startIndex + PAGE_SIZE, total)}{" "}
-          de {total} eventos
-        </div>
+      {startIndex < 1 && (
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
+          <div className="text-sm text-muted-foreground text-center sm:text-left">
+            Mostrando {startIndex + 1}-{Math.min(startIndex + PAGE_SIZE, total)}{" "}
+            de {total} eventos
+          </div>
 
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => page > 1 && handlePageChange(page - 1)}
-                href={page > 1 ? "#" : undefined}
-                className={page === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-
-            {Array.from({ length: pageCount }, (_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  isActive={page === i + 1}
-                  href="#"
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </PaginationLink>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => page > 1 && handlePageChange(page - 1)}
+                  href={page > 1 ? "#" : undefined}
+                  className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                />
               </PaginationItem>
-            ))}
 
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => page < pageCount && handlePageChange(page + 1)}
-                href={page < pageCount ? "#" : undefined}
-                className={
-                  page === pageCount ? "pointer-events-none opacity-50" : ""
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+              {Array.from({ length: pageCount }, (_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    isActive={page === i + 1}
+                    href="#"
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => page < pageCount && handlePageChange(page + 1)}
+                  href={page < pageCount ? "#" : undefined}
+                  className={
+                    page === pageCount ? "pointer-events-none opacity-50" : ""
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 }

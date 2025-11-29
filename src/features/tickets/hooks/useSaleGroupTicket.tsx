@@ -12,7 +12,7 @@ import type { SaleGroupTicketPayload } from "../types/ticketSaleGroupTypes";
 import { STATUS_PAYMENT_OPTIONS } from "../types/ticketSaleGroupTypes";
 
 const paymentMethodValues = ["DINHEIRO", "PIX", "CARTÃO"] as const;
-const statusValues = ["PENDING", "PAID", "CANCELLED"] as const;
+const statusValues = ["PENDING", "UNDER_REVIEW", "PAID", "CANCELLED"] as const;
 
 const saleGroupTicketSchema = z.object({
   quantity: z

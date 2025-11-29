@@ -6,7 +6,7 @@ export async function createTicket(
 ): Promise<CreateTicketOutput> {
   try {
     const { data } = await axiosInstance.post<CreateTicketOutput>(
-      "/ticket/create",
+      "/tickets/create",
       input
     );
     return data;

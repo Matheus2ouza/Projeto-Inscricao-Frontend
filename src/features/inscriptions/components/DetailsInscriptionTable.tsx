@@ -880,7 +880,7 @@ export default function DetailsInscriptionsTable({
                   </Table>
                 </div>
 
-                {/* Paginação - Estilo igual ao AccountsTable */}
+                {/* Paginação */}
                 {totalPages > 1 && (
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6">
                     <div className="text-sm text-muted-foreground text-center sm:text-left">

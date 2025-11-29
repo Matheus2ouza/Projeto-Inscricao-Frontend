@@ -32,6 +32,7 @@ import {
   LogOut,
   ScrollText,
   Settings,
+  Ticket,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -179,6 +180,19 @@ export default function AppSidebarNormal({
                       >
                         <FileText className="size-4" />
                         Minhas Inscrições
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  {/* Tickets */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href="/user/tickets"
+                        className="flex items-center gap-2"
+                      >
+                        <Ticket className="size-4" />
+                        Tickets
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

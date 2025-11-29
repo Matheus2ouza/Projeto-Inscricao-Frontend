@@ -9,7 +9,15 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { Download, Loader2, ZoomIn, ZoomOut } from "lucide-react";
-import { useState } from "react";
+import type { SyntheticEvent } from "react";
+import { useEffect, useState } from "react";
+
+export enum ImageViewerDownloadExtension {
+  JPG = "jpg",
+  JPEG = "jpeg",
+  PNG = "png",
+  WEBP = "webp",
+}
 
 interface ImageViewerDialogProps {
   isOpen: boolean;
@@ -18,6 +26,7 @@ interface ImageViewerDialogProps {
   title?: string;
   description?: string;
   downloadFileName?: string;
+  downloadFileExtension?: ImageViewerDownloadExtension;
 }
 
 export default function ImageViewerDialog({
@@ -27,17 +36,55 @@ export default function ImageViewerDialog({
   title = "Visualizar Imagem",
   description,
   downloadFileName,
+  downloadFileExtension = ImageViewerDownloadExtension.JPG,
 }: ImageViewerDialogProps) {
   const [imageLoading, setImageLoading] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [imageDimensions, setImageDimensions] = useState<
+    | {
+        width: number;
+        height: number;
+      }
+    | null
+  >(null);
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
-  const handleImageLoad = () => {
+  useEffect(() => {
+    const updateViewportSize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    updateViewportSize();
+    window.addEventListener("resize", updateViewportSize);
+    return () => window.removeEventListener("resize", updateViewportSize);
+  }, []);
+
+  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight } = event.currentTarget;
+    setImageDimensions({ width: naturalWidth, height: naturalHeight });
     setImageLoading(false);
   };
 
   const handleImageError = () => {
     setImageLoading(false);
+  };
+
+  const resolveDownloadFileName = () => {
+    const sanitizedExtension =
+      downloadFileExtension ?? ImageViewerDownloadExtension.JPG;
+    const fallbackBaseName = `imagem-${Date.now()}`;
+
+    if (downloadFileName?.trim()) {
+      const trimmed = downloadFileName.trim();
+      const hasExtension = /\.[^./\\]+$/.test(trimmed);
+      if (hasExtension) {
+        return trimmed;
+      }
+      return `${trimmed}.${sanitizedExtension}`;
+    }
+
+    return `${fallbackBaseName}.${sanitizedExtension}`;
   };
 
   const handleDownloadImage = async () => {
@@ -55,8 +102,7 @@ export default function ImageViewerDialog({
       link.href = blobUrl;
 
       // Nome do arquivo
-      const fileName = downloadFileName || `imagem-${Date.now()}.${getFileExtension(imageUrl)}`;
-      link.download = fileName;
+      link.download = resolveDownloadFileName();
 
       // Simular clique no link para iniciar o download
       document.body.appendChild(link);
@@ -72,12 +118,6 @@ export default function ImageViewerDialog({
     } finally {
       setDownloadLoading(false);
     }
-  };
-
-  // Função para obter a extensão do arquivo baseado na URL
-  const getFileExtension = (url: string) => {
-    const extension = url.split(".").pop()?.split("?")[0];
-    return extension || "jpg"; // Fallback para jpg
   };
 
   const handleZoomIn = () => {
@@ -96,12 +136,67 @@ export default function ImageViewerDialog({
   const handleClose = () => {
     setZoom(1);
     setImageLoading(true);
+    setImageDimensions(null);
     onClose();
   };
 
+  const dialogWidth = (() => {
+    if (!viewportSize.width) {
+      return undefined;
+    }
+
+    const horizontalAllowance = 96; // paddings + controls
+    if (!imageDimensions) {
+      return Math.min(960, viewportSize.width * 0.95);
+    }
+
+    return Math.min(
+      imageDimensions.width + horizontalAllowance,
+      viewportSize.width * 0.95
+    );
+  })();
+
+  const dialogHeight = (() => {
+    if (!viewportSize.height) {
+      return undefined;
+    }
+
+    const verticalAllowance = 260; // header + actions + paddings
+    if (!imageDimensions) {
+      return Math.min(720, viewportSize.height * 0.95);
+    }
+
+    return Math.min(
+      imageDimensions.height + verticalAllowance,
+      viewportSize.height * 0.95
+    );
+  })();
+
+  const imageAreaMaxHeight = (() => {
+    if (viewportSize.height) {
+      const viewportLimit = viewportSize.height * 0.7;
+      if (!imageDimensions) {
+        return viewportLimit;
+      }
+
+      return Math.min(imageDimensions.height, viewportLimit);
+    }
+
+    return imageDimensions?.height ?? 480;
+  })();
+
+  const imageAreaMinHeight = Math.min(400, imageAreaMaxHeight ?? 400);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
+      <DialogContent
+        className="flex flex-col"
+        style={{
+          width: dialogWidth,
+          maxWidth: viewportSize.width ? viewportSize.width * 0.95 : undefined,
+          maxHeight: dialogHeight,
+        }}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
@@ -150,7 +245,13 @@ export default function ImageViewerDialog({
         </div>
 
         {/* Container da Imagem com Scroll */}
-        <div className="flex-1 overflow-auto rounded-lg bg-gray-100 dark:bg-gray-800 min-h-[400px] max-h-[60vh]">
+        <div
+          className="flex-1 overflow-auto rounded-lg bg-gray-100 dark:bg-gray-800"
+          style={{
+            minHeight: imageAreaMinHeight,
+            maxHeight: imageAreaMaxHeight,
+          }}
+        >
           <div className="flex justify-center items-start p-4">
             {imageLoading && (
               <div className="flex items-center justify-center h-96 w-full">
@@ -181,4 +282,3 @@ export default function ImageViewerDialog({
     </Dialog>
   );
 }
-

@@ -10,7 +10,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
-import { generateGradient } from "@/shared/utils/getgenerateGradient";
+import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -56,7 +56,7 @@ export default function SelectEventTable({
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {events.map((event) => {
-          const gradientClass = generateGradient(event.name);
+          const gradientClass = getGradientClass(event.name);
           // Se não há imagem, não está carregando. Se há imagem, verifica o estado
           const isImageLoading = event.imageUrl
             ? imageLoadingStates[event.id] !== false

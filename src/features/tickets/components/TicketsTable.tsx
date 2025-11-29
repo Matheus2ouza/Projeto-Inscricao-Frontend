@@ -221,7 +221,7 @@ export default function TicketsTable({
                         onClick={() => handleIndividualInscription(event.id)}
                         disabled={statusInfo.disabled}
                       >
-                        Visualizar Tickets
+                        Visualizar
                       </Button>
                     </div>
 

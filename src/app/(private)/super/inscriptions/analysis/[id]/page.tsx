@@ -15,19 +15,12 @@ export default function EventInscriptionsAnalysisSuperPage() {
     return null;
   }
 
-  const {
-    analysisData,
-    loading,
-    error,
-    page,
-    pageCount,
-    total,
-    setPage,
-  } = useInscriptionsForAnalysis({
-    eventId,
-    initialPage: 1,
-    pageSize: 15,
-  });
+  const { analysisData, loading, error, page, pageCount, total, setPage } =
+    useInscriptionsForAnalysis({
+      eventId,
+      initialPage: 1,
+      pageSize: 15,
+    });
   const handleBack = () => {
     router.push("/super/inscriptions/analysis");
   };

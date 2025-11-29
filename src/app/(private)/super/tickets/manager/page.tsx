@@ -5,7 +5,7 @@ import TicketsTable from "@/features/tickets/components/TicketsTable";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useRouter } from "next/navigation";
 
-export default function TicketsAdminPage() {
+export default function TicketsSuperPage() {
   const router = useRouter();
   const { events, page, pageCount, setPage, loading, error } = useEventsAll({
     initialPage: 1,
@@ -13,17 +13,17 @@ export default function TicketsAdminPage() {
   });
 
   const handleViewEvent = (eventId: string) => {
-    router.push(`/admin/tickets/analysis/${eventId}`);
+    router.push(`/super/tickets/manager/analysis/${eventId}`);
   };
 
   const handleBack = () => {
-    router.push("/admin/home");
+    router.push("/super/home");
   };
 
   return (
     <PageContainer
       title="Tickets"
-      description="Liste os eventos para gerenciar vendas de tickets de alimentação"
+      description="Liste os eventos para gerenciar vendas de tickets de alimentação."
       showBackButton
       backButtonAction={handleBack}
     >

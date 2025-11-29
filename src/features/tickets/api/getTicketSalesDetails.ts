@@ -6,7 +6,7 @@ export async function getTicketSalesDetails(
 ): Promise<TicketDetails> {
   try {
     const { data } = await axiosInstance.get<TicketDetails>(
-      `/ticket/${ticketId}/details`
+      `/tickets/${ticketId}/details`
     );
     return data;
   } catch (error) {

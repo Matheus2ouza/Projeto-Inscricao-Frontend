@@ -9,7 +9,7 @@ export async function saleGroupTicket(
 ): Promise<SaleGroupTicketResponse> {
   try {
     const { data } = await axiosInstance.post<SaleGroupTicketResponse>(
-      "/ticket/sale/group",
+      "/tickets/sale/group",
       payload
     );
     return data;
@@ -17,7 +17,7 @@ export async function saleGroupTicket(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao registrar venda em grupo do ticket"
+      "Falha ao registrar venda em grupo do ticket"
     );
   }
 }

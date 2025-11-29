@@ -3,12 +3,10 @@
 import InscriptionsByEventTable from "@/features/inscriptions/components/InscriptionsByEventTable";
 import { useInscriptions } from "@/features/inscriptions/hooks/useInscriptions";
 import PageContainer from "@/shared/components/layout/PageContainer";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function MyInscriptions() {
   const router = useRouter();
-  const params = useParams();
-  const eventId = params.eventId as string;
   const { events, total, page, pageCount, error, setPage, refetch } =
     useInscriptions({
       pageSize: 10,
