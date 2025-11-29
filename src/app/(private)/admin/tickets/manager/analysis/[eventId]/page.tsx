@@ -31,7 +31,7 @@ export default function TicketsAnalysisByEventAdminPage() {
     useTicketSaleStatus();
 
   const handleBack = () => {
-    router.push("/admin/tickets");
+    router.push("/admin/tickets/manager");
   };
 
   const handleViewSales = (ticketId: string) => {
