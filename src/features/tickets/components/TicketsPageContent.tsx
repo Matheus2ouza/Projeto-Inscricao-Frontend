@@ -145,14 +145,13 @@ export function TicketsPageContent({
                 <div>
                   <h1 className="text-2xl font-semibold">{event.name}</h1>
                   <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                    Abaixo você verá os tickets disponíveis para compra. Caso
-                    prefira, copie o link e compartilhe com os inscritos para
-                    que eles mesmos possam acessar e adquirir seus tickets.
+                    Abaixo você verá os tickets disponíveis para compra. Também
+                    encontrará um link
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                    Link
+                    Link Público
                   </span>
                   <div className="flex-1 min-w-0">
                     <input

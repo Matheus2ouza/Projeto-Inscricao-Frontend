@@ -31,7 +31,7 @@ export default function TicketsAnalysisByEventSuperPage() {
     useTicketSaleStatus();
 
   const handleBack = () => {
-    router.push("/super/tickets");
+    router.push("/super/tickets/manager");
   };
 
   const handleViewSales = (ticketId: string) => {
@@ -123,6 +123,7 @@ export default function TicketsAnalysisByEventSuperPage() {
 
     return (
       <TicketsByEvent
+        eventId={eventId}
         tickets={tickets}
         form={form}
         onSubmit={onSubmit}

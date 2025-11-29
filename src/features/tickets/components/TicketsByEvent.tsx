@@ -22,14 +22,24 @@ import { Textarea } from "@/shared/components/ui/textarea";
 import { cn } from "@/shared/lib/utils";
 import { getAvailabilityState } from "@/shared/utils/getAvailabilityState";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
-import { Frown, Plus, Ticket, TrendingUp, Users, Wallet } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Frown,
+  Plus,
+  Ticket,
+  TrendingUp,
+  Users,
+  Wallet,
+} from "lucide-react";
 import Image from "next/image";
-import { BaseSyntheticEvent, useState } from "react";
+import { BaseSyntheticEvent, useMemo, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CreateTicketFormType } from "../hooks/useCreateTicket";
 import { TicketsByEventResponse } from "../types/ticketsTypes";
 
 interface TicketsByEventProps {
+  eventId: string;
   tickets?: TicketsByEventResponse;
   form: UseFormReturn<CreateTicketFormType>;
   onSubmit: (event?: BaseSyntheticEvent) => Promise<boolean | void> | void;
@@ -40,6 +50,7 @@ interface TicketsByEventProps {
 }
 
 export default function TicketsByEvent({
+  eventId,
   tickets,
   form,
   onSubmit,
@@ -68,6 +79,25 @@ export default function TicketsByEvent({
   const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "medium",
   });
+
+  const [copied, setCopied] = useState(false);
+
+  const ticketPageUrl = useMemo(() => {
+    if (typeof window === "undefined") {
+      return "";
+    }
+    return `${window.location.origin}/events/tickets/${eventId}`;
+  }, [eventId]);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(ticketPageUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Falha ao copiar link de tickets", error);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -157,6 +187,38 @@ export default function TicketsByEvent({
                       </p>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                    Link Público
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <input
+                      readOnly
+                      value={ticketPageUrl}
+                      className="w-full text-xs bg-transparent border rounded px-2 py-1 truncate"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className={cn(
+                      "p-1 h-7 w-7 sm:h-8 sm:w-8 transition-all duration-300",
+                      copied
+                        ? "bg-green-50 text-green-600 border-green-200"
+                        : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+                    )}
+                    onClick={handleCopyLink}
+                    title={copied ? "Copiado!" : "Copiar link"}
+                  >
+                    {copied ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
