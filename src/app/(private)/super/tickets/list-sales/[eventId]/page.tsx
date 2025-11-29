@@ -1,35 +1,45 @@
 "use client";
 
-import TicketSalesDetails from "@/features/tickets/components/TicketSalesDetails";
-import { useTicketSalesDetails } from "@/features/tickets/hooks/useTicketSalesDetails";
+import TicketSalesListContent from "@/features/tickets/components/TicketSalesListContent";
+import { useListPreSales } from "@/features/tickets/hooks/useListPreSales";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
 
-export default function TicketSalesDetailsSuperPage() {
+export default function ListSalesSuperPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
-  const rawTicketId = params.ticketId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
-  const ticketId = Array.isArray(rawTicketId) ? rawTicketId[0] : rawTicketId;
 
-  if (!eventId || !ticketId) {
+  const {
+    sales,
+    event,
+    total,
+    page,
+    pageCount,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+    setPage,
+  } = useListPreSales(eventId ?? "", { initialPage: 1, pageSize: 10 });
+
+  if (!eventId) {
     return null;
   }
 
-  const { data, isFetching, error, refetch, showSkeleton, hasData } =
-    useTicketSalesDetails(ticketId);
-
   const handleBack = () => {
-    router.push(`/super/tickets/manager/analysis/${eventId}`);
+    router.push("/super/tickets/list-sales");
   };
 
   const renderLoadingState = () => (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Skeleton className="h-32 w-full rounded-xl" />
-      <Skeleton className="h-64 w-full rounded-xl" />
+      {Array.from({ length: 2 }).map((_, index) => (
+        <Skeleton key={index} className="h-64 w-full rounded-2xl" />
+      ))}
     </div>
   );
 
@@ -37,13 +47,13 @@ export default function TicketSalesDetailsSuperPage() {
     const message =
       error instanceof Error
         ? error.message
-        : "Não foi possível carregar os detalhes do ticket.";
+        : "Não foi possível carregar as vendas deste evento.";
 
     return (
       <div className="flex flex-col items-center justify-center gap-4 text-center py-12">
         <div>
           <p className="text-red-600 dark:text-red-400 font-semibold">
-            Falha ao carregar dados.
+            Falha ao carregar lista de vendas.
           </p>
           <p className="text-muted-foreground mt-1 max-w-md">{message}</p>
         </div>
@@ -54,14 +64,8 @@ export default function TicketSalesDetailsSuperPage() {
     );
   };
 
-  const renderEmptyState = () => (
-    <div className="text-sm text-muted-foreground text-center py-12">
-      Nenhum detalhe disponível para este ticket.
-    </div>
-  );
-
   const renderContent = () => {
-    if (showSkeleton) {
+    if (isLoading) {
       return renderLoadingState();
     }
 
@@ -69,24 +73,24 @@ export default function TicketSalesDetailsSuperPage() {
       return renderErrorState();
     }
 
-    if (!hasData || !data) {
-      return renderEmptyState();
-    }
-
     return (
-      <TicketSalesDetails
-        ticketId={ticketId}
-        data={data}
+      <TicketSalesListContent
+        event={event}
+        sales={sales}
+        total={total}
+        page={page}
+        pageCount={pageCount}
         isFetching={isFetching}
         onRefresh={refetch}
+        onPageChange={setPage}
       />
     );
   };
 
   return (
     <PageContainer
-      title="Detalhes de Vendas"
-      description={data ? `Ticket: ${data.name}` : "Nenhum ticket encontrado"}
+      title="Lista de vendas"
+      description="Acompanhe todas as solicitações e vendas de tickets deste evento."
       showBackButton
       backButtonAction={handleBack}
     >

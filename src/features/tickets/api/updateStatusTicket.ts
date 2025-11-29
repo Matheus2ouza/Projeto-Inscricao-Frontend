@@ -8,7 +8,7 @@ export async function updateStatusTicket(
     const { data } = await axiosInstance.patch(
       `/events/${eventId}/update/tickets`,
       {
-        ticketEnabled: saleTicketsEnabled,
+        saleTicketsStatus: saleTicketsEnabled,
       }
     );
     return data;

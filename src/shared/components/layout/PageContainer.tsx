@@ -63,7 +63,7 @@ export default function PageContainer({
       <div
         className={cn(
           maxWidthClass,
-          "mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8",
+          "mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-8",
           containerClassName
         )}
       >

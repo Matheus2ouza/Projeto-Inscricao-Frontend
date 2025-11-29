@@ -13,9 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import {
@@ -29,7 +27,7 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, DollarSign } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -492,19 +490,14 @@ export function CheckoutSaleTicketContent({
         totalValue={totalAmount}
         onSubmitPayment={handleProofSubmit}
       />
-      <Dialog open={isSuccessDialogOpen} onOpenChange={handleSuccessDialogChange}>
+      <Dialog
+        open={isSuccessDialogOpen}
+        onOpenChange={handleSuccessDialogChange}
+      >
         <DialogContent className="sm:max-w-md border-0 shadow-xl">
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="size-14 rounded-full bg-green-50 text-green-700 flex items-center justify-center shadow-inner">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-6 h-6"
-              >
-                <path d="M9.172 16.172a4 4 0 0 1-1.197-2.303l-.262-1.832a2 2 0 0 1 .552-1.63L14.5 4.2a2 2 0 0 1 2.829 0l1.471 1.471a2 2 0 0 1 0 2.829l-5.235 5.235a2 2 0 0 1-1.63.552l-1.832-.262a4 4 0 0 1-2.303-1.197l-.628-.628z" />
-                <path d="M3 6a3 3 0 0 1 3-3h2a1 1 0 0 1 0 2H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 1 1 0 2H6a3 3 0 0 1-3-3V6z" />
-              </svg>
+              <DollarSign />
             </div>
             <div>
               <DialogTitle className="text-2xl font-semibold">
@@ -514,13 +507,14 @@ export function CheckoutSaleTicketContent({
           </div>
           <div className="space-y-4 text-sm text-muted-foreground">
             <p>
-              Recebemos seu comprovante. Nossa equipe vai analisar e, após a aprovação,
-              os tickets serão enviados para o e-mail informado em até
+              Recebemos seu comprovante. Nossa equipe vai analisar e, após a
+              aprovação, os tickets serão enviados para o e-mail informado em
+              até
               <span className="font-semibold text-primary"> 24 horas.</span>
             </p>
             <p>
-              Fique de olho no seu e-mail (inclusive na caixa de spam). Em caso de dúvidas, entre em contato com
-              o nosso suporte pelo WhatsApp.
+              Fique de olho no seu e-mail (inclusive na caixa de spam). Em caso
+              de dúvidas, entre em contato com o nosso suporte pelo WhatsApp.
             </p>
             <a
               href={whatsappLink}
@@ -542,7 +536,10 @@ export function CheckoutSaleTicketContent({
             </a>
           </div>
           <DialogFooter>
-            <Button onClick={() => handleSuccessDialogChange(false)} className="w-full">
+            <Button
+              onClick={() => handleSuccessDialogChange(false)}
+              className="w-full"
+            >
               Fechar
             </Button>
           </DialogFooter>
