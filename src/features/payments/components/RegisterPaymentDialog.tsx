@@ -1,4 +1,4 @@
-import { useRegisterPayment } from "@/features/payment/hooks/useRegisterPayment";
+import { useRegisterPayment } from "@/features/payments/hooks/useRegisterPayment";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import {

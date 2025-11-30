@@ -13,6 +13,7 @@ import {
 } from "@/shared/components/ui/pagination";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Calendar, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -144,50 +145,52 @@ export default function TicketsTable({
               return (
                 <Card
                   key={event.id}
-                  className="w-full hover:shadow-xl transition-all duration-300 border-0 shadow-md rounded-xl overflow-hidden hover:scale-[1.02]"
+                  className="w-full hover:shadow-xl transition-all duration-300 border border-transparent shadow-md rounded-xl hover:scale-[1.02] overflow-visible bg-white dark:bg-zinc-900 dark:border-zinc-800"
                 >
                   <CardBody className="p-0 relative">
-                    <div className="w-full h-48 relative">
-                      {event.imageUrl ? (
-                        <>
-                          {/* Loading overlay para a imagem */}
-                          {imageLoading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-muted z-10">
-                              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                            </div>
-                          )}
-                          <Image
-                            src={event.imageUrl}
-                            alt={event.name}
-                            fill
-                            sizes="(max-width: 768px) 100vw,
+                    <div className="w-full relative">
+                      <AspectRatio ratio={16 / 9} className="w-full">
+                        {event.imageUrl ? (
+                          <>
+                            {/* Loading overlay para a imagem */}
+                            {imageLoading && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-muted z-10">
+                                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                              </div>
+                            )}
+                            <Image
+                              src={event.imageUrl}
+                              alt={event.name}
+                              fill
+                              sizes="(max-width: 768px) 100vw,
                                 (max-width: 1200px) 50vw,
                                 25vw"
-                            priority={true}
-                            loading="eager"
-                            decoding="async"
-                            className="object-cover rounded-t-xl"
-                            onLoad={handleImageLoad}
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = "none";
-                              const parent = target.parentElement;
-                              if (parent) {
-                                parent.innerHTML = `
+                              priority={true}
+                              loading="eager"
+                              decoding="async"
+                              className="object-cover rounded-t-xl"
+                              onLoad={handleImageLoad}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = "none";
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = `
                                 <div class="w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center">
                                 <span class="text-white font-bold text-lg text-center px-4">${event.name}</span>
                                 </div>
                                 `;
-                              }
-                            }}
-                          />
-                        </>
-                      ) : (
-                        // Gradiente quando não há imagem
-                        <div
-                          className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
-                        ></div>
-                      )}
+                                }
+                              }}
+                            />
+                          </>
+                        ) : (
+                          // Gradiente quando não há imagem
+                          <div
+                            className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+                          ></div>
+                        )}
+                      </AspectRatio>
                     </div>
                     <div className="absolute top-2 right-2 select-none">
                       <Badge className={`${statusInfo.badgeClass} border-0`}>
