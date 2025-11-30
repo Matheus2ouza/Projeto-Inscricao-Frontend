@@ -34,7 +34,12 @@ export function usePaymentsList({
     page,
     pageCount: data?.pageCount ?? 0,
     loading,
-    error: error instanceof Error ? error.message : error?.toString() ?? null,
+    error:
+      error instanceof Error
+        ? error.message
+        : typeof error === "string"
+        ? error
+        : null,
     setPage,
     refetch: async () => {
       await refetch();
