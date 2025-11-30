@@ -45,7 +45,7 @@ export async function registerEvent(
     );
     throw new Error(
       axiosError.response?.data?.message ||
-        "Erro inesperado. Por favor, tente novamente mais tarde."
+      "Erro inesperado. Por favor, tente novamente mais tarde."
     );
   }
 }

@@ -192,6 +192,14 @@ export default function AppSidebarAdminManager({
                               <span>Analizar Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/payments/list-payments"
+                              className="gap-2"
+                            >
+                              <span>Lista de Pagamentos</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </Collapsible>

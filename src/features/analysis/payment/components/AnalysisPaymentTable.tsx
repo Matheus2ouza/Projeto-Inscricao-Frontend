@@ -12,6 +12,7 @@ import {
 } from "@/shared/components/ui/pagination";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { Card, CardBody, CardFooter } from "@heroui/react";
+import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -182,49 +183,51 @@ export default function AnalysisPaymentTable({
             >
               <CardBody className="p-0 relative overflow-visible">
                 <div className="w-full h-48 relative">
-                  {event.imageUrl ? (
-                    <>
-                      {/* Loading overlay para a imagem */}
-                      {isImageLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-muted/40 z-10">
-                          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        </div>
-                      )}
-                      <Image
-                        src={event.imageUrl}
-                        alt={event.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw,
+                  <AspectRatio ratio={16 / 9} className="w-full">
+                    {event.imageUrl ? (
+                      <>
+                        {/* Loading overlay para a imagem */}
+                        {isImageLoading && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-muted/40 z-10">
+                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                          </div>
+                        )}
+                        <Image
+                          src={event.imageUrl}
+                          alt={event.name}
+                          fill
+                          sizes="(max-width: 768px) 100vw,
                                 (max-width: 1200px) 50vw,
                                 25vw"
-                        priority={true}
-                        loading="eager"
-                        decoding="async"
-                        className="object-cover rounded-t-xl"
-                        onLoad={() => handleImageLoad(event.id)}
-                        onLoadStart={() => initializeImageLoading(event.id)}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = "none";
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `
+                          priority={true}
+                          loading="eager"
+                          decoding="async"
+                          className="object-cover rounded-t-xl"
+                          onLoad={() => handleImageLoad(event.id)}
+                          onLoadStart={() => initializeImageLoading(event.id)}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = "none";
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = `
                                 <div class="w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center">
                                 <span class="text-white font-bold text-lg text-center px-4">${event.name}</span>
                                 </div>
                                 `;
-                          }
-                          // Marcar como carregado mesmo em caso de erro
-                          handleImageLoad(event.id);
-                        }}
-                      />
-                    </>
-                  ) : (
-                    // Gradiente quando não há imagem
-                    <div
-                      className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
-                    ></div>
-                  )}
+                            }
+                            // Marcar como carregado mesmo em caso de erro
+                            handleImageLoad(event.id);
+                          }}
+                        />
+                      </>
+                    ) : (
+                      // Gradiente quando não há imagem
+                      <div
+                        className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+                      ></div>
+                    )}
+                  </AspectRatio>
                 </div>
                 <div className="absolute top-2 right-2 select-none">
                   <Badge className={`${statusEvent.badgeClass} border-0`}>
@@ -278,7 +281,7 @@ export default function AnalysisPaymentTable({
                 {/* Botão de Análise */}
                 <div className="flex flex-col w-full gap-2 mt-2 ">
                   <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={() => onIndividualInscription(event.id)}
                   >

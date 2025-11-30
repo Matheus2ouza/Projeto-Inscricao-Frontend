@@ -22,19 +22,13 @@ export default function PaymentsDetailInsideAnalysisSuperPage() {
   // Determinar quais status de pagamento buscar baseado no status do evento
   const paymentStatusToFetch = useMemo(() => {
     if (eventStatus === "OPEN") {
-      // Se evento está aberto, buscar todos os pagamentos
       return [
         PaymentStatus.APPROVED,
         PaymentStatus.UNDER_REVIEW,
         PaymentStatus.REFUSED,
-      ].map((status) => status.toString());
-    } else {
-      // Se evento está fechado, buscar apenas aprovados e em análise
-      return [
-        PaymentStatus.APPROVED.toString(),
-        PaymentStatus.UNDER_REVIEW.toString(),
-      ].map((status) => status.toString());
+      ];
     }
+    return [PaymentStatus.APPROVED, PaymentStatus.UNDER_REVIEW];
   }, [eventStatus]);
 
   const {
