@@ -15,7 +15,6 @@ import { Card, CardBody, CardFooter } from "@heroui/react";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Event } from "../types/eventTypes";
 
@@ -34,7 +33,6 @@ export default function AnalysisPaymentTable({
   onPageChange,
   onIndividualInscription,
 }: AnalysisPaymentTableProps) {
-  const router = useRouter();
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
@@ -182,7 +180,7 @@ export default function AnalysisPaymentTable({
               className="w-full hover:shadow-xl transition-all duration-300 border border-transparent shadow-md rounded-xl hover:scale-[1.02] overflow-visible bg-white dark:bg-zinc-900 dark:border-zinc-800"
             >
               <CardBody className="p-0 relative overflow-visible">
-                <div className="w-full h-48 relative">
+                <div className="w-full relative">
                   <AspectRatio ratio={16 / 9} className="w-full">
                     {event.imageUrl ? (
                       <>
