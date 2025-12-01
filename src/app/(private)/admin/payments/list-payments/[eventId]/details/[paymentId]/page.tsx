@@ -74,7 +74,7 @@ export default function PaymentDetailsAdminPage() {
   return (
     <PageContainer
       title="Detalhes do Pagamento"
-      description="Informações completas sobre o comprovante selecionado"
+      description="Informações completas sobre a inscrição referente ao pagamento"
       backButtonAction={handleBack}
     >
       <PaymentDetailsContent data={data} />

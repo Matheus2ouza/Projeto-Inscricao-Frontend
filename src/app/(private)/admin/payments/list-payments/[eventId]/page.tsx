@@ -102,7 +102,7 @@ export default function ListPaymentAdminPage() {
 
   return (
     <PageContainer
-      title="Pagamentos por inscrição"
+      title="Pagamentos por Inscrição"
       description="Acompanhe os comprovantes enviados para o evento"
       backButtonAction={handleBack}
     >
