@@ -2,6 +2,7 @@
 
 import ImageViewerDialog from "@/shared/components/ImageViewerDialog";
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
+import { Button } from "@/shared/components/ui/button";
 import {
   Card,
   CardContent,
@@ -20,7 +21,6 @@ import {
 import { getConvertStatusPayment } from "@/shared/utils/getConvertStatus";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import { ImageOff, ZoomIn } from "lucide-react";
-import { Button } from "@/shared/components/ui/button";
 import { useState } from "react";
 import { PaymentsList } from "../types/listPayments.types";
 
@@ -47,6 +47,14 @@ const formatHour = (iso: string) =>
     hour: "2-digit",
     minute: "2-digit",
   });
+
+const formatDateTime = (value: string | Date) => {
+  const date = new Date(value);
+  return date.toLocaleString("pt-BR", {
+    dateStyle: "long",
+    timeStyle: "short",
+  });
+};
 
 interface PaymentsListTableProps {
   payments: PaymentsList;
@@ -186,13 +194,13 @@ export default function PaymentsListTable({
                   {dayPayments.map((payment) => (
                     <article
                       key={payment.id}
-                      className="flex min-w-[260px] flex-col gap-3 rounded-2xl border border-muted/30 bg-card/40 p-4 shadow-sm"
+                      className="flex min-w-[360px] flex-col gap-3 rounded-2xl border border-muted/30 bg-card/40 p-4 shadow-sm"
                     >
-                      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                         <span className="text-base text-foreground font-semibold">
                           {payment.accountName ?? "Conta não informada"}
                         </span>
-                        <span>{formatHour(payment.createdAt)}</span>
+                        <span>{formatDateTime(payment.createdAt)}</span>
                       </div>
                       <AspectRatio
                         ratio={4 / 5}
