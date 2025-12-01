@@ -1,13 +1,20 @@
 "use client";
 
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
+import { useEventsWithPaymentsAll } from "@/features/payments/hooks/useEventsWithPaymentsAll";
 import TicketsTable from "@/features/tickets/components/TicketsTable";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useRouter } from "next/navigation";
 
 export default function SelectEventForListPaymentAdminPage() {
   const router = useRouter();
-  const { events, page, pageCount, setPage, loading, error } = useEventsAll({
+  const {
+    events,
+    page,
+    pageCount,
+    setPage,
+    loading,
+    error,
+  } = useEventsWithPaymentsAll({
     initialPage: 1,
     pageSize: 8,
   });

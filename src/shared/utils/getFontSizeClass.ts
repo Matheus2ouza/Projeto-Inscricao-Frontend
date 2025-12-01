@@ -12,9 +12,9 @@ export function getFontSizeClass(text: string, isCardTitle = false): string {
     // Para o título do card (h3)
     if (length <= 20) {
       return "text-lg"; // 18px - tamanho padrão
-    } else if (length <= 35) {
+    } else if (length <= 30) {
       return "text-base"; // 16px
-    } else if (length <= 50) {
+    } else if (length <= 35) {
       return "text-sm"; // 14px
     } else {
       return "text-xs"; // 12px

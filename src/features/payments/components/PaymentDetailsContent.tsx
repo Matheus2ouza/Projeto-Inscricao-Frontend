@@ -2,11 +2,13 @@
 
 import ImageViewerDialog from "@/shared/components/ImageViewerDialog";
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
-import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import { getConvertStatusPayment } from "@/shared/utils/getConvertStatus";
+import {
+  getConvertStatusInscription,
+  getConvertStatusPayment,
+} from "@/shared/utils/getConvertStatus";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
-import { CalendarClock, ZoomIn } from "lucide-react";
+import { ImageOff, ZoomIn } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
@@ -61,111 +63,152 @@ export default function PaymentDetailsContent({
   return (
     <>
       <div className="space-y-6">
-        <Card className="border shadow-sm">
-          <CardContent className="grid gap-4 md:grid-cols-2">
+        <Card className="border border-muted/30 bg-gradient-to-br from-white/80 via-muted/70 to-muted/50 shadow-lg">
+          <CardContent className="space-y-6">
             <div className="space-y-1">
-              <p className="text-xs uppercase font-semibold tracking-wide text-muted-foreground">
-                Inscrição
-              </p>
-              <p className="text-lg font-semibold">{inscription.id}</p>
-              <p className="text-sm text-muted-foreground">
-                {inscription.responsible}
-              </p>
+              <h2 className="text-3xl font-bold text-foreground">
+                Detalhes da Inscrição
+              </h2>
             </div>
-            <div className="space-y-1">
-              <p className="text-xs uppercase font-semibold tracking-wide text-muted-foreground">
-                Participantes
-              </p>
-              <p className="text-lg font-semibold">
-                {inscription.countParticipants}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Saldo aberto:{" "}
-                {currencyFormatter.format(inscription.openBalance)}
-              </p>
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Responsável
+                </p>
+                <p className="text-base font-semibold text-foreground">
+                  {inscription.responsible}
+                </p>
+              </div>
+              <span
+                className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
+                  inscription.status
+                )}`}
+              >
+                {getConvertStatusInscription(inscription.status)}
+              </span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Email
+                </p>
+                <p className="text-base text-foreground">
+                  {inscription.email ?? "Não informado"}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Telefone
+                </p>
+                <p className="text-base text-foreground">
+                  {inscription.phone ?? "Não informado"}
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-muted/30 bg-white/80 p-4 shadow-sm">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Participantes
+                </p>
+                <p className="mt-1 text-3xl font-semibold text-foreground">
+                  {inscription.countParticipants}
+                </p>
+                <p className="text-xs uppercase tracking-[0.2em] ">
+                  Qtd. de participantes
+                </p>
+              </div>
+              <div className="rounded-2xl border border-muted/30 bg-white/80 p-4 shadow-sm">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Total pago
+                </p>
+                <p className="mt-1 text-3xl font-semibold text-foreground">
+                  {currencyFormatter.format(totalPaid)}
+                </p>
+                <p className="text-xs uppercase tracking-[0.2em] ">
+                  Valor já pago
+                </p>
+              </div>
+              <div className="rounded-2xl border border-muted/30 bg-white/80 p-4 shadow-sm">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Saldo aberto
+                </p>
+                <p className="mt-1 text-3xl font-semibold text-red-500">
+                  {currencyFormatter.format(inscription.openBalance)}
+                </p>
+                <p className="text-xs uppercase tracking-[0.2em] text-red-400">
+                  Aguarda pagamento
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
+        <div className="flex gap-4 overflow-x-auto pb-4">
           {inscription.payments.map((payment) => (
-            <Card key={payment.id} className="border shadow-sm">
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Badge
-                    className={getStatusColor(payment.status)}
-                    variant="outline"
+            <article
+              key={payment.id}
+              className="flex min-w-[320px] flex-shrink-0 flex-col gap-4 rounded-2xl border border-muted/30 bg-card/40 p-4 shadow-sm"
+            >
+              <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <span className="text-base font-semibold text-foreground">
+                  {payment.accountName ?? "Conta não informada"}
+                </span>
+                <span>{formatDateTime(payment.createdAt)}</span>
+              </div>
+              <AspectRatio
+                ratio={4 / 5}
+                className={`relative rounded-xl border border-muted/30 bg-muted/60 transition ${
+                  payment.imageUrl ? "group cursor-pointer" : ""
+                }`}
+              >
+                {payment.imageUrl ? (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenViewer(payment)}
+                    className="absolute inset-0"
+                    aria-label="Visualizar comprovante"
                   >
-                    {getConvertStatusPayment(payment.status)}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    {formatDateTime(payment.createdAt)}
+                    <Image
+                      src={payment.imageUrl}
+                      alt={`Comprovante ${payment.id}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, 300px"
+                    />
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40">
+                      <ZoomIn className="w-8 h-8 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+                    </div>
+                  </button>
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-center text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                    <ImageOff className="h-6 w-6" />
+                    Sem imagem enviada
+                  </div>
+                )}
+                <span
+                  className={`absolute right-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getStatusColor(
+                    payment.status
+                  )}`}
+                >
+                  {getConvertStatusPayment(payment.status)}
+                </span>
+              </AspectRatio>
+              <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                <div className="flex items-center justify-between">
+                  <span>Valor</span>
+                  <span className="font-semibold text-foreground">
+                    {currencyFormatter.format(payment.value)}
                   </span>
                 </div>
-                <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
-                  <AspectRatio
-                    ratio={4 / 5}
-                    className="relative rounded-xl border border-muted/30 bg-muted group"
-                  >
-                    {payment.imageUrl ? (
-                      <button
-                        type="button"
-                        onClick={() => handleOpenViewer(payment)}
-                        className="absolute inset-0"
-                        aria-label="Visualizar comprovante"
-                      >
-                        <Image
-                          src={payment.imageUrl}
-                          alt={`Comprovante ${payment.id}`}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 100vw, 300px"
-                        />
-                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40">
-                          <ZoomIn className="w-8 h-8 text-white opacity-0 transition-opacity group-hover:opacity-100" />
-                        </div>
-                      </button>
-                    ) : (
-                      <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-center text-sm font-medium uppercase tracking-wide text-muted-foreground">
-                        <CalendarClock className="w-6 h-6" />
-                        Sem imagem enviada
-                      </div>
-                    )}
-                  </AspectRatio>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                        Conta
-                      </p>
-                      <p className="text-base font-semibold">
-                        {payment.accountName ?? "Não informado"}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <span>Valor</span>
-                      <span className="text-lg font-bold text-foreground">
-                        {currencyFormatter.format(payment.value)}
-                      </span>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Aprovado por{" "}
-                      <span className="text-foreground font-semibold">
-                        {payment.approvedBy ?? "Pendente"}
-                      </span>
-                    </div>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span>Aprovado por</span>
+                  <span className="font-medium text-foreground">
+                    {payment.approvedBy ?? "Pendente"}
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </article>
           ))}
-          <Card className="border shadow-sm">
-            <CardContent className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Total pago</p>
-              <p className="text-xl font-semibold text-foreground">
-                {currencyFormatter.format(totalPaid)}
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
       {viewerMeta && (

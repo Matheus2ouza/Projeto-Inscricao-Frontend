@@ -25,7 +25,9 @@ export default function ListPaymentSuperPage() {
   };
 
   const handleDetails = (paymentsInscriptionId: string) => {
-    router.push(`/super/payments/list-payments/${eventId}/details/${paymentsInscriptionId}`);
+    router.push(
+      `/super/payments/list-payments/${eventId}/details/${paymentsInscriptionId}`
+    );
   };
 
   if (!eventId) {
@@ -100,7 +102,7 @@ export default function ListPaymentSuperPage() {
 
   return (
     <PageContainer
-      title="Pagamentos por inscrição"
+      title="Pagamentos por Inscrição"
       description="Acompanhe os comprovantes enviados para o evento"
       backButtonAction={handleBack}
     >

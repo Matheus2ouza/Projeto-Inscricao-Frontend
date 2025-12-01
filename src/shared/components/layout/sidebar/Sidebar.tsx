@@ -102,13 +102,13 @@ export default function AppSidebarNormal({
             <Logo className="h-10 w-10" showTitle={false} />
           </SidebarHeader>
           <SidebarContent className="px-2 pb-4">
-            <SidebarGroup className="gap-2">
+            <SidebarGroup className="gap-1">
               <SidebarGroupContent>
                 <SidebarMenu>
                   {/* Inicio */}
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <a href="/user/home" className="flex items-center gap-2">
+                      <a href="/user/home" className="flex items-center gap-1">
                         <House className="size-4" />
                         Início
                       </a>
@@ -120,7 +120,7 @@ export default function AppSidebarNormal({
                     <SidebarMenuButton asChild>
                       <a
                         href="/user/events"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <CalendarCheck2 className="size-4" />
                         Eventos
@@ -136,7 +136,7 @@ export default function AppSidebarNormal({
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <ScrollText className="size-4" />
                             Inscrições
                           </span>
@@ -153,7 +153,7 @@ export default function AppSidebarNormal({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/user/individual-inscription"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <span>Inscrição em Individual</span>
                             </SidebarMenuSubButton>
@@ -161,7 +161,7 @@ export default function AppSidebarNormal({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/user/group-inscription"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <span>Inscrição em Grupo</span>
                             </SidebarMenuSubButton>
@@ -176,7 +176,7 @@ export default function AppSidebarNormal({
                     <SidebarMenuButton asChild>
                       <a
                         href="/user/MyInscriptions"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <FileText className="size-4" />
                         Minhas Inscrições
@@ -189,7 +189,7 @@ export default function AppSidebarNormal({
                     <SidebarMenuButton asChild>
                       <a
                         href="/user/tickets"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <Ticket className="size-4" />
                         Tickets
@@ -273,7 +273,7 @@ export default function AppSidebarNormal({
                     event.preventDefault();
                     handleAccountClick();
                   }}
-                  className="cursor-pointer gap-2 px-4 py-2"
+                  className="cursor-pointer gap-1 px-4 py-2"
                 >
                   <Settings className="size-4" />
                   Conta
@@ -285,7 +285,7 @@ export default function AppSidebarNormal({
                     event.preventDefault();
                     logout();
                   }}
-                  className="cursor-pointer gap-2 px-4 py-2"
+                  className="cursor-pointer gap-1 px-4 py-2"
                 >
                   <LogOut className="size-4" />
                   Sair

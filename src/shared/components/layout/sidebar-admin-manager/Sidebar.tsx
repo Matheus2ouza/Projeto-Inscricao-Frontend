@@ -40,11 +40,13 @@ import { cn } from "@/shared/lib/utils";
 import {
   BanknoteArrowDown,
   CalendarDays,
+  Captions,
+  CardSim,
   ChevronRight,
   ChevronsUpDown,
   DollarSign,
-  FileText,
   House,
+  IdCard,
   ListOrdered,
   LogOut,
   Map,
@@ -111,12 +113,12 @@ export default function AppSidebarAdminManager({
             <Logo className="h-10 w-10" showTitle={false} />
           </SidebarHeader>
           <SidebarContent className="px-2 pb-4">
-            <SidebarGroup className="gap-2">
+            <SidebarGroup className="gap-1">
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <a href="/admin/home" className="flex items-center gap-2">
+                      <a href="/admin/home" className="flex items-center gap-1">
                         <House className="size-4" />
                         Início
                       </a>
@@ -129,7 +131,7 @@ export default function AppSidebarAdminManager({
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <ScrollText className="size-4" />
                             Inscrições
                           </span>
@@ -146,16 +148,18 @@ export default function AppSidebarAdminManager({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/inscriptions/analysis"
-                              className="gap-2"
+                              className="gap-1"
                             >
+                              <Captions className="size-4" />
                               <span>Analizar Inscrições</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/inscriptions/avulsa"
-                              className="gap-2"
+                              className="gap-1"
                             >
+                              <IdCard className="size-4" />
                               <span>Inscrição Avulsas</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -170,7 +174,7 @@ export default function AppSidebarAdminManager({
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <BanknoteArrowDown className="size-4" />
                             Pagamentos
                           </span>
@@ -187,16 +191,18 @@ export default function AppSidebarAdminManager({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/payments/analysis"
-                              className="gap-2"
+                              className="gap-1"
                             >
+                              <DollarSign className="size-4" />
                               <span>Analizar Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/payments/list-payments"
-                              className="gap-2"
+                              className="gap-1"
                             >
+                              <ListOrdered className="size-4" />
                               <span>Lista de Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -208,7 +214,7 @@ export default function AppSidebarAdminManager({
                     <SidebarMenuButton asChild>
                       <a
                         href="/admin/accounts"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <Users className="size-4" />
                         Usuários
@@ -219,7 +225,7 @@ export default function AppSidebarAdminManager({
                     <SidebarMenuButton asChild>
                       <a
                         href="/admin/regions"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <Map className="size-4" />
                         Regiões
@@ -231,7 +237,7 @@ export default function AppSidebarAdminManager({
                     <Collapsible open={eventsOpen} onOpenChange={setEventsOpen}>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <CalendarDays className="size-4" />
                             Eventos
                           </span>
@@ -248,16 +254,16 @@ export default function AppSidebarAdminManager({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/events/manager"
-                              className="gap-2"
+                              className="gap-1"
                             >
-                              <FileText className="size-4" />
+                              <CardSim className="size-4" />
                               <span>Gerenciamento</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/participants/select-event"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Participantes</span>
@@ -275,7 +281,7 @@ export default function AppSidebarAdminManager({
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <Tickets className="size-4" />
                             Tickets
                           </span>
@@ -292,16 +298,16 @@ export default function AppSidebarAdminManager({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/tickets/manager"
-                              className="gap-2"
+                              className="gap-1"
                             >
-                              <FileText className="size-4" />
+                              <CardSim className="size-4" />
                               <span>Gerenciamento</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/tickets/sales"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <DollarSign className="size-4" />
                               <span>Analise de Vendas</span>
@@ -310,7 +316,7 @@ export default function AppSidebarAdminManager({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/admin/tickets/list-sales"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Vendas</span>
@@ -324,7 +330,7 @@ export default function AppSidebarAdminManager({
                     <SidebarMenuButton asChild>
                       <a
                         href="/admin/gastos"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <BanknoteArrowDown className="size-4" />
                         Gastos
@@ -335,7 +341,7 @@ export default function AppSidebarAdminManager({
                     <SidebarMenuButton asChild>
                       <a
                         href="/admin/report"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <SquareChartGantt className="size-4" />
                         Relatórios
@@ -419,7 +425,7 @@ export default function AppSidebarAdminManager({
                     event.preventDefault();
                     handleAccountClick();
                   }}
-                  className="cursor-pointer gap-2 px-4 py-2"
+                  className="cursor-pointer gap-1 px-4 py-2"
                 >
                   <Settings className="size-4" />
                   Conta
@@ -431,7 +437,7 @@ export default function AppSidebarAdminManager({
                     event.preventDefault();
                     logout();
                   }}
-                  className="cursor-pointer gap-2 px-4 py-2"
+                  className="cursor-pointer gap-1 px-4 py-2"
                 >
                   <LogOut className="size-4" />
                   Sair

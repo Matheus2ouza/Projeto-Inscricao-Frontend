@@ -113,12 +113,12 @@ export default function AppSidebarSuper({
             <Logo className="w-10" showTitle={false} />
           </SidebarHeader>
           <SidebarContent className="px-2 pb-4">
-            <SidebarGroup className="gap-2">
+            <SidebarGroup className="gap-1">
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <a href="/super/home" className="flex items-center gap-2">
+                      <a href="/super/home" className="flex items-center gap-1">
                         <House className="size-4" />
                         Início
                       </a>
@@ -131,7 +131,7 @@ export default function AppSidebarSuper({
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <ScrollText className="size-4" />
                             Inscrições
                           </span>
@@ -148,7 +148,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/inscriptions/analysis"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <span>Analizar Inscrições</span>
                             </SidebarMenuSubButton>
@@ -156,7 +156,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/inscriptions/avulsa"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <span>Inscrição Avulsas</span>
                             </SidebarMenuSubButton>
@@ -172,7 +172,7 @@ export default function AppSidebarSuper({
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <BanknoteArrowDown className="size-4" />
                             Pagamentos
                           </span>
@@ -189,7 +189,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/payments/analysis"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <span>Analizar Pagamentos</span>
                             </SidebarMenuSubButton>
@@ -197,7 +197,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/payments/list-payments"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <span>Lista de Pagamentos</span>
                             </SidebarMenuSubButton>
@@ -210,7 +210,7 @@ export default function AppSidebarSuper({
                     <SidebarMenuButton asChild>
                       <a
                         href="/super/accounts"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <Users className="size-4" />
                         Usuários
@@ -221,7 +221,7 @@ export default function AppSidebarSuper({
                     <SidebarMenuButton asChild>
                       <a
                         href="/super/regions"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <Map className="size-4" />
                         Regiões
@@ -232,7 +232,7 @@ export default function AppSidebarSuper({
                     <Collapsible open={eventsOpen} onOpenChange={setEventsOpen}>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <CalendarDays className="size-4" />
                             Eventos
                           </span>
@@ -249,7 +249,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/events/manager"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <FileText className="size-4" />
                               <span>Gerenciamento</span>
@@ -258,7 +258,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/participants/select-event"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Participantes</span>
@@ -276,7 +276,7 @@ export default function AppSidebarSuper({
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1">
                             <Tickets className="size-4" />
                             Tickets
                           </span>
@@ -293,7 +293,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/tickets/manager"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <FileText className="size-4" />
                               <span>Gerenciamento</span>
@@ -302,7 +302,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/tickets/sales"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <DollarSign className="size-4" />
                               <span>Analise de Vendas</span>
@@ -311,7 +311,7 @@ export default function AppSidebarSuper({
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
                               href="/super/tickets/list-sales"
-                              className="gap-2"
+                              className="gap-1"
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Vendas</span>
@@ -325,7 +325,7 @@ export default function AppSidebarSuper({
                     <SidebarMenuButton asChild>
                       <a
                         href="/super/gastos"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <BanknoteArrowDown className="size-4" />
                         Gastos
@@ -336,7 +336,7 @@ export default function AppSidebarSuper({
                     <SidebarMenuButton asChild>
                       <a
                         href="/super/report"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1"
                       >
                         <SquareChartGantt className="size-4" />
                         Relatórios
@@ -420,7 +420,7 @@ export default function AppSidebarSuper({
                     event.preventDefault();
                     handleAccountClick();
                   }}
-                  className="cursor-pointer gap-2 px-4 py-2"
+                  className="cursor-pointer gap-1 px-4 py-2"
                 >
                   <Settings className="size-4" />
                   Conta
@@ -432,7 +432,7 @@ export default function AppSidebarSuper({
                     event.preventDefault();
                     logout();
                   }}
-                  className="cursor-pointer gap-2 px-4 py-2"
+                  className="cursor-pointer gap-1 px-4 py-2"
                 >
                   <LogOut className="size-4" />
                   Sair
