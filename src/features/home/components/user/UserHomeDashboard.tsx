@@ -214,16 +214,15 @@ export default function UserHomeDashboard({
   return (
     <>
       <DismissibleAlert
-        id="system-development-warning"
-        title="Sistema em Desenvolvimento"
+        id="inscriptions-closing-warning"
+        title="Inscrições fecham às 15h"
         variant="warning"
         asModal={true}
       >
-        O sistema ainda está em fase de desenvolvimento, e algumas
-        funcionalidades podem não estar finalizadas ou funcionar de forma
-        diferente do esperado. Recomendamos utilizá-lo em um{" "}
-        <strong>computador (desktop)</strong> para uma melhor experiência, mas
-        ele também pode ser acessado pelo celular.
+        Hoje, às <strong>15h</strong>, as inscrições serão encerradas. Garanta
+        que todas as inscrições sejam feitas até o horario limite. Depois desse
+        horário, as inscrições não poderão ser mais feitas. Ainda poderá ser
+        feito os pagamentos após o horário limite.
       </DismissibleAlert>
 
       <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">

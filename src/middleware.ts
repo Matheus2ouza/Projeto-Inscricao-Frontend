@@ -93,8 +93,14 @@ export default async function middleware(request: NextRequest) {
       USER: "/user/",
     };
     const requiredPrefix = rolePrefix[role] ?? "/user/";
+    const normalizedPrefix =
+      requiredPrefix.endsWith("/") && requiredPrefix.length > 1
+        ? requiredPrefix.slice(0, -1)
+        : requiredPrefix;
+    const matchesPrefix =
+      pathname === normalizedPrefix || pathname.startsWith(requiredPrefix);
 
-    if (!pathname.startsWith(requiredPrefix)) {
+    if (!matchesPrefix) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = requiredPrefix;
       return NextResponse.redirect(redirectUrl);
