@@ -1,27 +1,69 @@
 "use client";
 
+import { ComboboxAccount } from "@/features/accounts/components/ComboboxAccount";
 import PaymentsAnalysisTable from "@/features/analysis/payment/components/PaymentsAnalysisTable";
 import { useAnalysisPaymentsQuery } from "@/features/analysis/payment/hooks/useAnalysisInscriptionsQuery";
 import { useEvent } from "@/features/events/hooks/useEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Filter } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
 export default function EventInscriptionsAnalysisSuperPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
 
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [appliedStatuses, setAppliedStatuses] = useState<string[] | undefined>(
+    undefined
+  );
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
+  const [appliedAccountId, setAppliedAccountId] = useState<string | undefined>(
+    undefined
+  );
+
+  const statusOptions = useMemo(
+    () => [
+      { value: "APPROVED", label: "Aprovados" },
+      { value: "UNDER_REVIEW", label: "Em análise" },
+      { value: "REFUSED", label: "Recusados" },
+    ],
+    []
+  );
+
   const { event, loading: eventLoading, error: eventError } = useEvent(eventId);
   const {
     data: analysisData,
     isLoading: analysisLoading,
     error: analysisError,
-  } = useAnalysisPaymentsQuery(eventId, 1, 1000);
+  } = useAnalysisPaymentsQuery(
+    eventId,
+    page,
+    pageSize,
+    appliedStatuses,
+    appliedAccountId
+  );
 
   const loading = eventLoading || analysisLoading;
   const error = eventError
@@ -90,17 +132,104 @@ export default function EventInscriptionsAnalysisSuperPage() {
     );
   };
 
+  const handleApplyFilters = () => {
+    setAppliedStatuses(
+      selectedStatuses.length > 0 ? selectedStatuses : undefined
+    );
+    setAppliedAccountId(selectedAccountId || undefined);
+    setPage(1);
+  };
+
+  const hasFilters = selectedStatuses.length > 0;
+
   return (
     <PageContainer
       title="Análise de Pagamentos"
       description="Visualize as inscrições por Conta"
     >
+      <div className="mb-4 grid items-center gap-4 md:grid-cols-[1fr_1fr_auto_auto]">
+        <div>
+          <ComboboxAccount
+            value={selectedAccountId ? [selectedAccountId] : []}
+            onChange={(items) =>
+              setSelectedAccountId(items[items.length - 1] ?? "")
+            }
+            showRole={false}
+            roles={["USER"]}
+          />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full max-w-[260px] justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Status
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {hasFilters
+                  ? `${selectedStatuses.length} selecionado(s)`
+                  : "Todos"}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            className="w-[var(--radix-popover-trigger-width)] min-w-[260px]"
+          >
+            <div className="px-4 py-2 text-sm font-semibold text-muted-foreground">
+              Filtrar por status
+            </div>
+            <DropdownMenuSeparator />
+            {statusOptions.map((status) => (
+              <DropdownMenuCheckboxItem
+                key={status.value}
+                checked={selectedStatuses.includes(status.value)}
+                onCheckedChange={(checked) => {
+                  setSelectedStatuses((prev) => {
+                    if (checked) {
+                      return [...prev, status.value];
+                    }
+                    return prev.filter((value) => value !== status.value);
+                  });
+                }}
+              >
+                {status.label}
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Select
+          value={pageSize.toString()}
+          onValueChange={(value) => {
+            setPageSize(Number(value));
+            setPage(1);
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Itens por página" />
+          </SelectTrigger>
+          <SelectContent>
+            {[10, 15, 25].map((size) => (
+              <SelectItem key={size} value={size.toString()}>
+                {size} por página
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button onClick={handleApplyFilters}>Aplicar filtros</Button>
+      </div>
       <PaymentsAnalysisTable
         eventId={eventId}
         event={event}
         analysisData={analysisData || null}
         loading={loading}
         error={error}
+        page={page}
+        pageCount={analysisData?.pageCount ?? 1}
+        onPageChange={setPage}
         onViewPayment={handleViewPayment}
       />
     </PageContainer>
