@@ -41,13 +41,10 @@ export default function ImageViewerDialog({
   const [imageLoading, setImageLoading] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const [imageDimensions, setImageDimensions] = useState<
-    | {
-        width: number;
-        height: number;
-      }
-    | null
-  >(null);
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -195,6 +192,7 @@ export default function ImageViewerDialog({
           width: dialogWidth,
           maxWidth: viewportSize.width ? viewportSize.width * 0.95 : undefined,
           maxHeight: dialogHeight,
+          minWidth: 450,
         }}
       >
         <DialogHeader>

@@ -6,18 +6,12 @@ import type { AnalysisPaymentResponse } from "../types/analysisTypes";
 // Chaves de cache para detalhes de pagamento
 export const paymentDetailsKeys = {
   all: ["payment-details"] as const,
-  detail: (
-    inscriptionId: string,
-    page: number,
-    pageSize: number,
-    status?: string[]
-  ) =>
-    [...paymentDetailsKeys.all, inscriptionId, page, pageSize, status] as const,
+  detail: (inscriptionId: string, page: number, pageSize: number) =>
+    [...paymentDetailsKeys.all, inscriptionId, page, pageSize] as const,
 };
 
 export function usePaymentDetailsQuery(
   inscriptionId: string,
-  paymentStatus?: string[],
   initialPage: number = 1,
   pageSize: number = 3
 ) {
@@ -28,14 +22,13 @@ export function usePaymentDetailsQuery(
     queryKey: paymentDetailsKeys.detail(
       inscriptionId,
       page,
-      pageSize,
-      paymentStatus
+      pageSize
     ),
     queryFn: () =>
       getPaymentDetails(inscriptionId, {
         page,
         pageSize,
-        status: paymentStatus,
+        inscriptionId,
       }),
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
@@ -53,17 +46,12 @@ export function usePaymentDetailsQuery(
     if (query.data && pageCount > 0 && page < pageCount) {
       const nextPage = page + 1;
       queryClient.prefetchQuery({
-        queryKey: paymentDetailsKeys.detail(
-          inscriptionId,
-          nextPage,
-          pageSize,
-          paymentStatus
-        ),
+        queryKey: paymentDetailsKeys.detail(inscriptionId, nextPage, pageSize),
         queryFn: () =>
           getPaymentDetails(inscriptionId, {
             page: nextPage,
             pageSize,
-            status: paymentStatus,
+            inscriptionId,
           }),
         staleTime: 5 * 60 * 1000,
       });
@@ -74,7 +62,6 @@ export function usePaymentDetailsQuery(
     pageCount,
     inscriptionId,
     pageSize,
-    paymentStatus,
     queryClient,
   ]);
 
@@ -83,22 +70,17 @@ export function usePaymentDetailsQuery(
     if (query.data && page > 1) {
       const prevPage = page - 1;
       queryClient.prefetchQuery({
-        queryKey: paymentDetailsKeys.detail(
-          inscriptionId,
-          prevPage,
-          pageSize,
-          paymentStatus
-        ),
+        queryKey: paymentDetailsKeys.detail(inscriptionId, prevPage, pageSize),
         queryFn: () =>
           getPaymentDetails(inscriptionId, {
             page: prevPage,
             pageSize,
-            status: paymentStatus,
+            inscriptionId,
           }),
         staleTime: 5 * 60 * 1000,
       });
     }
-  }, [query.data, page, inscriptionId, pageSize, paymentStatus, queryClient]);
+  }, [query.data, page, inscriptionId, pageSize, queryClient]);
 
   return {
     ...query,

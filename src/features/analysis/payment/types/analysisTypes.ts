@@ -1,23 +1,29 @@
 export type PaymentAnalysisRequest = {
-  page: number;
-  pageSize: number;
+  page?: number;
+  pageSize?: number;
+  eventId: string;
 };
 
-export type PaymentData = {
+export type Payments = {
   id: string;
+  value: number;
+  date: Date;
+};
+
+export type Inscriptions = {
+  id: string;
+  accountName?: string;
   responsible: string;
   totalValue: number;
   countPayments: number;
-};
-
-export type AccountData = {
-  id: string;
-  username: string;
-  inscriptions: PaymentData[];
+  payments: Payments[];
 };
 
 export type PaymentAnalysisResponse = {
-  account: AccountData[];
+  inscriptions: Inscriptions[];
+  total: number;
+  page: number;
+  pageCount: number;
 };
 
 export type UseAnalysisParams = {
@@ -57,7 +63,7 @@ export type PaymentDetail = {
 };
 
 export type AnalysisPaymentRequest = {
-  status?: string[];
+  inscriptionId: string;
   page: number;
   pageSize: number;
 };

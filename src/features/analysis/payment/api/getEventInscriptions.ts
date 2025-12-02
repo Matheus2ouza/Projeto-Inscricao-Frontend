@@ -1,8 +1,5 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import {
-  PaymentAnalysisRequest,
-  PaymentAnalysisResponse,
-} from "../types/analysisTypes";
+import { PaymentAnalysisRequest, PaymentAnalysisResponse } from "../types/analysisTypes";
 
 export async function getEventPayments(
   eventId: string,
@@ -15,6 +12,7 @@ export async function getEventPayments(
         params: {
           page: params.page,
           pageSize: params.pageSize,
+          eventId: params.eventId,
         },
       }
     );

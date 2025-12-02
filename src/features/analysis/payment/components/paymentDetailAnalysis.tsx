@@ -40,14 +40,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePaymentActions } from "../hooks/usePaymentActions";
 import { AnalysisPaymentResponse } from "../types/analysisTypes";
 
 interface PaymentDetailAnalysisProps {
-  inscriptionId: string;
   eventStatus: string;
-  eventId: string;
   paymentData: AnalysisPaymentResponse | null;
   page: number;
   pageCount: number;
@@ -56,9 +54,7 @@ interface PaymentDetailAnalysisProps {
 }
 
 export default function PaymentDetailAnalysis({
-  inscriptionId,
   eventStatus,
-  eventId,
   paymentData,
   page,
   pageCount,
@@ -86,7 +82,7 @@ export default function PaymentDetailAnalysis({
     isRefusing,
     isReviewing,
     isDeleting,
-  } = usePaymentActions({ inscriptionId, eventId });
+  } = usePaymentActions();
 
   const [refusalDialog, setRefusalDialog] = useState<{
     paymentId: string;
@@ -102,6 +98,9 @@ export default function PaymentDetailAnalysis({
   const [manualReviewState, setManualReviewState] = useState<
     Record<string, boolean>
   >({});
+  const [discardedPayments, setDiscardedPayments] = useState<Set<string>>(
+    () => new Set()
+  );
 
   useEffect(() => {
     if (!paymentData) {
@@ -120,16 +119,53 @@ export default function PaymentDetailAnalysis({
       return next;
     });
   }, [paymentData]);
+
+  useEffect(() => {
+    if (!paymentData) {
+      return;
+    }
+
+    setDiscardedPayments(new Set());
+  }, [paymentData?.inscription.id]);
   useEffect(() => {
     setManualReviewState({});
   }, [paymentData]);
+
+  const visiblePayments = useMemo(() => {
+    if (!paymentData) {
+      return [];
+    }
+
+    return paymentData.inscription.payments.filter(
+      (payment) => !discardedPayments.has(payment.id)
+    );
+  }, [discardedPayments, paymentData]);
+
+  const markPaymentAsDiscarded = (paymentId: string | null) => {
+    if (!paymentId) {
+      return;
+    }
+
+    setDiscardedPayments((prev) => {
+      if (prev.has(paymentId)) {
+        return prev;
+      }
+
+      const next = new Set(prev);
+      next.add(paymentId);
+
+      return next;
+    });
+  };
 
   const handleApprovePayment = (paymentId: string) => {
     setManualReviewState((prev) => {
       const { [paymentId]: _omit, ...rest } = prev;
       return rest;
     });
-    approvePayment(paymentId);
+    approvePayment(paymentId, {
+      onSuccess: () => markPaymentAsDiscarded(paymentId),
+    });
   };
 
   const handleRefusePayment = (paymentId: string) => {
@@ -165,6 +201,7 @@ export default function PaymentDetailAnalysis({
             const { [paymentId]: _omit, ...rest } = prev;
             return rest;
           });
+          markPaymentAsDiscarded(paymentId);
         },
         onError: () => {
           // Keep dialog open so the reviewer can adjust the reason if needed
@@ -194,6 +231,7 @@ export default function PaymentDetailAnalysis({
 
     deletePayment(deleteDialogPaymentId, {
       onSuccess: () => {
+        markPaymentAsDiscarded(deleteDialogPaymentId);
         handleCloseDeleteDialog();
       },
     });
@@ -451,7 +489,7 @@ export default function PaymentDetailAnalysis({
           <CardContent>
             <h3 className="text-xl font-bold mb-4">Pagamentos</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {paymentData.inscription.payments.map((payment, index) => {
+              {visiblePayments.map((payment, index) => {
                 const hasImage = Boolean(payment.image);
                 const isUnderReview =
                   payment.status.toLowerCase() === "under_review";
@@ -590,7 +628,7 @@ export default function PaymentDetailAnalysis({
               })}
             </div>
 
-            {paymentData.inscription.payments.length === 0 && (
+            {visiblePayments.length === 0 && (
               <div className="text-center py-12">
                 <CreditCard className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">
@@ -664,8 +702,8 @@ export default function PaymentDetailAnalysis({
             {/* Informação de paginação */}
             {total > 0 && (
               <div className="text-center mt-4 text-sm text-muted-foreground">
-                Mostrando {paymentData.inscription.payments.length} de {total}{" "}
-                pagamentos (Página {page} de {pageCount})
+                Mostrando {visiblePayments.length} de {total} pagamentos (Página{" "}
+                {page} de {pageCount})
               </div>
             )}
           </CardContent>
