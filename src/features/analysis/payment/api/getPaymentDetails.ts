@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
 import {
   AnalysisPaymentRequest,
   AnalysisPaymentResponse,
@@ -16,9 +15,7 @@ export async function getPaymentDetails(
         params: {
           page: params.page,
           pageSize: params.pageSize,
-          status: params.status,
         },
-        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
       }
     );
 
@@ -31,7 +28,7 @@ export async function getPaymentDetails(
     };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao carregar detalhes do pagamento"
+      "Falha ao carregar detalhes do pagamento"
     );
   }
 }

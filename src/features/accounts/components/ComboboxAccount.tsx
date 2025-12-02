@@ -18,6 +18,7 @@ import { cn } from "@/shared/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 import { useAccount } from "../hooks/useAccount";
+import type { AccountRole } from "../types/accounts.types";
 
 export type AccountOption = {
   label: string;
@@ -26,15 +27,17 @@ export type AccountOption = {
 };
 
 export type ComboboxAccountProps = {
+  label?: string;
   value: string[];
   onChange: (value: string[]) => void;
   options?: AccountOption[];
   loading?: boolean;
-  roles?: string[];
+  roles?: AccountRole[];
   showRole?: boolean;
 };
 
 export function ComboboxAccount({
+  label,
   value,
   onChange,
   options,
@@ -53,16 +56,25 @@ export function ComboboxAccount({
 
   // Preferência: props.options > API; fallback: []
   const accounts = React.useMemo<AccountOption[]>(() => {
-    if (options) return options;
+    const matchesRole = (accountRole?: string) => {
+      if (!roles || roles.length === 0) return true;
+      return accountRole ? roles.includes(accountRole as AccountRole) : false;
+    };
+
+    if (options) {
+      return options.filter((option) => matchesRole(option.role));
+    }
     if (fetched && fetched.length > 0) {
-      return fetched.map((r) => ({
-        label: r.username.toUpperCase(),
-        value: r.id,
-        role: r.role,
-      }));
+      return fetched
+        .map((r) => ({
+          label: r.username.toUpperCase(),
+          value: r.id,
+          role: r.role,
+        }))
+        .filter((account) => matchesRole(account.role));
     }
     return [];
-  }, [options, fetched]);
+  }, [options, fetched, roles]);
 
   const toggleSelection = (optionValue: string) => {
     const isSelected = value.includes(optionValue);
@@ -92,13 +104,13 @@ export function ComboboxAccount({
     if (selectedLabels.length === 0) {
       if (loading) return "Carregando usuários...";
       if (accounts.length === 0) return "Nenhum usuário encontrado";
-      return "Selecione um ou mais usuários...";
+      return label ?? "Selecione um ou mais usuários...";
     }
 
     if (selectedLabels.length === 1) return selectedLabels[0];
 
     return selectedLabels.join(", ");
-  }, [selectedLabels, loading, accounts.length]);
+  }, [selectedLabels, loading, accounts.length, label]);
 
   // Função para formatar o role para exibição
   const formatRole = (role?: string) => {

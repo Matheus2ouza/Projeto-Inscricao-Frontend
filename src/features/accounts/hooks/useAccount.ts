@@ -1,6 +1,7 @@
 "use client";
 
 import type { AccountDto } from "../api/getUsersCombobox";
+import { AccountRole } from "../types/accounts.types";
 import { useAccountsComboboxQuery } from "./useAccountsQuery";
 
 type UseAccountResult = {
@@ -12,7 +13,7 @@ type UseAccountResult = {
 
 export function useAccount(
   autoFetch: boolean = true,
-  roles?: string[]
+  roles?: AccountRole[],
 ): UseAccountResult {
   const { data, isLoading, isFetching, error, refetch } =
     useAccountsComboboxQuery(autoFetch, roles);

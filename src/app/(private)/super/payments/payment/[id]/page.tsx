@@ -1,35 +1,29 @@
 "use client";
 
 import PaymentDetailAnalysis from "@/features/analysis/payment/components/paymentDetailAnalysis";
+import { useInvalidateAnalysisPayments } from "@/features/analysis/payment/hooks/useAnalysisInscriptionsQuery";
 import { usePaymentDetailsQuery } from "@/features/analysis/payment/hooks/usePaymentDetails";
-import { PaymentStatus } from "@/features/analysis/payment/types/analysisTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { CreditCard } from "lucide-react";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 export default function PaymentsDetailInsideAnalysisSuperPage() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const inscriptionId = params.id as string;
-  const eventId = (searchParams.get("eventId") as string) || "";
   const eventStatus = searchParams.get("eventStatus") || "OPEN";
-
-  // Determinar quais status de pagamento buscar baseado no status do evento
-  const paymentStatusToFetch = useMemo(() => {
-    if (eventStatus === "OPEN") {
-      return [
-        PaymentStatus.APPROVED,
-        PaymentStatus.UNDER_REVIEW,
-        PaymentStatus.REFUSED,
-      ];
-    }
-    return [PaymentStatus.APPROVED, PaymentStatus.UNDER_REVIEW];
-  }, [eventStatus]);
+  const analysisEventId = searchParams.get("eventId") || undefined;
+  const analysisHref = analysisEventId
+    ? `/super/payments/analysis/${analysisEventId}`
+    : "/super/payments/analysis";
+  const { invalidateEventPayments } = useInvalidateAnalysisPayments();
+  const redirectGuardRef = useRef(false);
 
   const {
     data: paymentData,
@@ -39,7 +33,30 @@ export default function PaymentsDetailInsideAnalysisSuperPage() {
     setPage,
     pageCount,
     total,
-  } = usePaymentDetailsQuery(inscriptionId, paymentStatusToFetch);
+  } = usePaymentDetailsQuery(inscriptionId);
+
+  useEffect(() => {
+    return () => {
+      if (analysisEventId) {
+        invalidateEventPayments(analysisEventId);
+      }
+    };
+  }, [analysisEventId, invalidateEventPayments]);
+
+  useEffect(() => {
+    if (redirectGuardRef.current || !paymentData) {
+      return;
+    }
+
+    const hasUnderReview = paymentData.inscription.payments.some(
+      (payment) => payment.status.toLowerCase() === "under_review"
+    );
+
+    if (!hasUnderReview) {
+      redirectGuardRef.current = true;
+      router.push(analysisHref);
+    }
+  }, [analysisHref, paymentData, router]);
 
   if (loading) {
     return (
@@ -107,8 +124,6 @@ export default function PaymentsDetailInsideAnalysisSuperPage() {
       description="Análise detalhada dos pagamentos da inscrição"
     >
       <PaymentDetailAnalysis
-        inscriptionId={inscriptionId}
-        eventId={eventId}
         eventStatus={eventStatus}
         paymentData={paymentData || null}
         page={page}

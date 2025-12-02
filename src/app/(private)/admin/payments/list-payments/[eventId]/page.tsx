@@ -17,7 +17,7 @@ export default function ListPaymentAdminPage() {
     usePaymentsList({
       eventId: eventId || "",
       initialPage: 1,
-      pageSize: 10,
+      pageSize: 12,
     });
 
   const handleBack = () => {

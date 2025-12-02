@@ -11,7 +11,6 @@ export const analysisPaymentsKeys = {
       eventId,
       { page, pageSize },
     ] as const,
-  // Chave para eventos de análise
   events: (page: number, pageSize: number) =>
     [...analysisPaymentsKeys.all, "events", { page, pageSize }] as const,
 };
@@ -22,18 +21,14 @@ export function useAnalysisPaymentsQuery(
   pageSize: number = 15
 ) {
   return useQuery({
-    queryKey: analysisPaymentsKeys.eventPayments(
-      eventId,
-      page,
-      pageSize
-    ),
+    queryKey: analysisPaymentsKeys.eventPayments(eventId, page, pageSize),
     queryFn: async () =>
-      await getEventPayments(eventId, { page, pageSize }),
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos
+      await getEventPayments(eventId, { page, pageSize, eventId }),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     retry: 2,
     refetchOnWindowFocus: false,
-    enabled: !!eventId, // Só executa se eventId estiver definido
+    enabled: !!eventId,
   });
 }
 
@@ -48,7 +43,6 @@ export function useInvalidateAnalysisPayments() {
       queryClient.invalidateQueries({
         queryKey: analysisPaymentsKeys.eventPayments(eventId, 1, 15),
       }),
-    // Invalidate events cache
     invalidateEvents: () =>
       queryClient.invalidateQueries({
         queryKey: analysisPaymentsKeys.all,
@@ -58,7 +52,6 @@ export function useInvalidateAnalysisPayments() {
   };
 }
 
-// Hook para pré-carregar dados de análise
 export function usePrefetchAnalysisPayments() {
   const queryClient = useQueryClient();
 
@@ -78,6 +71,7 @@ export function usePrefetchAnalysisPayments() {
           await getEventPayments(eventId, {
             page: currentPage + 1,
             pageSize,
+            eventId,
           }),
         staleTime: 5 * 60 * 1000,
       });

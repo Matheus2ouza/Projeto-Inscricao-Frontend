@@ -38,8 +38,8 @@ export function usePaymentsList({
       error instanceof Error
         ? error.message
         : typeof error === "string"
-        ? error
-        : null,
+          ? error
+          : null,
     setPage,
     refetch: async () => {
       await refetch();

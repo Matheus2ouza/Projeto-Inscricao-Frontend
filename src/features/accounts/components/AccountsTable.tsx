@@ -166,7 +166,7 @@ export default function AccountsTable({
         username: "",
         password: "",
         role: defaultRoleValue,
-        region: isSuperUser ? "" : user?.region?.id ?? "",
+        region: isSuperUser ? "" : (user?.region?.id ?? ""),
       });
       setHasRegion(isSuperUser);
     }
@@ -177,10 +177,12 @@ export default function AccountsTable({
       <div className="max-w-7xl mx-auto px-6">
         <div
           className={`flex items-center mb-6 gap-2 flex-wrap ${
-            user.role === "super" ? "justify-between" : "justify-end"
+            user.role.toLowerCase() === "super"
+              ? "justify-between"
+              : "justify-end"
           }`}
         >
-          {user.role === "super" && (
+          {user.role.toLowerCase() === "super" && (
             <div className="flex items-center gap-2 flex-wrap ">
               <MultiSelectRegion
                 value={selectedRegions}
