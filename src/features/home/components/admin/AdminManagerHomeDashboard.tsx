@@ -123,7 +123,7 @@ export default function AdminManagerHomeDashboard({
       detailLabel: "Eventos",
     },
     {
-      title: "Participantes ativos",
+      title: "Participantes",
       subtitle: "Participantes inscritos",
       stripe: {
         color: "rgba(245, 158, 11, 0.55)",
