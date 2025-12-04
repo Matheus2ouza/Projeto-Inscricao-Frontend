@@ -69,10 +69,14 @@ export default function ParticipantsTable({
 }: ParticipantsTableProps) {
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
 
-  const { generatePdf, isGenerating: isGeneratingPdf } =
-    useDownloadParticipantsPdf(eventId, {
-      onSuccess: () => setSelectedAccountIds([]),
-    });
+  const {
+    generateSelectedPdf,
+    generateAllPdf,
+    isGenerating: isGeneratingPdf,
+    isGeneratingAll,
+  } = useDownloadParticipantsPdf(eventId, {
+    onSuccess: () => setSelectedAccountIds([]),
+  });
 
   const availableAccountIds = useMemo(
     () => accounts.map((account) => account.id),
@@ -110,7 +114,11 @@ export default function ParticipantsTable({
   };
 
   const handleGeneratePdf = () => {
-    generatePdf(selectedAccountIds);
+    generateSelectedPdf(selectedAccountIds);
+  };
+
+  const handleGenerateAll = () => {
+    generateAllPdf();
   };
 
   if (accounts.length === 0) {
@@ -149,16 +157,31 @@ export default function ParticipantsTable({
                   : "Nenhuma conta selecionada."}
               </p>
             </div>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleGeneratePdf}
-              disabled={!hasSelection || isGeneratingPdf}
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              {isGeneratingPdf ? "Gerando PDF..." : "Baixar PDF"}
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleGeneratePdf}
+                disabled={
+                  !hasSelection || isGeneratingPdf || isGeneratingAll
+                }
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {isGeneratingPdf ? "Gerando PDF..." : "Baixar PDF"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateAll}
+                disabled={isGeneratingPdf || isGeneratingAll}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {isGeneratingAll ? "Gerando PDF..." : "Baixar todas as contas"}
+              </Button>
+            </div>
           </div>
         </div>
       )}
