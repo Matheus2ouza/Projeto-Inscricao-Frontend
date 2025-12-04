@@ -9,7 +9,7 @@ export const checkInAccountDetailsKeys = {
 };
 
 export function useCheckInAccountDetails(eventId: string, accountId: string) {
-  return useQuery<CheckInAccountDetails>({
+  return useQuery<CheckInAccountDetailsData>({
     queryKey: checkInAccountDetailsKeys.detail(eventId, accountId),
     queryFn: () => getCheckInAccountDetails(eventId, accountId),
     staleTime: 5 * 60 * 1000,
