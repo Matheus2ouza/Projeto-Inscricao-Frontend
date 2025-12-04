@@ -33,6 +33,7 @@ export type Participants = {
   id: string;
   name: string;
   birthDate: string;
+  typeInscription: string;
   gender: string;
 }[];
 

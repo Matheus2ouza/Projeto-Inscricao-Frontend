@@ -18,7 +18,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { cn } from "@/shared/lib/utils";
-import { Calendar, Download, User, Users } from "lucide-react";
+import { Download, User, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Accounts } from "../types/participantsTypes";
 
@@ -121,6 +121,10 @@ export default function ParticipantsTable({
     generateAllPdf();
   };
 
+  const handleDownloadAccount = (accountId: string) => {
+    generateSelectedPdf([accountId]);
+  };
+
   if (accounts.length === 0) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
@@ -145,71 +149,46 @@ export default function ParticipantsTable({
     <>
       {/* Barra de ações de seleção */}
       {accounts.length > 0 && (
-        <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-4 mb-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Selecione as contas para gerar o PDF dos participantes
+        <div className="rounded-2xl border border-border bg-white/80 p-6 mb-6 shadow-sm">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Baixar seleção
               </p>
-              <p className="text-xs text-muted-foreground">
-                {hasSelection
-                  ? `${totalSelected} conta${totalSelected === 1 ? "" : "s"} selecionada${totalSelected === 1 ? "" : "s"}`
-                  : "Nenhuma conta selecionada."}
+              <p className="text-xs text-muted-foreground mb-3">
+                Gera o PDF apenas das contas marcadas na lista atual.
               </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="button"
                 size="sm"
                 onClick={handleGeneratePdf}
-                disabled={
-                  !hasSelection || isGeneratingPdf || isGeneratingAll
-                }
-                className="flex items-center gap-2"
+                disabled={!hasSelection || isGeneratingPdf || isGeneratingAll}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 disabled:bg-primary/40"
               >
                 <Download className="h-4 w-4" />
-                {isGeneratingPdf ? "Gerando PDF..." : "Baixar PDF"}
+                {isGeneratingPdf ? "Gerando..." : "Baixar PDF"}
               </Button>
+            </div>
+            <div className="rounded-2xl border border-muted-foreground/40 bg-white/90 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Baixar todas
+              </p>
+              <p className="text-xs text-muted-foreground mb-3">
+                Gera o relatório completo com todos os participantes do evento.
+              </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={handleGenerateAll}
                 disabled={isGeneratingPdf || isGeneratingAll}
-                className="flex items-center gap-2"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-border"
               >
                 <Download className="h-4 w-4" />
-                {isGeneratingAll ? "Gerando PDF..." : "Baixar todas as contas"}
+                {isGeneratingAll ? "Gerando..." : "Baixar todas as contas"}
               </Button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Botões de seleção */}
-      {accounts.length > 0 && (
-        <div className="flex flex-wrap items-center justify-end gap-2 mb-6">
-          {hasSelection && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleClearSelection}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Limpar seleção
-            </Button>
-          )}
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleToggleAll}
-            disabled={!availableAccountIds.length || isEverythingSelected}
-          >
-            Selecionar todas
-          </Button>
         </div>
       )}
 
@@ -247,6 +226,17 @@ export default function ParticipantsTable({
                       </CardDescription>
                     </div>
                   </div>
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    disabled={isGeneratingPdf || isGeneratingAll}
+                    onClick={() => handleDownloadAccount(account.id)}
+                    className="flex items-center gap-2 text-xs uppercase"
+                  >
+                    <Download className="h-3 w-3" />
+                    Baixar PDF
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
@@ -272,7 +262,7 @@ export default function ParticipantsTable({
                               Nome
                             </th>
                             <th className="px-6 py-4 text-left font-semibold text-base">
-                              Data de Nascimento
+                              Tipo de Inscrição
                             </th>
                             <th className="px-6 py-4 text-center font-semibold text-base">
                               Idade
@@ -299,15 +289,14 @@ export default function ParticipantsTable({
                                 </div>
                               </td>
                               <td className="px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                                  <span className="text-muted-foreground">
-                                    {formatDate(participant.birthDate)}
+                                <div className="flex items-center">
+                                  <span className="text-muted-foreground font-medium uppercase">
+                                    {participant.typeInscription}
                                   </span>
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-muted-foreground font-medium">
+                                <span className="text-muted-foreground font-medium uppercase">
                                   {calculateAge(participant.birthDate)} anos
                                 </span>
                               </td>
