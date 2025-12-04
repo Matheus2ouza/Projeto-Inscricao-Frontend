@@ -33,6 +33,7 @@ import {
   DollarSign,
   FileText,
   House,
+  IdCard,
   ListOrdered,
   LogOut,
   Map,
@@ -262,6 +263,15 @@ export default function AppSidebarSuper({
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Participantes</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/super/events/check-in"
+                              className="gap-1"
+                            >
+                              <IdCard className="size-4" />
+                              <span>Check-in</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>
