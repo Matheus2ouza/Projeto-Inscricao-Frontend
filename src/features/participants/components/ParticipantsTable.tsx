@@ -17,6 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { Download, User, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -30,20 +31,21 @@ interface ParticipantsTableProps {
   onPageChange: (page: number) => void;
 }
 
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString("pt-BR");
-};
+const GENDERS = [
+  { label: "Masculino", value: "MASCULINO" },
+  { label: "Feminino", value: "FEMININO" },
+];
+
+const formatDate = (date: string) => new Date(date).toLocaleDateString("pt-BR");
 
 const calculateAge = (birthDate: string) => {
   const today = new Date();
   const birth = new Date(birthDate);
   let age = today.getFullYear() - birth.getFullYear();
   const monthDiff = today.getMonth() - birth.getMonth();
-
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
     age--;
   }
-
   return age;
 };
 
@@ -68,15 +70,12 @@ export default function ParticipantsTable({
   onPageChange,
 }: ParticipantsTableProps) {
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
+  const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
 
-  const {
-    generateSelectedPdf,
-    generateAllPdf,
-    isGenerating: isGeneratingPdf,
-    isGeneratingAll,
-  } = useDownloadParticipantsPdf(eventId, {
-    onSuccess: () => setSelectedAccountIds([]),
-  });
+  const { generateSelectedPdf, generateAllPdf, isGenerating, isGeneratingAll } =
+    useDownloadParticipantsPdf(eventId, {
+      onSuccess: () => setSelectedAccountIds([]),
+    });
 
   const availableAccountIds = useMemo(
     () => accounts.map((account) => account.id),
@@ -109,23 +108,25 @@ export default function ParticipantsTable({
     );
   };
 
-  const handleClearSelection = () => {
-    setSelectedAccountIds([]);
+  const handleGenderToggle = (gender: string, enabled: boolean) => {
+    setSelectedGenders((prev) =>
+      enabled ? [...prev, gender] : prev.filter((item) => item !== gender)
+    );
   };
 
   const handleGeneratePdf = () => {
-    generateSelectedPdf(selectedAccountIds);
+    generateSelectedPdf(selectedAccountIds, selectedGenders);
   };
 
   const handleGenerateAll = () => {
-    generateAllPdf();
+    generateAllPdf(selectedGenders);
   };
 
   const handleDownloadAccount = (accountId: string) => {
-    generateSelectedPdf([accountId]);
+    generateSelectedPdf([accountId], selectedGenders);
   };
 
-  if (accounts.length === 0) {
+  if (!accounts.length) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
         <Card className="border-0 shadow-lg w-full max-w-md">
@@ -147,50 +148,69 @@ export default function ParticipantsTable({
 
   return (
     <>
-      {/* Barra de ações de seleção */}
-      {accounts.length > 0 && (
-        <div className="rounded-2xl border border-border bg-white/80 p-6 mb-6 shadow-sm">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                Baixar seleção
-              </p>
-              <p className="text-xs text-muted-foreground mb-3">
-                Gera o PDF apenas das contas marcadas na lista atual.
-              </p>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap gap-3">
+          {GENDERS.map((gender) => (
+            <label key={gender.value} className="flex items-center gap-2">
+              <Switch
+                checked={selectedGenders.includes(gender.value)}
+                onCheckedChange={(checked) =>
+                  handleGenderToggle(gender.value, Boolean(checked))
+                }
+              />
+              <span className="uppercase tracking-[0.3em] text-xs">
+                {gender.label}
+              </span>
+            </label>
+          ))}
+        </div>
+        <p className="text-xs uppercase tracking-[0.3em]">
+          {selectedGenders.length
+            ? `Filtrando: ${selectedGenders.join(", ")}`
+            : "Sem filtro de gênero"}
+        </p>
+      </div>
+      <div className="rounded-2xl border border-border bg-white/80 p-6 mb-6 shadow-sm">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Baixar seleção
+            </p>
+            <p className="text-xs text-muted-foreground mb-3">
+              Gera o PDF apenas das contas marcadas na lista atual.
+            </p>
               <Button
                 type="button"
                 size="sm"
                 onClick={handleGeneratePdf}
-                disabled={!hasSelection || isGeneratingPdf || isGeneratingAll}
+                disabled={!hasSelection || isGenerating || isGeneratingAll}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 disabled:bg-primary/40"
               >
-                <Download className="h-4 w-4" />
-                {isGeneratingPdf ? "Gerando..." : "Baixar PDF"}
-              </Button>
-            </div>
-            <div className="rounded-2xl border border-muted-foreground/40 bg-white/90 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                Baixar todas
-              </p>
-              <p className="text-xs text-muted-foreground mb-3">
-                Gera o relatório completo com todos os participantes do evento.
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleGenerateAll}
-                disabled={isGeneratingPdf || isGeneratingAll}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-border"
-              >
-                <Download className="h-4 w-4" />
-                {isGeneratingAll ? "Gerando..." : "Baixar todas as contas"}
-              </Button>
-            </div>
+              <Download className="h-4 w-4" />
+              {isGenerating ? "Baixando..." : "Baixar PDF dos selecionados"}
+            </Button>
+          </div>
+          <div className="rounded-2xl border border-muted-foreground/40 bg-white/90 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Baixar todas
+            </p>
+            <p className="text-xs text-muted-foreground mb-3">
+              Gera o relatório completo com todos os participantes do evento.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleGenerateAll}
+                disabled={isGenerating || isGeneratingAll}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-border"
+            >
+              <Download className="h-4 w-4" />
+              {isGeneratingAll ? "Baixando..." : "Baixar Lista completa"}
+            </Button>
           </div>
         </div>
-      )}
+      </div>
 
       <div className="space-y-6">
         {accounts.map((account) => {
@@ -228,14 +248,14 @@ export default function ParticipantsTable({
                   </div>
                   <Button
                     type="button"
-                    variant="default"
+                    variant="ghost"
                     size="sm"
-                    disabled={isGeneratingPdf || isGeneratingAll}
+                    disabled={isGenerating || isGeneratingAll}
                     onClick={() => handleDownloadAccount(account.id)}
                     className="flex items-center gap-2 text-xs uppercase"
                   >
                     <Download className="h-3 w-3" />
-                    Baixar PDF
+                    Baixar conta
                   </Button>
                 </div>
               </CardHeader>
@@ -336,14 +356,14 @@ export default function ParticipantsTable({
                   />
                 </PaginationItem>
 
-                {Array.from({ length: pageCount }, (_, i) => (
-                  <PaginationItem key={i}>
+                {Array.from({ length: pageCount }, (_, index) => (
+                  <PaginationItem key={index}>
                     <PaginationLink
-                      isActive={page === i + 1}
+                      isActive={page === index + 1}
                       href="#"
-                      onClick={() => onPageChange(i + 1)}
+                      onClick={() => onPageChange(index + 1)}
                     >
-                      {i + 1}
+                      {index + 1}
                     </PaginationLink>
                   </PaginationItem>
                 ))}

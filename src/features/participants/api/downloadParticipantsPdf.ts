@@ -14,6 +14,12 @@ export type downloadParticipantsPdfResponse = {
 export type downloadParticipantsPdfInput = {
   eventId: string;
   accountsId: string[];
+  genders?: string[];
+};
+
+export type downloadAllParticipantsPdfInput = {
+  eventId: string;
+  genders?: string[];
 };
 
 const wrapError = (error: unknown) => {
@@ -36,12 +42,15 @@ const postParticipantsPdf = async (url: string, body?: unknown) => {
   }
 };
 
-export async function downloadParticipantsPdf({ eventId, accountsId }: downloadParticipantsPdfInput) {
+export async function downloadParticipantsPdf({ eventId, accountsId, genders }: downloadParticipantsPdfInput) {
   return postParticipantsPdf(`/participants/pdf/${eventId}/list-participants/selected`, {
     accountsId,
+    genders,
   });
 }
 
-export async function downloadAllParticipantsPdf({ eventId }: { eventId: string }) {
-  return postParticipantsPdf(`/participants/pdf/${eventId}/list-participants/all`);
+export async function downloadAllParticipantsPdf({ eventId, genders }: downloadAllParticipantsPdfInput) {
+  return postParticipantsPdf(`/participants/pdf/${eventId}/list-participants/all`, {
+    genders,
+  });
 }

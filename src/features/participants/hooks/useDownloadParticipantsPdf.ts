@@ -108,23 +108,23 @@ export function useDownloadParticipantsPdf(
   );
 
   const generateSelectedPdf = useCallback(
-    async (accountsId: string[]) => {
+    async (accountsId: string[], genders?: string[]) => {
       if (!accountsId?.length) {
         toast.error("Selecione pelo menos uma conta.");
         return;
       }
 
       await processDownload(
-        () => downloadParticipantsPdf({ eventId, accountsId }),
+        () => downloadParticipantsPdf({ eventId, accountsId, genders }),
         setIsGenerating
       );
     },
     [eventId, processDownload]
   );
 
-  const generateAllPdf = useCallback(async () => {
+  const generateAllPdf = useCallback(async (genders?: string[]) => {
     await processDownload(
-      () => downloadAllParticipantsPdf({ eventId }),
+      () => downloadAllParticipantsPdf({ eventId, genders }),
       setIsGeneratingAll
     );
   }, [eventId, processDownload]);
@@ -136,4 +136,3 @@ export function useDownloadParticipantsPdf(
     isGeneratingAll,
   };
 }
-

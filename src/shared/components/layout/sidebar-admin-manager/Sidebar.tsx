@@ -269,6 +269,15 @@ export default function AppSidebarAdminManager({
                               <span>Lista de Participantes</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/events/check-in"
+                              className="gap-1"
+                            >
+                              <IdCard className="size-4" />
+                              <span>Check-in</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </Collapsible>
