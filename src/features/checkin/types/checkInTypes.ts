@@ -23,6 +23,8 @@ export type AccountsPaginatedResponse = {
   pageCount: number;
 };
 
+export type FindAccountsToCheckInResponse = AccountsPaginatedResponse;
+
 export type PaymentInscriptionOutput = {
   value: number;
   status: string;
