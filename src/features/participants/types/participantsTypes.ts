@@ -53,6 +53,8 @@ export type ListParticipantsResponse = {
   total: number;
   page: number;
   pageCount: number;
+  countAccounts: number;
+  countParticipants: number;
 };
 
 export type UseParticipantsParams = {
@@ -66,6 +68,8 @@ export type UseParticipantsResult = {
   total: number;
   page: number;
   pageCount: number;
+  countAccounts: number;
+  countParticipants: number;
   loading: boolean;
   error: string | null;
   setPage: (p: number) => void;

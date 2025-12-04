@@ -13,25 +13,35 @@ export type downloadParticipantsPdfResponse = {
 
 export type downloadParticipantsPdfInput = {
   eventId: string;
-  accountIds: string[];
+  accountsId: string[];
 };
 
-export async function downloadParticipantsPdf({ eventId, accountIds }: downloadParticipantsPdfInput) {
-  try {
-    const { data } = await axiosInstance.post<downloadParticipantsPdfResponse>(`/participants/pdf/${eventId}/list-participants`, {
-      accountIds,
-    })
+const wrapError = (error: unknown) => {
+  const axiosError = error as {
+    response?: { data?: { message?: string } };
+    message?: string;
+  };
+  throw new Error(
+    axiosError?.response?.data?.message ?? axiosError?.message ?? "Falha ao tentar gerar o PDF"
+  );
+};
 
-    return data
+const postParticipantsPdf = async (url: string, body?: unknown) => {
+  try {
+    const { data } = await axiosInstance.post<downloadParticipantsPdfResponse>(url, body);
+    return data;
   } catch (error) {
     console.error("Error while trying to generate the report: ", error);
-    const axiosError = error as {
-      response?: { data?: { message?: string } };
-      message?: string;
-    };
-    throw new Error(
-      axiosError.response?.data?.message ||
-      "Falha ao tentar gerar o PDF"
-    );
+    wrapError(error);
   }
+};
+
+export async function downloadParticipantsPdf({ eventId, accountsId }: downloadParticipantsPdfInput) {
+  return postParticipantsPdf(`/participants/pdf/${eventId}/list-participants/selected`, {
+    accountsId,
+  });
+}
+
+export async function downloadAllParticipantsPdf({ eventId }: { eventId: string }) {
+  return postParticipantsPdf(`/participants/pdf/${eventId}/list-participants/all`);
 }

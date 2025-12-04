@@ -31,6 +31,8 @@ export function useParticipants({
   return {
     accounts: data?.account || [],
     total: data?.total || 0,
+    countAccounts: data?.countAccounts || 0,
+    countParticipants: data?.countParticipants || 0,
     page,
     pageCount: data?.pageCount || 0,
     loading,

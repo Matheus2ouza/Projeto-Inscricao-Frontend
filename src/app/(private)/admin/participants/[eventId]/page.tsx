@@ -3,6 +3,13 @@
 import ParticipantsTable from "@/features/participants/components/ParticipantsTable";
 import { useParticipants } from "@/features/participants/hooks/useParticipants";
 import PageContainer from "@/shared/components/layout/PageContainer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams } from "next/navigation";
 
@@ -10,12 +17,20 @@ export default function ListParticipantsAdminPage() {
   const params = useParams();
   const eventId = params?.eventId as string;
 
-  const { accounts, loading, error, page, pageCount, setPage } =
-    useParticipants({
-      eventId: eventId || "",
-      initialPage: 1,
-      pageSize: 10,
-    });
+  const {
+    accounts,
+    loading,
+    error,
+    page,
+    pageCount,
+    setPage,
+    countAccounts,
+    countParticipants,
+  } = useParticipants({
+    eventId: eventId || "",
+    initialPage: 1,
+    pageSize: 10,
+  });
 
   if (loading) {
     return (
@@ -60,6 +75,34 @@ export default function ListParticipantsAdminPage() {
       title="Participantes do Evento"
       description="Visualize todos os participantes inscritos neste evento"
     >
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <Card className="border-2 border-primary/20 bg-white/60 shadow-sm">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-sm font-semibold text-foreground">
+              Contas cadastradas
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Quantas contas estão vinculadas ao evento
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-4xl font-bold text-foreground">
+            {countAccounts}
+          </CardContent>
+        </Card>
+        <Card className="border-2 border-primary/20 bg-white/60 shadow-sm">
+          <CardHeader className="pb-1">
+            <CardTitle className="text-sm font-semibold text-foreground">
+              Participantes Inscritos
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Total geral de inscritos por conta
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-4xl font-bold text-foreground">
+            {countParticipants}
+          </CardContent>
+        </Card>
+      </div>
       <ParticipantsTable
         eventId={eventId}
         accounts={accounts}

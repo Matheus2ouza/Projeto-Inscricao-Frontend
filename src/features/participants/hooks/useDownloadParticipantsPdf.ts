@@ -1,5 +1,8 @@
-import { downloadParticipantsPdf } from "@/features/participants/api/downloadParticipantsPdf";
-import { useCallback, useState } from "react";
+import {
+  downloadAllParticipantsPdf,
+  downloadParticipantsPdf,
+} from "@/features/participants/api/downloadParticipantsPdf";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 type UseDownloadParticipantsPdfOptions = {
@@ -49,26 +52,34 @@ export function useDownloadParticipantsPdf(
   options?: UseDownloadParticipantsPdfOptions
 ) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
   const onSuccess = options?.onSuccess;
 
-  const generatePdf = useCallback(
-    async (accountIds: string[]) => {
+  const processDownload = useCallback(
+    async (
+      fetchPdf: () => Promise<
+        | {
+          data?: {
+            pdfBase64?: string;
+            filename?: string;
+            message?: string;
+          };
+          pdfBase64?: string;
+          filename?: string;
+          message?: string;
+        }
+        | undefined
+      >,
+      setGenerating: Dispatch<SetStateAction<boolean>>
+    ) => {
       if (!eventId) {
         toast.error("Evento não encontrado.");
         return;
       }
 
-      if (!accountIds?.length) {
-        toast.error("Selecione pelo menos uma conta.");
-        return;
-      }
-
       try {
-        setIsGenerating(true);
-        const response = await downloadParticipantsPdf({
-          eventId,
-          accountIds,
-        });
+        setGenerating(true);
+        const response = await fetchPdf();
 
         const payload = extractPayload(response);
         const pdfBase64 = payload?.pdfBase64;
@@ -90,15 +101,39 @@ export function useDownloadParticipantsPdf(
           error instanceof Error ? error.message : DEFAULT_ERROR_MESSAGE;
         toast.error(message || DEFAULT_ERROR_MESSAGE);
       } finally {
-        setIsGenerating(false);
+        setGenerating(false);
       }
     },
     [eventId, onSuccess]
   );
 
+  const generateSelectedPdf = useCallback(
+    async (accountsId: string[]) => {
+      if (!accountsId?.length) {
+        toast.error("Selecione pelo menos uma conta.");
+        return;
+      }
+
+      await processDownload(
+        () => downloadParticipantsPdf({ eventId, accountsId }),
+        setIsGenerating
+      );
+    },
+    [eventId, processDownload]
+  );
+
+  const generateAllPdf = useCallback(async () => {
+    await processDownload(
+      () => downloadAllParticipantsPdf({ eventId }),
+      setIsGeneratingAll
+    );
+  }, [eventId, processDownload]);
+
   return {
-    generatePdf,
+    generateSelectedPdf,
+    generateAllPdf,
     isGenerating,
+    isGeneratingAll,
   };
 }
 
