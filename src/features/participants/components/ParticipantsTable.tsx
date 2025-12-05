@@ -1,5 +1,6 @@
 "use client";
 
+import { useDownloadEtiqueta } from "@/features/participants/hooks/useDownloadEtiqueta";
 import { useDownloadParticipantsPdf } from "@/features/participants/hooks/useDownloadParticipantsPdf";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -76,6 +77,7 @@ export default function ParticipantsTable({
     useDownloadParticipantsPdf(eventId, {
       onSuccess: () => setSelectedAccountIds([]),
     });
+  const { downloadEtiqueta, isDownloadingEtiqueta } = useDownloadEtiqueta(eventId);
 
   const availableAccountIds = useMemo(
     () => accounts.map((account) => account.id),
@@ -124,6 +126,9 @@ export default function ParticipantsTable({
 
   const handleDownloadAccount = (accountId: string) => {
     generateSelectedPdf([accountId], selectedGenders);
+  };
+  const handleDownloadEtiqueta = (accountId: string) => {
+    downloadEtiqueta(accountId);
   };
 
   if (!accounts.length) {
@@ -179,13 +184,13 @@ export default function ParticipantsTable({
             <p className="text-xs text-muted-foreground mb-3">
               Gera o PDF apenas das contas marcadas na lista atual.
             </p>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleGeneratePdf}
-                disabled={!hasSelection || isGenerating || isGeneratingAll}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 disabled:bg-primary/40"
-              >
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleGeneratePdf}
+              disabled={!hasSelection || isGenerating || isGeneratingAll}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 disabled:bg-primary/40"
+            >
               <Download className="h-4 w-4" />
               {isGenerating ? "Baixando..." : "Baixar PDF dos selecionados"}
             </Button>
@@ -202,7 +207,7 @@ export default function ParticipantsTable({
               variant="outline"
               size="sm"
               onClick={handleGenerateAll}
-                disabled={isGenerating || isGeneratingAll}
+              disabled={isGenerating || isGeneratingAll}
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-border"
             >
               <Download className="h-4 w-4" />
@@ -246,17 +251,36 @@ export default function ParticipantsTable({
                       </CardDescription>
                     </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    disabled={isGenerating || isGeneratingAll}
-                    onClick={() => handleDownloadAccount(account.id)}
-                    className="flex items-center gap-2 text-xs uppercase"
-                  >
-                    <Download className="h-3 w-3" />
-                    Baixar conta
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={
+                        isGenerating || isGeneratingAll || isDownloadingEtiqueta
+                      }
+                      onClick={() => handleDownloadAccount(account.id)}
+                      className="flex items-center gap-2 text-xs uppercase"
+                    >
+                      <Download className="h-3 w-3" />
+                      Baixar conta
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={
+                        isGenerating ||
+                        isGeneratingAll ||
+                        isDownloadingEtiqueta
+                      }
+                      onClick={() => handleDownloadEtiqueta(account.id)}
+                      className="flex items-center gap-2 text-xs uppercase"
+                    >
+                      <Download className="h-3 w-3" />
+                      Download etiqueta
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="p-0">

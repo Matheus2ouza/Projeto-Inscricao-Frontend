@@ -22,6 +22,11 @@ export type downloadAllParticipantsPdfInput = {
   genders?: string[];
 };
 
+export type downloadEtiquetaPdfInput = {
+  eventId: string;
+  accountId: string;
+};
+
 const wrapError = (error: unknown) => {
   const axiosError = error as {
     response?: { data?: { message?: string } };
@@ -52,5 +57,11 @@ export async function downloadParticipantsPdf({ eventId, accountsId, genders }: 
 export async function downloadAllParticipantsPdf({ eventId, genders }: downloadAllParticipantsPdfInput) {
   return postParticipantsPdf(`/participants/pdf/${eventId}/list-participants/all`, {
     genders,
+  });
+}
+
+export async function downloadEtiquetaPdf({ eventId, accountId }: downloadEtiquetaPdfInput) {
+  return postParticipantsPdf(`/participants/pdf/${eventId}/etiqueta`, {
+    accountsId: [accountId],
   });
 }
