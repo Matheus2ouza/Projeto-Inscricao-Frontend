@@ -1,11 +1,11 @@
 "use client";
 
+import CheckInAccountDetails from "@/features/checkin/components/CheckInAccountDetails";
+import { useCheckInAccountDetails } from "@/features/checkin/hooks/useCheckInAccountDetails";
 import PageContainer from "@/shared/components/layout/PageContainer";
+import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { Button } from "@/shared/components/ui/button";
-import { useCheckInAccountDetails } from "@/features/checkin/hooks/useCheckInAccountDetails";
-import CheckInAccountDetails from "@/features/checkin/components/CheckInAccountDetails";
 import { useParams, useRouter } from "next/navigation";
 
 export default function CheckInAccountDetailsAdminPage() {
@@ -14,7 +14,9 @@ export default function CheckInAccountDetailsAdminPage() {
   const rawEventId = params.eventId;
   const rawAccountId = params.accountId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
-  const accountId = Array.isArray(rawAccountId) ? rawAccountId[0] : rawAccountId;
+  const accountId = Array.isArray(rawAccountId)
+    ? rawAccountId[0]
+    : rawAccountId;
 
   const { data, isLoading, error, refetch } = useCheckInAccountDetails(
     eventId ?? "",
@@ -36,7 +38,9 @@ export default function CheckInAccountDetailsAdminPage() {
   const renderError = () => (
     <div className="text-center py-12">
       <p className="text-red-600 font-semibold">
-        {error instanceof Error ? error.message : "Não foi possível carregar os detalhes."}
+        {error instanceof Error
+          ? error.message
+          : "Não foi possível carregar os detalhes."}
       </p>
       <Button variant="outline" onClick={() => refetch()}>
         Tentar novamente
