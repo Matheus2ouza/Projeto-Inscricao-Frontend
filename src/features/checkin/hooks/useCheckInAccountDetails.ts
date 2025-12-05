@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCheckInAccountDetails } from "../api/getCheckInAccountDetails";
-import { CheckInAccountDetailsData } from "../types/checkInTypes";
+import { FindAccountsDetailsResponse } from "../types/checkInTypes";
 
 export const checkInAccountDetailsKeys = {
   all: ["check-in-account"] as const,
@@ -9,7 +9,7 @@ export const checkInAccountDetailsKeys = {
 };
 
 export function useCheckInAccountDetails(eventId: string, accountId: string) {
-  return useQuery<CheckInAccountDetailsData>({
+  return useQuery<FindAccountsDetailsResponse>({
     queryKey: checkInAccountDetailsKeys.detail(eventId, accountId),
     queryFn: () => getCheckInAccountDetails(eventId, accountId),
     staleTime: 5 * 60 * 1000,

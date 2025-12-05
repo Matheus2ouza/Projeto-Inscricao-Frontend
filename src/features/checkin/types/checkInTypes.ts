@@ -1,3 +1,8 @@
+import type {
+  InscriptionStatus,
+  StatusPayment,
+} from "@/features/payments/types/paymentsDetails.types";
+
 export type CheckInAccount = {
   id: string;
   username: string;
@@ -25,31 +30,33 @@ export type AccountsPaginatedResponse = {
 
 export type FindAccountsToCheckInResponse = AccountsPaginatedResponse;
 
-export type PaymentInscriptionOutput = {
+export type PaymentInscription = {
   value: number;
-  status: string;
+  status: StatusPayment;
   image: string;
-  createdAt: string;
+  createdAt: Date;
 };
 
 export type Participants = {
   name: string;
   gender: string;
-  birthDate: string;
+  birthDate: Date;
   typeInscription: string;
 }[];
 
 export type Inscriptions = {
   id: string;
-  status: string;
+  responsible: string;
+  email?: string;
+  status: InscriptionStatus;
   totalPayd: number;
   totalDebt: number;
-  createdAt: string;
+  createdAt: Date;
   participants: Participants;
-  paymentInscription: PaymentInscriptionOutput[];
+  paymentInscription: PaymentInscription[];
 }[];
 
-export type CheckInAccountDetailsData = {
+export type FindAccountsDetailsResponse = {
   id: string;
   username: string;
   email: string;
@@ -57,5 +64,6 @@ export type CheckInAccountDetailsData = {
   countDebt: number;
   countPay: number;
   countInscriptions: number;
+  countParticipants: number;
   inscriptions: Inscriptions;
 };
