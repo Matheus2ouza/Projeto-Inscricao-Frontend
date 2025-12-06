@@ -7,29 +7,35 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { saleGroupTicket } from "../api/saleGroupTicket";
-import { ticketsKeys } from "../types/ticketsTypes";
 import type { SaleGroupTicketPayload } from "../types/ticketSaleGroupTypes";
 import { STATUS_PAYMENT_OPTIONS } from "../types/ticketSaleGroupTypes";
+import { ticketsKeys } from "../types/ticketsTypes";
 
-const paymentMethodValues = ["DINHEIRO", "PIX", "CARTÃO"] as const;
+const paymentMethodValues = ["DINHEIRO", "PIX", "CARTAO"] as const;
 const statusValues = ["PENDING", "UNDER_REVIEW", "PAID", "CANCELLED"] as const;
 
 const saleGroupTicketSchema = z.object({
   quantity: z
     .string()
     .min(1, { message: "Informe a quantidade de tickets" })
-    .refine((value) => {
-      const numberValue = Number(value);
-      return Number.isInteger(numberValue) && numberValue > 0;
-    }, { message: "Quantidade deve ser um número inteiro maior que 0" }),
+    .refine(
+      (value) => {
+        const numberValue = Number(value);
+        return Number.isInteger(numberValue) && numberValue > 0;
+      },
+      { message: "Quantidade deve ser um número inteiro maior que 0" }
+    ),
   paymentMethod: z.enum(paymentMethodValues),
   pricePerTicket: z
     .string()
     .min(1, { message: "Informe o valor por ticket" })
-    .refine((value) => {
-      const numberValue = Number(value);
-      return !Number.isNaN(numberValue) && numberValue >= 0;
-    }, { message: "Informe um valor numérico válido" }),
+    .refine(
+      (value) => {
+        const numberValue = Number(value);
+        return !Number.isNaN(numberValue) && numberValue >= 0;
+      },
+      { message: "Informe um valor numérico válido" }
+    ),
   status: z.enum(statusValues),
 });
 
