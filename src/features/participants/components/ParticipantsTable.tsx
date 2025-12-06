@@ -77,7 +77,8 @@ export default function ParticipantsTable({
     useDownloadParticipantsPdf(eventId, {
       onSuccess: () => setSelectedAccountIds([]),
     });
-  const { downloadEtiqueta, isDownloadingEtiqueta } = useDownloadEtiqueta(eventId);
+  const { downloadEtiqueta, downloadEtiquetas, isDownloadingEtiqueta } =
+    useDownloadEtiqueta(eventId);
 
   const availableAccountIds = useMemo(
     () => accounts.map((account) => account.id),
@@ -127,8 +128,16 @@ export default function ParticipantsTable({
   const handleDownloadAccount = (accountId: string) => {
     generateSelectedPdf([accountId], selectedGenders);
   };
+
   const handleDownloadEtiqueta = (accountId: string) => {
     downloadEtiqueta(accountId);
+  };
+
+  const handleDownloadEtiquetasSelecionadas = async () => {
+    const success = await downloadEtiquetas(selectedAccountIds);
+    if (success) {
+      setSelectedAccountIds([]);
+    }
   };
 
   if (!accounts.length) {
@@ -193,6 +202,22 @@ export default function ParticipantsTable({
             >
               <Download className="h-4 w-4" />
               {isGenerating ? "Baixando..." : "Baixar PDF dos selecionados"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadEtiquetasSelecionadas}
+              disabled={
+                !hasSelection ||
+                isGenerating ||
+                isGeneratingAll ||
+                isDownloadingEtiqueta
+              }
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/60 text-xs uppercase tracking-wide"
+            >
+              <Download className="h-4 w-4" />
+              Gerar etiquetas selecionadas
             </Button>
           </div>
           <div className="rounded-2xl border border-muted-foreground/40 bg-white/90 p-4">
@@ -263,16 +288,14 @@ export default function ParticipantsTable({
                       className="flex items-center gap-2 text-xs uppercase"
                     >
                       <Download className="h-3 w-3" />
-                      Baixar conta
+                      Baixar Lista
                     </Button>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       disabled={
-                        isGenerating ||
-                        isGeneratingAll ||
-                        isDownloadingEtiqueta
+                        isGenerating || isGeneratingAll || isDownloadingEtiqueta
                       }
                       onClick={() => handleDownloadEtiqueta(account.id)}
                       className="flex items-center gap-2 text-xs uppercase"

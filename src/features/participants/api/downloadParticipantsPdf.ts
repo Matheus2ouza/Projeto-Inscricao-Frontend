@@ -24,7 +24,7 @@ export type downloadAllParticipantsPdfInput = {
 
 export type downloadEtiquetaPdfInput = {
   eventId: string;
-  accountId: string;
+  accountsId: string[];
 };
 
 const wrapError = (error: unknown) => {
@@ -60,8 +60,11 @@ export async function downloadAllParticipantsPdf({ eventId, genders }: downloadA
   });
 }
 
-export async function downloadEtiquetaPdf({ eventId, accountId }: downloadEtiquetaPdfInput) {
+export async function downloadEtiquetaPdf({
+  eventId,
+  accountsId,
+}: downloadEtiquetaPdfInput) {
   return postParticipantsPdf(`/participants/pdf/${eventId}/etiqueta`, {
-    accountsId: [accountId],
+    accountsId,
   });
 }

@@ -10,10 +10,12 @@ import { toast } from "sonner";
 const DEFAULT_ERROR_MESSAGE =
   "Não foi possível baixar a etiqueta. Tente novamente.";
 
+type ProcessDownloadOptions = {
+  successMessage?: string;
+};
+
 function extractPayload(
-  response:
-    | downloadParticipantsPdfResponse
-    | undefined
+  response: downloadParticipantsPdfResponse | undefined
 ) {
   return response?.data ?? response;
 }
@@ -43,16 +45,18 @@ export function useDownloadEtiqueta(eventId: string) {
 
   const processDownload = useCallback(
     async (
-      fetchPdf: () =>
-        Promise<downloadParticipantsPdfResponse | undefined>
-    ) => {
+      fetchPdf: () => Promise<downloadParticipantsPdfResponse | undefined>,
+      options?: ProcessDownloadOptions
+    ): Promise<boolean> => {
       if (!eventId) {
         toast.error("Evento não encontrado.");
-        return;
+        return false;
       }
 
+      setIsDownloadingEtiqueta(true);
+      let success = false;
+
       try {
-        setIsDownloadingEtiqueta(true);
         const response = await fetchPdf();
 
         const payload = extractPayload(response);
@@ -67,7 +71,10 @@ export function useDownloadEtiqueta(eventId: string) {
         }
 
         downloadPdf(pdfBase64, filename);
-        toast.success("Etiqueta baixada com sucesso.");
+        toast.success(
+          options?.successMessage ?? "Etiqueta baixada com sucesso."
+        );
+        success = true;
       } catch (error) {
         console.error("Erro ao baixar etiqueta:", error);
         const message =
@@ -76,6 +83,8 @@ export function useDownloadEtiqueta(eventId: string) {
       } finally {
         setIsDownloadingEtiqueta(false);
       }
+
+      return success;
     },
     [eventId]
   );
@@ -84,15 +93,30 @@ export function useDownloadEtiqueta(eventId: string) {
     async (accountId: string) => {
       if (!accountId) {
         toast.error("Conta inválida.");
-        return;
+        return false;
       }
 
-      await processDownload(() =>
-        downloadEtiquetaPdf({ eventId, accountId })
+      return processDownload(
+        () => downloadEtiquetaPdf({ eventId, accountsId: [accountId] })
       );
     },
     [eventId, processDownload]
   );
 
-  return { downloadEtiqueta, isDownloadingEtiqueta };
+  const downloadEtiquetas = useCallback(
+    async (accountsId: string[]) => {
+      if (!accountsId?.length) {
+        toast.error("Selecione pelo menos uma conta.");
+        return;
+      }
+
+      return processDownload(
+        () => downloadEtiquetaPdf({ eventId, accountsId }),
+        { successMessage: "Etiquetas baixadas com sucesso." }
+      );
+    },
+    [eventId, processDownload]
+  );
+
+  return { downloadEtiqueta, downloadEtiquetas, isDownloadingEtiqueta };
 }
