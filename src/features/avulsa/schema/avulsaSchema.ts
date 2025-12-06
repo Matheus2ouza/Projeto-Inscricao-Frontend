@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const participantPaymentSchema = z.object({
-  paymentMethod: z.enum(["DINHEIRO", "PIX", "CARTÃO"], {
+  paymentMethod: z.enum(["DINHEIRO", "PIX", "CARTAO"], {
     message: "Selecione uma forma de pagamento válida",
   }),
   value: z

@@ -1,4 +1,4 @@
-export type PaymentMethod = "DINHEIRO" | "PIX" | "CARTÃO";
+export type PaymentMethod = "DINHEIRO" | "PIX" | "CARTAO";
 export type InscriptionStatus =
   | "PENDING"
   | "PAID"

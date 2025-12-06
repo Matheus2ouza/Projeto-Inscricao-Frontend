@@ -235,7 +235,7 @@ function AddParticipantDialog({ onAddParticipant }: AddParticipantDialogProps) {
                                     PIX
                                   </div>
                                 </SelectItem>
-                                <SelectItem value="CARTÃO">
+                                <SelectItem value="CARTAO">
                                   <div className="flex items-center gap-2">
                                     <CreditCard className="h-3 w-3" />
                                     Cartão
