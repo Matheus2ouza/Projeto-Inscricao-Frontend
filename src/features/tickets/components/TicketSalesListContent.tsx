@@ -88,7 +88,7 @@ const paymentMethodDisplay: Record<
     label: "PIX",
     className: "text-blue-700",
   },
-  CARTÃO: {
+  CARTAO: {
     label: "Cartão",
     className: "text-purple-700",
   },
