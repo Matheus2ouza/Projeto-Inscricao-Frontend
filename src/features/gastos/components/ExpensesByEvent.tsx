@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/shared/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { CardBody, CardFooter, Skeleton } from "@heroui/react";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Badge, Calendar, DollarSign, Plus, User } from "lucide-react";
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -59,7 +59,7 @@ interface ExpensesByEventProps {
 
 const paymentMethodLabels: Record<PaymentMethod, string> = {
   PIX: "PIX",
-  CARTÃO: "Cartão",
+  CARTAO: "Cartão",
   DINHEIRO: "Dinheiro",
 };
 
@@ -85,12 +85,9 @@ export default function ExpensesByEvent({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Gastos do Evento
-          </h1>
+    <div className="min-h-screen ">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center justify-end mb-6">
           <Button
             onClick={() => setOpenCreate(true)}
             className="flex items-center gap-2"
@@ -214,9 +211,9 @@ export default function ExpensesByEvent({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, index) => (
               <Card key={index} className="border-0 shadow-sm">
-                <CardBody className="p-0">
+                <CardContent className="p-0">
                   <Skeleton className="w-full h-48 rounded-t-xl" />
-                </CardBody>
+                </CardContent>
                 <CardFooter className="flex flex-col items-start p-4">
                   <Skeleton className="h-6 w-3/4 mb-2" />
                   <Skeleton className="h-4 w-1/2 mb-2" />
@@ -233,7 +230,7 @@ export default function ExpensesByEvent({
                   key={expense.id}
                   className="border-0 shadow-md rounded-xl overflow-hidden"
                 >
-                  <CardBody className="p-4 relative">
+                  <CardContent className="p-4 relative">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {expense.description}
                     </h3>
@@ -252,7 +249,7 @@ export default function ExpensesByEvent({
                     <Badge className="absolute top-4 right-4">
                       {expense.paymentMethod}
                     </Badge>
-                  </CardBody>
+                  </CardContent>
                 </Card>
               ))}
             </div>
