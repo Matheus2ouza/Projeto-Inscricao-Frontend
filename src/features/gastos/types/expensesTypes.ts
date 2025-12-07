@@ -1,4 +1,4 @@
-export type PaymentMethod = "PIX" | "CARTÃO" | "DINHEIRO";
+export type PaymentMethod = "PIX" | "CARTAO" | "DINHEIRO";
 
 export type Expense = {
   id: string;

@@ -11,7 +11,7 @@ import { CreateExpenseRequest, expensesKeys } from "../types/expensesTypes";
 const createExpenseSchema = z.object({
   description: z.string().min(1, "Descrição é obrigatória"),
   value: z.number().min(0.01, "Valor deve ser maior que zero"),
-  paymentMethod: z.enum(["PIX", "CARTÃO", "DINHEIRO"], {
+  paymentMethod: z.enum(["PIX", "CARTAO", "DINHEIRO"], {
     message: "Método de pagamento é obrigatório",
   }),
   responsible: z.string().min(1, "Responsável é obrigatório"),

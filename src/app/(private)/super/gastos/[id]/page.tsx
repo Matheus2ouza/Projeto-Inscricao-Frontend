@@ -21,7 +21,12 @@ export default function EventExpensesSuperPage() {
 
   if (!eventId) return null;
 
-  const { data: expensesData, isLoading, error, invalidate } = useExpensesByEvent({
+  const {
+    data: expensesData,
+    isLoading,
+    error,
+    invalidate,
+  } = useExpensesByEvent({
     eventId,
     page,
     pageSize: PAGE_SIZE,
@@ -31,7 +36,11 @@ export default function EventExpensesSuperPage() {
 
   const loading = isLoading;
   const errorMessage =
-    error instanceof Error ? error : typeof error === "string" ? new Error(error) : null;
+    error instanceof Error
+      ? error
+      : typeof error === "string"
+        ? new Error(error)
+        : null;
 
   const handleBack = () => {
     router.push("/super/gastos");
