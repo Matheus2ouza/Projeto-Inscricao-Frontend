@@ -8,13 +8,18 @@ export const eventsWithPaymentsKeys = {
     [...eventsWithPaymentsKeys.lists(), { page, pageSize }] as const,
 };
 
-export function useEventsWithPaymentsQuery(page = 1, pageSize = 8) {
+export function useEventsWithPaymentsQuery(
+  page = 1,
+  pageSize = 8,
+  status?: string[]
+) {
   return useQuery({
     queryKey: eventsWithPaymentsKeys.list(page, pageSize),
     queryFn: () =>
       getEventsWithPayments({
         page,
         pageSize,
+        status,
       }),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

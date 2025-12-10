@@ -27,7 +27,7 @@ interface TicketsTableProps {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
-  onViewEvent: (eventId: string) => void;
+  onViewEvent?: (eventId: string) => void;
 }
 
 export default function TicketsTable({
@@ -148,7 +148,7 @@ export default function TicketsTable({
                   <Button
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
-                    onClick={() => onViewEvent(event.id)}
+                    onClick={() => onViewEvent?.(event.id)}
                     disabled={statusInfo.disabled}
                     variant={statusInfo.disabled ? "outline" : "default"}
                   >

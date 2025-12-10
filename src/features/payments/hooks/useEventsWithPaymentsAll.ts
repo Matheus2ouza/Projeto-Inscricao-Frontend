@@ -28,7 +28,7 @@ export function useEventsWithPaymentsAll({
   const [page, setPage] = useState(initialPage);
 
   const { data, isLoading: loading, error, refetch } =
-    useEventsWithPaymentsQuery(page, pageSize);
+    useEventsWithPaymentsQuery(page, pageSize, ["OPEN", "CLOSE", "FINALIZED"]);
 
   const { prefetchNextPage } = usePrefetchEventsWithPaymentsQuery();
 

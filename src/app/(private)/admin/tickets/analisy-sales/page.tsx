@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useEventsAll } from "@/features/events/hooks/useEventsAll";
 import TicketsTable from "@/features/tickets/components/TicketsTable";
 import PageContainer from "@/shared/components/layout/PageContainer";
@@ -27,15 +28,21 @@ export default function TicketSalesAdminPage() {
       showBackButton
       backButtonAction={handleBack}
     >
-      <TicketsTable
-        events={events}
-        loading={loading}
-        error={error}
-        page={page}
-        pageCount={pageCount}
-        onPageChange={setPage}
-        onViewEvent={handleViewEvent}
-      />
+      {loading ? (
+        <div className="flex justify-center items-center min-h-96">
+          <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
+        <TicketsTable
+          events={events}
+          buttonLabel="Analisar Vendas"
+          error={error}
+          page={page}
+          pageCount={pageCount}
+          onPageChange={setPage}
+          onViewEvent={handleViewEvent}
+        />
+      )}
     </PageContainer>
   );
 }
