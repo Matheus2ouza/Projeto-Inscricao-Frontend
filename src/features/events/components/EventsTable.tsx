@@ -127,17 +127,15 @@ export default function EventsTable({
 
   return (
     <div className="pb-4 sm:p-5 relative">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 mb-4">
+      <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-end">
         <Button
-          asChild
-          className="w-full sm:w-auto dark:text-white"
-          variant="default"
           onClick={onCreateEvent}
+          variant="default"
+          className="text-xs sm:text-sm"
         >
           Criar Evento
         </Button>
       </div>
-
       {/* Grid de Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 relative">
         {events.map((event) => {
