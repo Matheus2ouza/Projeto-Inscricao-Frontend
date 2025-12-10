@@ -13,15 +13,24 @@ type UseTicketsForSaleResult = {
 export function useTicketsForSale(eventId?: string): UseTicketsForSaleResult {
   const query = useTicketsForSaleQuery(eventId);
 
+  const data = query.data as FindTicketsForSaleOutput | undefined;
+
+  const error = (() => {
+    if (query.error instanceof Error) {
+      return query.error.message;
+    }
+
+    if (query.isError) {
+      return "Erro ao carregar tickets";
+    }
+
+    return null;
+  })();
+
   return {
-    data: query.data,
+    data,
     loading: query.isLoading,
-    error:
-      query.isError && query.error instanceof Error
-        ? query.error.message
-        : query.isError
-          ? "Erro ao carregar tickets"
-          : null,
+    error,
     refetch: query.refetch as () => Promise<unknown>,
   };
 }
