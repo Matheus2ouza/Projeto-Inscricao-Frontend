@@ -7,17 +7,11 @@ import { useRouter } from "next/navigation";
 
 export default function SelectEventForListPaymentAdminPage() {
   const router = useRouter();
-  const {
-    events,
-    page,
-    pageCount,
-    setPage,
-    loading,
-    error,
-  } = useEventsWithPaymentsAll({
-    initialPage: 1,
-    pageSize: 8,
-  });
+  const { events, page, pageCount, setPage, loading, error } =
+    useEventsWithPaymentsAll({
+      initialPage: 1,
+      pageSize: 8,
+    });
 
   const handleViewEvent = (eventId: string) => {
     router.push(`/admin/payments/list-payments/${eventId}`);

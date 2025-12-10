@@ -15,6 +15,7 @@ const paymentMethodValues = ["DINHEIRO", "PIX", "CARTAO"] as const;
 const statusValues = ["PENDING", "UNDER_REVIEW", "PAID", "CANCELLED"] as const;
 
 const saleGroupTicketSchema = z.object({
+  accountName: z.string().min(1, { message: "Informe o nome do comprador" }),
   quantity: z
     .string()
     .min(1, { message: "Informe a quantidade de tickets" })
@@ -46,6 +47,7 @@ export function useSaleGroupTicket(ticketId: string) {
   const [submitting, setSubmitting] = useState(false);
 
   const getDefaultValues = (): SaleGroupTicketFormValues => ({
+    accountName: "",
     quantity: "",
     paymentMethod: paymentMethodValues[0],
     pricePerTicket: "",
@@ -68,6 +70,7 @@ export function useSaleGroupTicket(ticketId: string) {
     try {
       const payload: SaleGroupTicketPayload = {
         ticketId,
+        accountName: values.accountName,
         quantity: Number(values.quantity),
         paymentMethod: values.paymentMethod,
         pricePerTicket: Number(values.pricePerTicket),

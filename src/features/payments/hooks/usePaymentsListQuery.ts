@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPaymentsList } from "../api/getPaymentsList";
-import { PaymentsListResponse } from "../types/listPayments.types";
+import { ListAllPaymentsResponse } from "../types/listPayments.types";
 
 export const paymentsListKeys = {
   all: ["payments-list"] as const,
@@ -16,7 +16,7 @@ export function usePaymentsListQuery(
   page: number = 1,
   pageSize: number = 10
 ) {
-  return useQuery<PaymentsListResponse>({
+  return useQuery<ListAllPaymentsResponse>({
     queryKey: paymentsListKeys.list(eventId, page, pageSize),
     queryFn: () => getPaymentsList(eventId, page, pageSize),
     staleTime: 5 * 60 * 1000,

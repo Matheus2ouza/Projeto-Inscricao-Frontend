@@ -13,7 +13,6 @@ export async function getEventsWithPayments(params: {
       params: {
         page: params.page,
         pageSize: params.pageSize,
-        status: params.status,
       },
       paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
     }

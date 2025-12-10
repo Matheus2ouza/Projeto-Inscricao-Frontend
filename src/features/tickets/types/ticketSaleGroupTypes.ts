@@ -4,6 +4,7 @@ export type StatusPayment = "PENDING" | "UNDER_REVIEW" | "PAID" | "CANCELLED";
 
 export type SaleGroupTicketPayload = {
   ticketId: string;
+  accountName: string;
   quantity: number;
   paymentMethod: PaymentMethod;
   pricePerTicket: number;

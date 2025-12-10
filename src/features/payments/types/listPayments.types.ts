@@ -1,18 +1,25 @@
+import type { StatusPayment } from "./paymentsDetails.types";
+
 export type PaymentListItem = {
   id: string;
   accountName?: string;
   imageUrl?: string;
   value: number;
-  status: string;
+  status: StatusPayment;
   approvedBy?: string;
-  createdAt: string;
+  createdAt: Date;
 };
 
-export type PaymentsList = PaymentListItem[];
+export type PaymentsInscriptions = PaymentListItem[];
 
-export type PaymentsListResponse = {
-  payments: PaymentsList;
-  total: number;
+export type PaymentGroup = {
+  date: string;
+  payments: PaymentsInscriptions;
+};
+
+export type ListAllPaymentsResponse = {
+  groups: PaymentGroup[];
+  totalDates: number;
   page: number;
   pageCount: number;
 };
@@ -24,8 +31,8 @@ export type UsePaymentsListParams = {
 };
 
 export type UsePaymentsListResult = {
-  payments: PaymentsList;
-  total: number;
+  groups: PaymentGroup[];
+  totalDates: number;
   page: number;
   pageCount: number;
   loading: boolean;

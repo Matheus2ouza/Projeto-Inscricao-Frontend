@@ -15,7 +15,6 @@ export function useEventsWithPaymentsQuery(page = 1, pageSize = 8) {
       getEventsWithPayments({
         page,
         pageSize,
-        status: ["OPEN", "CLOSE"],
       }),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

@@ -311,7 +311,7 @@ export default function AppSidebarSuper({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/super/tickets/sales"
+                              href="/super/tickets/analisy-sales"
                               className="gap-1"
                             >
                               <DollarSign className="size-4" />
@@ -325,6 +325,15 @@ export default function AppSidebarSuper({
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Vendas</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/super/tickets/register-sale"
+                              className="gap-1"
+                            >
+                              <ListOrdered className="size-4" />
+                              <span>Registrar Venda</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>

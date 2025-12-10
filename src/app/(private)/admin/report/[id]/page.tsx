@@ -62,12 +62,16 @@ export default function ReportDetalheAdminPage() {
 
   if (!eventId) return null;
 
+  const handleBack = () => {
+    router.push("/admin/report");
+  };
+
   return (
     <PageContainer
       title="Relatório Geral"
       description="Dados consolidados do evento selecionado."
       showBackButton
-      backButtonAction={() => router.push("/admin/reports")}
+      backButtonAction={handleBack}
     >
       <ReportDetails
         data={data}
@@ -75,7 +79,7 @@ export default function ReportDetalheAdminPage() {
         isFetching={isFetching}
         error={errorMessage}
         eventId={eventId}
-        listPath="/admin/reports"
+        listPath="/admin/report"
         isDownloading={isDownloading}
         onDownload={downloadReport}
         onRefresh={() => {

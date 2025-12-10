@@ -27,7 +27,6 @@ export type Event = {
   countTypeInscriptions?: number;
   typesInscriptions: TypeInscriptions[];
   responsibles?: Responsible[];
-  // Campos opcionais adicionais para a tela de gerenciamento
   description?: string;
   maxParticipants?: number;
   ticketPrice?: number;

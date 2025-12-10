@@ -39,6 +39,9 @@ type EventsTableProps = {
   pageCount: number;
   pageSize?: number;
   onPageChange: (page: number) => void;
+  onCreateEvent: () => void;
+  onManagerEvent: (eventId: string) => void;
+  onListInscriptions: (eventId: string) => void;
 };
 
 export default function EventsTable({
@@ -47,6 +50,9 @@ export default function EventsTable({
   page,
   pageCount,
   onPageChange,
+  onCreateEvent,
+  onManagerEvent,
+  onListInscriptions,
 }: EventsTableProps) {
   const { user } = useCurrentUser();
   const router = useRouter();
@@ -116,10 +122,6 @@ export default function EventsTable({
 
   const roleSegment = user?.role?.toLowerCase() === "super" ? "super" : "admin";
 
-  const handleManagerEvent = (eventId: string) => {
-    router.push(`/${roleSegment}/events/manager/${eventId}`);
-  };
-
   const currentPageSize = PAGE_SIZE;
   const startIndex = (page - 1) * currentPageSize;
 
@@ -130,10 +132,9 @@ export default function EventsTable({
           asChild
           className="w-full sm:w-auto dark:text-white"
           variant="default"
+          onClick={onCreateEvent}
         >
-          <Link href={`/${roleSegment}/events/manager/create`}>
-            Criar Evento
-          </Link>
+          Criar Evento
         </Button>
       </div>
 
@@ -366,16 +367,13 @@ export default function EventsTable({
                     <Button
                       variant="outline"
                       className="flex items-center gap-2 text-xs sm:text-sm dark:text-white"
+                      onClick={() => onListInscriptions(event.id)}
                       asChild
                     >
-                      <Link
-                        href={`/${roleSegment}/events/list-inscription/${event.id}`}
-                      >
-                        Lista de Inscrições
-                      </Link>
+                      Lista de Inscrições
                     </Button>
                     <Button
-                      onClick={() => handleManagerEvent(event.id)}
+                      onClick={() => onManagerEvent(event.id)}
                       variant="default"
                       className="flex items-center gap-2 text-xs sm:text-sm dark:text-white"
                     >

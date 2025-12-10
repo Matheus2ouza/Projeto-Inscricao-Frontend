@@ -1,3 +1,5 @@
+import type { PaymentMethod } from "generated/prisma";
+
 export type GenaratePdfReportInput = {
   eventId: string;
 };
@@ -23,6 +25,10 @@ export type ReportGeneralResponse = {
   totalValue: number;
   totalDebt: number;
   typeInscription: TypeInscription;
+  inscriptionAvuls: InscriptionAvuls;
+  ticketSale: TicketSale;
+  expenses: ExpensesReport;
+  gastos: ExpensesReport;
 };
 
 export type TypeInscription = {
@@ -32,6 +38,56 @@ export type TypeInscription = {
   countParticipants: number;
   totalValue: number;
 }[];
+
+export type InscriptionAvuls = {
+  countParticipants: number;
+  totalValue: number;
+  byPaymentMethod: AvulsoPaymentMethodReport[];
+};
+
+export type AvulsoPaymentMethodReport = {
+  paymentMethod: PaymentMethod;
+  countParticipants: number;
+  totalValue: number;
+};
+
+export type TicketSale = {
+  totalSales: number;
+  totalTicketsSold: number;
+  byTicket: TicketSaleByTicket[];
+  byPaymentMethod: TicketSaleByPaymentMethod[];
+};
+
+export type TicketSaleByTicket = {
+  ticketId: string;
+  ticketName: string;
+  quantity: number;
+  totalValue: number;
+};
+
+export type TicketSaleByPaymentMethod = {
+  paymentMethod: PaymentMethod;
+  count: number;
+  totalValue: number;
+};
+
+export type ExpensesReport = {
+  total: number;
+  totalDinheiro: number;
+  totalPix: number;
+  totalCartao: number;
+  gastos: ExpenseDetail[];
+};
+
+export type ExpenseDetail = {
+  id: string;
+  description: string;
+  value: number;
+  paymentMethod: PaymentMethod;
+  responsible: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export type UseReportGeneralResult = {
   data: ReportGeneralResponse | null;

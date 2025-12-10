@@ -20,6 +20,18 @@ export default function EventsSuperPage() {
     router.push(`/super/home`);
   };
 
+  const handleCreateEvent = () => {
+    router.push(`/super/events/manager/create`);
+  };
+
+  const handleManagerEvent = (eventId: string) => {
+    router.push(`/super/events/manager/${eventId}`);
+  };
+
+  const handleListInscriptions = (eventId: string) => {
+    router.push(`/super/events/list-inscription/${eventId}`);
+  };
+
   // Estados de loading e error
   if (loading) {
     return (
@@ -99,6 +111,9 @@ export default function EventsSuperPage() {
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
+        onCreateEvent={handleCreateEvent}
+        onManagerEvent={handleManagerEvent}
+        onListInscriptions={handleListInscriptions}
       />
     </PageContainer>
   );

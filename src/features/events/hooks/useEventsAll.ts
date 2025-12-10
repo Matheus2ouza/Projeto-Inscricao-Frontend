@@ -17,7 +17,7 @@ export function useEventsAll({
     isLoading: loading,
     error,
     refetch,
-  } = useEventsQuery(page, pageSize);
+  } = useEventsQuery(page, pageSize, ["OPEN", "CLOSE", "FINALIZED"]);
 
   // Pré-carregar próxima página
   const { prefetchNextPage } = usePrefetchEventsQuery();

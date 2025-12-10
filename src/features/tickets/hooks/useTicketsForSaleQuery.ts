@@ -1,0 +1,29 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { getTicketsForSale } from "@/features/tickets/api/getTicketsForSale";
+import type {
+  FindTicketsForSaleOutput,
+} from "@/features/tickets/types/ticketSaleRegisterTypes";
+
+export const ticketsForSaleKeys = {
+  all: ["tickets-for-sale"] as const,
+  detail: (eventId: string) =>
+    [...ticketsForSaleKeys.all, "detail", eventId] as const,
+};
+
+export function useTicketsForSaleQuery(eventId?: string) {
+  return useQuery<FindTicketsForSaleOutput>({
+    queryKey: eventId ? ticketsForSaleKeys.detail(eventId) : ticketsForSaleKeys.all,
+    queryFn: () => {
+      if (!eventId) {
+        return Promise.reject(new Error("Evento não informado"));
+      }
+      return getTicketsForSale(eventId);
+    },
+    enabled: !!eventId,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}

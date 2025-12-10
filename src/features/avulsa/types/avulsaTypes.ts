@@ -37,6 +37,31 @@ export type ListAvulsaResponse = {
   totals: OnSiteRegistrationPaymentTotals;
 };
 
+export type GetAvulsaRegistrationDetailsRequest = {
+  eventId: string;
+  registrationId: string;
+};
+
+export type OnSiteParticipantPayment = {
+  id: string;
+  paymentMethod: PaymentMethod;
+  value: number;
+};
+
+export type OnSiteParticipant = {
+  id: string;
+  name: string;
+  gender: string;
+  onSiteParticipantPayment: OnSiteParticipantPayment[];
+};
+
+export type AvulsaRegistrationDetails = {
+  id: string;
+  name: string;
+  createdAt: string;
+  onSiteParticipant: OnSiteParticipant[];
+};
+
 export type Decimal = string;
 
 export type ParticipantPayment = {
@@ -63,4 +88,6 @@ export const avulsaKeys = {
   all: ["avulsa"] as const,
   list: (eventId: string, page: number, pageSize: number) =>
     [...avulsaKeys.all, "list", eventId, { page, pageSize }] as const,
+  detail: (eventId: string, registrationId: string) =>
+    [...avulsaKeys.all, "detail", eventId, registrationId] as const,
 };

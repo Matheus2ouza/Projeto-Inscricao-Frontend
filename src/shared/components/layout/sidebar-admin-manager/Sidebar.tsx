@@ -315,7 +315,7 @@ export default function AppSidebarAdminManager({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/admin/tickets/sales"
+                              href="/admin/tickets/analisy-sales"
                               className="gap-1"
                             >
                               <DollarSign className="size-4" />
@@ -329,6 +329,15 @@ export default function AppSidebarAdminManager({
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Vendas</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/tickets/register-sale"
+                              className="gap-1"
+                            >
+                              <ListOrdered className="size-4" />
+                              <span>Registrar Venda</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>
