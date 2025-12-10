@@ -1,4 +1,8 @@
-import type { PaymentMethod } from "generated/prisma";
+enum PaymentMethod {
+  DINHEIRO = "DINHEIRO",
+  PIX = "PIX",
+  CARTAO = "CARTAO",
+}
 
 export type GenaratePdfReportInput = {
   eventId: string;
