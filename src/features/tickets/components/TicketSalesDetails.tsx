@@ -181,6 +181,25 @@ export default function TicketSalesDetails({
             >
               <FormField
                 control={saleGroupForm.control}
+                name="accountName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome da conta</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Nome da conta"
+                        value={field.value ?? ""}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={saleGroupForm.control}
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>

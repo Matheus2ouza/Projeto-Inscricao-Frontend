@@ -40,7 +40,9 @@ export default function AvulsaByEventAdminPage() {
   };
 
   const handleViewDetails = (registrationId: string) => {
-    router.push(`/admin/inscriptions/avulsa/${registrationId}`);
+    router.push(
+      `/admin/inscriptions/avulsa/${eventId}/details/${registrationId}`
+    );
   };
 
   return (

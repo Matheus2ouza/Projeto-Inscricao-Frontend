@@ -23,7 +23,7 @@ export async function getAvulsaRegistrations(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao carregar inscrições avulsas"
+      "Falha ao carregar inscrições avulsas"
     );
   }
 }

@@ -13,12 +13,20 @@ export default function ListPaymentSuperPage() {
   const router = useRouter();
   const eventId = params?.eventId as string;
 
-  const { payments, total, page, pageCount, loading, error, setPage, refetch } =
-    usePaymentsList({
-      eventId: eventId || "",
-      initialPage: 1,
-      pageSize: 10,
-    });
+  const {
+    groups,
+    totalDates,
+    page,
+    pageCount,
+    loading,
+    error,
+    setPage,
+    refetch,
+  } = usePaymentsList({
+    eventId: eventId || "",
+    initialPage: 1,
+    pageSize: 10,
+  });
 
   const handleBack = () => {
     router.push("/super/payments/list-payments");
@@ -107,8 +115,8 @@ export default function ListPaymentSuperPage() {
       backButtonAction={handleBack}
     >
       <PaymentsListTable
-        payments={payments}
-        total={total}
+        groups={groups}
+        totalDates={totalDates}
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}

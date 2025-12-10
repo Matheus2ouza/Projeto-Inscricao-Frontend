@@ -11,10 +11,10 @@ export const eventsKeys = {
   detail: (id: string) => [...eventsKeys.details(), id] as const,
 };
 
-export function useEventsQuery(page: number = 1, pageSize: number = 8) {
+export function useEventsQuery(page: number = 1, pageSize: number = 8, status?: string[]) {
   return useQuery({
     queryKey: eventsKeys.list(page, pageSize),
-    queryFn: () => getEvents({ page, pageSize, status: ['OPEN', 'CLOSE'] }),
+    queryFn: () => getEvents({ page, pageSize, status }),
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
     retry: 2,

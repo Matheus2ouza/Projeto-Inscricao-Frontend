@@ -21,6 +21,18 @@ export default function EventsAdminPage() {
     router.replace(`/admin/home`);
   };
 
+  const handleCreateEvent = () => {
+    router.push(`/admin/events/manager/create`);
+  };
+
+  const handleManagerEvent = (eventId: string) => {
+    router.push(`/admin/events/manager/${eventId}`);
+  };
+
+  const handleListInscriptions = (eventId: string) => {
+    router.push(`/admin/events/list-inscription/${eventId}`);
+  };
+
   // Estados de loading e error
   if (loading) {
     return (
@@ -99,6 +111,9 @@ export default function EventsAdminPage() {
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
+        onCreateEvent={handleCreateEvent}
+        onManagerEvent={handleManagerEvent}
+        onListInscriptions={handleListInscriptions}
       />
     </PageContainer>
   );

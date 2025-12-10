@@ -1,21 +1,13 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import {
-  PaymentsList,
-  PaymentsListResponse,
-} from "../types/listPayments.types";
+import { ListAllPaymentsResponse } from "../types/listPayments.types";
 
-type PaymentsListApiResponse = {
-  paymentsInscriptions: PaymentsList;
-  total: number;
-  page: number;
-  pageCount: number;
-};
+type PaymentsListApiResponse = ListAllPaymentsResponse;
 
 export async function getPaymentsList(
   eventId: string,
   page: number,
   pageSize: number
-): Promise<PaymentsListResponse> {
+): Promise<ListAllPaymentsResponse> {
   try {
     const { data } = await axiosInstance.get<PaymentsListApiResponse>(
       `/payments/${eventId}/list`,
@@ -27,12 +19,7 @@ export async function getPaymentsList(
       }
     );
 
-    return {
-      payments: data.paymentsInscriptions,
-      total: data.total,
-      page: data.page,
-      pageCount: data.pageCount,
-    };
+    return data;
 
   } catch (error) {
     const axiosError = error as {

@@ -29,7 +29,7 @@ export default function SelectEventForListSuperPage() {
     >
       <TicketsTable
         events={events}
-        loading={loading}
+        buttonLabel="Visualizar Vendas"
         error={error}
         page={page}
         pageCount={pageCount}

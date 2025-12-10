@@ -1,11 +1,11 @@
-export type EventsForPayments = {
-  id: string;
-  name: string;
-  imageUrl?: string;
-  status: string;
+import { Event } from "@/features/events/types/eventTypes";
+
+export type EventForPayments = Event & {
   totalPayments: number;
   totalDebt: number;
-}[];
+};
+
+export type EventsForPayments = EventForPayments[];
 
 export type FindAllWithPaymentsOutput = {
   events: EventsForPayments;

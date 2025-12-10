@@ -29,8 +29,8 @@ export function usePaymentsList({
   }
 
   return {
-    payments: data?.payments || [],
-    total: data?.total ?? 0,
+    groups: data?.groups || [],
+    totalDates: data?.totalDates ?? 0,
     page,
     pageCount: data?.pageCount ?? 0,
     loading,
