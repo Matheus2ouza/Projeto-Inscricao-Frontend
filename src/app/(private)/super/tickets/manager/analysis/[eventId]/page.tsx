@@ -1,9 +1,9 @@
 "use client";
 
-import TicketsByEvent from "@/features/tickets/components/TicketsByEvent";
-import { useCreateTicket } from "@/features/tickets/hooks/useCreateTicket";
-import { useTicketSaleStatus } from "@/features/tickets/hooks/useTicketSaleStatus";
-import { useTicketsByEvent } from "@/features/tickets/hooks/useTicketsByEvent";
+import TicketsByEvent from "@/features/tickets/components/analysis/TicketsByEvent";
+import { useCreateTicket } from "@/features/tickets/hooks/analysis/createTicket/useCreateTicket";
+import { useTicketSaleStatus } from "@/features/tickets/hooks/analysis/useTicketSaleStatus";
+import { useTicketsByEvent } from "@/features/tickets/hooks/analysis/useTicketsByEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";

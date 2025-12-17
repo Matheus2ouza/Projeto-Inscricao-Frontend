@@ -1,7 +1,7 @@
 "use client";
 
-import TicketSalesDetails from "@/features/tickets/components/TicketSalesDetails";
-import { useTicketSalesDetails } from "@/features/tickets/hooks/useTicketSalesDetails";
+import TicketSalesDetails from "@/features/tickets/components/ticketDetails/TicketSalesDetails";
+import { useTicketSalesDetails } from "@/features/tickets/hooks/ticketDetails/useTicketSalesDetails";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
