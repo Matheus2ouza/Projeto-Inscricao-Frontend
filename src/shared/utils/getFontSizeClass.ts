@@ -5,31 +5,28 @@
  * @param isCardTitle - Se true, usa limites maiores (para títulos de card). Se false, usa limites menores (para textos dentro de imagens)
  * @returns String com a classe CSS do tamanho da fonte Tailwind
  */
+"use client";
+
+/** Normaliza o texto para calcular o tamanho, removendo espaços extras. */
+const normalizeText = (input: string) => input.trim();
+
 export function getFontSizeClass(text: string, isCardTitle = false): string {
-  const length = text.length;
+  const normalized = normalizeText(text);
+  const length = normalized.length;
 
   if (isCardTitle) {
-    // Para o título do card (h3)
-    if (length <= 20) {
-      return "text-lg"; // 18px - tamanho padrão
-    } else if (length <= 30) {
-      return "text-base"; // 16px
-    } else if (length <= 35) {
-      return "text-sm"; // 14px
-    } else {
-      return "text-xs"; // 12px
-    }
-  } else {
-    // Para o texto dentro do gradiente da imagem
-    if (length <= 15) {
-      return "text-lg"; // 18px
-    } else if (length <= 25) {
-      return "text-base"; // 16px
-    } else if (length <= 35) {
-      return "text-sm"; // 14px
-    } else {
-      return "text-xs"; // 12px
-    }
+    return "text-8xl"
   }
+
+  if (length <= 12) {
+    return "text-lg";
+  }
+  if (length <= 24) {
+    return "text-base";
+  }
+  if (length <= 36) {
+    return "text-sm";
+  }
+  return "text-xs";
 }
 
