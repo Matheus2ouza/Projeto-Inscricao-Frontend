@@ -262,7 +262,7 @@ export default function AppSidebarAdminManager({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/admin/participants/select-event"
+                              href="/admin/participants/list-participants"
                               className="gap-1"
                             >
                               <ListOrdered className="size-4" />
@@ -347,7 +347,7 @@ export default function AppSidebarAdminManager({
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <a
-                        href="/admin/gastos"
+                        href="/admin/expenses"
                         className="flex items-center gap-1"
                       >
                         <BanknoteArrowDown className="size-4" />

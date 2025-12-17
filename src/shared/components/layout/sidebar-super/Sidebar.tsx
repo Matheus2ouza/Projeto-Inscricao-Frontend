@@ -258,7 +258,7 @@ export default function AppSidebarSuper({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/super/participants/select-event"
+                              href="/super/participants/list-participants"
                               className="gap-1"
                             >
                               <ListOrdered className="size-4" />
@@ -343,7 +343,7 @@ export default function AppSidebarSuper({
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <a
-                        href="/super/gastos"
+                        href="/super/expenses"
                         className="flex items-center gap-1"
                       >
                         <BanknoteArrowDown className="size-4" />
