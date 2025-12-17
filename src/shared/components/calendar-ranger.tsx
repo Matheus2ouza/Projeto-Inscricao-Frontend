@@ -45,6 +45,10 @@ export function CalendarRanger({
     }
   };
 
+  const currentYear = new Date().getFullYear();
+  const fromYear = currentYear;
+  const toYear = currentYear + 10;
+
   return (
     <div className="flex flex-col gap-4 w-full align-center justify-center">
       <div className="flex justify-center align-middle w-full">
@@ -57,8 +61,9 @@ export function CalendarRanger({
             before: new Date(),
           }}
           showOutsideDays={false}
-          numberOfMonths={2}
           captionLayout={dropdown}
+          startMonth={new Date(fromYear, 0)}
+          endMonth={new Date(toYear, 0)}
           locale={ptBR}
           className="rounded-lg border shadow-sm"
         />
