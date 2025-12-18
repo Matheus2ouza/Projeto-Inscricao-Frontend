@@ -1,6 +1,7 @@
 "use client";
 
 import { PAGE_SIZE } from "@/app/(private)/super/events/manager/page";
+import EventStatusFilter from "@/shared/components/EventStatusFilter";
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -12,8 +13,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
-import { useCurrentUser } from "@/shared/context/user-context";
 import { cn } from "@/shared/lib/utils";
+import { formatCurrency } from "@/shared/utils/FormatCurrency";
+import { getGradientClass } from "@/shared/utils/getGenerateGradient";
+import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import {
   AlertTriangle,
   Calendar,
@@ -27,10 +30,10 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useEventsAll } from "../hooks/useEventsAll";
+import { useEventsAll } from "../../gastos/hooks/useEventsAll";
+import { StatusEvent } from "../types/eventTypes";
+import { EVENT_STATUS_OPTIONS } from "../types/selectEvent";
 
 type EventsTableProps = {
   events: ReturnType<typeof useEventsAll>["events"];
@@ -42,6 +45,9 @@ type EventsTableProps = {
   onCreateEvent: () => void;
   onManagerEvent: (eventId: string) => void;
   onListInscriptions: (eventId: string) => void;
+  statusFilter: StatusEvent[];
+  onStatusFilterChange: (value: string[]) => void;
+  onApplyStatusFilter: () => void;
 };
 
 export default function EventsTable({
@@ -53,9 +59,10 @@ export default function EventsTable({
   onCreateEvent,
   onManagerEvent,
   onListInscriptions,
+  statusFilter,
+  onStatusFilterChange,
+  onApplyStatusFilter,
 }: EventsTableProps) {
-  const { user } = useCurrentUser();
-  const router = useRouter();
   const [showAmount, setShowAmount] = useState<{ [key: string]: boolean }>({});
   const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
 
@@ -68,34 +75,6 @@ export default function EventsTable({
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR");
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
-  const getStatusBadge = (event: EventsTableProps["events"][number]) => {
-    const now = new Date();
-    const start = new Date(event.startDate);
-    const end = new Date(event.endDate);
-
-    if (start <= now && now <= end) {
-      return { label: "Em Andamento", color: "bg-blue-600" };
-    }
-
-    switch (event.status) {
-      case "OPEN":
-        return { label: "Inscrições Abertas", color: "bg-green-600" };
-      case "CLOSE":
-        return { label: "Inscrições Fechadas", color: "bg-amber-600" };
-      case "FINALIZED":
-        return { label: "Finalizado", color: "bg-red-600" };
-      default:
-        return { label: "Status desconhecido", color: "bg-gray-600" };
-    }
   };
 
   const handlePageChange = (newPage: number) => {
@@ -120,26 +99,45 @@ export default function EventsTable({
     window.open(`/events/${eventId}`, "_blank");
   };
 
-  const roleSegment = user?.role?.toLowerCase() === "super" ? "super" : "admin";
-
   const currentPageSize = PAGE_SIZE;
   const startIndex = (page - 1) * currentPageSize;
 
   return (
     <div className="pb-4 sm:p-5 relative">
-      <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-end">
-        <Button
-          onClick={onCreateEvent}
-          variant="default"
-          className="text-xs sm:text-sm"
-        >
-          Criar Evento
-        </Button>
+      <div className="flex flex-col gap-2 mb-4 sm:gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex items-center gap-2">
+              <EventStatusFilter
+                options={EVENT_STATUS_OPTIONS}
+                value={statusFilter}
+                onChange={onStatusFilterChange}
+                className="w-full sm:w-[220px]"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs"
+                onClick={onApplyStatusFilter}
+              >
+                Aplicar
+              </Button>
+            </div>
+          </div>
+          <Button
+            onClick={onCreateEvent}
+            variant="default"
+            className="text-xs sm:text-sm"
+          >
+            Criar Evento
+          </Button>
+        </div>
       </div>
       {/* Grid de Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 relative">
         {events.map((event) => {
-          const statusBadge = getStatusBadge(event);
+          const statusInfo = getEventStatusInfo(event.status);
+          const gradientClass = getGradientClass(event.name);
           const isCopied = copiedEventId === event.id;
           const hasTypeInscriptions = (event?.countTypeInscriptions ?? 0) > 0;
 
@@ -171,9 +169,9 @@ export default function EventsTable({
                     )}
                     <div className="absolute inset-0 bg-black/20" />
                     <Badge
-                      className={`absolute top-3 right-3 ${statusBadge.color} text-white min-w-[100px] flex items-center justify-center text-sm`}
+                      className={`absolute top-3 right-3 ${statusInfo.badgeClass} min-w-[100px] flex items-center justify-center text-sm`}
                     >
-                      {statusBadge.label}
+                      {statusInfo.label}
                     </Badge>
                   </div>
                 </AspectRatio>
@@ -314,11 +312,10 @@ export default function EventsTable({
                         <input
                           readOnly
                           className="w-full text-xs bg-transparent border rounded px-2 py-1 truncate"
-                          value={`${
-                            typeof window !== "undefined"
-                              ? window.location.origin
-                              : ""
-                          }/events/${event.id}`}
+                          value={`${typeof window !== "undefined"
+                            ? window.location.origin
+                            : ""
+                            }/events/${event.id}`}
                         />
                       </div>
                       <div className="flex gap-1 sm:gap-2">
@@ -366,7 +363,6 @@ export default function EventsTable({
                       variant="outline"
                       className="flex items-center gap-2 text-xs sm:text-sm dark:text-white"
                       onClick={() => onListInscriptions(event.id)}
-                      asChild
                     >
                       Lista de Inscrições
                     </Button>
@@ -398,10 +394,13 @@ export default function EventsTable({
               evento.
             </p>
           </div>
-          <Button size="lg" asChild className="w-full sm:w-auto">
-            <Link href={`/${roleSegment}/events/create`}>
-              Criar Primeiro Evento
-            </Link>
+          <Button
+            size="lg"
+            asChild
+            className="w-full sm:w-auto"
+            onClick={onCreateEvent}
+          >
+            Criar Primeiro Evento
           </Button>
         </div>
       )}

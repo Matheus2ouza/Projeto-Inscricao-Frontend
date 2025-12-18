@@ -1,7 +1,7 @@
 "use client";
 
-import InscriptionsAnalysisTable from "@/features/analysis/inscription/components/InscriptionsAnalysisTable";
-import { useInscriptionsForAnalysis } from "@/features/analysis/inscription/hooks/useInscriptionsForAnalysis";
+import InscriptionsAnalysisTable from "@/features/inscriptions/components/analysis/InscriptionsAnalysisTable";
+import { useInscriptionsForAnalysis } from "@/features/inscriptions/hooks/analysis/useInscriptionsForAnalysis";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter } from "next/navigation";
 

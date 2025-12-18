@@ -1,0 +1,83 @@
+"use client";
+
+import SpensTable from "@/features/gastos/components/SelectEventForExpenses";
+import { useEventsAll } from "@/features/gastos/hooks/useEventsAll";
+import PageContainer from "@/shared/components/layout/PageContainer";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Card, CardBody, CardFooter } from "@heroui/react";
+import { useRouter } from "next/navigation";
+
+export default function SpentsSuperPage() {
+  const router = useRouter();
+  const { events, page, pageCount, setPage, loading, error } = useEventsAll({
+    initialPage: 1,
+    pageSize: 8,
+  });
+
+  const handleViewEvent = (eventId: string) => {
+    router.push(`/super/expenses/${eventId}`);
+  };
+
+  const handleBack = () => {
+    router.push("/super/home");
+  };
+
+  const renderSkeletonGrid = () => {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <Card key={index} className="w-full border-0 shadow-md">
+            <CardBody className="p-0">
+              <Skeleton className="w-full h-48 rounded-t-xl" />
+            </CardBody>
+            <CardFooter className="flex flex-col items-start p-4">
+              <Skeleton className="h-6 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-2" />
+              <Skeleton className="h-4 w-1/2" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return renderSkeletonGrid();
+    }
+
+    if (error) {
+      return (
+        <div className="flex justify-center items-center min-h-96">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-red-600 mb-2">
+              Erro ao carregar eventos
+            </h2>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <SpensTable
+        events={events}
+        page={page}
+        pageCount={pageCount}
+        onPageChange={setPage}
+        onViewEvent={handleViewEvent}
+      />
+    );
+  };
+
+  return (
+    <PageContainer
+      title="Gastos"
+      description="Acompanhe e registre os gastos vinculados aos eventos."
+      showBackButton
+      backButtonAction={handleBack}
+    >
+      {renderContent()}
+    </PageContainer>
+  );
+}

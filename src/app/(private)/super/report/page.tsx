@@ -1,6 +1,6 @@
 "use client";
 
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
+import { useEventsAll } from "@/features/gastos/hooks/useEventsAll";
 import ReportTable from "@/features/report/components/ReportPage";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useRouter } from "next/navigation";

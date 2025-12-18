@@ -1,24 +1,18 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useEventsWithPaymentsAll } from "@/features/payments/hooks/useEventsWithPaymentsAll";
-import TicketsTable from "@/features/tickets/components/TicketsTable";
+import TicketsTable from "@/features/tickets/components/SelectedEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function SelectEventForListPaymentSuperPage() {
   const router = useRouter();
-  const {
-    events,
-    page,
-    pageCount,
-    setPage,
-    loading,
-    error,
-  } = useEventsWithPaymentsAll({
-    initialPage: 1,
-    pageSize: 8,
-  });
+  const { events, page, pageCount, setPage, loading, error } =
+    useEventsWithPaymentsAll({
+      initialPage: 1,
+      pageSize: 8,
+    });
 
   const handleViewEvent = (eventId: string) => {
     router.push(`/super/payments/list-payments/${eventId}`);

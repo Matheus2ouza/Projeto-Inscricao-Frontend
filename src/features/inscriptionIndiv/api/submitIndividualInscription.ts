@@ -14,42 +14,17 @@ export const submitIndividualInscription = async (
     );
     return response.data;
   } catch (error: unknown) {
-    console.error("Erro ao enviar inscrição individual:", error);
-
-    // Type guard para verificar se é um erro do Axios
-    const isAxiosError = (
-      err: unknown
-    ): err is {
-      response?: {
-        data?: {
-          message?: string;
-          error?: string;
-        };
-      };
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
       message?: string;
-    } => {
-      return (
-        typeof err === "object" &&
-        err !== null &&
-        ("response" in err || "message" in err)
-      );
     };
-
-    let errorMessage =
-      "Erro inesperado. Por favor, tente novamente mais tarde.";
-
-    if (isAxiosError(error)) {
-      errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Erro inesperado. Por favor, tente novamente mais tarde.";
-    } else if (error instanceof Error) {
-      errorMessage = error.message;
-    }
-
-    console.error("Mensagem de erro detalhada:", errorMessage);
-
-    throw new Error(errorMessage);
+    console.error(
+      "Erro ao enviar inscrição individual:",
+      axiosError.response?.data || axiosError.message
+    );
+    throw new Error(
+      axiosError.response?.data?.message ||
+      "Erro inesperado. Por favor, tente novamente mais tarde."
+    );
   }
 };

@@ -18,7 +18,6 @@ import { cn } from "@/shared/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 import { useAccount } from "../hooks/useAccount";
-import type { AccountRole } from "../types/accounts.types";
 
 export type AccountOption = {
   label: string;
@@ -32,7 +31,6 @@ export type ComboboxAccountProps = {
   onChange: (value: string[]) => void;
   options?: AccountOption[];
   loading?: boolean;
-  roles?: AccountRole[];
   showRole?: boolean;
 };
 
@@ -42,39 +40,28 @@ export function ComboboxAccount({
   onChange,
   options,
   loading: loadingProp,
-  roles,
   showRole = true,
 }: ComboboxAccountProps) {
   const [open, setOpen] = React.useState(false);
-  const shouldFetch = options === undefined;
+  const shouldFetch = true;
   const {
     accounts: fetched,
     loading: internalLoading,
     error,
-  } = useAccount(shouldFetch, roles);
+  } = useAccount(shouldFetch);
   const loading = loadingProp ?? internalLoading;
 
-  // Preferência: props.options > API; fallback: []
+  // Busca sempre da API e monta opções
   const accounts = React.useMemo<AccountOption[]>(() => {
-    const matchesRole = (accountRole?: string) => {
-      if (!roles || roles.length === 0) return true;
-      return accountRole ? roles.includes(accountRole as AccountRole) : false;
-    };
-
-    if (options) {
-      return options.filter((option) => matchesRole(option.role));
-    }
     if (fetched && fetched.length > 0) {
-      return fetched
-        .map((r) => ({
-          label: r.username.toUpperCase(),
-          value: r.id,
-          role: r.role,
-        }))
-        .filter((account) => matchesRole(account.role));
+      return fetched.map((r) => ({
+        label: r.username.toUpperCase(),
+        value: r.id,
+        role: r.role,
+      }));
     }
     return [];
-  }, [options, fetched, roles]);
+  }, [fetched]);
 
   const toggleSelection = (optionValue: string) => {
     const isSelected = value.includes(optionValue);
@@ -165,9 +152,9 @@ export function ComboboxAccount({
                 {accounts.map((account) => (
                   <CommandItem
                     key={account.value}
-                    value={account.value}
-                    onSelect={(currentValue) => {
-                      toggleSelection(currentValue);
+                    value={`${account.label} ${account.role ?? ""}`}
+                    onSelect={() => {
+                      toggleSelection(account.value);
                     }}
                   >
                     <div className="flex flex-col flex-1 min-w-0">

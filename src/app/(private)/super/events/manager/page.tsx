@@ -1,19 +1,23 @@
 "use client";
 
 import EventsTable from "@/features/events/components/EventsTable";
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
+import { useEventsAll } from "@/features/gastos/hooks/useEventsAll";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 export const PAGE_SIZE = 4;
 
-export default function EventsSuperPage() {
+export default function SelectEventSuperPage() {
   const router = useRouter();
+  const [pendingStatusFilter, setPendingStatusFilter] = useState<string[]>([]);
+  const [appliedStatusFilter, setAppliedStatusFilter] = useState<string[]>([]);
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
     useEventsAll({
       initialPage: 1,
       pageSize: 4,
+      status: appliedStatusFilter.length > 0 ? appliedStatusFilter : undefined,
     });
 
   const handleBack = () => {
@@ -30,6 +34,15 @@ export default function EventsSuperPage() {
 
   const handleListInscriptions = (eventId: string) => {
     router.push(`/super/events/list-inscription/${eventId}`);
+  };
+
+  const handleStatusChange = (value: string[]) => {
+    setPendingStatusFilter(value);
+  };
+
+  const handleApplyStatusFilter = () => {
+    setAppliedStatusFilter(pendingStatusFilter);
+    setPage(1);
   };
 
   // Estados de loading e error
@@ -114,6 +127,9 @@ export default function EventsSuperPage() {
         onCreateEvent={handleCreateEvent}
         onManagerEvent={handleManagerEvent}
         onListInscriptions={handleListInscriptions}
+        statusFilter={pendingStatusFilter}
+        onStatusFilterChange={handleStatusChange}
+        onApplyStatusFilter={handleApplyStatusFilter}
       />
     </PageContainer>
   );

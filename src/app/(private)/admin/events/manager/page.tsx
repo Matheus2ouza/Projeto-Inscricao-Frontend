@@ -1,20 +1,22 @@
 "use client";
 
 import EventsTable from "@/features/events/components/EventsTable";
-import { useEventsAll } from "@/features/events/hooks/useEventsAll";
+import { useEventsAll } from "@/features/gastos/hooks/useEventsAll";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-const PAGE_SIZE = 4;
-
-export default function EventsAdminPage() {
+export default function SelectEventAdminPage() {
   const router = useRouter();
+  const [pendingStatusFilter, setPendingStatusFilter] = useState<string[]>([]);
+  const [appliedStatusFilter, setAppliedStatusFilter] = useState<string[]>([]);
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
     useEventsAll({
       initialPage: 1,
       pageSize: 4,
+      status: appliedStatusFilter.length > 0 ? appliedStatusFilter : undefined,
     });
 
   const handleBack = () => {
@@ -33,6 +35,15 @@ export default function EventsAdminPage() {
     router.push(`/admin/events/list-inscription/${eventId}`);
   };
 
+  const handleStatusChange = (value: string[]) => {
+    setPendingStatusFilter(value);
+  };
+
+  const handleApplyStatusFilter = () => {
+    setAppliedStatusFilter(pendingStatusFilter);
+    setPage(1);
+  };
+
   // Estados de loading e error
   if (loading) {
     return (
@@ -45,7 +56,7 @@ export default function EventsAdminPage() {
           <Skeleton className="h-10 w-32" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
-          {Array.from({ length: PAGE_SIZE }).map((_, index) => (
+          {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
               className="bg-card text-card-foreground flex flex-col transition-all duration-300 ease-in-out shadow-sm w-full overflow-hidden rounded-xl"
@@ -114,6 +125,9 @@ export default function EventsAdminPage() {
         onCreateEvent={handleCreateEvent}
         onManagerEvent={handleManagerEvent}
         onListInscriptions={handleListInscriptions}
+        statusFilter={pendingStatusFilter}
+        onStatusFilterChange={handleStatusChange}
+        onApplyStatusFilter={handleApplyStatusFilter}
       />
     </PageContainer>
   );

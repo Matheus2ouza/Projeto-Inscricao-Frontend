@@ -41,7 +41,7 @@ import {
   CreateAvulsaFormData,
   createAvulsaFormSchema,
   ParticipantFormData,
-} from "../schema/avulsaSchema";
+} from "../../inscriptions/schema/avulsa/avulsaSchema";
 
 interface CreateAvulsaFormProps {
   onSubmit: (data: CreateAvulsaFormData) => void;

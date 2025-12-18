@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { updateEventInscriptions } from "../api/updateEventInscriptions";
+import { updateEventInscriptions } from "../api/eventActions/updateEventInscriptions";
 
 export function useEventInscriptions() {
   const [loading, setLoading] = useState(false);

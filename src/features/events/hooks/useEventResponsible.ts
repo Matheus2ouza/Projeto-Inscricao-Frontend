@@ -1,8 +1,8 @@
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteEventResponsible } from "../api/deleteEventResponsible";
-import { useInvalidateEventsQuery } from "./useEventsQuery";
+import { useInvalidateEventsQuery } from "../../gastos/hooks/useEventsQuery";
+import { deleteEventResponsible } from "../api/eventActions/deleteEventResponsible";
 
 export function useEventResponsible() {
   const { invalidateDetail } = useInvalidateEventsQuery();

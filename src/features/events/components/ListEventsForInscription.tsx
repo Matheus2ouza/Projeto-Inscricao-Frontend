@@ -13,6 +13,7 @@ import {
 } from "@/shared/components/ui/pagination";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
+import { getInitial } from "@/shared/utils/getInitials";
 import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
@@ -28,10 +29,6 @@ interface ListEventsForInscriptionProps {
   setPage: (page: number) => void;
   onSelectEvent: (eventId: string) => void;
 }
-
-const getEventInitials = (eventName: string): string => {
-  return eventName.trim().substring(0, 2).toUpperCase();
-};
 
 export default function ListEventsForInscription({
   events,
@@ -105,7 +102,7 @@ export default function ListEventsForInscription({
                       className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
                     >
                       <span className="text-white font-bold text-lg text-center px-4">
-                        {getEventInitials(event.name)}
+                        {getInitial(event.name)}
                       </span>
                     </div>
                   )}

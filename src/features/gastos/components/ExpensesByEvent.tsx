@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/shared/components/ui/card";
+import { Card, CardContent } from "@/shared/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +33,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Badge, Calendar, DollarSign, Plus, User } from "lucide-react";
 import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -199,113 +198,80 @@ export default function ExpensesByEvent({
           </DialogContent>
         </Dialog>
 
-        {error && (
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-6 text-center text-red-600">
-              {error instanceof Error ? error.message : error}
-            </CardContent>
-          </Card>
-        )}
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <Card key={index} className="border-0 shadow-sm">
-                <CardContent className="p-0">
-                  <Skeleton className="w-full h-48 rounded-t-xl" />
-                </CardContent>
-                <CardFooter className="flex flex-col items-start p-4">
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-1/2 mb-2" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {expensesData?.expenses.map((expense) => (
-                <Card
-                  key={expense.id}
-                  className="border-0 shadow-md rounded-xl overflow-hidden"
-                >
-                  <CardContent className="p-4 relative">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {expense.description}
-                    </h3>
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {new Date(expense.createdAt).toLocaleDateString("pt-BR")}
-                    </p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      {expense.responsible}
-                    </p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <DollarSign className="w-4 h-4" />
-                      R$ {expense.value.toFixed(2)}
-                    </p>
-                    <Badge className="absolute top-4 right-4">
-                      {expense.paymentMethod}
-                    </Badge>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {expensesData?.expenses.length === 0 && (
-              <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                  Nenhum gasto registrado
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {expensesData?.expenses.map((expense) => (
+            <Card
+              key={expense.id}
+              className="border-0 shadow-md rounded-xl overflow-hidden"
+            >
+              <CardContent className="p-4 relative">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {expense.description}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Registre um gasto para aparecer aqui.
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(expense.createdAt).toLocaleDateString("pt-BR")}
                 </p>
-              </div>
-            )}
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  {expense.responsible}
+                </p>
+                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  R$ {expense.value.toFixed(2)}
+                </p>
+                <Badge className="absolute top-4 right-4">
+                  {expense.paymentMethod}
+                </Badge>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-            <div className="flex justify-center mt-8">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => page > 1 && handlePageChange(page - 1)}
-                      href={page > 1 ? "#" : undefined}
-                      className={
-                        page === 1 ? "pointer-events-none opacity-50" : ""
-                      }
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: pageCount }, (_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink
-                        isActive={page === i + 1}
-                        href="#"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() =>
-                        page < pageCount && handlePageChange(page + 1)
-                      }
-                      href={page < pageCount ? "#" : undefined}
-                      className={
-                        page === pageCount
-                          ? "pointer-events-none opacity-50"
-                          : ""
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          </>
+        {expensesData?.expenses.length === 0 && (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+              Nenhum gasto registrado
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
+              Registre um gasto para aparecer aqui.
+            </p>
+          </div>
         )}
+
+        <div className="flex justify-center mt-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => page > 1 && handlePageChange(page - 1)}
+                  href={page > 1 ? "#" : undefined}
+                  className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              {Array.from({ length: pageCount }, (_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    isActive={page === i + 1}
+                    href="#"
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => page < pageCount && handlePageChange(page + 1)}
+                  href={page < pageCount ? "#" : undefined}
+                  className={
+                    page === pageCount ? "pointer-events-none opacity-50" : ""
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   );

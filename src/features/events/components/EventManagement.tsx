@@ -1,10 +1,6 @@
 "use client";
 
 import { useAccount } from "@/features/accounts/hooks/useAccount";
-import { deleteImageEvent } from "@/features/events/api/deleteImageEvent";
-import { deleteLogoEvent } from "@/features/events/api/deleteLogoEvent";
-import { updateEventImage } from "@/features/events/api/updateEventImage";
-import { updateEventLogo } from "@/features/events/api/updateEventLogo";
 import TypeInscriptionDialog from "@/features/typeInscription/components/TypeInscriptionDialog";
 import { useTypeInscriptions } from "@/features/typeInscription/hook/useTypeInscriptions";
 import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
@@ -34,8 +30,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useInvalidateEventsQuery } from "../../gastos/hooks/useEventsQuery";
+import { deleteImageEvent } from "../api/eventActions/deleteImageEvent";
+import { deleteLogoEvent } from "../api/eventActions/deleteLogoEvent";
+import { updateEventImage } from "../api/eventActions/updateEventImage";
+import { updateEventLogo } from "../api/eventActions/updateEventLogo";
 import { useEventResponsible } from "../hooks/useEventResponsible";
-import { useInvalidateEventsQuery } from "../hooks/useEventsQuery";
 import { useFormEditEvent } from "../hooks/useFormEditEvent";
 import { Event } from "../types/eventTypes";
 import ResponsiblesDialog from "./ResponsiblesDialog";

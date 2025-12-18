@@ -1,9 +1,9 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useEventsWithPaymentsAll } from "@/features/payments/hooks/useEventsWithPaymentsAll";
-import TicketsTable from "@/features/tickets/components/TicketsTable";
+import TicketsTable from "@/features/tickets/components/SelectedEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function SelectEventForListPaymentAdminPage() {

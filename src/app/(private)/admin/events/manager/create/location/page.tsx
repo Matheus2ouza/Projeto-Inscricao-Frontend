@@ -8,10 +8,7 @@ import { ArrowLeft, MapPin, Navigation, Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 
-const DEFAULT_POSITION = { lat: -23.55052, lng: -46.633308 };
-
-// Chave para armazenar o estado no sessionStorage (deve ser a mesma do formulário)
-const FORM_STORAGE_KEY = "event-form-data";
+const DEFAULT_POSITION = { lat: -23.56974503376432, lng: -46.71596012908226 };
 
 export default function LocationPickerPage() {
   const router = useRouter();

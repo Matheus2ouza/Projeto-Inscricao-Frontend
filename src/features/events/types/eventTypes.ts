@@ -52,6 +52,7 @@ export type UseEventsNameResult = {
 export type UseEventsParams = {
   initialPage?: number;
   pageSize?: number;
+  status?: string[];
 };
 
 export type getAllEventsResponse = {
@@ -95,7 +96,7 @@ export type TypeInscription = {
   value: number;
 };
 
-export type statusEvent = "OPEN" | "CLOSE" | "FINALIZED";
+export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
 
 export type FindDetailsEventResponse = {
   id: string;
@@ -106,7 +107,7 @@ export type FindDetailsEventResponse = {
   location?: string;
   longitude?: number | null;
   latitude?: number | null;
-  status: statusEvent;
+  status: StatusEvent;
   paymentEnabled: boolean;
   regionName?: string;
   typeInscriptions: TypeInscription[];

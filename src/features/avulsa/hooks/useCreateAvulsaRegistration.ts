@@ -1,12 +1,12 @@
-import { eventsKeys } from "@/features/events/hooks/useEventsQuery";
+import { eventsKeys } from "@/features/gastos/hooks/useEventsQuery";
 import {
   useMutation,
   UseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { avulsaKeys, CreateInscriptionAvulInput } from "../../inscriptions/types/avulsa/avulsaTypes";
 import { createAvulsaRegistration } from "../api/createAvulsaRegistration";
-import { avulsaKeys, CreateInscriptionAvulInput } from "../types/avulsaTypes";
 
 export function useCreateAvulsaRegistration(): UseMutationResult<
   { id: string },

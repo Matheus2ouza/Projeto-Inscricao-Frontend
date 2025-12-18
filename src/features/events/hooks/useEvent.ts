@@ -1,8 +1,8 @@
 import { getTypeInscriptionsByEvent } from "@/features/typeInscription/api/getTypeInscriptionsByEvent";
 import { useQuery } from "@tanstack/react-query";
+import { eventsKeys } from "../../gastos/hooks/useEventsQuery";
 import { getEvent } from "../api/getEvent";
 import { Event } from "../types/eventTypes";
-import { eventsKeys } from "./useEventsQuery";
 
 export function useEvent(eventId: string) {
   const {

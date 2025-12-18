@@ -1,12 +1,12 @@
 import { useCurrentUser } from "@/shared/context/user-context";
 import { useState } from "react";
 import { toast } from "sonner";
-import { deleteEvent } from "../api/deleteEvent";
-import { updateEvent } from "../api/updateEvent";
+import { useInvalidateEventsQuery } from "../../gastos/hooks/useEventsQuery";
+import { deleteEvent } from "../api/eventActions/deleteEvent";
+import { updateEvent } from "../api/eventActions/updateEvent";
 import { Event, UpdateEventInput } from "../types/eventTypes";
 import { useEventInscriptions } from "./useEventInscriptions";
 import { useEventPayment } from "./useEventPayment";
-import { useInvalidateEventsQuery } from "./useEventsQuery";
 
 export function useFormEditEvent(event: Event) {
   const { user } = useCurrentUser();

@@ -2,8 +2,8 @@
 
 import CreateAvulsaForm from "@/features/avulsa/components/CreateAvulsaForm";
 import { useCreateAvulsaRegistration } from "@/features/avulsa/hooks/useCreateAvulsaRegistration";
-import type { CreateAvulsaFormData } from "@/features/avulsa/schema/avulsaSchema";
-import type { CreateInscriptionAvulInput } from "@/features/avulsa/types/avulsaTypes";
+import type { CreateAvulsaFormData } from "@/features/inscriptions/schema/avulsa/avulsaSchema";
+import type { CreateInscriptionAvulInput } from "@/features/inscriptions/types/avulsa/avulsaTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";

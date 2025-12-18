@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { CreateInscriptionAvulInput } from "../types/avulsaTypes";
+import { CreateInscriptionAvulInput } from "../../inscriptions/types/avulsa/avulsaTypes";
 
 export async function createAvulsaRegistration(
   input: CreateInscriptionAvulInput
