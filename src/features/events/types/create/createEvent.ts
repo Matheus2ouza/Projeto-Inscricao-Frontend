@@ -1,4 +1,4 @@
-export type { EventFormType } from "../../schema/create/CreateEventSchema";
+export type { CreateEventFormType } from "../../schema/create/CreateEventSchema";
 export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
 
 export type CreateEventResponsible = {
