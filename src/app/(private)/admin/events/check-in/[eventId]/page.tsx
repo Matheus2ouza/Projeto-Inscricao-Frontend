@@ -1,12 +1,12 @@
 "use client";
 
-import CheckInPageContent from "@/features/checkin/components/CheckInPageContent";
-import { useCheckInAccounts } from "@/features/checkin/hooks/useCheckInAccounts";
-import { useCheckInEventInfo } from "@/features/checkin/hooks/useCheckInEventInfo";
+import CheckInPageContent from "@/features/events/components/check-in/CheckInPageContent";
+import { useCheckInAccounts } from "@/features/events/hooks/check-in/useCheckInAccounts";
+import { useCheckInEventInfo } from "@/features/events/hooks/check-in/useCheckInEventInfo";
 import {
   CheckInAccount,
   CheckInEventInfo,
-} from "@/features/checkin/types/checkInTypes";
+} from "@/features/events/types/check-in/checkInTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -35,7 +35,7 @@ export default function CheckInAdminPage() {
 
   const {
     data: accountsData,
-    isLoading: accountsLoading,
+    isLoading,
     error: accountsError,
     refetch: refetchAccounts,
   } = useCheckInAccounts(eventId ?? "", page, pageSize, onlyWithDebt);
@@ -43,7 +43,7 @@ export default function CheckInAdminPage() {
   const {
     data: eventInfo,
     isLoading: eventLoading,
-    error: eventError,
+    error,
     refetch: refetchEvent,
   } = useCheckInEventInfo(eventId ?? "");
 
@@ -74,15 +74,7 @@ export default function CheckInAdminPage() {
     window.localStorage.setItem(STORAGE_KEY, String(pageSize));
   }, [pageSize]);
 
-  const handleBack = () => {
-    router.push("/admin/events/check-in");
-  };
-
-  const handleCheckInDetails = (accountId: string) => {
-    router.push(`/admin/events/check-in/${eventId}/details/${accountId}`);
-  };
-
-  const renderLoading = () => (
+  const renderSkeletonGrid = () => (
     <div className="space-y-6">
       <Card className="border-0 shadow-sm">
         <CardContent className="p-6 flex flex-col gap-4">
@@ -105,26 +97,66 @@ export default function CheckInAdminPage() {
     </div>
   );
 
-  const renderError = () => {
-    const message =
-      (eventError instanceof Error ? eventError.message : null) ||
-      (accountsError instanceof Error ? accountsError.message : null) ||
-      "Não foi possível carregar as informações para check-in.";
+  const renderContent = () => {
+    if (isLoading) {
+      return renderSkeletonGrid()
+    }
+
+    if (error) {
+      const message =
+        (error instanceof Error ? error.message : null) ||
+        (accountsError instanceof Error ? accountsError.message : null) ||
+        "Não foi possível carregar as informações para check-in.";
+
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 text-center py-12">
+          <p className="text-red-600 font-semibold">{message}</p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              refetchEvent();
+              refetchAccounts();
+            }}
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      );
+    }
+
+    if (!eventInfoCache) {
+      return null
+    }
 
     return (
-      <div className="flex flex-col items-center justify-center gap-4 text-center py-12">
-        <p className="text-red-600 font-semibold">{message}</p>
-        <Button
-          variant="outline"
-          onClick={() => {
-            refetchEvent();
-            refetchAccounts();
-          }}
-        >
-          Tentar novamente
-        </Button>
-      </div>
-    );
+      <CheckInPageContent
+        event={eventInfoCache}
+        accounts={tableAccounts}
+        page={page}
+        pageCount={accountsData?.pageCount ?? 0}
+        onPageChange={setPage}
+        pageSize={pageSize}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
+        tableLoading={isLoading}
+        onlyWithDebt={onlyWithDebt}
+        onOnlyWithDebtChange={(value) => {
+          setOnlyWithDebt(value);
+          setPage(1);
+        }}
+        onAccountClick={handleCheckInDetails}
+      />
+    )
+  }
+
+  const handleBack = () => {
+    router.push("/admin/events/check-in");
+  };
+
+  const handleCheckInDetails = (accountId: string) => {
+    router.push(`/admin/events/check-in/${eventId}/details/${accountId}`);
   };
 
   return (
@@ -134,33 +166,7 @@ export default function CheckInAdminPage() {
       showBackButton
       backButtonAction={handleBack}
     >
-      {eventLoading && !eventInfoCache && renderLoading()}
-      {(eventError || accountsError) && !eventLoading && renderError()}
-      {eventInfoCache && (
-        <CheckInPageContent
-          event={eventInfoCache}
-          accounts={tableAccounts}
-          page={page}
-          pageCount={accountsData?.pageCount ?? 0}
-          onPageChange={setPage}
-          pageSize={pageSize}
-          onPageSizeChange={(size) => {
-            setPageSize(size);
-            setPage(1);
-          }}
-          tableLoading={accountsLoading}
-          onlyWithDebt={onlyWithDebt}
-          onOnlyWithDebtChange={(value) => {
-            setOnlyWithDebt(value);
-            setPage(1);
-          }}
-          onAccountClick={(accountId) =>
-            router.push(
-              `/admin/events/check-in/${eventId}/details/${accountId}`
-            )
-          }
-        />
-      )}
+      {renderContent()}
     </PageContainer>
   );
 }

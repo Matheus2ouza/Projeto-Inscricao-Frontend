@@ -3,14 +3,17 @@ export type Region = {
   Name: string;
 };
 
+export type UserRole = "SUPER" | "ADMIN" | "MANAGER" | "USER";
+
 export type User = {
   id: string;
   username: string;
-  role: string;
+  role: UserRole;
   email: string | null;
   region: Region | null;
   image: string | null;
 };
+
 export type LoginServiceInput = {
   username: string;
   password: string;

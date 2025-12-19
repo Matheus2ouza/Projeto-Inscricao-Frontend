@@ -2,7 +2,7 @@
 
 import PaymentsAnalysisTable from "@/features/analysis/payment/components/PaymentsAnalysisTable";
 import { useAnalysisPaymentsQuery } from "@/features/analysis/payment/hooks/useAnalysisInscriptionsQuery";
-import { useEvent } from "@/features/events/hooks/useEvent";
+import { useEventManager } from "@/features/events/hooks/manager/useEventManager";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -24,7 +24,7 @@ export default function EventInscriptionsAnalysisAdminPage() {
   const router = useRouter();
   const eventId = params.id as string;
 
-  const { event, loading: eventLoading, error: eventError } = useEvent(eventId);
+  const { event, isLoading, error: eventError } = useEventManager(eventId);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
 
@@ -34,7 +34,7 @@ export default function EventInscriptionsAnalysisAdminPage() {
     error: analysisError,
   } = useAnalysisPaymentsQuery(eventId, page, pageSize);
 
-  const loading = eventLoading || analysisLoading;
+  const loading = isLoading || analysisLoading;
   const error = eventError
     ? new Error(eventError)
     : analysisError instanceof Error

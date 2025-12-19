@@ -1,7 +1,7 @@
 "use client";
 
-import { UserTicketsByEvent } from "@/features/tickets/components/UserTicketsByEvent";
-import { useTicketsByEvent } from "@/features/tickets/hooks/useTicketsByEvent";
+import { UserTicketsByEvent } from "@/features/tickets/components/list-tickets-user/UserTicketsByEvent";
+import { useTicketsByEvent } from "@/features/tickets/hooks/analysis/useTicketsByEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -63,40 +63,23 @@ export default function TicketsByEventPage() {
     </div>
   );
 
-  const renderError = () => {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Não foi possível carregar os tickets deste evento.";
-
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 text-center py-12">
-        <div>
-          <p className="text-red-600 dark:text-red-400 font-semibold">
-            Falha ao carregar dados do evento.
-          </p>
-          <p className="text-muted-foreground mt-1 max-w-md">{message}</p>
-        </div>
-        <Button onClick={() => refetch()} variant="outline">
-          Tentar novamente
-        </Button>
-      </div>
-    );
-  };
-
   const renderContent = () => {
     if (isLoading) {
       return renderLoading();
     }
 
     if (error) {
-      return renderError();
-    }
-
-    if (!eventTickets) {
       return (
-        <div className="text-center text-muted-foreground py-12">
-          Nenhuma informação do evento encontrada.
+        <div className="flex flex-col items-center justify-center gap-4 text-center py-12">
+          <div>
+            <p className="text-red-600 dark:text-red-400 font-semibold">
+              Falha ao carregar dados do evento.
+            </p>
+            <p className="text-muted-foreground mt-1 max-w-md">{error.message}</p>
+          </div>
+          <Button onClick={() => refetch()} variant="outline">
+            Tentar novamente
+          </Button>
         </div>
       );
     }

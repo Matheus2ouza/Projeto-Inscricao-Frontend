@@ -1,7 +1,7 @@
 "use client";
 
-import TicketSalesListContent from "@/features/tickets/components/TicketSalesListContent";
-import { useListPreSales } from "@/features/tickets/hooks/useListPreSales";
+import TicketSalesListContent from "@/features/tickets/components/list-sales/TicketSalesListContent";
+import { useListPreSales } from "@/features/tickets/hooks/list-sales/useListPreSales";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -12,6 +12,11 @@ export default function ListSalesAdminPage() {
   const router = useRouter();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
+
+  if (!eventId) {
+    router.back();
+    return null;
+  }
 
   const {
     sales,
@@ -24,7 +29,7 @@ export default function ListSalesAdminPage() {
     error,
     refetch,
     setPage,
-  } = useListPreSales(eventId ?? "", { initialPage: 1, pageSize: 10 });
+  } = useListPreSales(eventId, { initialPage: 1, pageSize: 10 });
 
   if (!eventId) {
     return null;

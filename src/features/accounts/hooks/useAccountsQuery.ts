@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAccont, type AccountDto } from "../api/getUsersCombobox";
-import { AccountRole } from "../types/accounts.types";
+import { getAccont } from "../api/getUsersCombobox";
+import { AccountResponse, AccountRole } from "../types/accounts.types";
 
 export const accountsKeys = {
   all: ["accounts"] as const,
@@ -17,9 +17,9 @@ export function useAccountsComboboxQuery(
   roles?: AccountRole[]
 ) {
 
-  return useQuery<AccountDto[]>({
+  return useQuery<AccountResponse[]>({
     queryKey: [...accountsKeys.combobox(), { roles }],
-    queryFn: () => getAccont({ roles }),
+    queryFn: () => getAccont(),
     enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

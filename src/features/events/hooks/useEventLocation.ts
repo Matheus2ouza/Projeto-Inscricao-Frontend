@@ -3,8 +3,8 @@
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { useState } from "react";
 import { toast } from "sonner";
-import { updateEventLocation } from "../api/updateEventLocation";
-import { useInvalidateEventsQuery } from "./useEventsQuery";
+import { useInvalidateEventsQuery } from "../../expenses/hooks/useSelectEventsQuery";
+import { updateEventLocation } from "../api/eventActions/updateEventLocation";
 
 export function useEventLocation() {
   const [loading, setLoading] = useState(false);

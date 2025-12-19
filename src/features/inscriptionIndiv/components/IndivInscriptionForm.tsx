@@ -24,7 +24,7 @@ import {
 } from "@/shared/components/ui/popover";
 import { cn } from "@/shared/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useFormIndividualInscription } from "../hooks/useFormIndividualInscription";
+import { useFormCreateIndividualInscription } from "../hooks/useFormCreateIndividualInscription";
 
 interface IndividualInscriptionFormProps {
   eventId: string;
@@ -41,7 +41,7 @@ export default function IndividualInscriptionForm({
     handleInputChange,
     handleSubmit,
     register,
-  } = useFormIndividualInscription({ eventId });
+  } = useFormCreateIndividualInscription({ eventId });
 
   return (
     <Card>

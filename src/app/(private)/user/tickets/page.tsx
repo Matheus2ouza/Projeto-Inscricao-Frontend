@@ -1,26 +1,43 @@
 "use client";
 
-import ListEventsForTicket from "@/features/events/components/ListEventsForTicket";
-import { useTicketsEvents } from "@/features/events/hooks/useEventsForTicket";
+import SelectedEvent from "@/features/tickets/components/SelectedEvent";
+import { useSelectEvents } from "@/features/tickets/hooks/useSelectEvent";
+import type { StatusEvent } from "@/features/tickets/types/selectEvent";
+import { Event } from "@/features/tickets/types/selectEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SelectedEventTicketsPage() {
   const router = useRouter();
-  const { events, total, page, pageCount, loading, error, setPage, refetch } =
-    useTicketsEvents({
-      pageSize: 10,
+  const { user } = useCurrentUser();
+  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
+  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
+  const { events, page, pageCount, setPage, loading, error, refetch } =
+    useSelectEvents({
+      initialPage: 1,
+      pageSize: 8,
+      status: appliedFilter.length > 0 ? appliedFilter : undefined,
     });
 
-  const handleSelectEvent = (eventId: string) => {
-    router.push(`/user/tickets/${eventId}`);
+  const handleStatusChange = (value: StatusEvent[]) => {
+    setPendingFilter(value);
   };
 
-  const handleBack = () => {
-    router.push("/user/home");
+  const handleApplyStatusFilter = () => {
+    setAppliedFilter(pendingFilter);
+    setPage(1);
   };
+
+  const getInfoRows = (event: Event) => [
+    {
+      label: "Total de tickets",
+      value: event.countTickets
+    },
+  ]
 
   const renderSkeletonGrid = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -66,16 +83,30 @@ export default function SelectedEventTicketsPage() {
     }
 
     return (
-      <ListEventsForTicket
+      <SelectedEvent
         events={events}
-        total={total}
+        role={user.role}
+        buttonLabel="Visualizar tickets"
         page={page}
         pageCount={pageCount}
-        setPage={setPage}
-        onSelectEvent={handleSelectEvent}
+        onPageChange={setPage}
+        onViewEvent={handleViewEvent}
+        statusFilter={pendingFilter}
+        onStatusFilterChange={handleStatusChange}
+        onApplyStatusFilter={handleApplyStatusFilter}
+        getInfoRows={getInfoRows}
       />
     );
   };
+
+  const handleViewEvent = (eventId: string) => {
+    router.push(`/user/tickets/${eventId}`);
+  };
+
+  const handleBack = () => {
+    router.push("/user/home");
+  };
+
   return (
     <PageContainer
       title="Tickets de Alimentação"

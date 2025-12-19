@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { eventsKeys } from "../../expenses/hooks/useSelectEventsQuery";
 import { getDetailsEvent } from "../api/getdetailsEvent";
 import { FindDetailsEventResponse } from "../types/eventTypes";
-import { eventsKeys } from "./useEventsQuery";
 
 export function useDetailsEvent(eventId: string) {
   const {

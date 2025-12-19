@@ -22,7 +22,7 @@ import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { Download, User, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Accounts } from "../types/participantsTypes";
+import { Accounts } from "../../events/types/checkout/checkoutTypes";
 
 interface ParticipantsTableProps {
   eventId: string;

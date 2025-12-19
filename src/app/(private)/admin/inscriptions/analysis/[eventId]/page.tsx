@@ -1,0 +1,52 @@
+"use client";
+
+import InscriptionsAnalysisTable from "@/features/inscriptions/components/analysis/InscriptionsAnalysisTable";
+import { useInscriptionsForAnalysis } from "@/features/inscriptions/hooks/analysis/useInscriptionsForAnalysis";
+import PageContainer from "@/shared/components/layout/PageContainer";
+import { useParams, useRouter } from "next/navigation";
+
+export default function EventInscriptionsAnalysisAdminPage() {
+  const params = useParams();
+  const router = useRouter();
+  const rawEventId = params.eventId;
+  const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
+
+  if (!eventId) {
+    return null;
+  }
+
+  const { analysisData, loading, error, page, pageCount, total, setPage } =
+    useInscriptionsForAnalysis({
+      eventId,
+      initialPage: 1,
+      pageSize: 15,
+    });
+  const handleBack = () => {
+    router.push("/admin/inscriptions/analysis");
+  };
+
+  const handleViewInscription = (inscriptionId: string) => {
+    router.push(`/admin/inscriptions/analysis/inscription/${inscriptionId}`);
+  };
+
+  return (
+    <PageContainer
+      title="Inscrições do Evento"
+      description="Veja os detalhes das inscrições e avance na análise."
+      showBackButton
+      backButtonAction={handleBack}
+    >
+      <InscriptionsAnalysisTable
+        analysisData={analysisData}
+        loading={loading}
+        error={error}
+        page={page}
+        pageCount={pageCount}
+        total={total}
+        onPageChange={setPage}
+        onViewInscription={handleViewInscription}
+        listPath="/admin/inscriptions/analysis"
+      />
+    </PageContainer>
+  );
+}

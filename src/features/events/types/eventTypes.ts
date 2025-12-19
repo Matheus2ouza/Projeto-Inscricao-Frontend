@@ -1,5 +1,8 @@
 import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
 
+export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
+export const STATUS_EVENT_VALUES: StatusEvent[] = ["OPEN", "CLOSE", "FINALIZED"];
+
 export type Responsible = {
   id: string;
   name: string;
@@ -52,6 +55,7 @@ export type UseEventsNameResult = {
 export type UseEventsParams = {
   initialPage?: number;
   pageSize?: number;
+  status?: StatusEvent[];
 };
 
 export type getAllEventsResponse = {
@@ -95,7 +99,6 @@ export type TypeInscription = {
   value: number;
 };
 
-export type statusEvent = "OPEN" | "CLOSE" | "FINALIZED";
 
 export type FindDetailsEventResponse = {
   id: string;
@@ -106,7 +109,7 @@ export type FindDetailsEventResponse = {
   location?: string;
   longitude?: number | null;
   latitude?: number | null;
-  status: statusEvent;
+  status: StatusEvent;
   paymentEnabled: boolean;
   regionName?: string;
   typeInscriptions: TypeInscription[];

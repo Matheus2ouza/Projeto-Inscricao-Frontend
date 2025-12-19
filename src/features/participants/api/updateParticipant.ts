@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { UpdateParticipantInput } from "../types/participantsTypes";
+import { UpdateParticipantInput } from "../../events/types/checkout/checkoutTypes";
 
 export async function updateParticipant(participantId: string, input: UpdateParticipantInput) {
   try {
