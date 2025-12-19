@@ -1,8 +1,8 @@
-import axiosInstance from "@/shared/lib/apiClient";
 import {
   FindAllPaginatedEventExpensesRequest,
   FindAllPaginatedEventExpensesResponse,
-} from "../types/expensesTypes";
+} from "@/features/expenses/types/expensesTypes";
+import axiosInstance from "@/shared/lib/apiClient";
 
 export async function getExpensesByEvent(
   eventId: string,

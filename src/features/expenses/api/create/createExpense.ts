@@ -1,8 +1,8 @@
-import axiosInstance from "@/shared/lib/apiClient";
 import {
   CreateExpenseRequest,
   CreateExpenseResponse,
-} from "../types/expensesTypes";
+} from "@/features/expenses/types/expensesTypes";
+import axiosInstance from "@/shared/lib/apiClient";
 
 export async function createExpense(
   expenseData: CreateExpenseRequest
