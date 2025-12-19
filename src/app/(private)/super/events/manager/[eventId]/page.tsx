@@ -1,7 +1,7 @@
 "use client";
 
 import EventManagement from "@/features/events/components/EventManagement";
-import { useEvent } from "@/features/events/hooks/manager/useEventManager";
+import { useEventManager } from "@/features/events/hooks/manager/useEventManager";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -18,7 +18,7 @@ export default function EventManagementSuperPage() {
     return null;
   }
 
-  const { event, loading: eventLoading, error, refetch } = useEvent(eventId);
+  const { event, isLoading, error, refetch } = useEventManager(eventId);
 
   const handleBack = () => {
     router.replace(`/super/events/manager`);
@@ -62,7 +62,7 @@ export default function EventManagementSuperPage() {
   };
 
   const renderContent = () => {
-    if (eventLoading) {
+    if (isLoading) {
       renderSkeletonGrid();
     }
     if (error) {
