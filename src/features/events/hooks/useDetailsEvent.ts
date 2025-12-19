@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { eventsKeys } from "../../gastos/hooks/useSelectEventsQuery";
+import { eventsKeys } from "../../expenses/hooks/useSelectEventsQuery";
 import { getDetailsEvent } from "../api/getdetailsEvent";
 import { FindDetailsEventResponse } from "../types/eventTypes";
 

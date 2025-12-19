@@ -1,6 +1,10 @@
 "use client";
 
+import { UserRole } from "@/features/auth/types/loginTypes";
+import { Event, EVENT_STATUS_OPTIONS, StatusEvent } from "@/features/expenses/types/selectEvent";
+import EventStatusFilter from "@/shared/components/EventStatusFilter";
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
   Pagination,
@@ -13,11 +17,11 @@ import {
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
+import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Card, CardBody, CardFooter } from "@heroui/react";
-import { Loader2 } from "lucide-react";
+import { Frown, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { Event } from "../types/selectEvent";
 
 type InfoRow = {
   label: string;
@@ -26,33 +30,34 @@ type InfoRow = {
 
 interface SpensTableProps {
   events: Event[];
+  role?: UserRole;
+  buttonLabel: string;
   page: number;
   pageCount: number;
-  onPageChange: (page: number) => void;
-  onViewEvent: (eventId: string) => void;
+  statusFilter: StatusEvent[];
   getInfoRows?: (event: Event) => InfoRow[];
+  onPageChange: (page: number) => void;
+  onViewEvent?: (eventId: string) => void;
+  onStatusFilterChange: (value: StatusEvent[]) => void;
+  onApplyStatusFilter: () => void;
 }
 
 export default function SelectedEventForExpenses({
   events,
+  role,
+  buttonLabel,
   page,
   pageCount,
+  statusFilter,
   onPageChange,
   onViewEvent,
-  getInfoRows,
+  onStatusFilterChange,
+  onApplyStatusFilter,
+  getInfoRows
 }: SpensTableProps) {
-  const [imageLoading, setImageLoading] = useState(true);
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
-
-  const handleViewExpenses = (eventId: string) => {
-    onViewEvent(eventId);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    onPageChange(newPage);
-  };
 
   // Função para quando a imagem carregar
   const handleImageLoad = (eventId: string) => {
@@ -71,26 +76,46 @@ export default function SelectedEventForExpenses({
   };
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="space-y-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <EventStatusFilter
+            options={EVENT_STATUS_OPTIONS}
+            value={statusFilter}
+            onChange={onStatusFilterChange}
+            className="w-full sm:w-[220px]"
+          />
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs"
+            onClick={onApplyStatusFilter}
+          >
+            Aplicar
+          </Button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {events.map((event) => {
+          const statusInfo = getEventStatusInfo(event.status);
           const gradientClass = getGradientClass(event.name);
           const isImageLoading = event.imageUrl
             ? imageLoadingStates[event.id] !== false
             : false;
+
           return (
             <Card
               key={event.id}
-              className="w-full hover:shadow-xl transition-all duration-300 border-0 shadow-md rounded-xl overflow-hidden hover:scale-[1.02]"
+              className="w-full hover:shadow-xl transition-all duration-300 border border-transparent shadow-md rounded-xl overflow-hidden hover:scale-[1.02] bg-white dark:bg-zinc-900"
             >
-              <CardBody className="p-0 relative">
+              <CardBody className="p-0 relative overflow-visible">
                 <AspectRatio ratio={16 / 9} className="w-full">
                   <div className="relative h-full w-full">
                     {event.imageUrl ? (
                       <>
-                        {/* Loading overlay para a imagem */}
                         {isImageLoading && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-muted z-10">
+                          <div className="absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-muted/40 z-10">
                             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                           </div>
                         )}
@@ -114,15 +139,15 @@ export default function SelectedEventForExpenses({
                             if (parent) {
                               parent.innerHTML = `
                                 <div class="w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center">
-                                <span class="text-white font-bold text-lg text-center px-4">${event.name}</span>
+                                <span class="text-white text-5xl sm:text-6xl md:text-7xl font-semibold tracking-wide text-center px-4">${event.name}</span>
                                 </div>
                                 `;
                             }
+                            handleImageLoad(event.id);
                           }}
                         />
                       </>
                     ) : (
-                      // Gradiente quando não há imagem
                       <div
                         className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
                       >
@@ -133,8 +158,15 @@ export default function SelectedEventForExpenses({
                     )}
                   </div>
                 </AspectRatio>
+                {!isImageLoading && (
+                  <div className="absolute top-2 right-2 select-none">
+                    <Badge className={`${statusInfo.badgeClass} border-0`}>
+                      {statusInfo.label}
+                    </Badge>
+                  </div>
+                )}
               </CardBody>
-              <CardFooter className="flex flex-col items-start p-4 gap-3">
+              <CardFooter className="flex flex-col items-start p-4 gap-3 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
                 <h3
                   className={`font-bold ${getFontSizeClass(event.name)} line-clamp-2 text-gray-900 dark:text-white`}
                 >
@@ -145,13 +177,13 @@ export default function SelectedEventForExpenses({
                   {(
                     getInfoRows?.(event) ?? [
                       {
-                        label: "Gastos Registrados",
-                        value: event.countExpenses,
+                        label: "Total de Localidades",
+                        value: event.countExpenses
                       },
                       {
-                        label: "Total de Gastos",
-                        value: event.countTotalExpenses,
-                      },
+                        label: "Total de Participantes",
+                        value: event.countTotalExpenses
+                      }
                     ]
                   ).map(({ label, value }) => (
                     <div
@@ -162,11 +194,10 @@ export default function SelectedEventForExpenses({
                         {label}
                       </span>
                       <span
-                        className={`font-semibold ${
-                          label.toLowerCase().includes("pendentes")
-                            ? "text-yellow-600 dark:text-yellow-400"
-                            : ""
-                        }`}
+                        className={`font-semibold ${label.toLowerCase().includes("pendentes")
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : ""
+                          }`}
                       >
                         {value}
                       </span>
@@ -174,14 +205,13 @@ export default function SelectedEventForExpenses({
                   ))}
                 </div>
 
-                {/* Botões de Inscrição */}
                 <div className="flex flex-col w-full gap-2 mt-2">
                   <Button
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
-                    onClick={() => handleViewExpenses(event.id)}
+                    onClick={() => onViewEvent?.(event.id)}
                   >
-                    Visualizar Gastos
+                    {buttonLabel}
                   </Button>
                 </div>
               </CardFooter>
@@ -191,13 +221,9 @@ export default function SelectedEventForExpenses({
       </div>
 
       {events.length === 0 && (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-            Nenhum evento encontrado
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Não há eventos disponíveis no momento.
-          </p>
+        <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-2">
+          <Frown className="w-10 h-10" />
+          <p>Nenhum evento disponível no momento.</p>
         </div>
       )}
 
@@ -207,7 +233,7 @@ export default function SelectedEventForExpenses({
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
-                  onClick={() => page > 1 && handlePageChange(page - 1)}
+                  onClick={() => page > 1 && onPageChange(page - 1)}
                   href={page > 1 ? "#" : undefined}
                   className={page === 1 ? "pointer-events-none opacity-50" : ""}
                 />
@@ -218,7 +244,7 @@ export default function SelectedEventForExpenses({
                   <PaginationLink
                     isActive={page === i + 1}
                     href="#"
-                    onClick={() => handlePageChange(i + 1)}
+                    onClick={() => onPageChange(i + 1)}
                   >
                     {i + 1}
                   </PaginationLink>
@@ -227,7 +253,7 @@ export default function SelectedEventForExpenses({
 
               <PaginationItem>
                 <PaginationNext
-                  onClick={() => page < pageCount && handlePageChange(page + 1)}
+                  onClick={() => page < pageCount && onPageChange(page + 1)}
                   href={page < pageCount ? "#" : undefined}
                   className={
                     page === pageCount ? "pointer-events-none opacity-50" : ""
@@ -236,6 +262,18 @@ export default function SelectedEventForExpenses({
               </PaginationItem>
             </PaginationContent>
           </Pagination>
+        </div>
+      )}
+
+      {pageCount > 1 && (
+        <div className="text-sm text-muted-foreground text-right">
+          <p>
+            Mostrando {events.length} de {pageCount} evento
+            {pageCount !== 1 ? "s" : ""}
+          </p>
+          <p className="text-xs">
+            Página {page} de {pageCount}
+          </p>
         </div>
       )}
     </div>

@@ -1,9 +1,9 @@
 import { StatusEvent } from "@/features/events/types/selectEvent";
-import { getEvents } from "@/features/gastos/api/getEvents";
+import { getEvents } from "@/features/expenses/api/getEvents";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Chaves de query para organização
 export const eventsKeys = {
-  all: ["events"] as const,
+  all: ["events-expenses"] as const,
   lists: () => [...eventsKeys.all, "list"] as const,
   list: (page: number, pageSize: number, status?: StatusEvent[]) =>
     [...eventsKeys.lists(), { page, pageSize, status }] as const,

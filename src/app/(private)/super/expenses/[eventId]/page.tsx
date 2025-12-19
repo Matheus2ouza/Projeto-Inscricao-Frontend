@@ -1,8 +1,8 @@
 "use client";
 
-import ExpensesByEvent from "@/features/gastos/components/ExpensesByEvent";
-import { useCreateExpense } from "@/features/gastos/hooks/create/useCreateExpense";
-import { useExpensesByEvent } from "@/features/gastos/hooks/useExpensesByEvent";
+import ExpensesByEvent from "@/features/expenses/components/ExpensesByEvent";
+import { useCreateExpense } from "@/features/expenses/hooks/create/useCreateExpense";
+import { useExpensesByEvent } from "@/features/expenses/hooks/useExpensesByEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Card, CardContent, CardFooter } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";

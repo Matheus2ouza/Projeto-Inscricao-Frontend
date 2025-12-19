@@ -1,8 +1,8 @@
 "use client";
 
+import { getExpensesByEvent } from "@/features/expenses/api/listExpenses/getExpensesByEvent";
+import { expensesKeys } from "@/features/expenses/types/expensesTypes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getExpensesByEvent } from "../api/listExpenses/getExpensesByEvent";
-import { expensesKeys } from "../types/expensesTypes";
 
 interface UseExpensesByEventParams {
   eventId: string;

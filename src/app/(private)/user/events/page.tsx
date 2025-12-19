@@ -1,6 +1,6 @@
 "use client";
 
-import { useEventsAll } from "@/features/gastos/hooks/useSelectEvents";
+import { useEventsAll } from "@/features/expenses/hooks/useSelectEvents";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {

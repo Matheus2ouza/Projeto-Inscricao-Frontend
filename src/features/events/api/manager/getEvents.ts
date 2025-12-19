@@ -1,5 +1,5 @@
 import { getAllEventsResponse } from "@/features/events/types/eventTypes";
-import type { StatusEvent } from "@/features/gastos/types/selectEvent";
+import type { StatusEvent } from "@/features/expenses/types/selectEvent";
 import axiosInstance from "@/shared/lib/apiClient";
 import qs from "qs";
 

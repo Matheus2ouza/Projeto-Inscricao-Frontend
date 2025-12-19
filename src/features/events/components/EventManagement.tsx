@@ -30,7 +30,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../gastos/hooks/useSelectEventsQuery";
+import { useInvalidateEventsQuery } from "../../expenses/hooks/useSelectEventsQuery";
 import { deleteImageEvent } from "../api/eventActions/deleteImageEvent";
 import { deleteLogoEvent } from "../api/eventActions/deleteLogoEvent";
 import { updateEventImage } from "../api/eventActions/updateEventImage";

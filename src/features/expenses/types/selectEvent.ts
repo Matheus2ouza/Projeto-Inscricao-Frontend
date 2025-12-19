@@ -1,3 +1,5 @@
+import { EventStatusOption } from "@/shared/components/EventStatusFilter";
+
 export type Event = {
   id: string;
   name: string;
@@ -10,6 +12,12 @@ export type Event = {
 };
 export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
 export const STATUS_EVENT_VALUES: StatusEvent[] = ["OPEN", "CLOSE", "FINALIZED"];
+
+export const EVENT_STATUS_OPTIONS: EventStatusOption[] = [
+  { value: "OPEN", label: "Inscrições Abertas" },
+  { value: "CLOSE", label: "Inscrições Fechadas" },
+  { value: "FINALIZED", label: "Finalizados" },
+];
 
 export type UseEventsParams = {
   initialPage?: number;

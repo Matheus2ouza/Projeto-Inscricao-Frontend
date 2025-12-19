@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { STATUS_EVENT_VALUES, UseEventsParams, UseEventsResult } from "../types/selectEvent";
 import {
   usePrefetchSelectEvents,
   useSelectEventsQuery,
-} from "./useSelectEventsQuery";
+} from "@/features/expenses/hooks/useSelectEventsQuery";
+import { STATUS_EVENT_VALUES, UseEventsParams, UseEventsResult } from "@/features/expenses/types/selectEvent";
+import { useEffect, useState } from "react";
 
 export function useSelectEvents({
   initialPage = 1,
