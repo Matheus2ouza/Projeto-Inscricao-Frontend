@@ -1,4 +1,4 @@
-import { eventsKeys } from "@/features/gastos/hooks/useEventsQuery";
+import { eventsKeys } from "@/features/gastos/hooks/useSelectEventsQuery";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { confirmGroupInscription } from "../api/confirmGroupInscription";
 import { submitGroupInscription } from "../api/submitGroupInscription";

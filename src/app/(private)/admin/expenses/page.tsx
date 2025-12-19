@@ -1,7 +1,7 @@
 "use client";
 
 import SelectedEventForExpenses from "@/features/gastos/components/SelectEventForExpenses";
-import { useEventsAll } from "@/features/gastos/hooks/useEventsAll";
+import { useEventsAll } from "@/features/gastos/hooks/useSelectEvents";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";

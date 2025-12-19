@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UseParticipantsParams, UseParticipantsResult } from "../types/participantsTypes";
+import { UseParticipantsParams, UseParticipantsResult } from "../../events/types/checkout/checkoutTypes";
 import {
   useParticipantsQuery,
   usePrefetchParticipants,

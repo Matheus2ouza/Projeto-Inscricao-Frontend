@@ -1,7 +1,7 @@
 import { useCurrentUser } from "@/shared/context/user-context";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../gastos/hooks/useEventsQuery";
+import { useInvalidateEventsQuery } from "../../gastos/hooks/useSelectEventsQuery";
 import { deleteEvent } from "../api/eventActions/deleteEvent";
 import { updateEvent } from "../api/eventActions/updateEvent";
 import { Event, UpdateEventInput } from "../types/eventTypes";

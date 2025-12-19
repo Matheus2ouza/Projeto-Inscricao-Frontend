@@ -1,7 +1,7 @@
 "use client";
 
-import CheckInAccountDetails from "@/features/checkin/components/CheckInAccountDetails";
-import { useCheckInAccountDetails } from "@/features/checkin/hooks/useCheckInAccountDetails";
+import CheckInAccountDetails from "@/features/events/components/check-in/details/CheckInAccountDetails";
+import { useCheckInAccountDetails } from "@/features/events/hooks/check-in/details/useCheckInAccountDetails";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -25,28 +25,45 @@ export default function CheckInAccountDetailsAdminPage() {
 
   const handleBack = () => router.back();
 
-  const renderLoading = () => (
-    <Card className="border-0 shadow-sm">
+  const renderSkeletonGrid = () => {
+    return (<Card className="border-0 shadow-sm">
       <CardContent className="p-6 space-y-4">
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-3/4" />
       </CardContent>
     </Card>
-  );
+    )
+  }
 
-  const renderError = () => (
-    <div className="text-center py-12">
-      <p className="text-red-600 font-semibold">
-        {error instanceof Error
-          ? error.message
-          : "Não foi possível carregar os detalhes."}
-      </p>
-      <Button variant="outline" onClick={() => refetch()}>
-        Tentar novamente
-      </Button>
-    </div>
-  );
+  const renderContent = () => {
+    if (isLoading) {
+      return renderSkeletonGrid()
+    }
+
+    if (error) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-red-600 font-semibold">
+            {error instanceof Error
+              ? error.message
+              : "Não foi possível carregar os detalhes."}
+          </p>
+          <Button variant="outline" onClick={() => refetch()}>
+            Tentar novamente
+          </Button>
+        </div>
+      )
+    }
+
+    if (!data) {
+      return null
+    }
+
+    return (
+      <CheckInAccountDetails account={data} />
+    )
+  }
 
   return (
     <PageContainer
@@ -55,9 +72,7 @@ export default function CheckInAccountDetailsAdminPage() {
       showBackButton
       backButtonAction={handleBack}
     >
-      {isLoading && renderLoading()}
-      {error && !isLoading && renderError()}
-      {data && <CheckInAccountDetails account={data} />}
+      {renderContent()}
     </PageContainer>
   );
 }

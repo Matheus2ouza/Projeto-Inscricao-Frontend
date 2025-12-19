@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ListParticipantsResponse } from "../../events/types/checkout/checkoutTypes";
 import { getParticipants } from "../api/getParticipants";
-import { ListParticipantsResponse } from "../types/participantsTypes";
 
 // Chaves de query para organização - específicas para participantes
 export const participantsKeys = {

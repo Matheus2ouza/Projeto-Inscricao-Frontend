@@ -1,7 +1,7 @@
 "use client";
 
 import EventManagement from "@/features/events/components/EventManagement";
-import { useEvent } from "@/features/events/hooks/useEvent";
+import { useEvent } from "@/features/events/hooks/manager/useEventManager";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";

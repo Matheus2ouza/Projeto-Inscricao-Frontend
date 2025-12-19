@@ -30,7 +30,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../gastos/hooks/useEventsQuery";
+import { useInvalidateEventsQuery } from "../../gastos/hooks/useSelectEventsQuery";
 import { deleteImageEvent } from "../api/eventActions/deleteImageEvent";
 import { deleteLogoEvent } from "../api/eventActions/deleteLogoEvent";
 import { updateEventImage } from "../api/eventActions/updateEventImage";
@@ -525,27 +525,27 @@ export default function EventManagement({
                   // No modo visualização, mostrar apenas os responsáveis do evento
                   const displayResponsibles = isEditing
                     ? formData.responsibleIds
-                        .map((id) => {
-                          // Tentar encontrar no evento primeiro
-                          const eventResponsible = event.responsibles?.find(
-                            (r) => r.id === id
-                          );
-                          if (eventResponsible) {
-                            return eventResponsible;
-                          }
-                          // Se não encontrar, buscar nas accounts (novo responsável)
-                          const account = accounts.find((acc) => acc.id === id);
-                          if (account) {
-                            return {
-                              id: account.id,
-                              name: account.username,
-                            };
-                          }
-                          return null;
-                        })
-                        .filter(
-                          (r): r is { id: string; name: string } => r !== null
-                        )
+                      .map((id) => {
+                        // Tentar encontrar no evento primeiro
+                        const eventResponsible = event.responsibles?.find(
+                          (r) => r.id === id
+                        );
+                        if (eventResponsible) {
+                          return eventResponsible;
+                        }
+                        // Se não encontrar, buscar nas accounts (novo responsável)
+                        const account = accounts.find((acc) => acc.id === id);
+                        if (account) {
+                          return {
+                            id: account.id,
+                            name: account.username,
+                          };
+                        }
+                        return null;
+                      })
+                      .filter(
+                        (r): r is { id: string; name: string } => r !== null
+                      )
                     : event.responsibles || [];
 
                   return displayResponsibles.length > 0 ? (

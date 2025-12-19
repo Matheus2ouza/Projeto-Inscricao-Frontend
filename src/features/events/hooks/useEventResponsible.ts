@@ -1,7 +1,7 @@
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../gastos/hooks/useEventsQuery";
+import { useInvalidateEventsQuery } from "../../gastos/hooks/useSelectEventsQuery";
 import { deleteEventResponsible } from "../api/eventActions/deleteEventResponsible";
 
 export function useEventResponsible() {

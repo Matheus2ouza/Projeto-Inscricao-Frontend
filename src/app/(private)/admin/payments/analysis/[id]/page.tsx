@@ -2,7 +2,7 @@
 
 import PaymentsAnalysisTable from "@/features/analysis/payment/components/PaymentsAnalysisTable";
 import { useAnalysisPaymentsQuery } from "@/features/analysis/payment/hooks/useAnalysisInscriptionsQuery";
-import { useEvent } from "@/features/events/hooks/useEvent";
+import { useEvent } from "@/features/events/hooks/manager/useEventManager";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";

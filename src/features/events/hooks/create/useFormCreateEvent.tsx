@@ -7,7 +7,7 @@ import { useState } from "react";
 import { DateRange } from "react-day-picker";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../../gastos/hooks/useEventsQuery";
+import { useInvalidateEventsQuery } from "../../../gastos/hooks/useSelectEventsQuery";
 import { registerEvent } from "../../api/create/registerEvent";
 import {
   CreateEventSchema,

@@ -1,7 +1,7 @@
 "use client";
 
-import CheckInAccountDetails from "@/features/checkin/components/CheckInAccountDetails";
-import { useCheckInAccountDetails } from "@/features/checkin/hooks/useCheckInAccountDetails";
+import CheckInAccountDetails from "@/features/check-in/components/CheckInAccountDetails";
+import { useCheckInAccountDetails } from "@/features/events/hooks/check-in/details/useCheckInAccountDetails";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";

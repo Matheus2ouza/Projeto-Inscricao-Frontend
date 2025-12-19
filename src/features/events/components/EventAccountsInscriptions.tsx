@@ -1,6 +1,6 @@
 "use client";
 
-import { getEvent } from "@/features/events/api/getEvent";
+import { getEvent } from "@/features/events/api/manager/getEvent";
 import { useEventAccountsInscriptions } from "@/features/events/hooks/useEventAccountsInscriptions";
 import { useGenerateSelectedInscriptionsPdf } from "@/features/events/hooks/useGenerateSelectedInscriptionsPdf";
 import { AccountWithInscriptions } from "@/features/events/types/eventTypes";
@@ -336,9 +336,8 @@ export default function EventAccountsInscriptions({
               </p>
               <p className="text-xs text-muted-foreground">
                 {hasSelection
-                  ? `${totalSelected} inscrição${
-                      totalSelected === 1 ? "" : "s"
-                    } selecionada${totalSelected === 1 ? "" : "s"}`
+                  ? `${totalSelected} inscrição${totalSelected === 1 ? "" : "s"
+                  } selecionada${totalSelected === 1 ? "" : "s"}`
                   : "Nenhuma inscrição selecionada."}
               </p>
             </div>

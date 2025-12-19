@@ -1,12 +1,12 @@
 "use client";
 
-import CheckInPageContent from "@/features/checkin/components/CheckInPageContent";
-import { useCheckInAccounts } from "@/features/checkin/hooks/useCheckInAccounts";
-import { useCheckInEventInfo } from "@/features/checkin/hooks/useCheckInEventInfo";
+import CheckInPageContent from "@/features/events/components/check-in/CheckInPageContent";
+import { useCheckInAccounts } from "@/features/events/hooks/check-in/useCheckInAccounts";
+import { useCheckInEventInfo } from "@/features/events/hooks/check-in/useCheckInEventInfo";
 import {
   CheckInAccount,
   CheckInEventInfo,
-} from "@/features/checkin/types/checkInTypes";
+} from "@/features/events/types/check-in/checkInTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";

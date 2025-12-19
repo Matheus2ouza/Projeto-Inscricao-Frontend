@@ -1,7 +1,8 @@
 "use client";
 
-import EventsTable from "@/features/events/components/EventsTable";
-import { useEventsAll } from "@/features/gastos/hooks/useEventsAll";
+import SelectedEventManager from "@/features/events/components/manager/SelectedEventManager";
+import { useEventsAll } from "@/features/events/hooks/manager/useEventsAll";
+import { StatusEvent } from "@/features/events/types/selectEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@heroui/react";
@@ -10,8 +11,8 @@ import { useState } from "react";
 
 export default function SelectEventAdminPage() {
   const router = useRouter();
-  const [pendingStatusFilter, setPendingStatusFilter] = useState<string[]>([]);
-  const [appliedStatusFilter, setAppliedStatusFilter] = useState<string[]>([]);
+  const [pendingStatusFilter, setPendingStatusFilter] = useState<StatusEvent[]>([]);
+  const [appliedStatusFilter, setAppliedStatusFilter] = useState<StatusEvent[]>([]);
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
     useEventsAll({
       initialPage: 1,
@@ -19,23 +20,7 @@ export default function SelectEventAdminPage() {
       status: appliedStatusFilter.length > 0 ? appliedStatusFilter : undefined,
     });
 
-  const handleBack = () => {
-    router.replace(`/admin/home`);
-  };
-
-  const handleCreateEvent = () => {
-    router.push(`/admin/events/manager/create`);
-  };
-
-  const handleManagerEvent = (eventId: string) => {
-    router.push(`/admin/events/manager/${eventId}`);
-  };
-
-  const handleListInscriptions = (eventId: string) => {
-    router.push(`/admin/events/list-inscription/${eventId}`);
-  };
-
-  const handleStatusChange = (value: string[]) => {
+  const handleStatusChange = (value: StatusEvent[]) => {
     setPendingStatusFilter(value);
   };
 
@@ -44,8 +29,7 @@ export default function SelectEventAdminPage() {
     setPage(1);
   };
 
-  // Estados de loading e error
-  if (loading) {
+  const renderSkeletonGrid = () => {
     return (
       <div className="p-4 sm:p-6 relative">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
@@ -99,24 +83,24 @@ export default function SelectEventAdminPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="p-6 flex items-center justify-center min-h-96">
-        <div className="text-center text-destructive">
-          <p className="mb-4">Erro ao carregar eventos: {error}</p>
-          <Button onClick={refetch}>Tentar Novamente</Button>
+  const renderContent = () => {
+    if (loading) {
+      return renderSkeletonGrid()
+    }
+
+    if (error) {
+      return (
+        <div className="p-6 flex items-center justify-center min-h-96">
+          <div className="text-center text-destructive">
+            <p className="mb-4">Erro ao carregar eventos: {error}</p>
+            <Button onClick={refetch}>Tentar Novamente</Button>
+          </div>
         </div>
-      </div>
-    );
-  }
-  return (
-    <PageContainer
-      title="Eventos"
-      description="Escolha o evento que deseja gerenciar"
-      showBackButton={true}
-      backButtonAction={handleBack}
-    >
-      <EventsTable
+      );
+    }
+
+    return (
+      <SelectedEventManager
         events={events}
         total={total}
         page={page}
@@ -129,6 +113,33 @@ export default function SelectEventAdminPage() {
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
       />
+    )
+  }
+
+  const handleBack = () => {
+    router.replace(`/admin/home`);
+  };
+
+  const handleCreateEvent = () => {
+    router.push(`/admin/events/manager/create`);
+  };
+
+  const handleManagerEvent = (eventId: string) => {
+    router.push(`/admin/events/manager/${eventId}`);
+  };
+
+  const handleListInscriptions = (eventId: string) => {
+    router.push(`/admin/events/list-inscription/${eventId}`);
+  };
+
+  return (
+    <PageContainer
+      title="Eventos"
+      description="Escolha o evento que deseja gerenciar"
+      showBackButton={true}
+      backButtonAction={handleBack}
+    >
+      {renderContent()}
     </PageContainer>
   );
 }

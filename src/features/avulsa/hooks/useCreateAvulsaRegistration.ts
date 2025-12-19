@@ -1,4 +1,4 @@
-import { eventsKeys } from "@/features/gastos/hooks/useEventsQuery";
+import { eventsKeys } from "@/features/gastos/hooks/useSelectEventsQuery";
 import {
   useMutation,
   UseMutationResult,

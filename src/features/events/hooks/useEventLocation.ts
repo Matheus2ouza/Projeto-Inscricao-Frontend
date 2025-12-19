@@ -3,7 +3,7 @@
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../gastos/hooks/useEventsQuery";
+import { useInvalidateEventsQuery } from "../../gastos/hooks/useSelectEventsQuery";
 import { updateEventLocation } from "../api/eventActions/updateEventLocation";
 
 export function useEventLocation() {

@@ -1,7 +1,7 @@
 "use client";
 
 import EventManagement from "@/features/events/components/EventManagement";
-import { useEvent } from "@/features/events/hooks/useEvent";
+import { useEventManager } from "@/features/events/hooks/manager/useEventManager";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -16,11 +16,7 @@ export default function EventManagementAdminPage() {
   if (!eventId) {
     return null;
   }
-  const { event, loading: eventLoading, error, refetch } = useEvent(eventId);
-
-  const handleBack = () => {
-    router.replace(`/admin/events/manager`);
-  };
+  const { event, isLoading, error, refetch } = useEventManager(eventId);
 
   const renderSkeletonGrid = () => {
     return (
@@ -60,8 +56,8 @@ export default function EventManagementAdminPage() {
   };
 
   const renderContent = () => {
-    if (eventLoading) {
-      renderSkeletonGrid();
+    if (isLoading) {
+      return renderSkeletonGrid();
     }
     if (error) {
       return (
@@ -89,6 +85,10 @@ export default function EventManagementAdminPage() {
     }
 
     return <EventManagement event={event} refetch={refetch} />;
+  };
+
+  const handleBack = () => {
+    router.replace(`/admin/events/manager`);
   };
 
   return (
