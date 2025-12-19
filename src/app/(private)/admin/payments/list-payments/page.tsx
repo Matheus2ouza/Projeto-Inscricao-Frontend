@@ -1,28 +1,56 @@
 "use client";
 
-import { useEventsWithPaymentsAll } from "@/features/payments/hooks/useEventsWithPaymentsAll";
-import TicketsTable from "@/features/tickets/components/SelectedEvent";
+import SelectedEventForPayments from "@/features/payments/components/SelectEventForPayments";
+import { useSelectEvents } from "@/features/payments/hooks/useSelectEvents";
+import { Event, StatusEvent } from "@/features/payments/types/selectEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function SelectEventForListPaymentAdminPage() {
+export default function SelectEventForListPaymentSuperPage() {
   const router = useRouter();
-  const { events, page, pageCount, setPage, loading, error } =
-    useEventsWithPaymentsAll({
-      initialPage: 1,
-      pageSize: 8,
-    });
+  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
+  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
+  const { events, page, pageCount, setPage, loading, error } = useSelectEvents({
+    initialPage: 1,
+    pageSize: 8,
+    status: appliedFilter.length > 0 ? appliedFilter : undefined,
+  });
 
-  const handleViewEvent = (eventId: string) => {
-    router.push(`/admin/payments/list-payments/${eventId}`);
+  const getInfoRows = (event: Event) => [
+    {
+      label: "Total de Pagamentos",
+      value: event.totalPayments
+    },
+    {
+      label: "Total em Debito",
+      value: event.totalDebt
+    }
+  ]
+
+  const handleStatusChange = (value: StatusEvent[]) => {
+    setPendingFilter(value);
   };
 
-  const handleBack = () => {
-    router.push("/admin/home");
+  const handleApplyStatusFilter = () => {
+    setAppliedFilter(pendingFilter);
+    setPage(1);
   };
+
+  const renderSkeletonGrid = () => {
+    return (
+      <div className="flex justify-center items-center min-h-96">
+        <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   const renderContent = () => {
+    if (loading) {
+      return renderSkeletonGrid()
+    }
+
     if (error) {
       return (
         <div className="flex justify-center items-center min-h-96">
@@ -36,25 +64,28 @@ export default function SelectEventForListPaymentAdminPage() {
       );
     }
 
-    if (loading) {
-      return (
-        <div className="flex justify-center items-center min-h-96">
-          <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
-        </div>
-      );
-    }
-
     return (
-      <TicketsTable
+      <SelectedEventForPayments
         events={events}
-        buttonLabel="Ver Pagamentos"
-        error={error}
+        buttonLabel="Visualizar Gastos"
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
         onViewEvent={handleViewEvent}
+        statusFilter={pendingFilter}
+        onStatusFilterChange={handleStatusChange}
+        onApplyStatusFilter={handleApplyStatusFilter}
+        getInfoRows={getInfoRows}
       />
-    );
+    )
+  }
+
+  const handleViewEvent = (eventId: string) => {
+    router.push(`/admin/payments/list-payments/${eventId}`);
+  };
+
+  const handleBack = () => {
+    router.push("/admin/home");
   };
 
   return (
