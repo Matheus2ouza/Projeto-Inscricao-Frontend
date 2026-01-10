@@ -4,27 +4,34 @@ import {
   IndivUploadRouteResponse,
 } from "../types/individualInscriptionTypes";
 
+export type AxiosError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+    status?: number;
+    statusText?: string;
+  };
+  message?: string;
+  code?: string;
+};
+
 export const submitIndividualInscription = async (
   data: IndividualInscriptionSubmit
 ): Promise<IndivUploadRouteResponse> => {
   try {
     const response = await axiosInstance.post<IndivUploadRouteResponse>(
-      "/inscriptions/indiv/upload",
+      "/inscription/indiv/register",
       data
     );
     return response.data;
   } catch (error: unknown) {
-    const axiosError = error as {
-      response?: { data?: { message?: string } };
-      message?: string;
-    };
-    console.error(
-      "Erro ao enviar inscrição individual:",
-      axiosError.response?.data || axiosError.message
-    );
-    throw new Error(
+    const axiosError = error as AxiosError;
+
+    // Lança um erro com a mensagem específica da API
+    const errorMessage =
       axiosError.response?.data?.message ||
-      "Erro inesperado. Por favor, tente novamente mais tarde."
-    );
+      "Erro inesperado. Por favor, tente novamente mais tarde.";
+    throw new Error(errorMessage);
   }
 };

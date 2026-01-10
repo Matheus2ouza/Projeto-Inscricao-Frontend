@@ -216,10 +216,11 @@ export default function SelectedEventForInscription({
                         {label}
                       </span>
                       <span
-                        className={`font-semibold ${label.toLowerCase().includes("pendentes")
-                          ? "text-yellow-600 dark:text-yellow-400"
-                          : ""
-                          }`}
+                        className={`font-semibold ${
+                          label.toLowerCase().includes("pendentes")
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : ""
+                        }`}
                       >
                         {value}
                       </span>

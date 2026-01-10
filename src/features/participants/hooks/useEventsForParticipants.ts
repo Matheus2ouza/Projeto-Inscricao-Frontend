@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { UseEventsParams, UseEventsResult } from "../../events/types/checkout/checkoutTypes";
+import {
+  UseEventsParams,
+  UseEventsResult,
+} from "../../events/types/checkout/checkoutTypes";
 import {
   useParticipantsEventsQuery,
   usePrefetchParticipantsEvents,
@@ -40,4 +43,3 @@ export function useEventsForParticipants({
     },
   };
 }
-

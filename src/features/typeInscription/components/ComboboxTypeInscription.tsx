@@ -31,6 +31,7 @@ export type ComboboxTypeInscriptionProps = {
   onChange: (value: string) => void;
   options?: TypeInscriptionOption[];
   loading?: boolean;
+  disabled?: boolean; // Adicionado aqui
 };
 
 export function ComboboxTypeInscription({
@@ -39,6 +40,7 @@ export function ComboboxTypeInscription({
   onChange,
   options,
   loading: loadingProp,
+  disabled = false, // Recebido aqui com valor padrão
 }: ComboboxTypeInscriptionProps) {
   const [open, setOpen] = React.useState(false);
   const shouldFetch = options === undefined;
@@ -67,13 +69,14 @@ export function ComboboxTypeInscription({
   }, [typeInscriptions, value]);
 
   const buttonLabel = React.useMemo(() => {
+    if (disabled) return "Selecione um membro primeiro";
     if (loading) return "Carregando tipos...";
     if (typeInscriptions.length === 0) return "Nenhum tipo encontrado";
     if (selectedTypeInscription) {
       return selectedTypeInscription.label;
     }
     return "Selecione o tipo de inscrição";
-  }, [selectedTypeInscription, loading, typeInscriptions.length]);
+  }, [selectedTypeInscription, loading, typeInscriptions.length, disabled]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -82,21 +85,28 @@ export function ComboboxTypeInscription({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between relative overflow-hidden"
+          disabled={disabled} // Aplicado aqui
+          className={cn(
+            "w-full justify-between relative overflow-hidden",
+            disabled &&
+              "opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800"
+          )}
         >
           <span
-            className={
+            className={cn(
               value
                 ? "relative z-10 text-blue-700 dark:text-blue-300 font-semibold px-2 py-1"
-                : "text-gray-700 dark:text-gray-200"
-            }
+                : "text-gray-700 dark:text-gray-200",
+              disabled && "text-gray-500 dark:text-gray-400"
+            )}
           >
             {buttonLabel}
           </span>
           <ChevronsUpDown
-            className={
-              value ? "relative z-10 text-blue-700 opacity-80" : "opacity-50"
-            }
+            className={cn(
+              value ? "relative z-10 text-blue-700 opacity-80" : "opacity-50",
+              disabled && "opacity-30"
+            )}
           />
         </Button>
       </PopoverTrigger>
@@ -117,14 +127,18 @@ export function ComboboxTypeInscription({
                     key={type.value}
                     value={type.value}
                     onSelect={(currentValue) => {
-                      onChange(currentValue === value ? "" : currentValue);
-                      setOpen(false);
+                      if (!disabled) {
+                        onChange(currentValue === value ? "" : currentValue);
+                        setOpen(false);
+                      }
                     }}
+                    className={cn(disabled && "opacity-50 cursor-not-allowed")}
                   >
                     <span
                       className={cn(
                         "px-2 py-1 rounded text-xs font-semibold",
-                        value === type.value ? "ring-2 ring-blue-400" : ""
+                        value === type.value ? "ring-2 ring-blue-400" : "",
+                        disabled && "text-gray-400"
                       )}
                     >
                       {type.label}
@@ -132,7 +146,8 @@ export function ComboboxTypeInscription({
                     <Check
                       className={cn(
                         "ml-auto",
-                        value === type.value ? "opacity-100" : "opacity-0"
+                        value === type.value ? "opacity-100" : "opacity-0",
+                        disabled && "text-gray-400"
                       )}
                     />
                   </CommandItem>

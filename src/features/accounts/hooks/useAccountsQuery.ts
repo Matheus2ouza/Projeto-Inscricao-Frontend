@@ -16,7 +16,6 @@ export function useAccountsComboboxQuery(
   enabled: boolean = true,
   roles?: AccountRole[]
 ) {
-
   return useQuery<AccountResponse[]>({
     queryKey: [...accountsKeys.combobox(), { roles }],
     queryFn: () => getAccont(),

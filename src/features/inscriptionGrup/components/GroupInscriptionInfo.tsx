@@ -25,42 +25,59 @@ export function GroupInscriptionInfo() {
             </p>
           </div>
 
-          {/* 2. Baixe a planilha */}
+          {/* 2. Adicionar membros */}
           <div className="space-y-2">
-            <h4 className="font-semibold">2. Baixe a Planilha</h4>
+            <h4 className="font-semibold">2. Adicione os Membros</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Faça o download do template Excel clicando em{" "}
-              <strong>“Baixar Planilha”</strong>.
+              Clique em <strong>“Adicionar Membro”</strong> para incluir cada
+              participante individualmente.
             </p>
+            <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc list-inside space-y-1 mt-2">
+              <li>Busque o membro pelo nome</li>
+              <li>Selecione o tipo de inscrição</li>
+              <li>Confirme a adição do membro</li>
+            </ul>
           </div>
 
-          {/* 3. Preencha os dados */}
+          {/* 3. Gerenciamento */}
           <div className="space-y-2">
-            <h4 className="font-semibold">
-              3. Adicione os Dados dos Participantes
-            </h4>
+            <h4 className="font-semibold">3. Gerencie a Lista de Membros</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Abra a planilha e preencha as informações dos participantes
-              conforme o formato indicado no arquivo.
+              Visualize todos os membros adicionados na tabela. Você pode editar
+              ou remover membros a qualquer momento antes do envio final.
             </p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <Badge
+                variant="outline"
+                className="bg-blue-50 text-blue-700 border-blue-200"
+              >
+                Visualização em Tempo Real
+              </Badge>
+              <Badge
+                variant="outline"
+                className="bg-red-50 text-red-700 border-red-200"
+              >
+                Remoção Instantânea
+              </Badge>
+            </div>
           </div>
 
-          {/* 4. Upload */}
+          {/* 4. Validação */}
           <div className="space-y-2">
-            <h4 className="font-semibold">4. Faça o Upload da Planilha</h4>
+            <h4 className="font-semibold">4. Validação em Tempo Real</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Após preencher, envie o arquivo Excel no campo{" "}
-              <strong>“Planilha Preenchida”</strong> para análise.
+              O sistema valida automaticamente os dados do responsável e de cada
+              membro adicionado, mostrando erros imediatamente para correção.
             </p>
           </div>
 
           {/* 5. Envio */}
           <div className="space-y-2">
-            <h4 className="font-semibold">5. Envie para Análise</h4>
+            <h4 className="font-semibold">5. Finalize a Inscrição</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Clique em <strong>“Enviar para Análise”</strong> e aguarde o
-              sistema verificar a planilha. Você será informado se houver erros
-              ou se as inscrições forem confirmadas.
+              Após adicionar todos os membros e corrigir possíveis erros, clique
+              em <strong>“Finalizar Inscrição em Grupo”</strong> para enviar
+              todas as inscrições de uma vez.
             </p>
           </div>
         </CardContent>
@@ -68,48 +85,101 @@ export function GroupInscriptionInfo() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Fluxo de Análise</CardTitle>
+          <CardTitle className="text-lg">Vantagens do Novo Sistema</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <h4 className="font-semibold">Análise Automática</h4>
+            <h4 className="font-semibold">Adição Manual Simplificada</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              O sistema validará automaticamente:
+              Agora você adiciona cada membro individualmente, com busca por
+              nome e seleção de tipo de inscrição em uma interface intuitiva.
             </p>
             <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc list-inside space-y-1 mt-2">
-              <li>Formato e consistência dos dados</li>
-              <li>Campos obrigatórios preenchidos</li>
-              <li>Duplicidade de inscrições</li>
+              <li>Busca rápida de membros cadastrados</li>
+              <li>Seleção de tipo de inscrição com valores</li>
+              <li>Visualização prévia dos dados</li>
             </ul>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">Resultado da Análise</h4>
+            <h4 className="font-semibold">Validação Imediata</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Após a verificação, você poderá receber:
+              Cada membro é validado instantaneamente, reduzindo erros e
+              garantindo que todas as informações estejam corretas antes do
+              envio.
             </p>
             <div className="flex flex-wrap gap-2 mt-2">
               <Badge
                 variant="outline"
-                className="bg-red-50 text-red-700 border-red-200"
+                className="bg-green-50 text-green-700 border-green-200"
               >
-                Lista de Erros (se houver)
+                Validação Instantânea
               </Badge>
               <Badge
                 variant="outline"
-                className="bg-green-50 text-green-700 border-green-200"
+                className="bg-amber-50 text-amber-700 border-amber-200"
               >
-                Dados para Confirmação
+                Feedback Imediato
               </Badge>
             </div>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">Confirmação Final</h4>
+            <h4 className="font-semibold">Controle Total</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Na etapa seguinte, revise as informações e confirme o envio
-              definitivo das inscrições.
+              Você tem controle completo sobre a lista de membros, podendo
+              adicionar, visualizar e remover participantes conforme necessário
+              antes da confirmação final.
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold">Processo Simplificado</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Sem necessidade de planilhas ou arquivos Excel. Todo o processo é
+              feito diretamente na plataforma, com interface amigável e passo a
+              passo.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Requisitos e Validações</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <h4 className="font-semibold">O que é Necessário</h4>
+            <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc list-inside space-y-1">
+              <li>Responsável: Nome completo e telefone</li>
+              <li>Cada membro: Deve estar previamente cadastrado no sistema</li>
+              <li>Tipo de inscrição: Selecionado para cada membro</li>
+              <li>Mínimo: 1 membro por inscrição em grupo</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold">O que é Validado</h4>
+            <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc list-inside space-y-1">
+              <li>Dados completos do responsável</li>
+              <li>Existência de cada membro no sistema</li>
+              <li>Tipo de inscrição válido para o evento</li>
+              <li>Não duplicidade de membros na mesma inscrição</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold">Dicas Importantes</h4>
+            <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc list-inside space-y-1">
+              <li>
+                Certifique-se que os membros já estão cadastrados antes de
+                iniciar
+              </li>
+              <li>Adicione membros individualmente para melhor controle</li>
+              <li>Revise todos os dados antes do envio final</li>
+              <li>O sistema não permitirá envio com erros de validação</li>
+            </ul>
           </div>
         </CardContent>
       </Card>

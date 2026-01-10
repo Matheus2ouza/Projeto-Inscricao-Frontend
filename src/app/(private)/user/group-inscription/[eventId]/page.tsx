@@ -1,11 +1,11 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { Button } from "@/shared/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useFormInscriptionGrup } from "@/features/inscriptionGrup/hooks/useFormInscriptionGrup";
 import { GroupInscriptionForm } from "@/features/inscriptionGrup/components/GroupInscriptionForm";
 import { GroupInscriptionInfo } from "@/features/inscriptionGrup/components/GroupInscriptionInfo";
+import { useFormInscriptionGrup } from "@/features/inscriptionGrup/hooks/useFormInscriptionGrup";
+import { Button } from "@/shared/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useParams } from "next/navigation";
 
 export default function GroupInscriptionPage() {
   const params = useParams();
@@ -34,7 +34,7 @@ export default function GroupInscriptionPage() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3">
-          <GroupInscriptionForm hookData={hookData} />
+          <GroupInscriptionForm hookData={hookData} eventId={eventId} />
         </div>
         {/* Informações - agora ocupa 1 coluna */}
         <div className="space-y-6">

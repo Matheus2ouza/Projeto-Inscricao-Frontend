@@ -1,5 +1,13 @@
 "use client";
 
+import { useTypeInscriptionsQuery } from "@/features/inscriptionIndiv/hooks/useTypeInscriptionsQuery";
+import { TypeInscription } from "@/features/inscriptionIndiv/types/individualInscriptionTypes";
+import {
+  ComboboxMemberSingle,
+  MemberSingleOption,
+} from "@/features/members/components/combobox/ComboboxMemberSingle";
+import { ComboboxTypeInscription } from "@/features/typeInscription/components/ComboboxTypeInscription";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
   Card,
@@ -8,71 +16,121 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import { cn } from "@/shared/lib/utils";
 import {
-  AlertCircle,
-  Download,
-  Phone,
-  Trash2,
-  Upload,
-  User,
-  X,
-} from "lucide-react";
-import { UseFormInscriptionGrupReturn } from "../types/inscriptionGrupTypes";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/shared/components/ui/sheet";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/components/ui/table";
+import { cn } from "@/shared/lib/utils";
+import { Phone, Plus, Trash2, User, Users } from "lucide-react";
+import { useState } from "react";
+import {
+  MemberDisplayData,
+  UseFormInscriptionGrupReturn,
+} from "../types/inscriptionGrupTypes";
 
 interface GroupInscriptionFormProps {
   hookData: UseFormInscriptionGrupReturn;
+  eventId: string;
 }
 
-export function GroupInscriptionForm({ hookData }: GroupInscriptionFormProps) {
+export function GroupInscriptionForm({
+  hookData,
+  eventId,
+}: GroupInscriptionFormProps) {
   const {
     formData,
-    file,
+    members,
     isSubmitting,
-    isDragging,
-    validationErrors,
-    showErrorModal,
-    fileInputRef,
-    handleInputChange,
-    downloadTemplate,
-    handleDragOver,
-    handleDragLeave,
-    handleDrop,
-    handleFileChange,
-    handleRemoveFile,
-    handleAreaClick,
-    handleSubmit,
-    handleCloseErrorModal,
-    register,
     formErrors,
+    handleInputChange,
+    addMember,
+    removeMember,
+    handleSubmit,
+    register,
   } = hookData;
+
+  // Busca os tipos de inscrição para obter o nome quando selecionado
+  const { data: typeInscriptions } = useTypeInscriptionsQuery(eventId);
+
+  // Estado local para o sheet de adição de membro
+  const [tempMemberId, setTempMemberId] = useState("");
+  const [tempMemberData, setTempMemberData] = useState<
+    MemberSingleOption | undefined
+  >(undefined);
+  const [tempTypeId, setTempTypeId] = useState("");
+  const [tempTypeName, setTempTypeName] = useState("");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleOpenSheet = () => {
+    setTempMemberId("");
+    setTempMemberData(undefined);
+    setTempTypeId("");
+    setTempTypeName("");
+    setIsSheetOpen(true);
+  };
+
+  const handleAddMember = () => {
+    if (tempMemberId && tempTypeId && tempMemberData) {
+      const newMember: MemberDisplayData = {
+        accountParticipantId: tempMemberId,
+        typeInscriptionId: tempTypeId,
+        name: tempMemberData.label,
+        birthDate: tempMemberData.birthDate,
+        gender: tempMemberData.gender,
+        typeInscriptionName: tempTypeName,
+      };
+
+      addMember(newMember);
+      // Fechar o sheet após adicionar
+      setIsSheetOpen(false);
+      // Limpar os campos temporários
+      setTempMemberId("");
+      setTempMemberData(undefined);
+      setTempTypeId("");
+      setTempTypeName("");
+    }
+  };
+
+  const formatBirthDate = (dateString?: string | Date) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR");
+  };
 
   return (
     <>
-      <Card className="w-full">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-2xl">Dados do Responsável</CardTitle>
-          <CardDescription className="text-base">
-            Preencha os dados do responsável pelas inscrições
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="space-y-6">
+        {/* Card do Responsável */}
+        <Card className="w-full">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <User className="h-6 w-6" />
+              Dados do Responsável
+            </CardTitle>
+            <CardDescription className="text-base">
+              Preencha os dados do responsável pelas inscrições
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Responsável */}
               <div className="space-y-3 md:col-span-2">
                 <Label htmlFor="responsible" className="text-base font-medium">
-                  <User className="w-4 h-4 inline mr-2" />
                   Nome do Responsável *
                 </Label>
                 <Input
@@ -135,6 +193,7 @@ export function GroupInscriptionForm({ hookData }: GroupInscriptionFormProps) {
                   onChange={handleInputChange}
                   placeholder="(11) 99999-9999"
                   required
+                  maxLength={15}
                   className={cn(
                     "h-12 text-base",
                     formErrors.phone && "border-red-500 focus:border-red-500"
@@ -146,322 +205,275 @@ export function GroupInscriptionForm({ hookData }: GroupInscriptionFormProps) {
                   </p>
                 )}
               </div>
-
-              {/* Template Download */}
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
-                  Template de Inscrição
-                </Label>
-                <div className="flex items-center gap-4">
-                  <Button
-                    type="button"
-                    onClick={downloadTemplate}
-                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white h-12 px-6"
-                  >
-                    <Download className="w-5 h-5" />
-                    Baixar Planilha
-                  </Button>
-                </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  Baixe o template, preencha com os dados dos inscritos.
-                </p>
-              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Upload da Planilha Preenchida */}
-            <div className="space-y-4 border-t pt-4">
-              <div className="space-y-3">
-                <Label
-                  htmlFor="file"
-                  className="text-sm md:text-base font-medium"
-                >
-                  Planilha Preenchida *
-                </Label>
+        {/* Card dos Membros */}
+        <Card className="w-full">
+          <CardHeader className="pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <Users className="h-6 w-6" />
+                Membros da Inscrição
+              </CardTitle>
+              <CardDescription className="text-base mt-1">
+                Adicione os membros que farão parte desta inscrição em grupo
+              </CardDescription>
+            </div>
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+              <SheetTrigger asChild>
+                <Button className="flex items-center gap-2 w-full sm:w-auto">
+                  <Plus className="h-4 w-4" />
+                  Adicionar Membro
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="sm:max-w-[500px] w-full overflow-y-auto">
+                <div className="flex flex-col h-full">
+                  <SheetHeader className="px-6 pt-6 pb-4">
+                    <SheetTitle className="text-xl">
+                      Adicionar Membro
+                    </SheetTitle>
+                    <SheetDescription className="text-sm">
+                      Busque um membro e selecione o tipo de inscrição.
+                    </SheetDescription>
+                  </SheetHeader>
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  accept=".xlsx, .xls"
-                  onChange={handleFileChange}
-                />
+                  <div className="flex-1 overflow-y-auto px-6">
+                    <div className="space-y-6 py-2">
+                      <div className="space-y-3">
+                        <Label
+                          htmlFor="memberSelect"
+                          className="text-sm font-medium"
+                        >
+                          Buscar Membro
+                        </Label>
+                        <ComboboxMemberSingle
+                          id="memberSelect"
+                          value={tempMemberId}
+                          onChange={(id, member) => {
+                            setTempMemberId(id);
+                            setTempMemberData(member);
+                          }}
+                        />
+                      </div>
 
-                {!file ? (
-                  <div
-                    className={cn(
-                      "flex flex-col items-center justify-center w-full h-32 md:h-40 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300",
-                      isDragging
-                        ? "border-primary bg-primary/5"
-                        : "border-border bg-background hover:bg-accent/50"
-                    )}
-                    onClick={handleAreaClick}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <div className="flex flex-col items-center justify-center p-4 text-center">
-                      <Upload className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground mb-2" />
-                      <p className="text-sm md:text-base text-muted-foreground">
-                        <span className="font-semibold">
-                          Clique para upload
-                        </span>{" "}
-                        ou arraste a planilha
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        XLSX, XLS até 10MB
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full space-y-3">
-                    <div className="flex items-center justify-between p-4 md:p-6 border-2 rounded-lg bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="flex-shrink-0">
-                          <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center">
-                            <Upload className="h-5 w-5 md:h-6 md:w-6 text-green-600 dark:text-green-400" />
+                      {tempMemberData && (
+                        <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">
+                                Nome
+                              </Label>
+                              <p className="text-sm font-medium break-words">
+                                {tempMemberData.label}
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">
+                                Nascimento
+                              </Label>
+                              <p className="text-sm font-medium">
+                                {formatBirthDate(tempMemberData.birthDate)}
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">
+                                Gênero
+                              </Label>
+                              <p className="text-sm font-medium capitalize">
+                                {tempMemberData.gender || "-"}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-green-800 dark:text-green-400 truncate text-sm md:text-base">
-                            {file.name}
-                          </p>
-                          <p className="text-xs md:text-sm text-green-600 dark:text-green-300">
-                            {(file.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
+                      )}
+
+                      <div className="space-y-3">
+                        <Label
+                          htmlFor="typeSelect"
+                          className="text-sm font-medium"
+                        >
+                          Tipo de Inscrição
+                        </Label>
+                        <ComboboxTypeInscription
+                          eventId={eventId}
+                          value={tempTypeId}
+                          onChange={(selectedValue) => {
+                            setTempTypeId(selectedValue);
+                            // Encontrar o nome do tipo selecionado para exibição na tabela
+                            if (Array.isArray(typeInscriptions)) {
+                              const selectedType = typeInscriptions.find(
+                                (t: TypeInscription) => t.id === selectedValue
+                              );
+                              if (selectedType) {
+                                setTempTypeName(
+                                  `${selectedType.description} - R$ ${selectedType.value.toFixed(
+                                    2
+                                  )}`
+                                );
+                              }
+                            }
+                          }}
+                          disabled={!tempMemberId}
+                        />
                       </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRemoveFile}
-                        className="flex items-center gap-1 md:gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:hover:bg-red-900/20 ml-2"
-                      >
-                        <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
-                        <span className="hidden sm:inline">Remover</span>
-                      </Button>
-                    </div>
-
-                    {/* Botão adicional para trocar arquivo */}
-                    <div className="flex justify-center">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleAreaClick}
-                        className="text-blue-600 border-blue-200 hover:bg-blue-50 dark:border-blue-800 dark:hover:bg-blue-900/20 px-4 md:px-8"
-                      >
-                        <Upload className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                        Trocar Arquivo
-                      </Button>
                     </div>
                   </div>
-                )}
 
-                <p className="text-xs md:text-sm text-gray-500">
-                  Faça o upload da planilha preenchida com os dados dos
-                  participantes.
+                  <SheetFooter className="px-6 py-4 border-t mt-6">
+                    <div className="flex flex-col sm:flex-row gap-3 w-full">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsSheetOpen(false)}
+                        className="w-full sm:w-1/2"
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        onClick={handleAddMember}
+                        disabled={!tempMemberId || !tempTypeId}
+                        className="w-full sm:w-1/2"
+                      >
+                        Adicionar
+                      </Button>
+                    </div>
+                  </SheetFooter>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </CardHeader>
+          <CardContent>
+            {members.length === 0 ? (
+              <div className="text-center py-10 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                <Users className="h-10 w-10 text-gray-400 mx-auto mb-3" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  Nenhum membro adicionado
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 mt-1 mb-4 px-4">
+                  Clique no botão "Adicionar Membro" para começar.
                 </p>
+                <Button variant="outline" onClick={handleOpenSheet}>
+                  Adicionar Membro
+                </Button>
               </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                className="w-full md:w-auto px-8 py-3 text-base transform uppercase dark:text-white"
-                disabled={
-                  isSubmitting ||
-                  !file ||
-                  !!formErrors.responsible ||
-                  !!formErrors.phone
-                }
-              >
-                {isSubmitting
-                  ? "Enviando para análise..."
-                  : "Enviar para Análise"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Modal de Erros de Validação */}
-      <Dialog open={showErrorModal} onOpenChange={handleCloseErrorModal}>
-        <DialogContent className="max-w-3xl h-[95vh] sm:max-h-[90vh] overflow-hidden rounded-lg sm:rounded-2xl mx-2 sm:mx-0 flex flex-col">
-          <DialogHeader className="space-y-3 pb-4 sm:pb-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-            <div className="flex items-start gap-3">
-              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-amber-100 dark:bg-amber-900/20 rounded-full flex-shrink-0 mt-1">
-                <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                  Ajustes Necessários na Planilha
-                </DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Encontramos alguns pontos que precisam de sua atenção antes de
-                  continuar. O arquivo atual será removido automaticamente para
-                  que você possa fazer upload da versão corrigida
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <div className="space-y-4 sm:space-y-6 py-2 h-full overflow-y-auto custom-scrollbar px-1">
-              {/* Resumo dos erros */}
-              <div className="bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <p className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base">
-                        Itens para revisar
-                      </p>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        Verifique cada ponto abaixo cuidadosamente
-                      </p>
-                    </div>
-                  </div>
-                  <div className="bg-amber-50 dark:bg-amber-900/20 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-700 self-start sm:self-auto">
-                    <span className="text-amber-600 dark:text-amber-400 text-xs sm:text-sm font-medium">
-                      {validationErrors.length}{" "}
-                      {validationErrors.length === 1 ? "item" : "itens"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Lista de erros */}
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex items-center gap-2 px-1">
-                  <div className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0"></div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm uppercase tracking-wide">
-                    Detalhes para Correção
-                  </h3>
+            ) : (
+              <>
+                {/* Versão Desktop - Tabela Completa */}
+                <div className="hidden md:block rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Nascimento</TableHead>
+                        <TableHead>Gênero</TableHead>
+                        <TableHead>Tipo de Inscrição</TableHead>
+                        <TableHead className="w-[100px]">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {members.map((member, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">
+                            {member.name}
+                          </TableCell>
+                          <TableCell>
+                            {formatBirthDate(member.birthDate)}
+                          </TableCell>
+                          <TableCell className="capitalize">
+                            {member.gender || "-"}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">
+                              {member.typeInscriptionName || "Selecionado"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeMember(index)}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
 
-                <div className="grid gap-2 sm:gap-3">
-                  {validationErrors.map((error, index) => (
+                {/* Versão Mobile - Lista Simplificada */}
+                <div className="md:hidden space-y-3">
+                  {members.map((member, index) => (
                     <div
                       key={index}
-                      className="group flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-amber-200 dark:hover:border-amber-600 transition-all duration-200 hover:shadow-sm"
+                      className="border rounded-lg p-4 space-y-3 bg-card"
                     >
-                      <div className="flex-shrink-0">
-                        <div className="relative">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
-                            <span className="text-white text-xs sm:text-sm font-bold">
-                              {error.line}
-                            </span>
-                          </div>
-                          <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-white dark:bg-gray-800 rounded-full border border-amber-200 dark:border-amber-700 flex items-center justify-center">
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-500 rounded-full"></div>
+                      {/* Linha 1: Nome e Ação */}
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1 flex-1">
+                          <p className="font-medium text-sm">{member.name}</p>
+                          <div className="flex flex-wrap gap-1 items-center">
+                            <Badge
+                              variant="secondary"
+                              className="text-xs font-normal"
+                            >
+                              {member.typeInscriptionName || "Selecionado"}
+                            </Badge>
                           </div>
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeMember(index)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 ml-2"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-900 dark:text-white text-xs sm:text-sm mb-1">
-                              Linha {error.line}
-                            </p>
-                            <p className="text-amber-700 dark:text-amber-300 text-xs sm:text-sm leading-relaxed break-words">
-                              {error.reason}
-                            </p>
-                          </div>
-                          <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-2">
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-400 rounded-full animate-pulse"></div>
-                          </div>
+                      {/* Linha 2: Detalhes Adicionais */}
+                      <div className="grid grid-cols-2 gap-2 pt-2 border-t text-xs text-muted-foreground">
+                        <div>
+                          <span className="font-medium">Nascimento:</span>
+                          <p className="mt-0.5">
+                            {formatBirthDate(member.birthDate)}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="font-medium">Gênero:</span>
+                          <p className="mt-0.5 capitalize">
+                            {member.gender || "-"}
+                          </p>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </>
+            )}
 
-              {/* Card de instruções */}
-              <div className="bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-800/20 dark:to-gray-800/20 border border-slate-200 dark:border-slate-700 rounded-xl p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-slate-100 dark:bg-slate-800/30 rounded-lg flex items-center justify-center mt-0.5">
-                    <svg
-                      className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600 dark:text-slate-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-2 sm:mb-3">
-                      Próximos passos
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
-                      <div className="flex items-center gap-2 sm:gap-3 text-slate-700 dark:text-slate-300">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-600 flex items-center justify-center flex-shrink-0">
-                          <span className="text-slate-600 dark:text-slate-400 text-xs font-bold">
-                            1
-                          </span>
-                        </div>
-                        <span className="break-words">
-                          Baixe o template atualizado
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 sm:gap-3 text-slate-700 dark:text-slate-300">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-600 flex items-center justify-center flex-shrink-0">
-                          <span className="text-slate-600 dark:text-slate-400 text-xs font-bold">
-                            2
-                          </span>
-                        </div>
-                        <span className="break-words">
-                          Revise as linhas indicadas
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 sm:gap-3 text-slate-700 dark:text-slate-300">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-600 flex items-center justify-center flex-shrink-0">
-                          <span className="text-slate-600 dark:text-slate-400 text-xs font-bold">
-                            3
-                          </span>
-                        </div>
-                        <span className="break-words">
-                          Ajuste os dados conforme necessário
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 sm:gap-3 text-slate-700 dark:text-slate-300">
-                        <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-600 flex items-center justify-center flex-shrink-0">
-                          <span className="text-slate-600 dark:text-slate-400 text-xs font-bold">
-                            4
-                          </span>
-                        </div>
-                        <span className="break-words">
-                          Faça o upload do arquivo corrigido
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter className="flex-shrink-0 flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 pb-3 sm:pb-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex flex-col sm:flex-row w-full sm:w-auto justify-center sm:justify-end">
+            <div className="flex justify-end mt-6">
               <Button
-                type="button"
-                onClick={handleCloseErrorModal}
-                className="w-full sm:w-auto bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white shadow-sm px-6 py-3 text-sm sm:text-base"
+                onClick={() => handleSubmit({} as any)}
+                className="w-full md:w-auto px-8 py-3 text-base transform uppercase dark:text-white"
+                disabled={
+                  isSubmitting ||
+                  members.length === 0 ||
+                  !!formErrors.responsible ||
+                  !!formErrors.phone
+                }
               >
-                <X className="h-4 w-4 mr-2" />
-                Entendi, Vou Corrigir
+                {isSubmitting
+                  ? "Processando..."
+                  : "Finalizar Inscrição em Grupo"}
               </Button>
             </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 }

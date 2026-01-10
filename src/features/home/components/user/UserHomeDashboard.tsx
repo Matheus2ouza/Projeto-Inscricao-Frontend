@@ -214,15 +214,15 @@ export default function UserHomeDashboard({
   return (
     <>
       <DismissibleAlert
-        id="inscriptions-closing-warning"
-        title="Inscrições fecham às 15h"
-        variant="warning"
+        id="system-development-warning"
+        title="Sistema em Aprimoramento"
+        variant="default"
         asModal={true}
       >
-        Hoje, às <strong>15h</strong>, as inscrições serão encerradas. Garanta
-        que todas as inscrições sejam feitas até o horario limite. Depois desse
-        horário, as inscrições não poderão ser mais feitas. Ainda poderá ser
-        feito os pagamentos após o horário limite.
+        Estamos melhorando as funcionalidades de inscrições. Durante esta
+        atualização, algumas partes do sistema podem apresentar comportamento
+        diferente ou falhas temporárias. Para melhor experiência, utilize em
+        computador. Em caso de problemas, contate o suporte: (91) 99258-7483.
       </DismissibleAlert>
 
       <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">

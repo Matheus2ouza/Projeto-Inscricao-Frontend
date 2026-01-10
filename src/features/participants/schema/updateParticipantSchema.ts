@@ -10,4 +10,3 @@ export const UpdateParticipantSchema = z.object({
 export type UpdateParticipantFormInputs = z.infer<
   typeof UpdateParticipantSchema
 >;
-

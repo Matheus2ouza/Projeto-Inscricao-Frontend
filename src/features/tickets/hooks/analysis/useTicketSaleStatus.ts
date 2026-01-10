@@ -4,7 +4,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateStatusTicket } from "../../api/analysis/updateStatusTicket";
-import { TicketsByEventResponse, ticketsKeys } from "../../types/analysis/ticketsTypes";
+import {
+  TicketsByEventResponse,
+  ticketsKeys,
+} from "../../types/analysis/ticketsTypes";
 
 export function useTicketSaleStatus() {
   const [loading, setLoading] = useState(false);
@@ -22,9 +25,9 @@ export function useTicketSaleStatus() {
         (previous: TicketsByEventResponse | undefined) =>
           previous
             ? {
-              ...previous,
-              ticketEnabled: saleTicketsEnabled,
-            }
+                ...previous,
+                ticketEnabled: saleTicketsEnabled,
+              }
             : previous
       );
       toast.success(
@@ -35,7 +38,9 @@ export function useTicketSaleStatus() {
       return true;
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Erro ao atualizar os tickets.";
+        error instanceof Error
+          ? error.message
+          : "Erro ao atualizar os tickets.";
       toast.error("Erro ao atualizar status dos tickets", {
         description: message,
       });

@@ -10,36 +10,29 @@ export interface UseFormIndividualInscriptionReturn {
   typeInscriptions: TypeInscription[];
   isSubmitting: boolean;
   formErrors: FormErrors;
+  selectedMemberId: string;
 
   // Ações
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+  handleMemberSelect: (memberId: string, member?: any) => void;
   register: UseFormRegister<IndividualInscriptionFormInputs>;
 }
 
 export interface IndividualInscriptionSubmit {
+  eventId: string;
   responsible: string;
   email?: string;
   phone: string;
-  eventId: string;
-  participant: {
-    name: string;
-    birthDateStr: string;
-    gender: string;
-    typeDescriptionId: string;
+  member: {
+    accountParticipantId: string;
+    typeInscriptionId: string;
   };
 }
 
 // Resposta da API na primeira parte
 export interface IndivUploadRouteResponse {
-  cacheKey: string;
-  participant: {
-    name: string;
-    birthDate: string;
-    gender: string;
-    typeDescription: string;
-    value: number;
-  };
+  inscriptionId: string;
 }
 
 // Dados de confirmação

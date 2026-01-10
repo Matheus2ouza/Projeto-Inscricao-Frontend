@@ -14,10 +14,18 @@ export function getInitial(name: string): string {
   if (!name) return "";
 
   const STOP = new Set([
-    "de", "da", "das", "des", "dos", "do",
-    "e", "a", "o", "pra", "para",
-    // se você quiser que "EM" seja ignorado também, descomente:
-    // "em",
+    "de",
+    "da",
+    "das",
+    "des",
+    "dos",
+    "do",
+    "e",
+    "a",
+    "o",
+    "pra",
+    "para",
+    "em",
   ]);
 
   // Pega somente palavras compostas por letras Unicode (com acentos)

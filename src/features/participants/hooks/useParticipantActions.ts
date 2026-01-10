@@ -127,4 +127,3 @@ export function useParticipantActions({
     isDeleting: deleteMutation.isPending,
   };
 }
-

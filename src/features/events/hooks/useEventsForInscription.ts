@@ -14,8 +14,13 @@ export function useEventsForInscription({
 }: UseEventsForInscriptionParams = {}): UseEventsForInscriptionResult {
   const [page, setPage] = useState(initialPage);
   const { setLoading: setGlobalLoading } = useGlobalLoading();
-  const { data, isLoading, isFetching, error, refetch: queryRefetch } =
-    useEventsForInscriptionQuery(page, pageSize);
+  const {
+    data,
+    isLoading,
+    isFetching,
+    error,
+    refetch: queryRefetch,
+  } = useEventsForInscriptionQuery(page, pageSize);
 
   useEffect(() => {
     setGlobalLoading(isFetching);

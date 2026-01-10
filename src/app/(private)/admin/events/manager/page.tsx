@@ -11,8 +11,12 @@ import { useState } from "react";
 
 export default function SelectEventAdminPage() {
   const router = useRouter();
-  const [pendingStatusFilter, setPendingStatusFilter] = useState<StatusEvent[]>([]);
-  const [appliedStatusFilter, setAppliedStatusFilter] = useState<StatusEvent[]>([]);
+  const [pendingStatusFilter, setPendingStatusFilter] = useState<StatusEvent[]>(
+    []
+  );
+  const [appliedStatusFilter, setAppliedStatusFilter] = useState<StatusEvent[]>(
+    []
+  );
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
     useEventsAll({
       initialPage: 1,
@@ -81,11 +85,11 @@ export default function SelectEventAdminPage() {
         </div>
       </div>
     );
-  }
+  };
 
   const renderContent = () => {
     if (loading) {
-      return renderSkeletonGrid()
+      return renderSkeletonGrid();
     }
 
     if (error) {
@@ -113,8 +117,8 @@ export default function SelectEventAdminPage() {
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
       />
-    )
-  }
+    );
+  };
 
   const handleBack = () => {
     router.replace(`/admin/home`);

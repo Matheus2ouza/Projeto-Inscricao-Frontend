@@ -1,4 +1,3 @@
-import { RefObject } from "react";
 import { FieldErrors } from "react-hook-form";
 
 export interface GroupInscriptionFormData {
@@ -7,39 +6,33 @@ export interface GroupInscriptionFormData {
   phone: string;
 }
 
-export interface ValidationError {
-  line: number;
-  reason: string;
-}
-
-export interface InscriptionItem {
-  name: string;
-  birthDate: string;
-  gender: string;
-  typeDescription: string;
-  value: number;
-}
-
 export interface GroupInscriptionConfirmationData {
-  cacheKey: string;
-  total: number;
-  unitValue: number;
-  items: InscriptionItem[];
+  inscriptionId: string;
 }
 
 export interface UseFormInscriptionGrupProps {
   eventId: string;
 }
 
+// Novo tipo para estado dos membros
+export interface MemberFormData {
+  accountParticipantId: string;
+  typeInscriptionId: string;
+}
+
+// Tipo estendido para exibição na lista
+export interface MemberDisplayData extends MemberFormData {
+  name: string;
+  birthDate?: Date;
+  gender?: string;
+  typeInscriptionName?: string; // Para mostrar o nome do tipo de inscrição
+}
+
 export interface UseFormInscriptionGrupReturn {
   // Estado
   formData: GroupInscriptionFormData;
-  file: File | null;
+  members: MemberDisplayData[];
   isSubmitting: boolean;
-  isDragging: boolean;
-  validationErrors: ValidationError[];
-  showErrorModal: boolean;
-  fileInputRef: RefObject<HTMLInputElement>;
   formErrors: FieldErrors<{
     responsible: string;
     email?: string;
@@ -48,15 +41,9 @@ export interface UseFormInscriptionGrupReturn {
 
   // Ações
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  downloadTemplate: () => void;
-  handleDragOver: (e: React.DragEvent) => void;
-  handleDragLeave: (e: React.DragEvent) => void;
-  handleDrop: (e: React.DragEvent) => void;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleRemoveFile: () => void;
-  handleAreaClick: () => void;
+  addMember: (member: MemberDisplayData) => void;
+  removeMember: (index: number) => void;
   handleSubmit: (e: React.FormEvent) => void;
-  handleCloseErrorModal: () => void;
   register: any;
 }
 
@@ -74,3 +61,29 @@ export interface UseGroupInscriptionConfirmationReturn {
   handlePayment: () => void;
   handleSkipPayment: () => void;
 }
+
+// Tipo para submissão de inscrição em grupo
+export type GroupInscriptionSubmit = {
+  eventId: string;
+  responsible: string;
+  email?: string;
+  phone: string;
+  members: member[];
+};
+
+export type member = {
+  accountParticipantId: string;
+  typeInscriptionId: string;
+};
+
+export type AxiosError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+    status?: number;
+    statusText?: string;
+  };
+  message?: string;
+  code?: string;
+};

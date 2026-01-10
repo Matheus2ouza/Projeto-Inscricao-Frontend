@@ -1,42 +1,21 @@
 "use client";
 
+import { useGlobalLoading } from "@/components/GlobalLoading";
+import {
+  GroupInscriptionFormInputs,
+  groupInscriptionSchema,
+} from "@/features/inscriptionGrup/schema/grupInscriptionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { RefObject, useCallback, useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 import { submitGroupInscription } from "../api/submitGroupInscription";
 import {
+  MemberDisplayData,
   UseFormInscriptionGrupProps,
   UseFormInscriptionGrupReturn,
-  ValidationError,
 } from "../types/inscriptionGrupTypes";
-
-// Schema de validação com Zod
-const groupInscriptionSchema = z.object({
-  responsible: z
-    .string()
-    .min(2, { message: "Nome deve ter pelo menos 2 caracteres" })
-    .regex(/^[a-zA-ZÀ-ÿ\s']+$/, {
-      message: "Nome deve conter apenas letras e espaços",
-    })
-    .transform((name) =>
-      name
-        .trim()
-        .replace(/\s+/g, " ")
-        .replace(/(^\w|\s\w)/g, (l) => l.toUpperCase())
-    ),
-  email: z.optional(z.email({ message: "Informe um e-mail válido" })),
-  phone: z
-    .string()
-    .min(1, { message: "Telefone é obrigatório" })
-    .regex(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, {
-      message: "Telefone deve estar no formato (11) 99999-9999",
-    }),
-});
-
-type GroupInscriptionFormInputs = z.infer<typeof groupInscriptionSchema>;
 
 export function useFormInscriptionGrup({
   eventId,
@@ -61,14 +40,9 @@ export function useFormInscriptionGrup({
     mode: "onChange",
   });
 
-  const [file, setFile] = useState<File | null>(null);
+  const [members, setMembers] = useState<MemberDisplayData[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
-    []
-  );
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { setLoading } = useGlobalLoading();
 
   // Observar os valores do formulário
   const formData = watch();
@@ -84,7 +58,7 @@ export function useFormInscriptionGrup({
       const trimmed = value.trim();
       setValue(
         name as keyof GroupInscriptionFormInputs,
-        (trimmed.length === 0 ? undefined : trimmed) as never
+        trimmed.length === 0 ? undefined : trimmed
       );
     } else {
       setValue(name as keyof GroupInscriptionFormInputs, value);
@@ -116,143 +90,56 @@ export function useFormInscriptionGrup({
     }
   };
 
-  const downloadTemplate = () => {
-    const fileUrl = `/xlsx/${eventId}.xlsx`;
-    const link = document.createElement("a");
-    link.href = fileUrl;
-    link.setAttribute("download", "Template das Inscrições.xlsx");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Funções para manipulação de membros
+  const addMember = (member: MemberDisplayData) => {
+    setMembers([...members, member]);
+    toast.success("Membro adicionado à lista!");
   };
 
-  // Função para validar o tipo de arquivo
-  const isValidFileType = (file: File): boolean => {
-    const acceptedTypes = [
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.ms-excel",
-    ];
-    return (
-      acceptedTypes.includes(file.type) ||
-      file.name.endsWith(".xlsx") ||
-      file.name.endsWith(".xls")
-    );
-  };
-
-  // Função para mostrar erro de formato
-  const showFormatError = () => {
-    toast.error("Por favor, selecione um arquivo Excel (.xlsx ou .xls)");
-  };
-
-  // Funções para drag and drop
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      const selectedFile = files[0];
-
-      if (!isValidFileType(selectedFile)) {
-        showFormatError();
-        return;
-      }
-
-      setFile(selectedFile);
-    }
-  }, []);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-
-      if (!isValidFileType(selectedFile)) {
-        showFormatError();
-        return;
-      }
-
-      setFile(selectedFile);
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setFile(null);
-    setValidationErrors([]);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const handleAreaClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // Função para processar erros de validação
-  const processValidationErrors = (errorMessage: string) => {
-    try {
-      const errorData = JSON.parse(errorMessage);
-      if (errorData.errors && Array.isArray(errorData.errors)) {
-        setValidationErrors(errorData.errors);
-        setShowErrorModal(true);
-        return true;
-      }
-    } catch {
-      return false;
-    }
-    return false;
-  };
-
-  const handleCloseErrorModal = () => {
-    setShowErrorModal(false);
-    setValidationErrors([]);
-    handleRemoveFile();
+  const removeMember = (index: number) => {
+    const newMembers = [...members];
+    newMembers.splice(index, 1);
+    setMembers(newMembers);
+    toast.info("Membro removido da lista");
   };
 
   const onSubmit = async (data: GroupInscriptionFormInputs) => {
-    if (!file) {
-      toast.warning("Por favor, selecione o arquivo da planilha preenchida");
+    // Validar o formulário principal
+    await trigger();
+
+    // Verificar se há pelo menos um membro
+    if (members.length === 0) {
+      toast.warning("É necessário adicionar pelo menos um membro na inscrição");
       return;
     }
 
-    setIsSubmitting(true);
+    setLoading(true);
 
     try {
       const response = await submitGroupInscription({
+        eventId,
         responsible: data.responsible,
         email: data.email,
         phone: data.phone,
-        eventId,
-        file,
+        members: members.map((member) => ({
+          accountParticipantId: member.accountParticipantId,
+          typeInscriptionId: member.typeInscriptionId,
+        })),
       });
 
-      // Salvar os dados completos no localStorage
-      if (response.cacheKey) {
-        localStorage.setItem(
-          `group-inscription-${response.cacheKey}`,
-          JSON.stringify(response)
-        );
+      // Mostrar toast de sucesso
+      toast.success("Inscrição realizada com sucesso!", {
+        description: `ID da inscrição: ${response.inscriptionId}`,
+      });
 
-        toast.success(
-          "Dados processados com sucesso! Verifique as informações antes de confirmar."
-        );
-        router.push(`/user/group-inscription/confirm/${response.cacheKey}`);
-      } else {
-        toast.success("Inscrições em grupo realizadas com sucesso!");
-        router.push("/user/events");
-      }
+      // Limpar formulário e lista
+      setMembers([]);
+      setValue("responsible", "");
+      setValue("email", undefined);
+      setValue("phone", "");
+
+      // Opcional: Redirecionar se desejar, mas o usuário pediu para simplificar
+      // router.push("/user/events");
     } catch (error: unknown) {
       console.error("Erro:", error);
 
@@ -265,22 +152,43 @@ export function useFormInscriptionGrup({
         return typeof err === "object" && err !== null && "response" in err;
       };
 
-      if (
-        isErrorWithResponse(error) &&
-        error.response?.status === 400 &&
-        error.response?.data?.message
-      ) {
-        const hasValidationErrors = processValidationErrors(
-          error.response.data.message
+      // Type guard para verificar se é um erro do Next.js Server Action
+      const isServerActionError = (
+        err: unknown
+      ): err is { message?: string; name?: string } => {
+        return (
+          typeof err === "object" &&
+          err !== null &&
+          "message" in err &&
+          "name" in err
         );
-        if (hasValidationErrors) {
-          return;
+      };
+
+      // Type guard para verificar se é um Error padrão
+      const isStandardError = (err: unknown): err is Error => {
+        return err instanceof Error;
+      };
+
+      let errorMessage =
+        "Erro ao processar inscrição, verifique os dados e tente novamente.";
+
+      if (isErrorWithResponse(error) && error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (isServerActionError(error)) {
+        // Tratar erros específicos do Next.js Server Actions
+        if (error.message?.includes("UnrecognizedActionError")) {
+          errorMessage =
+            "Erro de conexão com o servidor. Tente novamente em alguns instantes.";
+        } else {
+          errorMessage = error.message || "Erro desconhecido do servidor.";
         }
+      } else if (isStandardError(error)) {
+        errorMessage = error.message;
       }
 
-      toast.error("Erro ao processar inscrições. Tente novamente.");
+      toast.error(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -290,25 +198,15 @@ export function useFormInscriptionGrup({
   return {
     // Estado
     formData,
-    file,
+    members,
     isSubmitting,
-    isDragging,
-    validationErrors,
-    showErrorModal,
-    fileInputRef: fileInputRef as RefObject<HTMLInputElement>,
-    formErrors: errors, // Exportando os erros do formulário
+    formErrors: errors,
 
     // Ações
     handleInputChange,
-    downloadTemplate,
-    handleDragOver,
-    handleDragLeave,
-    handleDrop,
-    handleFileChange,
-    handleRemoveFile,
-    handleAreaClick,
-    handleSubmit: handleFormSubmit, // Usando o handleSubmit do react-hook-form
-    handleCloseErrorModal,
-    register, // Exportando register para usar nos inputs
+    addMember,
+    removeMember,
+    handleSubmit: handleFormSubmit,
+    register,
   };
 }

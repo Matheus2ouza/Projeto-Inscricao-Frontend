@@ -28,7 +28,7 @@ export function getStatusColor(status: string): string {
     default:
       return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
   }
-};
+}
 
 export function getStatusEventColor(status?: string): string {
   const normalizedStatus = status?.toLowerCase();

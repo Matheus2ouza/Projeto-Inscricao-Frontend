@@ -24,9 +24,8 @@ export async function getEvents(
 
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível carregar os eventos."
+        axiosError.message ??
+        "Não foi possível carregar os eventos."
     );
   }
 }
-

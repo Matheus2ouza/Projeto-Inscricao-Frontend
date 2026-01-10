@@ -16,9 +16,9 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { useCurrentUser } from "@/shared/context/user-context";
 import { cn } from "@/shared/lib/utils";
-import { MapPin, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, {
   useCallback,
   useEffect,
@@ -53,7 +53,6 @@ export default function RegisterFormEvent({
   roleSegment,
 }: RegisterFormEventProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { user } = useCurrentUser();
   const { setLoading: setGlobalLoading } = useGlobalLoading();
   const { form, onSubmit, dateRange, setDateRange } = useFormCreateEvent();
@@ -61,8 +60,6 @@ export default function RegisterFormEvent({
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [hasProcessedLocationParams, setHasProcessedLocationParams] =
-    useState(false);
   const resolvedRole = (roleSegment ??
     (user?.role === "SUPER" ? "SUPER" : "ADMIN")) as
     | "SUPER"
@@ -87,141 +84,6 @@ export default function RegisterFormEvent({
     };
   }, [regionsLoading, setGlobalLoading]);
 
-  // Salvar o estado do formulário no sessionStorage antes de navegar
-  const saveFormState = useCallback(() => {
-    const formData = form.getValues();
-    const preview = cachedImagePreviewUrl ?? previewUrl;
-    const state = {
-      name: formData.name,
-      regionId: formData.regionId,
-      accountIds: Array.isArray(formData.accountIds) ? formData.accountIds : [],
-      dateRange: dateRange,
-      openImmediately: formData.openImmediately,
-      previewUrl: preview, // Salvar a URL da preview
-      hasImage: Boolean(cachedImageFile ?? formData.image), // Marcar que há uma imagem
-    };
-    sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(state));
-  }, [form, dateRange, previewUrl]);
-
-  // Restaurar o estado do formulário do sessionStorage
-  const restoreFormState = useCallback(() => {
-    try {
-      const saved = sessionStorage.getItem(FORM_STORAGE_KEY);
-      if (saved) {
-        const state = JSON.parse(saved);
-
-        // Restaurar campos básicos
-        if (state.name) form.setValue("name", state.name);
-        if (state.regionId) form.setValue("regionId", state.regionId);
-        if (Array.isArray(state.accountIds)) {
-          form.setValue("accountIds", state.accountIds);
-        }
-        if (state.openImmediately !== undefined) {
-          form.setValue("openImmediately", state.openImmediately);
-        }
-
-        // Restaurar dateRange (converte strings em Date)
-        if (state.dateRange) {
-          const parsedDateRange = {
-            from: state.dateRange.from
-              ? new Date(state.dateRange.from)
-              : undefined,
-            to: state.dateRange.to ? new Date(state.dateRange.to) : undefined,
-          };
-          setDateRange(parsedDateRange);
-        }
-
-        // Restaurar imagem do cache se disponível
-        if (cachedImageFile) {
-          form.setValue("image", cachedImageFile);
-          if (!cachedImagePreviewUrl && state.previewUrl) {
-            cachedImagePreviewUrl = state.previewUrl;
-          }
-          if (cachedImagePreviewUrl) {
-            setPreviewUrl(cachedImagePreviewUrl);
-          }
-        }
-
-        // Limpar o storage após restaurar
-        sessionStorage.removeItem(FORM_STORAGE_KEY);
-      }
-    } catch (error) {
-      console.error("Erro ao restaurar estado do formulário:", error);
-      sessionStorage.removeItem(FORM_STORAGE_KEY);
-    }
-  }, [form, setDateRange]);
-
-  // Processar dados de localização do sessionStorage
-  const processLocationData = useCallback(() => {
-    try {
-      const locationData = sessionStorage.getItem("temp-location-data");
-      if (locationData) {
-        const { locationData: location } = JSON.parse(locationData);
-
-        if (location && location.lat && location.lng && location.address) {
-          form.setValue("location", {
-            lat: parseFloat(location.lat),
-            lng: parseFloat(location.lng),
-            address: location.address,
-          });
-
-          toast.success("Localização definida com sucesso");
-        }
-
-        // Limpar os dados temporários após processar
-        sessionStorage.removeItem("temp-location-data");
-      }
-    } catch (error) {
-      console.error("Erro ao processar dados de localização:", error);
-      sessionStorage.removeItem("temp-location-data");
-    }
-  }, [form]);
-
-  // Efeito para capturar os parâmetros da URL quando voltamos da página de localização
-  useEffect(() => {
-    const lat = searchParams.get("lat");
-    const lng = searchParams.get("lng");
-    const address = searchParams.get("address");
-
-    // Restaurar estado primeiro
-    restoreFormState();
-
-    // Processar dados de localização do sessionStorage
-    processLocationData();
-
-    // Só processa os parâmetros da URL se ainda não foram processados e se existem valores
-    if (!hasProcessedLocationParams && lat && lng && address) {
-      form.setValue("location", {
-        lat: parseFloat(lat),
-        lng: parseFloat(lng),
-        address: address,
-      });
-
-      setHasProcessedLocationParams(true);
-
-      // Limpar os parâmetros da URL para evitar repetição
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, "", newUrl);
-
-      toast.success("Localização definida com sucesso");
-    }
-  }, [
-    searchParams,
-    form,
-    hasProcessedLocationParams,
-    restoreFormState,
-    processLocationData,
-  ]);
-
-  // Restaurar estado quando o componente montar
-  useEffect(() => {
-    restoreFormState();
-    setHasProcessedLocationParams(false);
-
-    // Também processar dados de localização ao montar
-    processLocationData();
-  }, [restoreFormState, processLocationData]);
-
   // Remover preview da imagem ao resetar o formulário
   useEffect(() => {
     const subscription = form.watch((values: { image?: File | null }) => {
@@ -244,10 +106,6 @@ export default function RegisterFormEvent({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    // Limpar storage antes do submit
-    sessionStorage.removeItem(FORM_STORAGE_KEY);
-    sessionStorage.removeItem("temp-location-data"); // Limpar também dados de localização
 
     const { success, id } = await onSubmit(event);
 
@@ -402,31 +260,9 @@ export default function RegisterFormEvent({
     });
   };
 
-  const handleSelectLocation = () => {
-    // Salvar estado antes de navegar
-    saveFormState();
-
-    const locationValue = form.getValues("location");
-    const params = new URLSearchParams();
-
-    if (locationValue?.lat && locationValue?.lng) {
-      params.append("lat", locationValue.lat.toString());
-      params.append("lng", locationValue.lng.toString());
-    }
-    if (locationValue?.address) {
-      params.append("address", locationValue.address);
-    }
-
-    router.push(
-      `/${resolvedRole.toLowerCase()}/events/manager/create/location?${params.toString()}`
-    );
-  };
-
-  // Limpar todos os dados ao cancelar
   const handleCancel = () => {
     // Limpar storage também
     sessionStorage.removeItem(FORM_STORAGE_KEY);
-    sessionStorage.removeItem("temp-location-data");
 
     form.reset({
       name: "",
@@ -673,53 +509,30 @@ export default function RegisterFormEvent({
 
                 {/* Campo: Localização */}
                 <div className="space-y-3">
-                  <FormLabel className="text-base font-medium">
-                    Localização do Evento *
-                  </FormLabel>
                   <FormField
                     control={form.control}
                     name="location"
                     render={({ field }) => (
                       <FormItem>
+                        <FormLabel className="text-base font-medium">
+                          Localização do Evento
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Informe o endereço ou local onde o evento será
+                          realizado.
+                        </p>
                         <FormControl>
-                          <div className="space-y-3">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={handleSelectLocation}
-                              className="w-full h-12 border-dashed"
-                            >
-                              <MapPin className="h-4 w-4 mr-2" />
-                              {field.value?.address
-                                ? "Alterar Localização"
-                                : "Selecionar Localização"}
-                            </Button>
-
-                            {field.value?.address && (
-                              <div className="p-4 border rounded-lg bg-muted/50">
-                                <div className="flex items-start gap-3">
-                                  <MapPin className="h-4 w-4 text-primary mt-0.5" />
-                                  <div className="flex-1">
-                                    <p className="text-sm font-medium text-foreground">
-                                      Local selecionado:
-                                    </p>
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                      {field.value.address}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="Digite o endereço ou nome do local"
+                            className="w-full"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Clique no botão acima para abrir o mapa e selecionar a
-                    localização exata do evento.
-                  </p>
                 </div>
               </div>
 

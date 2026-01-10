@@ -38,10 +38,24 @@ export default function ListEventsForInscription({
   setPage,
   onSelectEvent,
 }: ListEventsForInscriptionProps) {
-  const [imageLoading, setImageLoading] = useState(true);
+  const [imageLoadingStates, setImageLoadingStates] = useState<
+    Record<string, boolean>
+  >({});
 
-  const handleImageLoad = () => {
-    setImageLoading(false);
+  // Função para quando a imagem carregar
+  const handleImageLoad = (eventId: string) => {
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [eventId]: false,
+    }));
+  };
+
+  // Função para inicializar o estado de loading da imagem
+  const initializeImageLoading = (eventId: string) => {
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [eventId]: true,
+    }));
   };
 
   const formatDate = (dateString: string) => {
@@ -54,34 +68,38 @@ export default function ListEventsForInscription({
         {events.map((event) => {
           const statusInfo = getEventStatusInfo(event.status);
           const gradientClass = getGradientClass(event.name);
+          const isImageLoading = event.imageUrl
+            ? imageLoadingStates[event.id] !== false
+            : false;
 
           return (
             <Card
               key={event.id}
               className="w-full hover:shadow-xl transition-all duration-300 border border-transparent shadow-md rounded-xl overflow-hidden hover:scale-[1.02] bg-white dark:bg-zinc-900"
             >
-              <CardBody className="p-0 relative">
-                <div className="w-full relative">
-                  {event.imageUrl ? (
-                    <>
-                      {imageLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-muted/40 z-10">
-                          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                        </div>
-                      )}
-                      <AspectRatio ratio={16 / 9} className="w-full">
+              <CardBody className="p-0 relative overflow-visible">
+                <AspectRatio ratio={16 / 9} className="w-full">
+                  <div className="relative h-full w-full">
+                    {event.imageUrl ? (
+                      <>
+                        {isImageLoading && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-muted/40 z-10">
+                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                          </div>
+                        )}
                         <Image
                           src={event.imageUrl}
                           alt={event.name}
                           fill
                           sizes="(max-width: 768px) 100vw,
-                              (max-width: 1200px) 50vw,
-                              25vw"
+                                (max-width: 1200px) 50vw,
+                                25vw"
                           priority={true}
                           loading="eager"
                           decoding="async"
                           className="object-cover rounded-t-xl"
-                          onLoad={handleImageLoad}
+                          onLoad={() => handleImageLoad(event.id)}
+                          onLoadStart={() => initializeImageLoading(event.id)}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = "none";
@@ -89,36 +107,36 @@ export default function ListEventsForInscription({
                             if (parent) {
                               parent.innerHTML = `
                                 <div class="w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center">
-                                <span class="text-white font-bold text-lg text-center px-4">${event.name}</span>
+                                <span class="text-white text-5xl sm:text-6xl md:text-7xl font-semibold tracking-wide text-center px-4">${event.name}</span>
                                 </div>
                                 `;
                             }
+                            handleImageLoad(event.id);
                           }}
                         />
-                      </AspectRatio>
-                    </>
-                  ) : (
-                    <div
-                      className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
-                    >
-                      <span className="text-white font-bold text-lg text-center px-4">
-                        {getInitial(event.name)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="absolute top-2 right-2 select-none">
-                  <Badge className={`${statusInfo.badgeClass} border-0`}>
-                    {statusInfo.label}
-                  </Badge>
-                </div>
+                      </>
+                    ) : (
+                      <div
+                        className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+                      >
+                        <h3 className="text-white text-5xl sm:text-6xl md:text-7xl font-semibold tracking-wide text-center px-4">
+                          {getInitial(event.name)}
+                        </h3>
+                      </div>
+                    )}
+                  </div>
+                </AspectRatio>
+                {!isImageLoading && (
+                  <div className="absolute top-2 right-2 select-none">
+                    <Badge className={`${statusInfo.badgeClass} border-0`}>
+                      {statusInfo.label}
+                    </Badge>
+                  </div>
+                )}
               </CardBody>
               <CardFooter className="flex flex-col items-start p-4 gap-3 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
                 <h3
-                  className={`font-bold ${getFontSizeClass(
-                    event.name,
-                    true
-                  )} mb-1 line-clamp-2 text-gray-900 dark:text-white`}
+                  className={`font-bold ${getFontSizeClass(event.name)} mb-1 line-clamp-2 text-gray-900 dark:text-white`}
                 >
                   {event.name}
                 </h3>

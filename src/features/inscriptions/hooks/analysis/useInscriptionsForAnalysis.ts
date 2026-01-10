@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { UseAnalysisParams, UseAnalysisResult } from "../../types/analysis/analysisTypes";
+import {
+  UseAnalysisParams,
+  UseAnalysisResult,
+} from "../../types/analysis/analysisTypes";
 import {
   useAnalysisInscriptionsQuery,
   usePrefetchAnalysisInscriptions,
@@ -24,7 +27,6 @@ export function useInscriptionsForAnalysis({
 
   // Pré-carregar próxima página
   const { prefetchNextPage } = usePrefetchAnalysisInscriptions();
-
 
   return {
     analysisData: data ?? null,

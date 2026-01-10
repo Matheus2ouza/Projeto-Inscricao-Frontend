@@ -27,12 +27,14 @@ import {
   CalendarCheck2,
   ChevronRight,
   ChevronsUpDown,
-  FileText,
+  Dock,
   House,
+  LibraryBig,
   LogOut,
   ScrollText,
   Settings,
   Ticket,
+  Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -172,7 +174,7 @@ export default function AppSidebarNormal({
                   </SidebarMenuItem>
 
                   {/* Minhas inscrições */}
-                  <SidebarMenuItem>
+                  {/* <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <a
                         href="/user/MyInscriptions"
@@ -180,6 +182,61 @@ export default function AppSidebarNormal({
                       >
                         <FileText className="size-4" />
                         Minhas Inscrições
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem> */}
+
+                  {/* Inscrições */}
+                  <SidebarMenuItem>
+                    <Collapsible
+                      open={inscriptionsOpen}
+                      onOpenChange={setInscriptionsOpen}
+                    >
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="justify-between">
+                          <span className="flex items-center gap-1">
+                            <Dock className="size-4" />
+                            Pagamentos
+                          </span>
+                          <ChevronRight
+                            className={cn(
+                              "size-4 text-muted-foreground transition-transform",
+                              inscriptionsOpen && "rotate-90"
+                            )}
+                          />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub className="mt-1 border-0 pl-6">
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/user/payment/register"
+                              className="gap-1"
+                            >
+                              <span>Registrar Pagamento</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/user/group-inscription"
+                              className="gap-1"
+                            >
+                              <span>Inscrição em Grupo</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href="/user/members"
+                        className="flex items-center gap-1"
+                      >
+                        <Users className="size-4" />
+                        Membros
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -193,6 +250,19 @@ export default function AppSidebarNormal({
                       >
                         <Ticket className="size-4" />
                         Tickets
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  {/* Documentação */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href="/documentation"
+                        className="flex items-center gap-1"
+                      >
+                        <LibraryBig className="size-4" />
+                        Documentação
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

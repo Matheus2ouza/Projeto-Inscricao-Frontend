@@ -16,7 +16,7 @@ export default function CreateEventSuperPage() {
   return (
     <PageContainer
       title="Criar Novo Evento"
-      description="Preencha as informações para publicar um novo evento."
+      description="Preencha as informações para publicar um novo evento. Os campos com * são obrigatórios."
       showBackButton={true}
       backButtonAction={handleBack}
     >

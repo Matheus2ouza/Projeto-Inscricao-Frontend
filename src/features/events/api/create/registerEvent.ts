@@ -1,7 +1,10 @@
 "use server";
 
 import axiosInstance from "@/shared/lib/apiClient";
-import { CreateEventRequest, RegisterEventResponse } from "../../types/create/createEvent";
+import {
+  CreateEventRequest,
+  RegisterEventResponse,
+} from "../../types/create/createEvent";
 
 export async function registerEvent(
   data: CreateEventRequest
@@ -21,7 +24,7 @@ export async function registerEvent(
     );
     throw new Error(
       axiosError.response?.data?.message ||
-      "Erro inesperado. Por favor, tente novamente mais tarde."
+        "Erro inesperado. Por favor, tente novamente mais tarde."
     );
   }
 }

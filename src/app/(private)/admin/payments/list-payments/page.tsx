@@ -21,13 +21,13 @@ export default function SelectEventForListPaymentSuperPage() {
   const getInfoRows = (event: Event) => [
     {
       label: "Total de Pagamentos",
-      value: event.totalPayments
+      value: event.totalPayments,
     },
     {
       label: "Total em Debito",
-      value: event.totalDebt
-    }
-  ]
+      value: event.totalDebt,
+    },
+  ];
 
   const handleStatusChange = (value: StatusEvent[]) => {
     setPendingFilter(value);
@@ -43,12 +43,12 @@ export default function SelectEventForListPaymentSuperPage() {
       <div className="flex justify-center items-center min-h-96">
         <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
       </div>
-    )
-  }
+    );
+  };
 
   const renderContent = () => {
     if (loading) {
-      return renderSkeletonGrid()
+      return renderSkeletonGrid();
     }
 
     if (error) {
@@ -77,8 +77,8 @@ export default function SelectEventForListPaymentSuperPage() {
         onApplyStatusFilter={handleApplyStatusFilter}
         getInfoRows={getInfoRows}
       />
-    )
-  }
+    );
+  };
 
   const handleViewEvent = (eventId: string) => {
     router.push(`/admin/payments/list-payments/${eventId}`);
