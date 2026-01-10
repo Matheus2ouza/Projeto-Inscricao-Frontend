@@ -13,7 +13,11 @@ export type Event = {
   countSingleDebit: number;
 };
 export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
-export const STATUS_EVENT_VALUES: StatusEvent[] = ["OPEN", "CLOSE", "FINALIZED"];
+export const STATUS_EVENT_VALUES: StatusEvent[] = [
+  "OPEN",
+  "CLOSE",
+  "FINALIZED",
+];
 
 export const EVENT_STATUS_OPTIONS: EventStatusOption[] = [
   { value: "OPEN", label: "Inscrições Abertas" },

@@ -4,7 +4,7 @@ import axiosInstance from "@/shared/lib/apiClient";
 export type CreatePaymentInscriptionRequest = {
   inscriptionId: string;
   value: number;
-  image: string; // base64 ou URL (Data URL)
+  image: string;
 };
 
 export async function createPayment(

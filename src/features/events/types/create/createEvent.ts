@@ -12,8 +12,6 @@ export type CreateEventRequest = {
   regionId: string;
   image?: string;
   location?: string;
-  longitude?: number;
-  latitude?: number;
   status: StatusEvent;
   paymentEnabled: boolean;
   responsibles?: CreateEventResponsible[];

@@ -48,12 +48,12 @@ export default function EventsPage() {
           </Card>
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   const renderContent = () => {
     if (loading) {
-      return renderSkeletonGrid()
+      return renderSkeletonGrid();
     }
 
     if (error) {
@@ -81,8 +81,8 @@ export default function EventsPage() {
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
       />
-    )
-  }
+    );
+  };
 
   const handleDetailsEvent = (eventId: string) => {
     router.push(`/user/events/${eventId}`);
@@ -101,5 +101,5 @@ export default function EventsPage() {
     >
       {renderContent()}
     </PageContainer>
-  )
+  );
 }

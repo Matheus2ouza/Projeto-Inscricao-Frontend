@@ -1,8 +1,10 @@
 "use client";
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
+import { MemberSingleOption } from "@/features/members/components/combobox/ComboboxMemberSingle";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import * as React from "react";
 import { useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -24,6 +26,9 @@ export function useFormCreateIndividualInscription({
   const router = useRouter();
   const { setLoading } = useGlobalLoading();
 
+  // Estado para o ID do membro selecionado
+  const [selectedMemberId, setSelectedMemberId] = React.useState<string>("");
+
   // Inicializar o react-hook-form com Zod
   const {
     register,
@@ -32,6 +37,7 @@ export function useFormCreateIndividualInscription({
     setValue,
     watch,
     trigger,
+    reset, // Adicionado o método reset
   } = useForm<IndividualInscriptionFormInputs>({
     resolver: zodResolver(individualInscriptionSchema),
     defaultValues: {
@@ -97,6 +103,54 @@ export function useFormCreateIndividualInscription({
     trigger(name as keyof IndividualInscriptionFormInputs);
   };
 
+  // Função para lidar com a seleção de um membro
+  const handleMemberSelect = (
+    memberId: string,
+    member?: MemberSingleOption
+  ) => {
+    setSelectedMemberId(memberId);
+
+    if (member) {
+      // Preenche os campos do formulário com os dados do membro
+      setValue("participantName", member.label);
+
+      if (member.birthDate) {
+        // Formata a data de nascimento para DD/MM/AAAA
+        const birthDate = new Date(member.birthDate);
+        const formattedDate = birthDate.toLocaleDateString("pt-BR");
+        setValue("birthDate", formattedDate);
+      }
+
+      if (member.gender) {
+        setValue("gender", member.gender.toLowerCase());
+      }
+
+      // Valida os campos preenchidos
+      trigger("participantName");
+      trigger("birthDate");
+      trigger("gender");
+    }
+  };
+
+  // Função para limpar todos os campos do formulário
+  const clearForm = React.useCallback(() => {
+    // Limpa todos os campos do formulário
+    reset({
+      responsible: "",
+      email: undefined,
+      phone: "",
+      participantName: "",
+      birthDate: "",
+      gender: "",
+      typeInscriptionId: "",
+    });
+
+    // Limpa o membro selecionado
+    setSelectedMemberId("");
+
+    console.log("Formulário limpo com sucesso");
+  }, [reset]);
+
   // Função para formatar telefone
   const formatPhone = (value: string): string => {
     // Remove tudo que não é número
@@ -142,11 +196,9 @@ export function useFormCreateIndividualInscription({
       responsible: data.responsible,
       phone: data.phone,
       eventId,
-      participant: {
-        name: data.participantName,
-        birthDateStr: data.birthDate,
-        gender: data.gender,
-        typeDescriptionId: data.typeInscriptionId,
+      member: {
+        accountParticipantId: selectedMemberId,
+        typeInscriptionId: data.typeInscriptionId,
       },
     };
 
@@ -158,23 +210,12 @@ export function useFormCreateIndividualInscription({
     try {
       const response = await submitMutation.mutateAsync(apiData);
 
-      // Salvar os dados completos no localStorage
-      if (response.cacheKey) {
-        localStorage.setItem(
-          `individual-inscription-${response.cacheKey}`,
-          JSON.stringify(response)
-        );
+      toast.success("Inscrição realizada com sucesso!", {
+        description: `Inscrição realizada com sucesso! ID: ${response.inscriptionId}`,
+      });
 
-        toast.success(
-          "Dados processados com sucesso! Verifique as informações antes de confirmar."
-        );
-        router.push(
-          `/user/individual-inscription/confirm/${response.cacheKey}`
-        );
-      } else {
-        toast.success("Inscrição individual realizada com sucesso!");
-        router.push("/user/events");
-      }
+      // Limpa o formulário após sucesso
+      clearForm();
     } catch (error: unknown) {
       console.error("Erro:", error);
 
@@ -236,10 +277,12 @@ export function useFormCreateIndividualInscription({
     typeInscriptions,
     isSubmitting: submitMutation.isPending,
     formErrors: errors as FormErrors,
+    selectedMemberId,
 
     // Ações
     handleInputChange,
     handleSubmit: handleFormSubmit,
+    handleMemberSelect,
     register: register as UseFormRegister<IndividualInscriptionFormInputs>,
   };
 }

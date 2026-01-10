@@ -15,6 +15,7 @@ import {
 import { cn } from "@/shared/lib/utils";
 import { formatCurrency } from "@/shared/utils/FormatCurrency";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
+import { getInitial } from "@/shared/utils/getInitials";
 import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import {
   AlertTriangle,
@@ -182,7 +183,7 @@ export default function SelectedEventManager({
                       {/* Sigla do Evento */}
                       <div className="flex-shrink-0">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg">
-                          {event.name.substring(0, 2)}
+                          {getInitial(event.name)}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -310,10 +311,11 @@ export default function SelectedEventManager({
                         <input
                           readOnly
                           className="w-full text-xs bg-transparent border rounded px-2 py-1 truncate"
-                          value={`${typeof window !== "undefined"
-                            ? window.location.origin
-                            : ""
-                            }/events/${event.id}`}
+                          value={`${
+                            typeof window !== "undefined"
+                              ? window.location.origin
+                              : ""
+                          }/events/${event.id}`}
                         />
                       </div>
                       <div className="flex gap-1 sm:gap-2">
@@ -407,8 +409,8 @@ export default function SelectedEventManager({
       {startIndex < 1 && (
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
           <div className="text-sm text-muted-foreground text-center sm:text-left">
-            Mostrando {startIndex + 1}-{Math.min(startIndex + currentPageSize, total)}{" "}
-            de {total} eventos
+            Mostrando {startIndex + 1}-
+            {Math.min(startIndex + currentPageSize, total)} de {total} eventos
           </div>
 
           <Pagination>

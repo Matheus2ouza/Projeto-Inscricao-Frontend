@@ -2,7 +2,10 @@
 
 import { UserRole } from "@/features/auth/types/loginTypes";
 import type { StatusEvent } from "@/features/tickets/types/selectEvent";
-import { Event, EVENT_STATUS_OPTIONS } from "@/features/tickets/types/selectEvent";
+import {
+  Event,
+  EVENT_STATUS_OPTIONS,
+} from "@/features/tickets/types/selectEvent";
 import EventStatusFilter from "@/shared/components/EventStatusFilter";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -54,7 +57,7 @@ export default function SelectedEvent({
   onViewEvent,
   onStatusFilterChange,
   onApplyStatusFilter,
-  getInfoRows
+  getInfoRows,
 }: TicketsTableProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
@@ -195,10 +198,11 @@ export default function SelectedEvent({
                         {label}
                       </span>
                       <span
-                        className={`font-semibold ${label.toLowerCase().includes("pendentes")
-                          ? "text-yellow-600 dark:text-yellow-400"
-                          : ""
-                          }`}
+                        className={`font-semibold ${
+                          label.toLowerCase().includes("pendentes")
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : ""
+                        }`}
                       >
                         {value}
                       </span>
@@ -211,8 +215,12 @@ export default function SelectedEvent({
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
                     onClick={() => onViewEvent?.(event.id)}
-                    variant={!event.ticketEnabled && role === 'USER' ? 'outline' : 'default'}
-                    disabled={!event.ticketEnabled && role === 'USER'}
+                    variant={
+                      !event.ticketEnabled && role === "USER"
+                        ? "outline"
+                        : "default"
+                    }
+                    disabled={!event.ticketEnabled && role === "USER"}
                   >
                     {buttonLabel}
                   </Button>

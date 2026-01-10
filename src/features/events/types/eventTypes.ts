@@ -1,7 +1,11 @@
 import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
 
 export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
-export const STATUS_EVENT_VALUES: StatusEvent[] = ["OPEN", "CLOSE", "FINALIZED"];
+export const STATUS_EVENT_VALUES: StatusEvent[] = [
+  "OPEN",
+  "CLOSE",
+  "FINALIZED",
+];
 
 export type Responsible = {
   id: string;
@@ -98,7 +102,6 @@ export type TypeInscription = {
   description: string;
   value: number;
 };
-
 
 export type FindDetailsEventResponse = {
   id: string;

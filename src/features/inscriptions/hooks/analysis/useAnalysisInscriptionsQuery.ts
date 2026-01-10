@@ -13,7 +13,11 @@ export const analysisInscriptionsKeys = {
     ] as const,
   // Base key for all pages of a specific inscription's details
   inscriptionDetailsBase: (inscriptionId: string) =>
-    [...analysisInscriptionsKeys.all, "inscriptionDetails", inscriptionId] as const,
+    [
+      ...analysisInscriptionsKeys.all,
+      "inscriptionDetails",
+      inscriptionId,
+    ] as const,
   inscriptionDetails: (inscriptionId: string, page: number, pageSize: number) =>
     [
       ...analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
@@ -59,40 +63,45 @@ export function useInvalidateAnalysisInscriptions() {
     // Invalidate all pages of inscription details using the base key
     invalidateInscriptionDetails: (inscriptionId: string) =>
       queryClient.invalidateQueries({
-        queryKey: analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+        queryKey:
+          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
       }),
     // Remove all pages of inscription details from cache (e.g., after delete)
     removeInscriptionDetails: (inscriptionId: string) =>
       queryClient.removeQueries({
-        queryKey: analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+        queryKey:
+          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
       }),
     // Cancel any in-flight requests for this inscription's details
     cancelInscriptionDetails: (inscriptionId: string) =>
       queryClient.cancelQueries({
-        queryKey: analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+        queryKey:
+          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
       }),
     // Invalidate events cache
     invalidateEvents: () =>
       queryClient.invalidateQueries({
         queryKey: analysisInscriptionsKeys.all,
         predicate: (query) =>
-          query.queryKey.includes("events") || query.queryKey.includes("eventInscriptions"),
+          query.queryKey.includes("events") ||
+          query.queryKey.includes("eventInscriptions"),
       }),
     // Remove specific inscription from all caches
     removeInscriptionFromAllCaches: (inscriptionId: string) => {
       // Remove inscription details
       queryClient.removeQueries({
-        queryKey: analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+        queryKey:
+          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
       });
       // Cancel any ongoing requests for this inscription
       queryClient.cancelQueries({
-        queryKey: analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+        queryKey:
+          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
       });
       // Invalidate event inscriptions to refresh lists
       queryClient.invalidateQueries({
         queryKey: analysisInscriptionsKeys.all,
-        predicate: (query) =>
-          query.queryKey.includes("eventInscriptions"),
+        predicate: (query) => query.queryKey.includes("eventInscriptions"),
       });
     },
   };

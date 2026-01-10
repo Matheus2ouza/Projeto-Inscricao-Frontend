@@ -9,10 +9,7 @@ export const eventsForInscriptionKeys = {
     [...eventsForInscriptionKeys.lists(), { page, pageSize }] as const,
 };
 
-export function useEventsForInscriptionQuery(
-  page: number,
-  pageSize: number
-) {
+export function useEventsForInscriptionQuery(page: number, pageSize: number) {
   return useQuery<EventsListResponse>({
     queryKey: eventsForInscriptionKeys.list(page, pageSize),
     queryFn: () => getEventsForInscription({ page, pageSize }),

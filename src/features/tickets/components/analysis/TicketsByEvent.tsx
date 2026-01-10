@@ -32,7 +32,6 @@ import {
   Ticket,
   TrendingUp,
   Users,
-  Wallet,
 } from "lucide-react";
 import Image from "next/image";
 import { BaseSyntheticEvent, useMemo, useState } from "react";
@@ -146,7 +145,7 @@ export default function TicketsByEvent({
                       </span>
                       <Button
                         onClick={onToggleTicketSale}
-                        disabled={ticketSaleLoading}
+                        disabled={ticketSaleLoading || !hasTickets}
                         variant={tickets.ticketEnabled ? "outline" : "default"}
                         className="dark:text-white"
                       >
@@ -381,7 +380,7 @@ export default function TicketsByEvent({
                   className={cn(
                     "h-full border border-border/40 shadow-sm hover:shadow-md transition-shadow rounded-2xl flex flex-col",
                     availabilityState.isSoldOut &&
-                    "bg-muted/30 dark:bg-zinc-900/30 border-dashed border-border/60"
+                      "bg-muted/30 dark:bg-zinc-900/30 border-dashed border-border/60"
                   )}
                 >
                   <CardContent
@@ -442,7 +441,6 @@ export default function TicketsByEvent({
                             <div className="flex items-center justify-between">
                               <dt>Preço:</dt>
                               <dd className="font-medium text-foreground flex items-center gap-1">
-                                <Wallet className="w-4 h-4" />
                                 {currencyFormatter.format(ticket.price)}
                               </dd>
                             </div>
