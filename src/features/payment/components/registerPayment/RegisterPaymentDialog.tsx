@@ -12,7 +12,7 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
-import { formatCurrency } from "@/shared/utils/formatCurrency";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   ArrowBigRightDash,
   CheckCheck,
@@ -177,7 +177,7 @@ export default function RegisterPaymentDialog({
     if (allowCustomValue) {
       if (resolvedValue <= 0 || resolvedValue > totalValue) {
         toast.error("Valor inválido", {
-          description: `Por favor, insira um valor entre R$ 0,01 e ${formatCurrency(totalValue)}.`,
+          description: `Por favor, insira um valor entre R$ 0,01 e ${getFormatCurrency(totalValue)}.`,
         });
         return;
       }
@@ -311,7 +311,7 @@ export default function RegisterPaymentDialog({
                         Valor Total da Inscrição
                       </Label>
                       <p className="text-lg font-bold text-primary">
-                        {formatCurrency(totalValue)}
+                        {getFormatCurrency(totalValue)}
                       </p>
                     </div>
 
@@ -475,13 +475,14 @@ export default function RegisterPaymentDialog({
                               className="text-lg font-medium"
                             />
                             <p className="text-xs text-muted-foreground">
-                              Valor entre R$ 0,01 e {formatCurrency(totalValue)}
+                              Valor entre R$ 0,01 e{" "}
+                              {getFormatCurrency(totalValue)}
                             </p>
                           </>
                         ) : (
                           <div className="space-y-1">
                             <div className="flex items-center justify-between rounded-lg border px-4 py-2 text-lg font-semibold">
-                              <span>{formatCurrency(totalValue)}</span>
+                              <span>{getFormatCurrency(totalValue)}</span>
                               <span className="text-xs text-muted-foreground">
                                 Valor fixo
                               </span>

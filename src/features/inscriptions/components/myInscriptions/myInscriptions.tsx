@@ -29,9 +29,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
   Calendar,
@@ -197,7 +197,7 @@ export default function MyInscriptionsTable({
                       Total Pago
                     </span>
                     <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {formatCurrency(event.totalPaid)}
+                      {getFormatCurrency(event.totalPaid)}
                     </span>
                   </div>
                 </div>

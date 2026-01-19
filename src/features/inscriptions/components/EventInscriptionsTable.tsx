@@ -11,6 +11,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { cn } from "@/shared/lib/utils";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { Banknote, Calendar, FileText, UserCheck, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -98,12 +99,6 @@ export function EventInscriptionsTable({
   const router = useRouter();
   const totalPages = pageCount || 1;
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("pt-BR");
 
@@ -135,7 +130,7 @@ export function EventInscriptionsTable({
               <div
                 className={cn(
                   "absolute inset-0 bg-gradient-to-br flex items-center justify-center",
-                  getEventGradient(event.name)
+                  getEventGradient(event.name),
                 )}
               >
                 <span className="text-7xl sm:text-8xl lg:text-9xl font-bold text-white drop-shadow-lg">
@@ -183,7 +178,7 @@ export function EventInscriptionsTable({
                     <span className="text-xs font-medium">Débito total</span>
                   </div>
                   <p className="text-lg font-bold">
-                    {formatCurrency(totalDebt)}
+                    {getFormatCurrency(totalDebt)}
                   </p>
                 </div>
               </div>
@@ -249,7 +244,7 @@ export function EventInscriptionsTable({
                         className="border-t hover:bg-muted/50 cursor-pointer transition-colors"
                         onClick={() =>
                           router.push(
-                            `/user/MyInscriptions/${event.id}/${inscription.id}`
+                            `/user/MyInscriptions/${event.id}/${inscription.id}`,
                           )
                         }
                       >
@@ -259,13 +254,13 @@ export function EventInscriptionsTable({
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center font-medium text-xs sm:text-sm">
-                          {formatCurrency(inscription.totalValue)}
+                          {getFormatCurrency(inscription.totalValue)}
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span
                             className={cn(
                               "inline-block px-2 py-1 rounded text-xs font-semibold whitespace-nowrap",
-                              getStatusColor(inscription.status)
+                              getStatusColor(inscription.status),
                             )}
                           >
                             {inscription.status === "PENDING"

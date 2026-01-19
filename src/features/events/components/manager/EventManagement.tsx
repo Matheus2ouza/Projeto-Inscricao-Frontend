@@ -26,6 +26,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { useCurrentUser } from "@/shared/context/user-context";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   AlertCircle,
   Calendar,
@@ -114,14 +115,6 @@ export default function EventManagement({
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
   const getEventStatus = () => {
     const now = new Date();
     const start = new Date(event.startDate);
@@ -271,7 +264,7 @@ export default function EventManagement({
                   variant={event.status === "OPEN" ? "destructive" : "outline"}
                   onClick={() =>
                     handleUpdateInscription(
-                      event.status === "OPEN" ? "CLOSE" : "OPEN"
+                      event.status === "OPEN" ? "CLOSE" : "OPEN",
                     )
                   }
                   className="flex items-center gap-2"
@@ -512,7 +505,7 @@ export default function EventManagement({
                       href={
                         formData.location
                           ? `https://www.google.com.br/maps/search/${encodeURIComponent(
-                              formData.location
+                              formData.location,
                             )}`
                           : "https://www.google.com.br/maps"
                       }
@@ -590,7 +583,7 @@ export default function EventManagement({
                         .map((id) => {
                           // Tentar encontrar no evento primeiro
                           const eventResponsible = event.responsibles?.find(
-                            (r) => r.id === id
+                            (r) => r.id === id,
                           );
                           if (eventResponsible) {
                             return eventResponsible;
@@ -606,7 +599,7 @@ export default function EventManagement({
                           return null;
                         })
                         .filter(
-                          (r): r is { id: string; name: string } => r !== null
+                          (r): r is { id: string; name: string } => r !== null,
                         )
                     : event.responsibles || [];
 
@@ -636,7 +629,7 @@ export default function EventManagement({
                                     {
                                       description:
                                         "O evento deve ter pelo menos um responsável.",
-                                    }
+                                    },
                                   );
                                   return;
                                 }
@@ -730,7 +723,7 @@ export default function EventManagement({
                           )}
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {formatCurrency(type.value)}
+                          {getFormatCurrency(type.value)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -790,7 +783,7 @@ export default function EventManagement({
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                      {showAmount ? "****" : formatCurrency(totalRevenue)}
+                      {showAmount ? "****" : getFormatCurrency(totalRevenue)}
                     </span>
                     <button
                       onClick={() => setShowAmount(!showAmount)}
@@ -1058,15 +1051,15 @@ export default function EventManagement({
                   refetch();
                   handleResponsiblesChange(
                     formData.responsibleIds.filter(
-                      (id) => id !== deleteResponsibleDialog.responsibleId
-                    )
+                      (id) => id !== deleteResponsibleDialog.responsibleId,
+                    ),
                   );
                   setDeleteResponsibleDialog({
                     open: false,
                     responsibleId: null,
                     responsibleName: null,
                   });
-                }
+                },
               );
             }
           }}

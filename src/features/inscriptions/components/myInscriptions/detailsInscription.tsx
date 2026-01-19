@@ -30,10 +30,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
 import { formatPhone } from "@/shared/utils/formatPhone";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
   Calendar,
@@ -507,7 +507,7 @@ export default function DetailsInscriptionTable({
                     Total pago
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {formatCurrency(inscription.totalPaid)}
+                    {getFormatCurrency(inscription.totalPaid)}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-500">
                     {payments.length} pagamento
@@ -521,7 +521,7 @@ export default function DetailsInscriptionTable({
                     Valor total
                   </p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {formatCurrency(inscription.totalValue)}
+                    {getFormatCurrency(inscription.totalValue)}
                   </p>
                 </div>
 
@@ -537,7 +537,7 @@ export default function DetailsInscriptionTable({
                         : "text-green-600 dark:text-green-500"
                     }`}
                   >
-                    {formatCurrency(inscription.totalDebt)}
+                    {getFormatCurrency(inscription.totalDebt)}
                   </p>
                 </div>
               </div>
@@ -658,7 +658,7 @@ export default function DetailsInscriptionTable({
                     <div className="space-y-1">
                       <p className="text-xs text-muted-foreground">Valor</p>
                       <p className="text-base font-bold text-green-600 dark:text-green-400">
-                        {formatCurrency(payment.value)}
+                        {getFormatCurrency(payment.value)}
                       </p>
                     </div>
                     <div className="space-y-1">
@@ -702,7 +702,7 @@ export default function DetailsInscriptionTable({
                     {payment.id.substring(0, 8)}...
                   </TableCell>
                   <TableCell className="font-semibold text-green-600 dark:text-green-400">
-                    {formatCurrency(payment.value)}
+                    {getFormatCurrency(payment.value)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

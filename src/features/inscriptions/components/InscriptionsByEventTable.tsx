@@ -10,6 +10,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   BanknoteArrowDown,
   Calendar,
@@ -76,13 +77,6 @@ export default function InscriptionsByEventTable({
 }: MyInscriptionsTableProps) {
   const router = useRouter();
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
@@ -147,7 +141,7 @@ export default function InscriptionsByEventTable({
                       ) : (
                         <div
                           className={`absolute inset-0 bg-gradient-to-br ${getEventGradient(
-                            event.name
+                            event.name,
                           )} flex items-center justify-center`}
                         >
                           <span className="lg:text-7xl text-8xl sm:text-7xl font-bold text-white drop-shadow-lg">
@@ -207,7 +201,7 @@ export default function InscriptionsByEventTable({
                           <span className="text-xs font-medium">Débito</span>
                         </div>
                         <p className="text-lg font-bold">
-                          {formatCurrency(event.totalDebt)}
+                          {getFormatCurrency(event.totalDebt)}
                         </p>
                       </div>
 
@@ -218,11 +212,11 @@ export default function InscriptionsByEventTable({
                           </span>
                         </div>
                         <p className="text-lg font-bold">
-                          {formatCurrency(
+                          {getFormatCurrency(
                             event.inscriptions.reduce(
                               (sum, ins) => sum + ins.totalValue,
-                              0
-                            )
+                              0,
+                            ),
                           )}
                         </p>
                       </div>
@@ -261,7 +255,7 @@ export default function InscriptionsByEventTable({
                             className="border-t hover:bg-muted/50 cursor-pointer transition-colors"
                             onClick={() => {
                               router.push(
-                                `/user/MyInscriptions/${event.id}/${inscription.id}`
+                                `/user/MyInscriptions/${event.id}/${inscription.id}`,
                               );
                             }}
                           >
@@ -271,12 +265,12 @@ export default function InscriptionsByEventTable({
                               </span>
                             </td>
                             <td className="px-4 py-3 text-center font-medium text-xs sm:text-sm">
-                              {formatCurrency(inscription.totalValue)}
+                              {getFormatCurrency(inscription.totalValue)}
                             </td>
                             <td className="px-4 py-3 text-center">
                               <span
                                 className={`inline-block px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${getStatusColor(
-                                  inscription.status
+                                  inscription.status,
                                 )}`}
                               >
                                 {inscription.status === "PENDING"

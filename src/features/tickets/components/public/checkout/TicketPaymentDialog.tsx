@@ -12,6 +12,7 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { ImageIcon, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -47,12 +48,6 @@ export function TicketPaymentDialog({
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollYRef = useRef<number>(0);
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
 
   const handleFileSelect = (file: File) => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
@@ -155,7 +150,7 @@ export function TicketPaymentDialog({
           <DialogTitle>Envie o comprovante</DialogTitle>
           <DialogDescription>
             Para concluir o pedido, envie o comprovante do pagamento no valor
-            exato de {formatCurrency(totalValue)}.
+            exato de {getFormatCurrency(totalValue)}.
           </DialogDescription>
         </DialogHeader>
 
@@ -163,7 +158,7 @@ export function TicketPaymentDialog({
           <div>
             <Label className="text-sm font-medium">Valor devido</Label>
             <p className="text-2xl font-semibold mt-1">
-              {formatCurrency(totalValue)}
+              {getFormatCurrency(totalValue)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               O valor é definido pelo sistema. Pagamentos parciais não são
@@ -207,8 +202,9 @@ export function TicketPaymentDialog({
               </div>
             ) : (
               <div
-                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragOver ? "border-primary bg-primary/5" : "border-muted"
-                  }`}
+                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                  isDragOver ? "border-primary bg-primary/5" : "border-muted"
+                }`}
                 onDragOver={(event) => {
                   event.preventDefault();
                   setIsDragOver(true);

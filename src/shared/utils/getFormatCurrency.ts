@@ -4,7 +4,7 @@
  * @param value - Número a ser formatado como moeda
  * @returns String formatada no padrão "R$ 0,00"
  */
-export function formatCurrency(value: number) {
+export function getFormatCurrency(value: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",

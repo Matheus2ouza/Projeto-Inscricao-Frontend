@@ -25,8 +25,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { getConvertStatusPayment } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -95,7 +95,7 @@ export default function ListPaymentsTable({
               Valor Pago
             </span>
             <span className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
-              {formatCurrency(summary.totalPaidValue)}
+              {getFormatCurrency(summary.totalPaidValue)}
             </span>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function ListPaymentsTable({
               Em Análise
             </span>
             <span className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
-              {formatCurrency(summary.totalUnderReviewValue)}
+              {getFormatCurrency(summary.totalUnderReviewValue)}
             </span>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function ListPaymentsTable({
               Recusados
             </span>
             <span className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">
-              {formatCurrency(summary.totalRefusedValue)}
+              {getFormatCurrency(summary.totalRefusedValue)}
             </span>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function ListPaymentsTable({
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Valor</p>
                     <p className="text-base font-bold text-green-600 dark:text-green-400">
-                      {formatCurrency(payment.totalValue)}
+                      {getFormatCurrency(payment.totalValue)}
                     </p>
                   </div>
                 </div>
@@ -246,7 +246,7 @@ export default function ListPaymentsTable({
                   </span>
                 </TableCell>
                 <TableCell className="font-semibold text-green-600 dark:text-green-400 align-middle">
-                  {formatCurrency(payment.totalValue)}
+                  {getFormatCurrency(payment.totalValue)}
                 </TableCell>
                 <TableCell className="font-medium align-middle">
                   {formatDate(payment.createdAt)}
@@ -392,7 +392,7 @@ export default function ListPaymentsTable({
                   <div className="space-y-1">
                     <span className="text-xs text-muted-foreground">Valor</span>
                     <p className="text-base sm:text-lg font-semibold text-green-600 dark:text-green-400">
-                      {formatCurrency(selectedPayment.totalValue)}
+                      {getFormatCurrency(selectedPayment.totalValue)}
                     </p>
                   </div>
 
@@ -506,7 +506,7 @@ export default function ListPaymentsTable({
                               Valor
                             </span>
                             <span className="font-semibold text-green-600 dark:text-green-400 text-sm sm:text-base">
-                              {formatCurrency(alloc.value)}
+                              {getFormatCurrency(alloc.value)}
                             </span>
                           </div>
                         </div>

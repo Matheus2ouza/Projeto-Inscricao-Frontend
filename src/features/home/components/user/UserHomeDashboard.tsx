@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { getConvertStatusEvent } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   addDays,
   addMonths,
@@ -44,13 +45,6 @@ type UserHomeDashboardProps = {
   refreshingMetric?: DashboardUserMetric | null;
   onRefreshMetric?: (metric: DashboardUserMetric) => void;
 };
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  }).format(value || 0);
 
 export default function UserHomeDashboard({
   data,
@@ -142,13 +136,13 @@ export default function UserHomeDashboard({
       },
       textColor: "text-rose-700",
       metric: "payments",
-      value: formatCurrency(data?.payments?.countTotalDebt ?? 0),
+      value: getFormatCurrency(data?.payments?.countTotalDebt ?? 0),
       subItems: [
         {
           icon: Wallet,
           iconColor: "text-emerald-600",
           label: "Pago",
-          value: formatCurrency(data?.payments?.countTotalPaid ?? 0),
+          value: getFormatCurrency(data?.payments?.countTotalPaid ?? 0),
         },
         {
           icon: Percent,

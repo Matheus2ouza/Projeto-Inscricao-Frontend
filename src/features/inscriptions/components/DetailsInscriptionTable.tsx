@@ -74,6 +74,7 @@ import {
   getConvertStatusInscription,
   getConvertStatusPayment,
 } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
   CreditCard,
@@ -109,7 +110,7 @@ export default function DetailsInscriptionsTable({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [registerPaymentOpen, setRegisterPaymentOpen] = useState(false);
   const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>(
-    {}
+    {},
   );
   const [downloadLoading, setDownloadLoading] = useState<{
     [key: string]: boolean;
@@ -155,7 +156,8 @@ export default function DetailsInscriptionsTable({
       return fallbackId;
     }
     const match = typeInscriptionList.find(
-      (type) => type.description.trim().toLowerCase() === participantDescription
+      (type) =>
+        type.description.trim().toLowerCase() === participantDescription,
     );
     return match?.id ?? fallbackId;
   }, [selectedParticipant, typeInscriptionList]);
@@ -249,7 +251,7 @@ export default function DetailsInscriptionsTable({
   const paginatedParticipants = data?.participants
     ? data.participants.slice(
         (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
+        currentPage * itemsPerPage,
       )
     : [];
 
@@ -261,7 +263,7 @@ export default function DetailsInscriptionsTable({
   const paginatedPayments = data?.payments
     ? data.payments.slice(
         (currentPaymentPage - 1) * paymentItemsPerPage,
-        currentPaymentPage * paymentItemsPerPage
+        currentPaymentPage * paymentItemsPerPage,
       )
     : [];
 
@@ -355,13 +357,6 @@ export default function DetailsInscriptionsTable({
       </div>
     );
   }
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
 
   const formatDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString("pt-BR");
@@ -640,7 +635,7 @@ export default function DetailsInscriptionsTable({
                   Saldo devedor
                 </p>
                 <p className="text-lg font-bold text-red-500">
-                  {formatCurrency(data.totalValue)}
+                  {getFormatCurrency(data.totalValue)}
                 </p>
               </div>
               <div className="space-y-2">
@@ -904,7 +899,7 @@ export default function DetailsInscriptionsTable({
                           </PaginationItem>
                           {Array.from(
                             { length: totalPages },
-                            (_, i) => i + 1
+                            (_, i) => i + 1,
                           ).map((page) => (
                             <PaginationItem key={page}>
                               <PaginationLink
@@ -970,7 +965,7 @@ export default function DetailsInscriptionsTable({
                               {getConvertStatusPayment(payment.status)}
                             </Badge>
                             <span className="text-sm font-medium">
-                              {formatCurrency(payment.value)}
+                              {getFormatCurrency(payment.value)}
                             </span>
                           </div>
                           <div className="mt-2 text-xs text-muted-foreground">
@@ -1027,7 +1022,7 @@ export default function DetailsInscriptionsTable({
                                     onClick={() =>
                                       handleDownloadImage(
                                         payment.image,
-                                        payment.id
+                                        payment.id,
                                       )
                                     }
                                     disabled={downloadLoading[payment.id]}
@@ -1080,7 +1075,7 @@ export default function DetailsInscriptionsTable({
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                {formatCurrency(payment.value)}
+                                {getFormatCurrency(payment.value)}
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-2">
@@ -1131,7 +1126,7 @@ export default function DetailsInscriptionsTable({
                                           onClick={() =>
                                             handleDownloadImage(
                                               payment.image,
-                                              payment.id
+                                              payment.id,
                                             )
                                           }
                                           disabled={downloadLoading[payment.id]}
@@ -1155,7 +1150,7 @@ export default function DetailsInscriptionsTable({
                               <TableCell>
                                 <div className="max-w-sm">
                                   {renderRejectionReason(
-                                    payment.rejectionReason
+                                    payment.rejectionReason,
                                   )}
                                 </div>
                               </TableCell>
@@ -1206,7 +1201,7 @@ export default function DetailsInscriptionsTable({
                           </PaginationItem>
                           {Array.from(
                             { length: totalPaymentPages },
-                            (_, i) => i + 1
+                            (_, i) => i + 1,
                           ).map((page) => (
                             <PaginationItem key={page}>
                               <PaginationLink

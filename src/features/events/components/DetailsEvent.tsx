@@ -3,6 +3,7 @@
 import EventMap from "@/shared/components/EventMap";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Calendar, Car, Clock, Loader2, MapPin, Share2 } from "lucide-react";
@@ -44,12 +45,12 @@ const getEventCountdownLabel = (start: string | Date) => {
   const normalizedNow = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate()
+    now.getDate(),
   );
   const normalizedStart = new Date(
     startDate.getFullYear(),
     startDate.getMonth(),
-    startDate.getDate()
+    startDate.getDate(),
   );
   const diffMs = normalizedStart.getTime() - normalizedNow.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
@@ -104,9 +105,9 @@ export default function DetailsEvent({
       .replace(/-|:|\.\d+/g, "");
 
     const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-      event.name
+      event.name,
     )}&dates=${startDate}/${endDate}&details=${encodeURIComponent(
-      `Evento: ${event.name}\nLocal: ${event.location || "A definir"}`
+      `Evento: ${event.name}\nLocal: ${event.location || "A definir"}`,
     )}`;
 
     window.open(calendarUrl, "_blank");
@@ -120,12 +121,6 @@ export default function DetailsEvent({
 
     window.open(mapsUrl, "_blank");
   };
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
 
   if (!event) {
     return (
@@ -343,7 +338,7 @@ export default function DetailsEvent({
                       </span>
                       <span className="text-base sm:text-lg font-bold text-primary whitespace-nowrap">
                         {type.value > 0
-                          ? formatCurrency(type.value)
+                          ? getFormatCurrency(type.value)
                           : "Gratuito"}
                       </span>
                     </div>

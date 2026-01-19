@@ -23,12 +23,12 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
-import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { formatDateTime } from "@/shared/utils/formatDate";
 import {
   getConvertStatusInscription,
   getConvertStatusPayment,
 } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import { CheckCircle, CreditCard, Eye, HelpCircle, Info } from "lucide-react";
 import Link from "next/link";
@@ -204,7 +204,7 @@ export default function RegisterPaymentTable({
                       Valor total
                     </div>
                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {formatCurrency(selectedTotal)}
+                      {getFormatCurrency(selectedTotal)}
                     </div>
                   </div>
                 )}
@@ -244,7 +244,7 @@ export default function RegisterPaymentTable({
                     Valor total
                   </p>
                   <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                    {formatCurrency(selectedTotal)}
+                    {getFormatCurrency(selectedTotal)}
                   </p>
                 </div>
               )}
@@ -304,7 +304,7 @@ export default function RegisterPaymentTable({
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold">
-                          {formatCurrency(inscription.totalValue)}
+                          {getFormatCurrency(inscription.totalValue)}
                         </p>
                       </div>
                     </div>
@@ -428,7 +428,7 @@ export default function RegisterPaymentTable({
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center font-medium">
-                        {formatCurrency(inscription.totalValue)}
+                        {getFormatCurrency(inscription.totalValue)}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {formatDateTime(inscription.createAt)}
@@ -553,7 +553,7 @@ export default function RegisterPaymentTable({
                         Valor total
                       </span>
                       <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
-                        {formatCurrency(paymentResult.totalValue)}
+                        {getFormatCurrency(paymentResult.totalValue)}
                       </span>
                     </div>
 
