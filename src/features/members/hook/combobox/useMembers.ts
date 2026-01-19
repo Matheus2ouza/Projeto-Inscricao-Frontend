@@ -12,11 +12,11 @@ type UseMemberResult = {
 
 export function useMember(
   eventId: string,
-  autoFetch: boolean = true
+  autoFetch: boolean = true,
 ): UseMemberResult {
   const { data, isLoading, isFetching, error, refetch } = useMembersQuery(
     eventId,
-    autoFetch
+    autoFetch,
   );
 
   return {

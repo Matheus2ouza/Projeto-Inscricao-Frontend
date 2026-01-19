@@ -81,7 +81,7 @@ export function ComboboxMemberSingle({
     }
     const term = searchTerm.toLowerCase().trim();
     return allMembers.filter((member) =>
-      member.label.toLowerCase().includes(term)
+      member.label.toLowerCase().includes(term),
     );
   }, [allMembers, searchTerm]);
 
@@ -125,7 +125,7 @@ export function ComboboxMemberSingle({
           aria-expanded={open}
           className={cn(
             "w-full justify-between relative overflow-hidden",
-            className
+            className,
           )}
         >
           <span
@@ -199,7 +199,7 @@ export function ComboboxMemberSingle({
                               ? "text-blue-600 dark:text-blue-400"
                               : "",
                             (isRegistered || isDisabled) &&
-                              "text-gray-400 dark:text-gray-500"
+                              "text-gray-400 dark:text-gray-500",
                           )}
                         >
                           {member.label}
@@ -218,7 +218,9 @@ export function ComboboxMemberSingle({
                       <Check
                         className={cn(
                           "ml-2 flex-shrink-0",
-                          isSelected ? "opacity-100 text-blue-600" : "opacity-0"
+                          isSelected
+                            ? "opacity-100 text-blue-600"
+                            : "opacity-0",
                         )}
                       />
                     </CommandItem>
