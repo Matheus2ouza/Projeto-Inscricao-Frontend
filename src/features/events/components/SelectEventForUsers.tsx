@@ -168,8 +168,8 @@ export default function SelectEventForUsers({
                 <div className="flex items-center text-sm text-gray-700 dark:text-gray-300 mb-1">
                   <Calendar className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
                   <span className="line-clamp-1">
-                    {new Date(event.startDate).toLocaleDateString("pt-BR")}{" "}
-                    - {new Date(event.endDate).toLocaleDateString("pt-BR")}
+                    {new Date(event.startDate).toLocaleDateString("pt-BR")} -{" "}
+                    {new Date(event.endDate).toLocaleDateString("pt-BR")}
                   </span>
                 </div>
 

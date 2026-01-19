@@ -64,6 +64,7 @@ export default function AppSidebarNormal({
   const router = useRouter();
   const isMobile = useIsMobile();
   const [inscriptionsOpen, setInscriptionsOpen] = React.useState(true);
+  const [paymentsOpen, setPaymentsOpen] = React.useState(true);
 
   const userInitials = React.useMemo(() => {
     if (user?.username) {
@@ -154,7 +155,7 @@ export default function AppSidebarNormal({
                         <SidebarMenuSub className="mt-1 border-0 pl-6">
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/user/individual-inscription"
+                              href="/user/inscription/individual-inscription"
                               className="gap-1"
                             >
                               <span>Inscrição em Individual</span>
@@ -162,10 +163,18 @@ export default function AppSidebarNormal({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/user/group-inscription"
+                              href="/user/inscription/group-inscription"
                               className="gap-1"
                             >
                               <span>Inscrição em Grupo</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/user/inscription/my-inscriptions"
+                              className="gap-1"
+                            >
+                              <span>Minhas Inscrições</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>
@@ -186,11 +195,11 @@ export default function AppSidebarNormal({
                     </SidebarMenuButton>
                   </SidebarMenuItem> */}
 
-                  {/* Inscrições */}
+                  {/* Pagamentos */}
                   <SidebarMenuItem>
                     <Collapsible
-                      open={inscriptionsOpen}
-                      onOpenChange={setInscriptionsOpen}
+                      open={paymentsOpen}
+                      onOpenChange={setPaymentsOpen}
                     >
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="justify-between">
@@ -201,7 +210,7 @@ export default function AppSidebarNormal({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              inscriptionsOpen && "rotate-90"
+                              paymentsOpen && "rotate-90"
                             )}
                           />
                         </SidebarMenuButton>
@@ -218,10 +227,10 @@ export default function AppSidebarNormal({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/user/group-inscription"
+                              href="/user/payment/list-payments"
                               className="gap-1"
                             >
-                              <span>Inscrição em Grupo</span>
+                              <span>Visualizar Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>

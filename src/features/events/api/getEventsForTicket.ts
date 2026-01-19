@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import type { EventsListResponse } from "../types/listEventsTypes";
+import type { EventsListResponse } from "../../inscriptions/types/listEventsTypes";
 
 export type getEventsForTicketParams = {
   page: number;

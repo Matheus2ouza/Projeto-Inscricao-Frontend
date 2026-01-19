@@ -10,9 +10,14 @@ type UseMemberResult = {
   refetch: () => Promise<void>;
 };
 
-export function useMember(autoFetch: boolean = true): UseMemberResult {
-  const { data, isLoading, isFetching, error, refetch } =
-    useMembersQuery(autoFetch);
+export function useMember(
+  eventId: string,
+  autoFetch: boolean = true
+): UseMemberResult {
+  const { data, isLoading, isFetching, error, refetch } = useMembersQuery(
+    eventId,
+    autoFetch
+  );
 
   return {
     members: data ?? [],

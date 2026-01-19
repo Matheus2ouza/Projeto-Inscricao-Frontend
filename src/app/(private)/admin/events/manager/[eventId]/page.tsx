@@ -1,6 +1,6 @@
 "use client";
 
-import EventManagement from "@/features/events/components/EventManagement";
+import EventManagement from "@/features/events/components/manager/EventManagement";
 import { useEventManager } from "@/features/events/hooks/manager/useEventManager";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";

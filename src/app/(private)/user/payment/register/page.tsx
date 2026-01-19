@@ -68,6 +68,7 @@ export default function SelectedEventForRegisterPayment() {
 
     return (
       <ListEventsForPayment
+        buttonLabel="Realizar Pagamento"
         events={events}
         total={total}
         page={page}

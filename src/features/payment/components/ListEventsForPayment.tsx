@@ -1,6 +1,6 @@
 "use client";
 
-import type { Event } from "@/features/events/types/eventTypes";
+import type { Event } from "@/features/payment/types/listEventsTypes";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -22,6 +22,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 interface ListEventsForPaymentProps {
+  buttonLabel: string;
   events: Event[];
   total: number;
   page: number;
@@ -31,6 +32,7 @@ interface ListEventsForPaymentProps {
 }
 
 export default function ListEventsForPayment({
+  buttonLabel,
   events,
   total,
   page,
@@ -162,7 +164,7 @@ export default function ListEventsForPayment({
                     onClick={() => onSelectEvent(event.id)}
                     disabled={statusInfo.disabled}
                   >
-                    Realizar Pagamento
+                    {buttonLabel}
                   </Button>
                 </div>
 

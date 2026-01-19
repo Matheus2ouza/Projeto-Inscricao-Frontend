@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/shared/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/shared/components/ui/alert-dialog";
+import { Button } from "@/shared/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 
 interface ConfirmationDialogProps {

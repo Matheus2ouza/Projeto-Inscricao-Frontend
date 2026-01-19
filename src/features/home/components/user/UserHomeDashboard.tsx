@@ -214,15 +214,19 @@ export default function UserHomeDashboard({
   return (
     <>
       <DismissibleAlert
-        id="system-development-warning"
-        title="Sistema em Aprimoramento"
+        id="system-documentation-available"
+        title="Documentação Disponível"
         variant="default"
         asModal={true}
       >
-        Estamos melhorando as funcionalidades de inscrições. Durante esta
-        atualização, algumas partes do sistema podem apresentar comportamento
-        diferente ou falhas temporárias. Para melhor experiência, utilize em
-        computador. Em caso de problemas, contate o suporte: (91) 99258-7483.
+        Agora você pode consultar a documentação completa do sistema para tirar
+        suas dúvidas sobre inscrições, pagamentos e eventos.
+        <Link
+          href="/documentation"
+          className="font-semibold underline underline-offset-2 ml-1"
+        >
+          Acesse a documentação
+        </Link>
       </DismissibleAlert>
 
       <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">

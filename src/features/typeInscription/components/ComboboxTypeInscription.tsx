@@ -31,7 +31,8 @@ export type ComboboxTypeInscriptionProps = {
   onChange: (value: string) => void;
   options?: TypeInscriptionOption[];
   loading?: boolean;
-  disabled?: boolean; // Adicionado aqui
+  disabled?: boolean;
+  modal?: boolean;
 };
 
 export function ComboboxTypeInscription({
@@ -40,7 +41,8 @@ export function ComboboxTypeInscription({
   onChange,
   options,
   loading: loadingProp,
-  disabled = false, // Recebido aqui com valor padrão
+  disabled = false,
+  modal = true,
 }: ComboboxTypeInscriptionProps) {
   const [open, setOpen] = React.useState(false);
   const shouldFetch = options === undefined;
@@ -79,7 +81,7 @@ export function ComboboxTypeInscription({
   }, [selectedTypeInscription, loading, typeInscriptions.length, disabled]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -136,7 +138,7 @@ export function ComboboxTypeInscription({
                   >
                     <span
                       className={cn(
-                        "px-2 py-1 rounded text-xs font-semibold",
+                        "px-2 py-1 rounded text-xs font-semibold uppercase",
                         value === type.value ? "ring-2 ring-blue-400" : "",
                         disabled && "text-gray-400"
                       )}

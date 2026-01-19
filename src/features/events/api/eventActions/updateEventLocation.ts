@@ -2,32 +2,29 @@ import axiosInstance from "@/shared/lib/apiClient";
 
 export type UpdateLocationEventRequest = {
   location: string;
-  longitude: number;
-  latitude: number;
 };
 
-type UpdateEventLocationInput = {
+export type UpdateEventLocationInput = {
   eventId: string;
   location: string;
-  longitude: number;
   latitude: number;
+  longitude: number;
 };
 
 export async function updateEventLocation({
   eventId,
   location,
-  longitude,
   latitude,
+  longitude,
 }: UpdateEventLocationInput): Promise<void> {
   try {
     await axiosInstance.patch(`/events/${eventId}/update/location`, {
       location,
-      longitude,
       latitude,
+      longitude,
     });
   } catch (error) {
     console.error("Error updating event location:", error);
     throw new Error("Falha ao atualizar localização do evento");
   }
 }
-

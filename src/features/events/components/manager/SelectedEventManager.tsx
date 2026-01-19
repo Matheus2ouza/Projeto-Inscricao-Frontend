@@ -13,7 +13,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { cn } from "@/shared/lib/utils";
-import { formatCurrency } from "@/shared/utils/FormatCurrency";
+import { formatCurrency } from "@/shared/utils/formatCurrency";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
 import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";

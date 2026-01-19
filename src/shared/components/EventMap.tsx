@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import dynamic from "next/dynamic";
+import React, { useEffect, useState } from "react";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -17,10 +17,9 @@ const Marker = dynamic(
   () => import("react-leaflet").then((mod) => mod.Marker),
   { ssr: false }
 );
-const Popup = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Popup),
-  { ssr: false }
-);
+const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
+  ssr: false,
+});
 
 interface EventMapProps {
   lat: number;
@@ -57,14 +56,20 @@ const EventMap: React.FC<EventMapProps> = ({
 
   if (!isMounted) {
     return (
-      <div className="bg-muted flex items-center justify-center rounded-md" style={{ height }}>
-         <p className="text-muted-foreground text-sm">Carregando mapa...</p>
+      <div
+        className="bg-muted flex items-center justify-center rounded-md"
+        style={{ height }}
+      >
+        <p className="text-muted-foreground text-sm">Carregando mapa...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full z-0 rounded-md overflow-hidden" style={{ height }}>
+    <div
+      className="relative w-full z-0 rounded-md overflow-hidden"
+      style={{ height }}
+    >
       <MapContainer
         center={[lat, lng]}
         zoom={zoom}

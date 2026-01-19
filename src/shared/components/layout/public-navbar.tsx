@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { ModeToggle } from "@/shared/components/ui/mode-toggle";
 import Logo from "@/shared/components/ui/logo";
+import { ModeToggle } from "@/shared/components/ui/mode-toggle";
 import { Button } from "@heroui/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 const PublicNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,9 +40,6 @@ const PublicNavbar = () => {
         } else {
           router.push("/#eventos");
         }
-        break;
-      case "Documentação":
-        router.push("/documentation");
         break;
       case "Login":
         router.push("/login");
@@ -118,13 +115,6 @@ const PublicNavbar = () => {
                 className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200 relative group"
               >
                 Eventos
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
-              </button>
-              <button
-                onClick={() => handleNavigation("Documentação")}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200 relative group"
-              >
-                Documentação
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
               </button>
             </div>

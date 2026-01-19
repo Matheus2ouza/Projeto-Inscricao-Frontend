@@ -8,7 +8,7 @@ const MAINTENANCE_MODE =
 const MAINTENANCE_PATH = "/maintenance";
 
 function isPublicPath(pathname: string): boolean {
-  if (pathname === "/" || pathname === "/documentation") return true;
+  if (pathname === "/" || pathname.startsWith("/documentation")) return true;
   if (pathname === "/login") return true; // pública, mas redireciona se autenticado
   if (pathname.startsWith("/events/")) return true; // página pública dinâmica
   return false;
@@ -54,7 +54,6 @@ export default async function middleware(request: NextRequest) {
 
   // Com token, se rota pública que redireciona (ex.: /login), mandar para home do role
   if (shouldRedirectWhenAuthenticated(pathname)) {
-
     const session = await verifySession();
     if (session) {
       const role = session.user.role;
@@ -117,7 +116,7 @@ export const config: MiddlewareConfig = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     * - xlsx (permitir arquivos Excel)
+     * - xlsx (allow Excel files)
      */
     "/((?!api|_next/static|_next/image|images/|xlsx/|favicon.ico|sitemap.xml|robots.txt).*)",
   ],

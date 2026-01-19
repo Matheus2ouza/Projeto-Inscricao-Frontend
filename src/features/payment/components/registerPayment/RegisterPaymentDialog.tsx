@@ -1,19 +1,19 @@
 import { useRegisterPayment } from "@/features/payment/hook/registerPayment/useRegisterPayment";
+import type { CreatePaymentResponse } from "@/features/payment/types/registerPayment/registerPaymentTypes";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
+import { formatCurrency } from "@/shared/utils/formatCurrency";
 import {
-  ArrowBigLeftDash,
   ArrowBigRightDash,
   CheckCheck,
   Copy,
@@ -32,7 +32,7 @@ interface RegisterPaymentDialogProps {
   selectedInscriptions: { id: string }[];
   eventId: string;
   totalValue: number;
-  onPaymentRegistered?: () => void;
+  onPaymentRegistered?: (payment: CreatePaymentResponse) => void;
   onSubmitPayment?: (payload: {
     value: number;
     image: string;
@@ -191,13 +191,15 @@ export default function RegisterPaymentDialog({
       !onSubmitPayment || (autoRegisterOnExactAmount && isExactAmount);
 
     try {
+      let paymentResult: CreatePaymentResponse | undefined;
+
       if (shouldRegisterWithBackend) {
         if (!selectedInscriptions || selectedInscriptions.length === 0) {
           throw new Error(
-            "Nenhuma inscrição selecionada para registrar pagamento."
+            "Nenhuma inscrição selecionada para registrar pagamento.",
           );
         }
-        await registerPayment.mutateAsync({
+        paymentResult = await registerPayment.mutateAsync({
           eventId,
           totalValue: resolvedValue,
           image: imageData,
@@ -218,15 +220,8 @@ export default function RegisterPaymentDialog({
       onOpenChange(false);
 
       // Callback opcional
-      if (onPaymentRegistered) {
-        onPaymentRegistered();
-      }
-
-      if (!onSubmitPayment || shouldRegisterWithBackend) {
-        toast.success("Pagamento registrado!", {
-          description:
-            "O pagamento foi registrado com sucesso e está aguardando aprovação.",
-        });
+      if (onPaymentRegistered && paymentResult) {
+        onPaymentRegistered(paymentResult);
       }
     } catch (error) {
       console.error("Erro ao registrar pagamento:", error);
@@ -240,13 +235,6 @@ export default function RegisterPaymentDialog({
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -289,7 +277,7 @@ export default function RegisterPaymentDialog({
             {selectedInscriptions.length === 1
               ? `Registre um novo pagamento para a inscrição #${selectedInscriptions[0].id.slice(
                   0,
-                  8
+                  8,
                 )}...`
               : `Registre um novo pagamento para ${selectedInscriptions.length} inscrições.`}
           </DialogDescription>
@@ -313,18 +301,6 @@ export default function RegisterPaymentDialog({
                       <h3 className="text-lg font-semibold">
                         Dados para Pagamento
                       </h3>
-                    </div>
-                    <div className="flex items-center">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleFlip}
-                        className="text-primary text-base hover:text-primary/80 font-bold text-right"
-                      >
-                        Registrar Pagamento
-                      </Button>
-                      <ArrowBigRightDash className="h-6 w-6 text-primary" />
                     </div>
                   </div>
 
@@ -356,7 +332,7 @@ export default function RegisterPaymentDialog({
                             onClick={() =>
                               handleCopyToClipboard(
                                 bankData.beneficiary,
-                                "beneficiary"
+                                "beneficiary",
                               )
                             }
                           >
@@ -406,7 +382,7 @@ export default function RegisterPaymentDialog({
                               onClick={() =>
                                 handleCopyToClipboard(
                                   bankData.account,
-                                  "account"
+                                  "account",
                                 )
                               }
                             >
@@ -442,20 +418,16 @@ export default function RegisterPaymentDialog({
                       </div>
                     </div>
 
-                    {/* Instruções */}
-                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <h4 className="text-base font-medium mb-2">
-                        Instruções:
-                      </h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>
-                          • Realize o pagamento via PIX ou depósito bancário
-                        </li>
-                        <li>• Utilize os dados acima para a transferência</li>
-                        <li>• Após o pagamento, anexe o comprovante</li>
-                        <li>• Envie somente um comprovante de cada vez</li>
-                        <li>• O valor pode ser parcial ou total</li>
-                      </ul>
+                    {/* Botão Registrar Pagamento */}
+                    <div className="pt-4 border-t">
+                      <Button
+                        type="button"
+                        onClick={handleFlip}
+                        className="w-full flex items-center justify-center gap-2 py-3 text-base font-semibold"
+                      >
+                        Registrar Pagamento
+                        <ArrowBigRightDash className="h-5 w-5" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -472,18 +444,6 @@ export default function RegisterPaymentDialog({
                       <h3 className="text-lg font-semibold">
                         Registrar Pagamento
                       </h3>
-                    </div>
-                    <div className="flex items-center">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleFlip}
-                        className="text-primary text-base hover:text-primary/80 font-bold text-right"
-                      >
-                        Voltar aos Dados
-                      </Button>
-                      <ArrowBigLeftDash className="h-6 w-6 text-primary" />
                     </div>
                   </div>
 
@@ -543,7 +503,7 @@ export default function RegisterPaymentDialog({
                           className="text-sm font-medium"
                         >
                           Comprovante de Pagamento* (Envie somente um
-                          comprovante)
+                          comprovante por vez)
                         </Label>
 
                         {receiptFile ? (
@@ -633,30 +593,36 @@ export default function RegisterPaymentDialog({
                       </div>
                     </div>
 
-                    <DialogFooter className="pt-4 mt-auto">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => onOpenChange(false)}
-                        disabled={isSubmitting}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting || !paymentValue || !receiptFile}
-                        className="min-w-32 dark:text-white"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                            Registrando...
-                          </>
-                        ) : (
-                          "Registrar Pagamento"
-                        )}
-                      </Button>
-                    </DialogFooter>
+                    {/* Botão Registrar Pagamento (lado do formulário) */}
+                    <div className="pt-4 border-t mt-auto">
+                      <div className="flex justify-between gap-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => onOpenChange(false)}
+                          disabled={isSubmitting}
+                          className="flex-1"
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={
+                            isSubmitting || !paymentValue || !receiptFile
+                          }
+                          className="flex-1 min-w-32 dark:text-white"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                              Registrando...
+                            </>
+                          ) : (
+                            "Registrar Pagamento"
+                          )}
+                        </Button>
+                      </div>
+                    </div>
                   </form>
                 </CardContent>
               </Card>

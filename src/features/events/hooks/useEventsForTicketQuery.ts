@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import type { EventsListResponse } from "../../inscriptions/types/listEventsTypes";
 import { getEventsForTicket } from "../api/getEventsForTicket";
-import type { EventsListResponse } from "../types/listEventsTypes";
 
 export const ticketEventsKeys = {
   all: ["ticket-events"] as const,

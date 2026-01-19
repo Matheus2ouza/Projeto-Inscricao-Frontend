@@ -27,6 +27,7 @@ import {
 } from "@/shared/components/ui/pagination";
 import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import { useCurrentUser } from "@/shared/context/user-context";
+import { formatDateTime } from "@/shared/utils/formatDate";
 import { AlertCircle, ThumbsUp } from "lucide-react";
 import React, { useState } from "react";
 import { FormProvider } from "react-hook-form";
@@ -41,24 +42,6 @@ type MembersTableProps = {
   pageCount: number;
   onPageChange: (page: number) => void;
   pageSize?: number;
-};
-
-// Função para formatar data e hora no formato brasileiro
-const formatDateTime = (dateString: string | Date): string => {
-  if (!dateString) return "-";
-
-  const date = new Date(dateString);
-
-  // Formata data: DD/MM/YYYY
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-
-  // Formata hora: HH:MM
-  const hours = date.getHours().toString().padStart(2, "0");
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-
-  return `${day}/${month}/${year} - ${hours}:${minutes}`;
 };
 
 // Função para formatar apenas data (para birthDate)
@@ -370,7 +353,7 @@ export default function MembersTable({
                     type="submit"
                     className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80"
                   >
-                    Criar
+                    Salvar
                   </Button>
                   <DialogClose asChild>
                     <Button

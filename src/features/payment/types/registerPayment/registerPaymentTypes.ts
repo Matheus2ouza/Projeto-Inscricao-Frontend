@@ -1,11 +1,11 @@
-export type ListAllPaymentsResponse = {
-  inscriptions: Inscriptions[];
+export type ListAllPaymentsPendingResponse = {
+  inscriptions: Inscription[];
   total: number;
   page: number;
   pageCount: number;
 };
 
-type Inscriptions = {
+export type Inscription = {
   id: string;
   eventId: string;
   accountId: string;
@@ -15,14 +15,14 @@ type Inscriptions = {
   canPay: boolean;
 };
 
-export type UseInscriptionsInAnalisisParams = {
+export type UseListPaymentPendingParams = {
   eventId: string;
   initialPage?: number;
   pageSize?: number;
 };
 
-export type UseInscriptionsInAnalisisResult = {
-  inscriptions: Inscriptions[];
+export type UseListPaymentPendingResult = {
+  inscriptions: Inscription[];
   total: number;
   page: number;
   pageCount: number;
@@ -32,6 +32,15 @@ export type UseInscriptionsInAnalisisResult = {
   refresh: () => void;
 };
 
+export enum StatusPayment {
+  APPROVED = "approved",
+  UNDER_REVIEW = "under_review",
+  REFUSED = "refused",
+}
+
 export type CreatePaymentResponse = {
   id: string;
+  totalValue: number;
+  status: StatusPayment;
+  createdAt: Date;
 };

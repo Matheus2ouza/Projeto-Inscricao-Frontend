@@ -5,12 +5,7 @@ import { getTypeInscriptionsByEvent } from "@/features/typeInscription/api/getTy
 import { useQuery } from "@tanstack/react-query";
 
 export function useEventManager(eventId: string) {
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery<Event>({
+  const { data, isLoading, error, refetch } = useQuery<Event>({
     queryKey: eventsKeys.detail(eventId),
     queryFn: async () => {
       const [eventData, typesInscriptions] = await Promise.all([

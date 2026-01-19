@@ -72,7 +72,7 @@ export default function EventsPage() {
     return (
       <SelectEventForUsers
         events={events}
-        buttonLabel="Começar Check-In"
+        buttonLabel="Visualizar Evento"
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}

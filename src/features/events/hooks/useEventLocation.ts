@@ -11,20 +11,13 @@ export function useEventLocation() {
   const { setLoading: setGlobalLoading } = useGlobalLoading();
   const { invalidateDetail } = useInvalidateEventsQuery();
 
-  const updateLocation = async (
-    eventId: string,
-    location: string,
-    longitude: number,
-    latitude: number
-  ) => {
+  const updateLocation = async (eventId: string, location: string) => {
     setLoading(true);
     setGlobalLoading(true);
     try {
       await updateEventLocation({
         eventId,
         location,
-        longitude,
-        latitude,
       });
 
       // Invalidar cache do evento
@@ -50,4 +43,3 @@ export function useEventLocation() {
     updateLocation,
   };
 }
-
