@@ -10,10 +10,10 @@ export const membersKeys = {
   detail: (id: string) => [...membersKeys.details(), id] as const,
 };
 
-export function useMembersQuery(enabled: boolean = true) {
+export function useMembersQuery(eventId: string, enabled: boolean = true) {
   return useQuery<MemberResponse[]>({
     queryKey: [...membersKeys.combobox()],
-    queryFn: () => getMembersCombobox(),
+    queryFn: () => getMembersCombobox(eventId),
     enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

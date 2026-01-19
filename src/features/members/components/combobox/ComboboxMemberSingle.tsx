@@ -16,7 +16,6 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { cn } from "@/shared/lib/utils";
-import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 
@@ -25,26 +24,31 @@ export type MemberSingleOption = {
   value: string;
   birthDate?: Date;
   gender?: string;
+  registered?: boolean;
 };
 
 export type ComboboxMemberSingleProps = {
+  eventId: string;
   id?: string;
   label?: string;
   value: string;
   onChange: (value: string, member?: MemberSingleOption) => void;
   loading?: boolean;
   className?: string;
-  usePortal?: boolean; // Nova prop para controlar portal
+  modal?: boolean;
+  disabledValues?: string[];
 };
 
 export function ComboboxMemberSingle({
+  eventId,
   id,
   label,
   value,
   onChange,
   loading: loadingProp,
   className,
-  usePortal = true, // Por padrão usa portal (recomendado para dialogs)
+  modal = true,
+  disabledValues = [],
 }: ComboboxMemberSingleProps) {
   const [open, setOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -53,7 +57,7 @@ export function ComboboxMemberSingle({
     members: fetched,
     loading: internalLoading,
     error,
-  } = useMember(shouldFetch);
+  } = useMember(eventId, shouldFetch);
   const loading = loadingProp ?? internalLoading;
 
   // Busca sempre da API e monta opções
@@ -64,6 +68,7 @@ export function ComboboxMemberSingle({
         value: m.id,
         birthDate: m.birthDate,
         gender: m.gender,
+        registered: m.registered,
       }));
     }
     return [];
@@ -76,7 +81,7 @@ export function ComboboxMemberSingle({
     }
     const term = searchTerm.toLowerCase().trim();
     return allMembers.filter((member) =>
-      member.label.toLowerCase().includes(term)
+      member.label.toLowerCase().includes(term),
     );
   }, [allMembers, searchTerm]);
 
@@ -97,6 +102,9 @@ export function ComboboxMemberSingle({
 
   const handleSelect = (memberValue: string) => {
     const member = allMembers.find((m) => m.value === memberValue);
+    if (member?.registered || disabledValues.includes(memberValue)) {
+      return;
+    }
     onChange(memberValue, member);
     setOpen(false);
     setSearchTerm(""); // Limpar busca após selecionar
@@ -107,43 +115,17 @@ export function ComboboxMemberSingle({
     setSearchTerm(search);
   };
 
-  // Criar um componente de conteúdo com ou sem portal
-  const CustomPopoverContent = React.useMemo(() => {
-    if (!usePortal) {
-      return PopoverContent;
-    }
-
-    // Componente com portal
-    const PortalPopoverContent = React.forwardRef<
-      React.ElementRef<typeof PopoverPrimitive.Content>,
-      React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
-    >((props, ref) => (
-      <PopoverPrimitive.Portal>
-        <PopoverPrimitive.Content
-          ref={ref}
-          {...props}
-          className={cn(
-            "w-[var(--radix-popover-trigger-width)] min-w-[240px] p-0 z-50",
-            props.className
-          )}
-        />
-      </PopoverPrimitive.Portal>
-    ));
-
-    PortalPopoverContent.displayName = "PortalPopoverContent";
-    return PortalPopoverContent;
-  }, [usePortal]);
-
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className={cn(
             "w-full justify-between relative overflow-hidden",
-            className
+            className,
           )}
         >
           <span
@@ -164,13 +146,15 @@ export function ComboboxMemberSingle({
           />
         </Button>
       </PopoverTrigger>
-      <CustomPopoverContent
+      <PopoverContent
         align="start"
         side="bottom"
         sideOffset={5}
         avoidCollisions={true}
         collisionPadding={16}
+        className="w-[--radix-popover-trigger-width] p-0"
         style={{
+          width: "var(--radix-popover-trigger-width)",
           maxHeight: "300px",
           overflow: "hidden",
         }}
@@ -195,39 +179,58 @@ export function ComboboxMemberSingle({
             </CommandEmpty>
             {filteredMembers.length > 0 && (
               <CommandGroup className="max-h-[250px] overflow-y-auto">
-                {filteredMembers.map((member) => (
-                  <CommandItem
-                    key={member.value}
-                    value={member.label}
-                    onSelect={() => handleSelect(member.value)}
-                  >
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <span
-                        className={cn(
-                          "text-sm font-semibold",
-                          selectedMember?.value === member.value
-                            ? "text-blue-600 dark:text-blue-400"
-                            : ""
+                {filteredMembers.map((member) => {
+                  const isSelected = selectedMember?.value === member.value;
+                  const isRegistered = Boolean(member.registered);
+                  const isDisabled = disabledValues.includes(member.value);
+
+                  return (
+                    <CommandItem
+                      key={member.value}
+                      value={member.label}
+                      onSelect={() => handleSelect(member.value)}
+                      disabled={isRegistered || isDisabled}
+                    >
+                      <div className="flex flex-1 min-w-0 items-center justify-start gap-5">
+                        <span
+                          className={cn(
+                            "text-sm font-semibold truncate",
+                            isSelected
+                              ? "text-blue-600 dark:text-blue-400"
+                              : "",
+                            (isRegistered || isDisabled) &&
+                              "text-gray-400 dark:text-gray-500",
+                          )}
+                        >
+                          {member.label}
+                        </span>
+                        {isRegistered && (
+                          <span className="text-[9px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-600 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800">
+                            já inscrito
+                          </span>
                         )}
-                      >
-                        {member.label}
-                      </span>
-                    </div>
-                    <Check
-                      className={cn(
-                        "ml-2 flex-shrink-0",
-                        selectedMember?.value === member.value
-                          ? "opacity-100 text-blue-600"
-                          : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
+                        {isDisabled && !isRegistered && (
+                          <span className="text-[9px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-green-100 text-green-600 border border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800">
+                            selecionado
+                          </span>
+                        )}
+                      </div>
+                      <Check
+                        className={cn(
+                          "ml-2 flex-shrink-0",
+                          isSelected
+                            ? "opacity-100 text-blue-600"
+                            : "opacity-0",
+                        )}
+                      />
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
           </CommandList>
         </Command>
-      </CustomPopoverContent>
+      </PopoverContent>
     </Popover>
   );
 }

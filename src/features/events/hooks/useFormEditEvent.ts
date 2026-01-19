@@ -34,9 +34,12 @@ export function useFormEditEvent(event: Event) {
       ? event.endDate.split("T")[1].substring(0, 5)
       : "00:00",
     location: event.location || "",
+    latitude: event.latitude || 0,
+    longitude: event.longitude || 0,
     maxParticipants: event.maxParticipants || 0,
     ticketPrice: event.ticketPrice || 0,
     status: event.status || "CLOSE",
+    active: event.active || false,
     responsibleIds: originalResponsibleIds,
   });
 
@@ -64,10 +67,16 @@ export function useFormEditEvent(event: Event) {
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
         location: formData.location,
+        latitude: Number(formData.latitude),
+        longitude: Number(formData.longitude),
         maxParticipants: formData.maxParticipants || undefined,
         ticketPrice: formData.ticketPrice || undefined,
         status: formData.status,
-        responsibles: newResponsibleIds && newResponsibleIds.length > 0 ? newResponsibleIds : undefined,
+        active: formData.active,
+        responsibles:
+          newResponsibleIds && newResponsibleIds.length > 0
+            ? newResponsibleIds
+            : undefined,
       };
 
       await updateEvent(event.id, updateData);
@@ -134,9 +143,12 @@ export function useFormEditEvent(event: Event) {
         ? event.endDate.split("T")[1].substring(0, 5)
         : "00:00",
       location: event.location || "",
+      latitude: event.latitude || 0,
+      longitude: event.longitude || 0,
       maxParticipants: event.maxParticipants || 0,
       ticketPrice: event.ticketPrice || 0,
       status: event.status || "CLOSE",
+      active: event.active || false,
       responsibleIds: originalResponsibleIds,
     });
     setIsEditing(false);

@@ -3,35 +3,35 @@
 import EventMap from "@/shared/components/EventMap";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { Calendar, Car, Clock, Loader2, Share2 } from "lucide-react";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+import { getGradientClass } from "@/shared/utils/getGenerateGradient";
+import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
+import { Calendar, Car, Clock, Loader2, MapPin, Share2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useDetailsEvent } from "../hooks/useDetailsEvent";
+import { EventManager } from "../types/eventTypes";
 
 interface DetailsEventProps {
-  eventId: string;
+  event: EventManager | null;
+  individualInscriptionClick: () => void;
+  groupInscriptionClick: () => void;
 }
-
-const formatDate = (date: string | Date) =>
-  new Date(date).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
 
 const getDateDetails = (date: string | Date) => {
   const parsedDate = new Date(date);
 
+  const rawDate = parsedDate.toLocaleDateString("pt-BR", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
   return {
     weekday: parsedDate.toLocaleDateString("pt-BR", { weekday: "long" }),
-    date: parsedDate.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }),
+    date: rawDate.replace(".", ""),
     time: parsedDate.toLocaleTimeString("pt-BR", {
       hour: "2-digit",
       minute: "2-digit",
@@ -45,12 +45,12 @@ const getEventCountdownLabel = (start: string | Date) => {
   const normalizedNow = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate()
+    now.getDate(),
   );
   const normalizedStart = new Date(
     startDate.getFullYear(),
     startDate.getMonth(),
-    startDate.getDate()
+    startDate.getDate(),
   );
   const diffMs = normalizedStart.getTime() - normalizedNow.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
@@ -70,19 +70,14 @@ const getEventCountdownLabel = (start: string | Date) => {
   return "Evento já começou";
 };
 
-export default function DetailsEvent({ eventId }: DetailsEventProps) {
+export default function DetailsEvent({
+  event,
+  individualInscriptionClick,
+  groupInscriptionClick,
+}: DetailsEventProps) {
   const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageFailed, setImageFailed] = useState(false);
-  const { event, loading, error } = useDetailsEvent(eventId);
-
-  const handleIndividualInscription = () => {
-    router.push(`/user/individual-inscription/${eventId}`);
-  };
-
-  const handleGroupInscription = () => {
-    router.push(`/user/group-inscription/${eventId}`);
-  };
 
   const handleShare = () => {
     if (event && navigator.share) {
@@ -110,9 +105,9 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
       .replace(/-|:|\.\d+/g, "");
 
     const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-      event.name
+      event.name,
     )}&dates=${startDate}/${endDate}&details=${encodeURIComponent(
-      `Evento: ${event.name}\nLocal: ${event.location || "A definir"}`
+      `Evento: ${event.name}\nLocal: ${event.location || "A definir"}`,
     )}`;
 
     window.open(calendarUrl, "_blank");
@@ -126,91 +121,6 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
 
     window.open(mapsUrl, "_blank");
   };
-
-  const generateGradient = (eventName: string) => {
-    const colors = [
-      "from-purple-500 to-pink-500",
-      "from-blue-500 to-cyan-500",
-      "from-green-500 to-emerald-500",
-      "from-orange-500 to-red-500",
-      "from-indigo-500 to-purple-500",
-      "from-teal-500 to-blue-500",
-      "from-yellow-500 to-orange-500",
-      "from-pink-500 to-rose-500",
-    ];
-
-    let hash = 0;
-    for (let i = 0; i < eventName.length; i++) {
-      hash = eventName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const index = Math.abs(hash) % colors.length;
-
-    return colors[index];
-  };
-
-  const getEventStatusInfo = (status: string) => {
-    switch (status) {
-      case "OPEN":
-        return {
-          label: "Inscrições Abertas",
-          badgeClass: "bg-green-500 text-white",
-          disabled: false,
-        };
-      case "CLOSE":
-        return {
-          label: "Inscrições Fechadas",
-          badgeClass: "bg-red-500 text-white",
-          disabled: true,
-        };
-      case "FINALIZED":
-        return {
-          label: "Evento Finalizado",
-          badgeClass: "bg-gray-500 text-white",
-          disabled: true,
-        };
-      default:
-        return {
-          label: "Status Desconhecido",
-          badgeClass: "bg-gray-500 hover:bg-gray-600 text-white",
-          disabled: true,
-        };
-    }
-  };
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-
-  if (loading) {
-    return (
-      <div className="space-y-8">
-        <Skeleton className="h-80 w-full rounded-3xl" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <Skeleton className="h-48 w-full rounded-2xl" />
-            <Skeleton className="h-56 w-full rounded-2xl" />
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-48 w-full rounded-2xl" />
-            <Skeleton className="h-40 w-full rounded-2xl" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
-        <h2 className="text-2xl font-semibold text-red-600 mb-2">
-          Erro ao carregar evento
-        </h2>
-        <p className="text-muted-foreground">{error}</p>
-      </div>
-    );
-  }
 
   if (!event) {
     return (
@@ -226,12 +136,12 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
   }
 
   const statusInfo = getEventStatusInfo(event.status);
-  const gradientClass = generateGradient(event.name);
+  const gradientClass = getGradientClass(event.name);
   const shouldShowImage = Boolean(event.imageUrl && !imageFailed);
-  const formattedStartDate = formatDate(event.startDate);
-  const formattedEndDate = formatDate(event.endDate);
   const hasCoordinates =
-    typeof event.latitude === "number" && typeof event.longitude === "number";
+    typeof event.latitude === "number" &&
+    typeof event.longitude === "number" &&
+    typeof event.location;
   const startDetails = getDateDetails(event.startDate);
   const endDetails = getDateDetails(event.endDate);
   const countdownLabel = getEventCountdownLabel(event.startDate);
@@ -309,9 +219,6 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                   Início
                 </p>
-                <p className="text-sm text-muted-foreground capitalize">
-                  {startDetails.weekday}
-                </p>
                 <p className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white leading-tight">
                   {startDetails.date}
                 </p>
@@ -320,9 +227,6 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
               <div className="space-y-2">
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                   Encerramento
-                </p>
-                <p className="text-sm text-muted-foreground capitalize">
-                  {endDetails.weekday}
                 </p>
                 <p className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white leading-tight">
                   {endDetails.date}
@@ -337,6 +241,14 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Localização
                 </h2>
+                {event.location && (
+                  <div className="flex items-center gap-2 mt-2 text-gray-700 dark:text-gray-200">
+                    <MapPin className="h-5 w-5 text-primary shrink-0" />
+                    <p className="text-base sm:text-lg font-medium">
+                      {event.location}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -398,11 +310,10 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
                 {event.name}.
               </p>
             </div>
-            {event.status !== "OPEN" && (
-              <Badge className={`${statusInfo.badgeClass} border-0`}>
-                {statusInfo.label}
-              </Badge>
-            )}
+
+            <Badge className={`${statusInfo.badgeClass} border-0`}>
+              {statusInfo.label}
+            </Badge>
           </div>
 
           {statusInfo.disabled && (
@@ -427,7 +338,7 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
                       </span>
                       <span className="text-base sm:text-lg font-bold text-primary whitespace-nowrap">
                         {type.value > 0
-                          ? formatCurrency(type.value)
+                          ? getFormatCurrency(type.value)
                           : "Gratuito"}
                       </span>
                     </div>
@@ -441,7 +352,7 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
             )}
           </div>
 
-          {statusInfo.disabled && (
+          {event.status === "FINALIZED" && (
             <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-sm text-primary/80">
               {event.status === "FINALIZED"
                 ? "Inscrições encerradas porque o evento já aconteceu."
@@ -453,7 +364,7 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
             <Button
               size="lg"
               className="w-full sm:flex-1 rounded-xl dark:text-white py-6 text-base"
-              onClick={handleIndividualInscription}
+              onClick={individualInscriptionClick}
               disabled={statusInfo.disabled}
             >
               Inscrição Individual
@@ -462,7 +373,7 @@ export default function DetailsEvent({ eventId }: DetailsEventProps) {
               size="lg"
               variant="outline"
               className="w-full sm:flex-1 rounded-xl py-6 text-base"
-              onClick={handleGroupInscription}
+              onClick={groupInscriptionClick}
               disabled={statusInfo.disabled}
             >
               Inscrição em Grupo

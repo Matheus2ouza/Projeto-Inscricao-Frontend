@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { getConvertStatusPayment } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import { Eye, Info } from "lucide-react";
 import { useState } from "react";
@@ -33,14 +34,6 @@ import type {
   PaymentGroup,
   PaymentListItem,
 } from "../types/listPayments.types";
-
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-  minimumFractionDigits: 2,
-});
-
-const formatCurrency = (value: number) => currencyFormatter.format(value ?? 0);
 
 const formatDayLabel = (isoDay: string) => {
   const date = new Date(isoDay);
@@ -79,10 +72,10 @@ export default function PaymentsListTable({
   const totalPayments = allPayments.length;
   const totalValue = allPayments.reduce(
     (sum, payment) => sum + payment.value,
-    0
+    0,
   );
   const approvedPayments = allPayments.filter(
-    (payment) => !!payment.approvedBy
+    (payment) => !!payment.approvedBy,
   ).length;
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerImage, setViewerImage] = useState<{
@@ -144,7 +137,7 @@ export default function PaymentsListTable({
             <div>
               <p className="text-sm text-muted-foreground">Valor listado</p>
               <p className="text-2xl font-semibold">
-                {formatCurrency(totalValue)}
+                {getFormatCurrency(totalValue)}
               </p>
             </div>
             <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -205,14 +198,14 @@ export default function PaymentsListTable({
                       <TableCell className="text-left">
                         <span
                           className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getStatusColor(
-                            payment.status ?? "pending"
+                            payment.status ?? "pending",
                           )}`}
                         >
                           {getConvertStatusPayment(payment.status)}
                         </span>
                       </TableCell>
                       <TableCell className="font-semibold text-left">
-                        {formatCurrency(payment.value)}
+                        {getFormatCurrency(payment.value)}
                       </TableCell>
                       <TableCell
                         className={
@@ -288,7 +281,7 @@ export default function PaymentsListTable({
                   const startPage = Math.min(page, maxStart);
                   const endPage = Math.min(
                     startPage + windowSize - 1,
-                    pageCount
+                    pageCount,
                   );
 
                   return Array.from(
@@ -306,7 +299,7 @@ export default function PaymentsListTable({
                           </PaginationLink>
                         </PaginationItem>
                       );
-                    }
+                    },
                   );
                 })()}
                 <PaginationItem>

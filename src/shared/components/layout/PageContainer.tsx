@@ -17,7 +17,9 @@ interface PageContainerProps {
   title?: string;
   description?: string;
   showBackButton?: boolean;
+  showTitle?: boolean;
   backButtonAction?: () => void;
+  titleSize?: string;
   className?: string;
   containerClassName?: string;
   maxWidth?: ContainerWidth;
@@ -31,6 +33,7 @@ interface PageContainerProps {
  * <PageContainer
  *   title="Minhas Inscrições"
  *   description="Visualize todas as suas inscrições nos eventos"
+ *   showTitle={true}
  * >
  *   <MyContent />
  * </PageContainer>
@@ -40,11 +43,13 @@ export default function PageContainer({
   title,
   description,
   showBackButton = true,
+  showTitle = true,
   backButtonAction,
   className,
   containerClassName,
   maxWidth = "2xl",
   actions,
+  titleSize,
 }: PageContainerProps) {
   const router = useRouter();
 
@@ -64,7 +69,7 @@ export default function PageContainer({
         className={cn(
           maxWidthClass,
           "mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-8",
-          containerClassName
+          containerClassName,
         )}
       >
         {(title || showBackButton || actions) && (
@@ -75,9 +80,11 @@ export default function PageContainer({
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               )}
-              {title && (
+              {title && showTitle && (
                 <div>
-                  <h1 className={PAGE_CONTAINER_CLASSES.title}>{title}</h1>
+                  <h1 className={cn(PAGE_CONTAINER_CLASSES.title, titleSize)}>
+                    {title}
+                  </h1>
                   {description && (
                     <p className={PAGE_CONTAINER_CLASSES.description}>
                       {description}

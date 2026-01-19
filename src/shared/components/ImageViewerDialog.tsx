@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/shared/components/ui/dialog";
 import { Download, Loader2, ZoomIn, ZoomOut } from "lucide-react";
-import type { SyntheticEvent } from "react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export enum ImageViewerDownloadExtension {
@@ -56,16 +56,6 @@ export default function ImageViewerDialog({
     window.addEventListener("resize", updateViewportSize);
     return () => window.removeEventListener("resize", updateViewportSize);
   }, []);
-
-  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
-    const { naturalWidth, naturalHeight } = event.currentTarget;
-    setImageDimensions({ width: naturalWidth, height: naturalHeight });
-    setImageLoading(false);
-  };
-
-  const handleImageError = () => {
-    setImageLoading(false);
-  };
 
   const resolveDownloadFileName = () => {
     const sanitizedExtension =
@@ -137,41 +127,48 @@ export default function ImageViewerDialog({
     onClose();
   };
 
+  // Cálculo responsivo para o dialog
   const dialogWidth = (() => {
-    if (!viewportSize.width) {
-      return undefined;
-    }
+    if (!viewportSize.width) return undefined;
 
-    const horizontalAllowance = 96; // paddings + controls
+    const isMobile = viewportSize.width < 640;
+    const horizontalAllowance = isMobile ? 48 : 96; // paddings + controls
+    const maxWidthPercentage = isMobile ? 0.98 : 0.95;
+
     if (!imageDimensions) {
-      return Math.min(960, viewportSize.width * 0.95);
+      return Math.min(960, viewportSize.width * maxWidthPercentage);
     }
 
-    return Math.min(
+    const maxWidth = Math.min(
       imageDimensions.width + horizontalAllowance,
-      viewportSize.width * 0.95
+      viewportSize.width * maxWidthPercentage
     );
+
+    return isMobile ? Math.max(280, maxWidth) : maxWidth;
   })();
 
   const dialogHeight = (() => {
-    if (!viewportSize.height) {
-      return undefined;
-    }
+    if (!viewportSize.height) return undefined;
 
-    const verticalAllowance = 260; // header + actions + paddings
+    const isMobile = viewportSize.width < 640;
+    const verticalAllowance = isMobile ? 200 : 260; // header + actions + paddings
+    const maxHeightPercentage = isMobile ? 0.95 : 0.9;
+
     if (!imageDimensions) {
-      return Math.min(720, viewportSize.height * 0.95);
+      return Math.min(720, viewportSize.height * maxHeightPercentage);
     }
 
     return Math.min(
       imageDimensions.height + verticalAllowance,
-      viewportSize.height * 0.95
+      viewportSize.height * maxHeightPercentage
     );
   })();
 
   const imageAreaMaxHeight = (() => {
     if (viewportSize.height) {
-      const viewportLimit = viewportSize.height * 0.7;
+      const isMobile = viewportSize.width < 640;
+      const viewportLimit = viewportSize.height * (isMobile ? 0.65 : 0.7);
+
       if (!imageDimensions) {
         return viewportLimit;
       }
@@ -182,36 +179,44 @@ export default function ImageViewerDialog({
     return imageDimensions?.height ?? 480;
   })();
 
-  const imageAreaMinHeight = Math.min(400, imageAreaMaxHeight ?? 400);
+  const imageAreaMinHeight = Math.min(300, imageAreaMaxHeight ?? 300);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="flex flex-col"
+        className="flex flex-col p-4 sm:p-6"
         style={{
           width: dialogWidth,
-          maxWidth: viewportSize.width ? viewportSize.width * 0.95 : undefined,
+          maxWidth: viewportSize.width
+            ? viewportSize.width * (viewportSize.width < 640 ? 0.98 : 0.95)
+            : undefined,
           maxHeight: dialogHeight,
-          minWidth: 450,
+          minWidth: viewportSize.width < 640 ? 280 : 450,
         }}
       >
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+        <DialogHeader className="px-0 sm:px-2">
+          <DialogTitle className="text-lg sm:text-xl">{title}</DialogTitle>
+          {description && (
+            <DialogDescription className="text-xs sm:text-sm">
+              {description}
+            </DialogDescription>
+          )}
         </DialogHeader>
 
         {/* Controles de Zoom e Download */}
-        <div className="flex justify-between items-center gap-2 border-b pb-3">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 border-b pb-3">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleZoomOut}
               disabled={zoom <= 0.5}
+              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+              title="Reduzir zoom"
             >
-              <ZoomOut className="h-4 w-4" />
+              <ZoomOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <span className="text-sm font-medium min-w-[60px] text-center">
+            <span className="text-xs sm:text-sm font-medium min-w-[50px] sm:min-w-[60px] text-center">
               {Math.round(zoom * 100)}%
             </span>
             <Button
@@ -219,10 +224,17 @@ export default function ImageViewerDialog({
               size="sm"
               onClick={handleZoomIn}
               disabled={zoom >= 3}
+              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+              title="Aumentar zoom"
             >
-              <ZoomIn className="h-4 w-4" />
+              <ZoomIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <Button variant="outline" size="sm" onClick={handleResetZoom}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetZoom}
+              className="text-xs h-8 px-2 sm:h-9 sm:px-3"
+            >
               Resetar
             </Button>
           </div>
@@ -231,12 +243,12 @@ export default function ImageViewerDialog({
             onClick={handleDownloadImage}
             disabled={downloadLoading}
             size="sm"
-            className="text-white"
+            className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
           >
             {downloadLoading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 animate-spin" />
             ) : (
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             )}
             Download
           </Button>
@@ -250,31 +262,44 @@ export default function ImageViewerDialog({
             maxHeight: imageAreaMaxHeight,
           }}
         >
-          <div className="flex justify-center items-start p-4">
+          <div className="flex justify-center items-start p-2 sm:p-4">
             {imageLoading && (
-              <div className="flex items-center justify-center h-96 w-full">
-                <Loader2 className="h-8 w-8 animate-spin" />
+              <div className="flex items-center justify-center h-64 sm:h-96 w-full">
+                <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
               </div>
             )}
-            <img
-              src={imageUrl}
-              alt="Imagem ampliada"
-              className={`rounded-lg transition-transform duration-200 ${imageLoading ? "hidden" : "block"}`}
-              style={{
-                transform: `scale(${zoom})`,
-                transformOrigin: "top center",
-                maxWidth: "none",
-                cursor: zoom > 1 ? "move" : "default",
-              }}
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-            />
+            <div className="relative">
+              <Image
+                src={imageUrl}
+                alt="Imagem ampliada"
+                width={imageDimensions?.width ?? 800}
+                height={imageDimensions?.height ?? 600}
+                className="rounded-lg transition-transform duration-200"
+                style={{
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "top center",
+                  maxWidth: "none",
+                  cursor: zoom > 1 ? "move" : "default",
+                }}
+                onLoad={(event) => {
+                  const img = event.currentTarget;
+                  setImageDimensions({
+                    width: img.naturalWidth,
+                    height: img.naturalHeight,
+                  });
+                  setImageLoading(false);
+                }}
+                onError={() => setImageLoading(false)}
+              />
+            </div>
           </div>
         </div>
 
         {/* Instruções */}
-        <div className="text-xs text-muted-foreground text-center pt-2 border-t">
+        <div className="text-xs text-muted-foreground text-center pt-2 border-t text-[10px] sm:text-xs">
           Use os botões de zoom para ampliar ou reduzir a imagem
+          {viewportSize.width < 640 &&
+            " • Arraste para mover a imagem ampliada"}
         </div>
       </DialogContent>
     </Dialog>

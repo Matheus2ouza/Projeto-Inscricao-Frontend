@@ -1,22 +1,15 @@
 import { Badge } from "@/shared/components/ui/badge";
 import { Card, CardContent } from "@/shared/components/ui/card";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import type {
   AvulsaRegistrationDetails,
   OnSiteParticipant,
 } from "../../../types/avulsa/avulsaTypes";
 
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
-
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
   timeStyle: "short",
 });
-
-const formatCurrency = (value: number) =>
-  currencyFormatter.format(Number.isNaN(value) ? 0 : value);
 
 const formatDate = (value?: string) => {
   if (!value) return "-";
@@ -26,7 +19,7 @@ const formatDate = (value?: string) => {
 };
 
 const computeTotals = (
-  participants: OnSiteParticipant[]
+  participants: OnSiteParticipant[],
 ): {
   totalGeral: number;
   totalDinheiro: number;
@@ -57,7 +50,7 @@ const computeTotals = (
       totalDinheiro: 0,
       totalGeral: 0,
       totalPix: 0,
-    }
+    },
   );
 };
 
@@ -78,7 +71,7 @@ export default function AvulsaRegistrationDetailsContent({
   const totals = computeTotals(participants);
   const participantSum = participants.reduce(
     (sum, participant) => sum + getParticipantTotal(participant),
-    0
+    0,
   );
 
   const totalItems = [
@@ -124,7 +117,7 @@ export default function AvulsaRegistrationDetailsContent({
             <CardContent>
               <p className="text-xs text-muted-foreground">{item.label}</p>
               <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                {formatCurrency(item.value)}
+                {getFormatCurrency(item.value)}
               </p>
             </CardContent>
           </Card>
@@ -137,7 +130,7 @@ export default function AvulsaRegistrationDetailsContent({
             Participantes ({participants.length})
           </h2>
           <p className="text-sm text-muted-foreground">
-            Total registrado {formatCurrency(participantSum)}
+            Total registrado {getFormatCurrency(participantSum)}
           </p>
         </div>
 
@@ -165,7 +158,7 @@ export default function AvulsaRegistrationDetailsContent({
                       </p>
                     </div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {formatCurrency(getParticipantTotal(participant))}
+                      {getFormatCurrency(getParticipantTotal(participant))}
                     </p>
                   </div>
 
@@ -177,7 +170,7 @@ export default function AvulsaRegistrationDetailsContent({
                         className="text-xs font-medium"
                       >
                         {payment.paymentMethod} •{" "}
-                        {formatCurrency(payment.value)}
+                        {getFormatCurrency(payment.value)}
                       </Badge>
                     ))}
                   </div>

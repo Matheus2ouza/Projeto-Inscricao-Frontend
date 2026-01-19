@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { getConvertStatusEvent } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   addDays,
   addMonths,
@@ -35,13 +36,6 @@ type AdminManagerHomeDashboardProps = {
   refreshingMetric?: DashboardMetric | null;
   onRefreshMetric?: (metric: DashboardMetric) => void;
 };
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  }).format(value || 0);
 
 export default function AdminManagerHomeDashboard({
   data,
@@ -93,7 +87,7 @@ export default function AdminManagerHomeDashboard({
       },
       textColor: "text-emerald-600",
       metric: "totalCollected",
-      value: formatCurrency(data?.totalCollected ?? 0),
+      value: getFormatCurrency(data?.totalCollected ?? 0),
       detailLabel: "Recebido",
     },
     {
@@ -106,7 +100,7 @@ export default function AdminManagerHomeDashboard({
       },
       textColor: "text-rose-600",
       metric: "totalDebt",
-      value: formatCurrency(data?.totalDebt ?? 0),
+      value: getFormatCurrency(data?.totalDebt ?? 0),
       detailLabel: "Em aberto",
     },
     {

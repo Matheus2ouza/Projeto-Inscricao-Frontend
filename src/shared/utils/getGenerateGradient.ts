@@ -27,4 +27,3 @@ export function getGradientClass(eventName: string): string {
 
   return colors[index];
 }
-

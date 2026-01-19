@@ -13,7 +13,7 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { cn } from "@/shared/lib/utils";
-import { formatCurrency } from "@/shared/utils/FormatCurrency";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
 import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
@@ -148,7 +148,7 @@ export default function SelectedEventManager({
               {/* Card personalizado sem bordas do shadcn */}
               <div
                 className={cn(
-                  "bg-card text-card-foreground flex flex-col transition-all duration-300 ease-in-out shadow-sm w-full overflow-hidden rounded-xl hover:shadow-md cursor-pointer"
+                  "bg-card text-card-foreground flex flex-col transition-all duration-300 ease-in-out shadow-sm w-full overflow-hidden rounded-xl hover:shadow-md cursor-pointer",
                 )}
               >
                 {/* Imagem do Evento - Ocupando toda a parte superior */}
@@ -230,7 +230,7 @@ export default function SelectedEventManager({
                           <div className="flex-1">
                             <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
                               {showAmount[event.id]
-                                ? formatCurrency(event.amountCollected)
+                                ? getFormatCurrency(event.amountCollected)
                                 : "****"}
                             </p>
                             <p className="text-xs text-muted-foreground">
@@ -327,12 +327,12 @@ export default function SelectedEventManager({
                             "p-1 h-7 w-7 sm:h-8 sm:w-8 transition-all duration-300",
                             isCopied
                               ? "bg-green-50 text-green-600 border-green-200"
-                              : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+                              : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200",
                           )}
                           onClick={() =>
                             copyToClipboard(
                               `${window.location.origin}/events/${event.id}`,
-                              event.id
+                              event.id,
                             )
                           }
                           title={isCopied ? "Copiado!" : "Copiar URL"}

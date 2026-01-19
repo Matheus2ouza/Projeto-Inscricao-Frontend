@@ -22,13 +22,13 @@ export default function ExpensesSuperPage() {
   const getInfoRows = (event: Event) => [
     {
       label: "Total de Localidades",
-      value: event.countExpenses
+      value: event.countExpenses,
     },
     {
       label: "Total de Participantes",
-      value: event.countTotalExpenses
-    }
-  ]
+      value: event.countTotalExpenses,
+    },
+  ];
 
   const handleStatusChange = (value: StatusEvent[]) => {
     setPendingFilter(value);

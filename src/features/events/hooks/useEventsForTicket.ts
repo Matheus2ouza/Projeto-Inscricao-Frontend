@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import type {
   UseTicketsEventsParams,
   UseTicketsEventsResult,
-} from "../types/listEventsTypes";
+} from "../../inscriptions/types/listEventsTypes";
 import { useTicketsEventsQuery } from "./useEventsForTicketQuery";
 
 export function useTicketsEvents({
@@ -14,8 +14,10 @@ export function useTicketsEvents({
 }: UseTicketsEventsParams = {}): UseTicketsEventsResult {
   const [page, setPage] = useState(initialPage);
   const { setLoading: setGlobalLoading } = useGlobalLoading();
-  const { data, isLoading, isFetching, error, refetch } =
-    useTicketsEventsQuery(page, pageSize);
+  const { data, isLoading, isFetching, error, refetch } = useTicketsEventsQuery(
+    page,
+    pageSize
+  );
 
   useEffect(() => {
     setGlobalLoading(isFetching);
@@ -30,9 +32,7 @@ export function useTicketsEvents({
       return null;
     }
 
-    return error instanceof Error
-      ? error.message
-      : "Falha ao carregar eventos";
+    return error instanceof Error ? error.message : "Falha ao carregar eventos";
   }, [error]);
 
   return {

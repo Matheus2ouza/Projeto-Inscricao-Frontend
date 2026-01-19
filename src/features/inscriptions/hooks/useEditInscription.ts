@@ -90,11 +90,14 @@ export function useUpdateInscription({
       if (!inscriptionId) return;
 
       // Marcar inscrição como deletada no cache para evitar queries futuras
-      queryClient.setQueryData(["deleted-inscriptions"], (old: Set<string> | undefined) => {
-        const deletedSet = old || new Set();
-        deletedSet.add(inscriptionId);
-        return new Set(deletedSet);
-      });
+      queryClient.setQueryData(
+        ["deleted-inscriptions"],
+        (old: Set<string> | undefined) => {
+          const deletedSet = old || new Set();
+          deletedSet.add(inscriptionId);
+          return new Set(deletedSet);
+        }
+      );
 
       // Cancelar todas as queries relacionadas à inscrição antes de deletar
       await queryClient.cancelQueries({
@@ -111,11 +114,14 @@ export function useUpdateInscription({
 
       if (inscriptionId) {
         // Garantir que a inscrição permaneça marcada como deletada
-        queryClient.setQueryData(["deleted-inscriptions"], (old: Set<string> | undefined) => {
-          const deletedSet = old || new Set();
-          deletedSet.add(inscriptionId);
-          return new Set(deletedSet);
-        });
+        queryClient.setQueryData(
+          ["deleted-inscriptions"],
+          (old: Set<string> | undefined) => {
+            const deletedSet = old || new Set();
+            deletedSet.add(inscriptionId);
+            return new Set(deletedSet);
+          }
+        );
 
         // Invalidar apenas as listas de inscrições
         await queryClient.invalidateQueries({
@@ -129,18 +135,19 @@ export function useUpdateInscription({
     onError: (error) => {
       // Em caso de erro, remover a marcação de deletada
       if (inscriptionId) {
-        queryClient.setQueryData(["deleted-inscriptions"], (old: Set<string> | undefined) => {
-          if (!old) return old;
-          const deletedSet = new Set(old);
-          deletedSet.delete(inscriptionId);
-          return deletedSet.size > 0 ? deletedSet : undefined;
-        });
+        queryClient.setQueryData(
+          ["deleted-inscriptions"],
+          (old: Set<string> | undefined) => {
+            if (!old) return old;
+            const deletedSet = new Set(old);
+            deletedSet.delete(inscriptionId);
+            return deletedSet.size > 0 ? deletedSet : undefined;
+          }
+        );
       }
 
       const message =
-        error instanceof Error
-          ? error.message
-          : "Erro ao excluir inscrição.";
+        error instanceof Error ? error.message : "Erro ao excluir inscrição.";
       toast.error(message);
     },
   });

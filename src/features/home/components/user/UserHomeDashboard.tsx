@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
 import { getConvertStatusEvent } from "@/shared/utils/getConvertStatus";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   addDays,
   addMonths,
@@ -44,13 +45,6 @@ type UserHomeDashboardProps = {
   refreshingMetric?: DashboardUserMetric | null;
   onRefreshMetric?: (metric: DashboardUserMetric) => void;
 };
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  }).format(value || 0);
 
 export default function UserHomeDashboard({
   data,
@@ -142,13 +136,13 @@ export default function UserHomeDashboard({
       },
       textColor: "text-rose-700",
       metric: "payments",
-      value: formatCurrency(data?.payments?.countTotalDebt ?? 0),
+      value: getFormatCurrency(data?.payments?.countTotalDebt ?? 0),
       subItems: [
         {
           icon: Wallet,
           iconColor: "text-emerald-600",
           label: "Pago",
-          value: formatCurrency(data?.payments?.countTotalPaid ?? 0),
+          value: getFormatCurrency(data?.payments?.countTotalPaid ?? 0),
         },
         {
           icon: Percent,
@@ -214,15 +208,19 @@ export default function UserHomeDashboard({
   return (
     <>
       <DismissibleAlert
-        id="system-development-warning"
-        title="Sistema em Aprimoramento"
+        id="system-documentation-available"
+        title="Documentação Disponível"
         variant="default"
         asModal={true}
       >
-        Estamos melhorando as funcionalidades de inscrições. Durante esta
-        atualização, algumas partes do sistema podem apresentar comportamento
-        diferente ou falhas temporárias. Para melhor experiência, utilize em
-        computador. Em caso de problemas, contate o suporte: (91) 99258-7483.
+        Agora você pode consultar a documentação completa do sistema para tirar
+        suas dúvidas sobre inscrições, pagamentos e eventos.
+        <Link
+          href="/documentation"
+          className="font-semibold underline underline-offset-2 ml-1"
+        >
+          Acesse a documentação
+        </Link>
       </DismissibleAlert>
 
       <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">

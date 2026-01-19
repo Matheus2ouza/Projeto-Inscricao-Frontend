@@ -22,9 +22,10 @@ export type Event = {
   imageUrl?: string;
   logoUrl?: string;
   location?: string;
-  latitude?: number | null;
-  longitude?: number | null;
+  latitude?: number;
+  longitude?: number;
   status: string;
+  active?: boolean;
   paymentEnebled: boolean;
   ticketEnabled: boolean;
   regionId: string;
@@ -85,13 +86,14 @@ export type UpdateEventInput = {
   startDate?: string;
   endDate?: string;
   location?: string;
-  maxParticipants?: number;
-  ticketPrice?: number;
   latitude?: number;
   longitude?: number;
+  maxParticipants?: number;
+  ticketPrice?: number;
   address?: string;
   status?: string;
-  responsibles?: string[]; // IDs dos responsáveis adicionados durante a edição
+  active?: boolean;
+  responsibles?: string[];
 };
 
 export type FindDetailsEventRequest = {
@@ -101,6 +103,21 @@ export type FindDetailsEventRequest = {
 export type TypeInscription = {
   description: string;
   value: number;
+};
+
+export type EventManager = {
+  id: string;
+  name: string;
+  startDate: string | Date;
+  endDate: string | Date;
+  imageUrl?: string;
+  location?: string;
+  longitude?: number | null;
+  latitude?: number | null;
+  status: StatusEvent;
+  paymentEnabled: boolean;
+  regionName?: string;
+  typeInscriptions: TypeInscription[];
 };
 
 export type FindDetailsEventResponse = {

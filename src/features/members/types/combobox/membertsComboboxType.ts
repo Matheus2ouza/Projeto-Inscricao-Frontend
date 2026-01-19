@@ -3,4 +3,5 @@ export type MemberResponse = {
   name: string;
   birthDate: Date;
   gender: string;
+  registered: boolean;
 };

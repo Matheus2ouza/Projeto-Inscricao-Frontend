@@ -33,7 +33,6 @@ type EventStatusFilterProps = {
   options?: EventStatusOption[];
   value: StatusEvent[];
   onChange: (value: StatusEvent[]) => void;
-  label?: string;
   className?: string;
 };
 
@@ -41,7 +40,6 @@ export default function EventStatusFilter({
   options = EVENT_STATUS_OPTIONS,
   value,
   onChange,
-  label = "Status",
   className,
 }: EventStatusFilterProps) {
   const [open, setOpen] = React.useState(false);
@@ -76,10 +74,9 @@ export default function EventStatusFilter({
           type="button"
         >
           <div className="text-left">
-            <p className="text-xs font-semibold text-muted-foreground">
-              {selectedLabels.length > 0 ? label : "Nenhum status selecionado"}
+            <p className="text-sm text-foreground truncate">
+              {displayText || "Nenhum status selecionado"}
             </p>
-            <p className="text-sm text-foreground truncate">{displayText}</p>
           </div>
           <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
         </Button>
