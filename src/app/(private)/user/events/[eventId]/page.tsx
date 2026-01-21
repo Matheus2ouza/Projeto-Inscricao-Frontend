@@ -9,7 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 export default function EventsDetailsPage() {
   const router = useRouter();
   const params = useParams();
-  const eventId = params.id as string;
+  const eventId = params.eventId as string;
   const { event, loading, error } = useDetailsEvent(eventId);
 
   const renderSkeletonGrid = () => {
@@ -56,11 +56,11 @@ export default function EventsDetailsPage() {
   };
 
   const handleIndividualInscription = () => {
-    router.push(`/user/individual-inscription/${eventId}`);
+    router.push(`/user/inscription/individual-inscription/${eventId}`);
   };
 
   const handleGroupInscription = () => {
-    router.push(`/user/group-inscription/${eventId}`);
+    router.push(`/user/inscription/group-inscription/${eventId}`);
   };
 
   return (

@@ -77,6 +77,7 @@ export default function RegisterPaymentPage() {
 
     return (
       <RegisterPaymentTable
+        eventId={eventId}
         inscriptions={inscriptions}
         allowCard={allowCard}
         total={total}

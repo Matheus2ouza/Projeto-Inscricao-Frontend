@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import RegisterPaymentDialog from "./RegisterPaymentDialog";
 
 type RegisterPaymentTableProps = {
+  eventId: string;
   inscriptions: Inscription[];
   allowCard: boolean;
   total: number;
@@ -57,6 +58,7 @@ type RegisterPaymentTableProps = {
 };
 
 export default function RegisterPaymentTable({
+  eventId,
   inscriptions,
   allowCard,
   total,
@@ -73,14 +75,13 @@ export default function RegisterPaymentTable({
     useState<CreatePaymentResponse | null>(null);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
-  // Calcular o total das inscrições selecionadas
+  // Calcular o total das inscrições selecionadas (Valor Total - Valor Pago)
   const selectedTotal = selectedIds.reduce((sum, id) => {
     const inscription = inscriptions.find((ins) => ins.id === id);
-    return sum + (inscription?.totalValue || 0);
+    const remaining =
+      (inscription?.totalValue || 0) - (inscription?.totalPaid || 0);
+    return sum + remaining;
   }, 0);
-
-  // Obter o eventId da primeira inscrição (todas devem pertencer ao mesmo evento)
-  const eventId = inscriptions.length > 0 ? inscriptions[0].eventId : "";
 
   // Preparar o array de inscrições selecionadas para o dialog
   const selectedInscriptions = selectedIds.map((id) => ({ id }));
@@ -314,10 +315,19 @@ export default function RegisterPaymentTable({
                           </span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold">
-                          {getFormatCurrency(inscription.totalValue)}
-                        </p>
+                      <div className="text-right space-y-1">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Valor</p>
+                          <p className="text-lg font-bold">
+                            {getFormatCurrency(inscription.totalValue)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground">Pago</p>
+                          <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                            {getFormatCurrency(inscription.totalPaid)}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
@@ -389,6 +399,7 @@ export default function RegisterPaymentTable({
                 <TableHead>ID</TableHead>
                 <TableHead className="text-center">Status</TableHead>
                 <TableHead className="text-center">Valor</TableHead>
+                <TableHead className="text-center">Total Pago</TableHead>
                 <TableHead className="text-center">Criado em</TableHead>
                 <TableHead className="text-center">Ações</TableHead>
               </TableRow>
@@ -397,7 +408,7 @@ export default function RegisterPaymentTable({
               {inscriptions.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
                     Nenhuma inscrição pendente encontrada
@@ -442,6 +453,9 @@ export default function RegisterPaymentTable({
                       </TableCell>
                       <TableCell className="text-center font-medium">
                         {getFormatCurrency(inscription.totalValue)}
+                      </TableCell>
+                      <TableCell className="text-center font-medium text-green-600 dark:text-green-400">
+                        {getFormatCurrency(inscription.totalPaid)}
                       </TableCell>
                       <TableCell className="text-center">
                         {formatDateTime(inscription.createAt)}
