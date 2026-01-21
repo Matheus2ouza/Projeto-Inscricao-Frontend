@@ -88,7 +88,7 @@ export default function AnalysisPaymentAdminPage() {
   };
 
   const handleBack = () => {
-    router.replace(`/super/home`);
+    router.replace(`/admin/home`);
   };
 
   return (

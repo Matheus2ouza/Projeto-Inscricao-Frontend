@@ -179,7 +179,7 @@ export default function MyInscriptionsTable({
               </div>
 
               {/* Estatísticas do Evento */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="flex flex-col space-y-1">
                     <span className="text-sm text-muted-foreground">
@@ -198,6 +198,17 @@ export default function MyInscriptionsTable({
                     </span>
                     <span className="text-2xl font-bold text-green-600 dark:text-green-400">
                       {getFormatCurrency(event.totalPaid)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <div className="flex flex-col space-y-1">
+                    <span className="text-sm text-muted-foreground">
+                      Total Pendente
+                    </span>
+                    <span className="text-2xl font-bold text-red-600 dark:text-red-400">
+                      {getFormatCurrency(event.totalDue)}
                     </span>
                   </div>
                 </div>

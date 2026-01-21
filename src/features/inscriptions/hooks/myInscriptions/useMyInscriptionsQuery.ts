@@ -18,7 +18,7 @@ export function useMyInscriptionsQuery(
   eventId: string,
   page: number = 0,
   pageSize: number = 10,
-  limitTime?: string
+  limitTime?: string,
 ) {
   return useQuery<MyInscriptionsResponse>({
     queryKey: MyInscriptionsKey.list(eventId, page, pageSize, limitTime),
@@ -62,7 +62,7 @@ export function usePrefetchMyInscriptionsQuery() {
       eventId: string,
       page: number = 0,
       pageSize: number = 10,
-      limitTime?: string
+      limitTime?: string,
     ) => {
       queryClient.prefetchQuery({
         queryKey: MyInscriptionsKey.list(eventId, page, pageSize, limitTime),

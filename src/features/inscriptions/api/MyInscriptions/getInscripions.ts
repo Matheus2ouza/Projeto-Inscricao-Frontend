@@ -5,7 +5,7 @@ export async function getMyInscriptions(
   eventId: string,
   page: number = 0,
   pageSize: number = 10,
-  limitTime?: string
+  limitTime?: string,
 ): Promise<MyInscriptionsResponse> {
   try {
     const { data } = await axiosInstance.get<MyInscriptionsResponse>(
@@ -16,7 +16,7 @@ export async function getMyInscriptions(
           pageSize,
           limitTime,
         },
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -27,7 +27,7 @@ export async function getMyInscriptions(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar as inscrições."
+        "Não foi possível buscar as inscrições.",
     );
   }
 }

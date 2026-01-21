@@ -3,7 +3,6 @@
 import type { DashboardAdminResponse } from "@/features/home/api/admin/dashboard";
 import type { DashboardMetric } from "@/features/home/hook/admin/useAdminDashboard";
 import { useEventDates } from "@/features/home/hook/admin/useEventDates";
-import DismissibleAlert from "@/shared/components/DismissibleAlert";
 import { Badge } from "@/shared/components/ui/badge";
 import {
   Popover,
@@ -184,20 +183,6 @@ export default function AdminManagerHomeDashboard({
 
   return (
     <>
-      {/* Aviso sobre desenvolvimento */}
-      <DismissibleAlert
-        id="system-development-warning"
-        title="Sistema em Desenvolvimento"
-        variant="warning"
-        asModal={true}
-      >
-        O sistema ainda está em fase de desenvolvimento, e algumas
-        funcionalidades podem não estar finalizadas ou funcionar de forma
-        diferente do esperado. Recomendamos utilizá-lo em um{" "}
-        <strong>computador (desktop)</strong> para uma melhor experiência, mas
-        ele também pode ser acessado pelo celular.
-      </DismissibleAlert>
-
       <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
           Situação das cobranças
