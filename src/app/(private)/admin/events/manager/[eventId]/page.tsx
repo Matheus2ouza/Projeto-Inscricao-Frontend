@@ -13,10 +13,29 @@ export default function EventManagementAdminPage() {
   const params = useParams();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
+
   if (!eventId) {
     return null;
   }
-  const { event, isLoading, error, refetch } = useEventManager(eventId);
+
+  const {
+    event,
+    loadingEvent,
+    fetchingEvent,
+    fetchedEvent,
+    errorEvent,
+    refetchEvent,
+    typeInscriptions,
+    loadingTypeInscriptions,
+    fetchingTypeInscriptions,
+    fetchedTypeInscriptions,
+    errorTypeInscriptions,
+    refetchTypeInscriptions,
+  } = useEventManager({ eventId });
+
+  const handleBack = () => {
+    router.replace(`/admin/events/manager`);
+  };
 
   const renderSkeletonGrid = () => {
     return (
@@ -56,10 +75,10 @@ export default function EventManagementAdminPage() {
   };
 
   const renderContent = () => {
-    if (isLoading) {
-      return renderSkeletonGrid();
+    if (loadingEvent) {
+      renderSkeletonGrid();
     }
-    if (error) {
+    if (errorEvent) {
       return (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
@@ -74,21 +93,14 @@ export default function EventManagementAdminPage() {
       );
     }
 
-    if (!event) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-400">
-            {"Evento não encontrado"}
-          </p>
-        </div>
-      );
-    }
-
-    return <EventManagement event={event} refetch={refetch} />;
-  };
-
-  const handleBack = () => {
-    router.replace(`/admin/events/manager`);
+    return (
+      <EventManagement
+        event={event}
+        typeInscriptions={typeInscriptions}
+        refreshEvent={refetchEvent}
+        refreshTypeInscriptions={refetchTypeInscriptions}
+      />
+    );
   };
 
   return (

@@ -1,5 +1,6 @@
 export type ListAllPaymentsPendingResponse = {
   inscriptions: Inscription[];
+  allowCard: boolean;
   total: number;
   page: number;
   pageCount: number;
@@ -23,6 +24,7 @@ export type UseListPaymentPendingParams = {
 
 export type UseListPaymentPendingResult = {
   inscriptions: Inscription[];
+  allowCard: boolean;
   total: number;
   page: number;
   pageCount: number;

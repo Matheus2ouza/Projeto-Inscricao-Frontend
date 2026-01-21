@@ -12,7 +12,7 @@ const axiosInstance = axios.create({
 async function resolveAuthToken(): Promise<string | null> {
   if (typeof window === "undefined") {
     const { getAuthToken } = await import("./session");
-    const token = await getAuthToken();;
+    const token = await getAuthToken();
     return token;
   }
   try {
@@ -30,7 +30,7 @@ async function resolveAuthToken(): Promise<string | null> {
     }
     console.warn(
       "[apiClient] resolveAuthToken (client): /api/token request failed",
-      res.status
+      res.status,
     );
     return null;
   } catch {
@@ -58,7 +58,7 @@ axiosInstance.interceptors.request.use(
   (error) => {
     console.error("[apiClient] request interceptor error", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 // Interceptor de resposta para tratamento de erros
@@ -77,7 +77,7 @@ axiosInstance.interceptors.response.use(
           url: originalRequest.url,
           method: originalRequest.method,
           status: error.response.status,
-        }
+        },
       );
       originalRequest.__retryCount = originalRequest.__retryCount || 0;
       if (originalRequest.__retryCount < 3) {
@@ -91,7 +91,7 @@ axiosInstance.interceptors.response.use(
           if (!res.ok) {
             console.error(
               "[apiClient] response interceptor: /api/refresh failed",
-              res.status
+              res.status,
             );
             throw new Error("refresh failed");
           }
@@ -99,12 +99,12 @@ axiosInstance.interceptors.response.use(
         } catch (refreshError) {
           console.error(
             "[apiClient] response interceptor: refresh sequence failed",
-            refreshError
+            refreshError,
           );
           // Logout e toast de sessão expirada
           try {
             await fetch("/api/logout", { method: "POST" });
-          } catch { }
+          } catch {}
           toast.error("Sessão expirada. Faça login novamente.");
           if (typeof window !== "undefined") {
             window.location.href = "/login";
@@ -115,10 +115,10 @@ axiosInstance.interceptors.response.use(
     }
     console.error(
       "[apiClient] API Error:",
-      error.response?.data || error.message || error
+      error.response?.data || error.message || error,
     );
     return Promise.reject(error); // repassa o erro pra onde foi chamado
-  }
+  },
 );
 
 export default axiosInstance;

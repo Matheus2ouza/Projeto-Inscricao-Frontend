@@ -31,13 +31,13 @@ export const analysisInscriptionsKeys = {
 export function useAnalysisInscriptionsQuery(
   eventId: string,
   page: number = 1,
-  pageSize: number = 15
+  pageSize: number = 15,
 ) {
   return useQuery({
     queryKey: analysisInscriptionsKeys.eventInscriptions(
       eventId,
       page,
-      pageSize
+      pageSize,
     ),
     queryFn: async () =>
       await getEventInscriptions(eventId, { page, pageSize }),
@@ -115,13 +115,13 @@ export function usePrefetchAnalysisInscriptions() {
     prefetchNextPage: (
       eventId: string,
       currentPage: number,
-      pageSize: number
+      pageSize: number,
     ) => {
       queryClient.prefetchQuery({
         queryKey: analysisInscriptionsKeys.eventInscriptions(
           eventId,
           currentPage + 1,
-          pageSize
+          pageSize,
         ),
         queryFn: async () =>
           await getEventInscriptions(eventId, {

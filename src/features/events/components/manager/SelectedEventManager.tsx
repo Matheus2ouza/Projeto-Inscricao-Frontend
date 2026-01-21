@@ -13,10 +13,10 @@ import {
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
 import { cn } from "@/shared/lib/utils";
+import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
-import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import {
   AlertTriangle,
   Calendar,

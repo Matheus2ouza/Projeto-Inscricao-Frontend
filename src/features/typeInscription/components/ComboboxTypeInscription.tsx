@@ -45,12 +45,11 @@ export function ComboboxTypeInscription({
   modal = true,
 }: ComboboxTypeInscriptionProps) {
   const [open, setOpen] = React.useState(false);
-  const shouldFetch = options === undefined;
   const {
     data: fetched,
     isLoading: internalLoading,
     error,
-  } = useTypeInscriptionsQuery(eventId, { enabled: shouldFetch });
+  } = useTypeInscriptionsQuery(eventId);
   const loading = loadingProp ?? internalLoading;
 
   const typeInscriptions = React.useMemo<TypeInscriptionOption[]>(() => {
@@ -91,7 +90,7 @@ export function ComboboxTypeInscription({
           className={cn(
             "w-full justify-between relative overflow-hidden",
             disabled &&
-              "opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800"
+              "opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800",
           )}
         >
           <span
@@ -99,7 +98,7 @@ export function ComboboxTypeInscription({
               value
                 ? "relative z-10 text-blue-700 dark:text-blue-300 font-semibold px-2 py-1"
                 : "text-gray-700 dark:text-gray-200",
-              disabled && "text-gray-500 dark:text-gray-400"
+              disabled && "text-gray-500 dark:text-gray-400",
             )}
           >
             {buttonLabel}
@@ -107,7 +106,7 @@ export function ComboboxTypeInscription({
           <ChevronsUpDown
             className={cn(
               value ? "relative z-10 text-blue-700 opacity-80" : "opacity-50",
-              disabled && "opacity-30"
+              disabled && "opacity-30",
             )}
           />
         </Button>
@@ -140,7 +139,7 @@ export function ComboboxTypeInscription({
                       className={cn(
                         "px-2 py-1 rounded text-xs font-semibold uppercase",
                         value === type.value ? "ring-2 ring-blue-400" : "",
-                        disabled && "text-gray-400"
+                        disabled && "text-gray-400",
                       )}
                     >
                       {type.label}
@@ -149,7 +148,7 @@ export function ComboboxTypeInscription({
                       className={cn(
                         "ml-auto",
                         value === type.value ? "opacity-100" : "opacity-0",
-                        disabled && "text-gray-400"
+                        disabled && "text-gray-400",
                       )}
                     />
                   </CommandItem>

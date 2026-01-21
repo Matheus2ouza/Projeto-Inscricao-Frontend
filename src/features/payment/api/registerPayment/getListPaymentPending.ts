@@ -4,7 +4,7 @@ import { ListAllPaymentsPendingResponse } from "../../types/registerPayment/regi
 export async function getListPaymentPending(
   eventId: string,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<ListAllPaymentsPendingResponse> {
   try {
     const { data } = await axiosInstance.get<ListAllPaymentsPendingResponse>(
@@ -14,7 +14,7 @@ export async function getListPaymentPending(
           page,
           pageSize,
         },
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -26,7 +26,7 @@ export async function getListPaymentPending(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros."
+        "Não foi possível carregar os membros.",
     );
   }
 }

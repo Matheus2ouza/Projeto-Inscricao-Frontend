@@ -16,7 +16,7 @@ export async function getEventsToAnalysis(params: {
         status: params.status,
       },
       paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
-    }
+    },
   );
   return data;
 }

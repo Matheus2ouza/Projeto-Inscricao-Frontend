@@ -14,7 +14,6 @@ import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
-  ArrowBigRightDash,
   CheckCheck,
   Copy,
   CreditCard,
@@ -425,8 +424,7 @@ export default function RegisterPaymentDialog({
                         onClick={handleFlip}
                         className="w-full flex items-center justify-center gap-2 py-3 text-base font-semibold"
                       >
-                        Registrar Pagamento
-                        <ArrowBigRightDash className="h-5 w-5" />
+                        Pagar com PIX
                       </Button>
                     </div>
                   </div>

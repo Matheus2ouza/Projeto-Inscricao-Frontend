@@ -14,7 +14,7 @@ import {
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
-import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
+import { getPaymentStatusInfo } from "@/shared/utils/getPaymentStatusInfo";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Calendar, Frown, Loader2, MapPin } from "lucide-react";
@@ -68,7 +68,7 @@ export default function ListEventsForPayment({
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {events.map((event) => {
-          const statusInfo = getEventStatusInfo(event.status);
+          const statusInfo = getPaymentStatusInfo(event.paymentEnabled);
           const gradientClass = getGradientClass(event.name);
           const isImageLoading = event.imageUrl
             ? imageLoadingStates[event.id] !== false
@@ -162,7 +162,7 @@ export default function ListEventsForPayment({
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
                     onClick={() => onSelectEvent(event.id)}
-                    disabled={statusInfo.disabled}
+                    disabled={!event.paymentEnabled}
                   >
                     {buttonLabel}
                   </Button>

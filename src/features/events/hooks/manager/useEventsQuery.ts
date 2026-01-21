@@ -1,4 +1,4 @@
-import { getEvents } from "@/features/events/api/manager/getEvents";
+import { getEvents } from "@/features/events/api/getEvents";
 import { StatusEvent } from "@/features/events/types/selectEvent";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Chaves de query para organização
@@ -11,7 +11,11 @@ export const eventsKeys = {
   detail: (id: string) => [...eventsKeys.details(), id] as const,
 };
 
-export function useEventsQuery(page: number = 1, pageSize: number = 8, status?: StatusEvent[]) {
+export function useEventsQuery(
+  page: number = 1,
+  pageSize: number = 8,
+  status?: StatusEvent[],
+) {
   return useQuery({
     queryKey: eventsKeys.list(page, pageSize, status),
     queryFn: () => getEvents({ page, pageSize, status }),
@@ -41,7 +45,11 @@ export function usePrefetchEventsQuery() {
   const queryClient = useQueryClient();
 
   return {
-    prefetchNextPage: (currentPage: number, pageSize: number, status?: StatusEvent[]) => {
+    prefetchNextPage: (
+      currentPage: number,
+      pageSize: number,
+      status?: StatusEvent[],
+    ) => {
       queryClient.prefetchQuery({
         queryKey: eventsKeys.list(currentPage + 1, pageSize, status),
         queryFn: () =>
@@ -55,4 +63,3 @@ export function usePrefetchEventsQuery() {
     },
   };
 }
-

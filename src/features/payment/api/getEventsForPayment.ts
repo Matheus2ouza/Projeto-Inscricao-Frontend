@@ -7,16 +7,16 @@ export type GetEventsForPaymentParams = {
 };
 
 export async function getEventsForPayment(
-  params: GetEventsForPaymentParams
+  params: GetEventsForPaymentParams,
 ): Promise<EventsListResponse> {
   const { data } = await axiosInstance.get<EventsListResponse>(
-    "/events/inscriptions",
+    "/events/payments",
     {
       params: {
         page: params.page,
         pageSize: params.pageSize,
       },
-    }
+    },
   );
 
   return data;

@@ -91,11 +91,7 @@ export default function ReportDetails({
               {new Date(data.endDate).toLocaleDateString("pt-BR")}
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-2">
-              <Button
-                size="sm"
-                onClick={onDownload}
-                disabled={isDownloading}
-              >
+              <Button size="sm" onClick={onDownload} disabled={isDownloading}>
                 {isDownloading ? "Gerando PDF..." : "Baixar PDF"}
               </Button>
             </div>
@@ -301,7 +297,7 @@ export default function ReportDetails({
                           {method.count} venda(s)
                         </p>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>

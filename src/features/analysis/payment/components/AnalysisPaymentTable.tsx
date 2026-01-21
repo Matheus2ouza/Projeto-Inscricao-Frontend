@@ -10,7 +10,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
+import { getGradientClass } from "@/shared/utils/getGenerateGradient";
+import { getInitial } from "@/shared/utils/getInitials";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Loader2 } from "lucide-react";
@@ -53,42 +56,11 @@ export default function AnalysisPaymentTable({
     }));
   };
 
-  // Função para determinar o status do evento
-  const getEventStatusInfo = (status: string) => {
-    switch (status) {
-      case "OPEN":
-        return {
-          label: "Inscrições Abertas",
-          badgeClass: "bg-green-500 hover:bg-green-600 text-white",
-          disabled: false,
-        };
-      case "CLOSE":
-        return {
-          label: "Inscrições Fechadas",
-          badgeClass: "bg-red-500 hover:bg-red-600 text-white",
-          disabled: true,
-        };
-      case "FINALIZED":
-        return {
-          label: "Evento Finalizado",
-          badgeClass: "bg-gray-500 hover:bg-gray-600 text-white",
-          disabled: true,
-        };
-      default:
-        return {
-          label: "Status Desconhecido",
-          badgeClass: "bg-gray-500 hover:bg-gray-600 text-white",
-          disabled: true,
-        };
-    }
-  };
-
   // Função para determinar o status da análise
   const getAnalysisStatusInfo = (
     countPayments: number,
-    countPaymentsAnalysis: number
+    countPaymentsAnalysis: number,
   ) => {
-    const pendingCount = countPayments - countPaymentsAnalysis;
     const inAnalysisCount = countPaymentsAnalysis;
 
     if (countPayments === 0) {
@@ -134,41 +106,17 @@ export default function AnalysisPaymentTable({
     }
   };
 
-  // Função para gerar gradiente baseado no nome do evento
-  const generateGradient = (eventName: string) => {
-    // Gerar cores baseadas no nome do evento para consistência
-    const colors = [
-      "from-purple-500 to-pink-500",
-      "from-blue-500 to-cyan-500",
-      "from-green-500 to-emerald-500",
-      "from-orange-500 to-red-500",
-      "from-indigo-500 to-purple-500",
-      "from-teal-500 to-blue-500",
-      "from-yellow-500 to-orange-500",
-      "from-pink-500 to-rose-500",
-    ];
-
-    // Gerar índice baseado no nome do evento
-    let hash = 0;
-    for (let i = 0; i < eventName.length; i++) {
-      hash = eventName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const index = Math.abs(hash) % colors.length;
-
-    return colors[index];
-  };
-
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {events.map((event) => {
           const statusInfo = getAnalysisStatusInfo(
             event.countPayments,
-            event.countPaymentsAnalysis
+            event.countPaymentsAnalysis,
           );
 
           const statusEvent = getEventStatusInfo(event.status);
-          const gradientClass = generateGradient(event.name);
+          const gradientClass = getGradientClass(event.name);
           // Se não há imagem, não está carregando. Se há imagem, verifica o estado
           const isImageLoading = event.imageUrl
             ? imageLoadingStates[event.id] !== false
@@ -223,7 +171,11 @@ export default function AnalysisPaymentTable({
                       // Gradiente quando não há imagem
                       <div
                         className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
-                      ></div>
+                      >
+                        <h3 className="text-white text-5xl sm:text-6xl md:text-7xl font-semibold tracking-wide text-center px-4">
+                          {getInitial(event.name)}
+                        </h3>
+                      </div>
                     )}
                   </AspectRatio>
                 </div>
@@ -251,7 +203,6 @@ export default function AnalysisPaymentTable({
                 <h3
                   className={`font-bold ${getFontSizeClass(
                     event.name,
-                    true
                   )} mb-1 line-clamp-2 text-gray-900 dark:text-white`}
                 >
                   {event.name}

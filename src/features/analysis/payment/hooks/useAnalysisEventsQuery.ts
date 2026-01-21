@@ -12,10 +12,7 @@ export const analysisEventsKeys = {
   detail: (id: string) => [...analysisEventsKeys.details(), id] as const,
 };
 
-export function useAnalysisEventsQuery(
-  page: number = 1,
-  pageSize: number = 8
-) {
+export function useAnalysisEventsQuery(page: number = 1, pageSize: number = 8) {
   return useQuery({
     queryKey: analysisEventsKeys.list(page, pageSize),
     queryFn: () => getEventsToAnalysis({ page, pageSize, status: ["OPEN"] }),
@@ -40,7 +37,7 @@ export function useInvalidateAnalysisEvents() {
       queryClient.invalidateQueries({ queryKey: analysisEventsKeys.lists() });
       queryClient.invalidateQueries({
         queryKey: analysisPaymentsKeys.all,
-        predicate: (query) => query.queryKey.includes("events")
+        predicate: (query) => query.queryKey.includes("events"),
       });
     },
     invalidateDetail: (id: string) =>

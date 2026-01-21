@@ -23,6 +23,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/components/ui/table";
 import { formatDateTime } from "@/shared/utils/formatDate";
 import {
   getConvertStatusInscription,
@@ -38,22 +46,26 @@ import RegisterPaymentDialog from "./RegisterPaymentDialog";
 
 type RegisterPaymentTableProps = {
   inscriptions: Inscription[];
+  allowCard: boolean;
   total: number;
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
   pageSize?: number;
-  onViewPayment: (eventId: string) => void;
+  onViewPayment: () => void;
+  onViewPaymentDetails: (paymentId: string) => void;
 };
 
 export default function RegisterPaymentTable({
   inscriptions,
+  allowCard,
   total,
   page,
   pageCount,
   onPageChange,
   pageSize = 10,
   onViewPayment,
+  onViewPaymentDetails,
 }: RegisterPaymentTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
@@ -356,12 +368,12 @@ export default function RegisterPaymentTable({
           )}
         </div>
 
-        {/* Tabela de inscrições - Versão desktop */}
-        <div className="hidden sm:block overflow-x-auto rounded-lg border">
-          <table className="min-w-full text-sm">
-            <thead className="bg-muted text-muted-foreground">
-              <tr>
-                <th className="w-12 px-4 py-3 text-center font-semibold">
+        {/* Tabela de inscrições - Versão desktop usando ShadCN Table */}
+        <div className="hidden sm:block rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12 text-center">
                   <Checkbox
                     checked={
                       inscriptions.length > 0 &&
@@ -372,37 +384,36 @@ export default function RegisterPaymentTable({
                     aria-label="Selecionar todas as inscrições"
                     disabled={inscriptions.every((ins) => !ins.canPay)}
                   />
-                </th>
-                <th className="w-12 px-4 py-3 text-center font-semibold">#</th>
-                <th className="px-4 py-3 text-left font-semibold">ID</th>
-                <th className="px-4 py-3 text-center font-semibold">Status</th>
-                <th className="px-4 py-3 text-center font-semibold">Valor</th>
-                <th className="px-4 py-3 text-center font-semibold">
-                  Criado em
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+                </TableHead>
+                <TableHead className="w-12 text-center">#</TableHead>
+                <TableHead>ID</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">Valor</TableHead>
+                <TableHead className="text-center">Criado em</TableHead>
+                <TableHead className="text-center">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {inscriptions.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
                     Nenhuma inscrição pendente encontrada
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 inscriptions.map((inscription, idx) => {
                   const isSelected = selectedIds.includes(inscription.id);
                   return (
-                    <tr
+                    <TableRow
                       key={inscription.id}
-                      className={`border-t hover:bg-muted/30 transition-colors ${
+                      className={`${
                         isSelected ? "bg-primary/5" : ""
                       } ${!inscription.canPay ? "opacity-50 bg-muted/20" : ""}`}
                     >
-                      <td className="w-12 px-4 py-3 text-center">
+                      <TableCell className="text-center">
                         <Checkbox
                           checked={isSelected}
                           onCheckedChange={() =>
@@ -411,14 +422,16 @@ export default function RegisterPaymentTable({
                           aria-label={`Selecionar inscrição ${inscription.id}`}
                           disabled={!inscription.canPay}
                         />
-                      </td>
-                      <td className="w-12 px-4 py-3 text-center font-medium">
+                      </TableCell>
+                      <TableCell className="text-center font-medium">
                         {calculateGlobalIndex(idx)}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs">
-                        {inscription.id.substring(0, 8)}...
-                      </td>
-                      <td className="px-4 py-3 text-center">
+                      </TableCell>
+                      <TableCell>
+                        <code className="font-mono text-xs">
+                          {inscription.id.substring(0, 8)}...
+                        </code>
+                      </TableCell>
+                      <TableCell className="text-center">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                             inscription.status,
@@ -426,19 +439,30 @@ export default function RegisterPaymentTable({
                         >
                           {getConvertStatusInscription(inscription.status)}
                         </span>
-                      </td>
-                      <td className="px-4 py-3 text-center font-medium">
+                      </TableCell>
+                      <TableCell className="text-center font-medium">
                         {getFormatCurrency(inscription.totalValue)}
-                      </td>
-                      <td className="px-4 py-3 text-center">
+                      </TableCell>
+                      <TableCell className="text-center">
                         {formatDateTime(inscription.createAt)}
-                      </td>
-                    </tr>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                          title="Visualizar"
+                          onClick={() => onViewPaymentDetails(inscription.id)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   );
                 })
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Paginação */}
@@ -609,9 +633,7 @@ export default function RegisterPaymentTable({
                 type="button"
                 onClick={() => {
                   if (paymentResult?.id) {
-                    if (eventId) {
-                      onViewPayment(eventId);
-                    }
+                    onViewPayment();
                     setIsSuccessDialogOpen(false);
                   }
                 }}

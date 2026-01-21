@@ -4,7 +4,7 @@ import axiosInstance from "@/shared/lib/apiClient";
 export async function getListPayments(
   eventId: string,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<ListPaymentsResponse> {
   try {
     const { data } = await axiosInstance.get<ListPaymentsResponse>(
@@ -14,7 +14,7 @@ export async function getListPayments(
           page,
           pageSize,
         },
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -26,7 +26,7 @@ export async function getListPayments(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros."
+        "Não foi possível carregar os membros.",
     );
   }
 }

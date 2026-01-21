@@ -15,7 +15,7 @@ export const participantsKeys = {
 export function useParticipantsQuery(
   eventId: string,
   page: number = 1,
-  pageSize: number = 10
+  pageSize: number = 10,
 ) {
   return useQuery<ListParticipantsResponse>({
     queryKey: participantsKeys.list(eventId, page, pageSize),
@@ -59,7 +59,7 @@ export function usePrefetchParticipants() {
     prefetchNextPage: (
       eventId: string,
       currentPage: number,
-      pageSize: number
+      pageSize: number,
     ) => {
       queryClient.prefetchQuery({
         queryKey: participantsKeys.list(eventId, currentPage + 1, pageSize),
@@ -69,4 +69,3 @@ export function usePrefetchParticipants() {
     },
   };
 }
-
