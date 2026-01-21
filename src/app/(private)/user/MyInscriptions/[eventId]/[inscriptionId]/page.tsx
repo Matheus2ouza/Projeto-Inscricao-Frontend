@@ -27,7 +27,7 @@ export default function DetailsInscriptionsPage() {
               {
                 style: "currency",
                 currency: "BRL",
-              }
+              },
             ).format(data.totalValue)}`
           : "Carregando informações da inscrição..."
       }

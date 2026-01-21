@@ -131,9 +131,7 @@ export default function DetailsInscriptionsTable({
     useState<Participant | null>(null);
   const resolvedEventId = eventId ?? data?.eventId ?? "";
   const { data: typeInscriptionList, isLoading: isLoadingTypeInscriptions } =
-    useTypeInscriptionsQuery(resolvedEventId, {
-      enabled: Boolean(resolvedEventId),
-    });
+    useTypeInscriptionsQuery(resolvedEventId);
   const typeInscriptionOptions = useMemo<TypeInscriptionOption[]>(() => {
     if (!typeInscriptionList) return [];
     return typeInscriptionList.map((type) => ({
