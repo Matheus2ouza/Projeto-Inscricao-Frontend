@@ -18,7 +18,7 @@ export type Event = {
   latitude?: number | null;
   longitude?: number | null;
   status: string;
-  paymentEnebled: boolean;
+  paymentEnabled: boolean;
   ticketEnabled: boolean;
   regionId: string;
   regionName?: string;

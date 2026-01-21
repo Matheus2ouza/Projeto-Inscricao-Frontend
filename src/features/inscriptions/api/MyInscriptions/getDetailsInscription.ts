@@ -2,11 +2,11 @@ import { DetailsInscriptionResponse } from "@/features/inscriptions/types/MyInsc
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function getDetailsInscription(
-  inscriptionId: string
+  inscriptionId: string,
 ): Promise<DetailsInscriptionResponse> {
   try {
     const { data } = await axiosInstance.get<DetailsInscriptionResponse>(
-      `/inscriptions/${inscriptionId}/details`
+      `/inscriptions/${inscriptionId}/details`,
     );
     return data;
   } catch (error) {
@@ -17,7 +17,7 @@ export async function getDetailsInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar os detalhes da inscrição."
+        "Não foi possível buscar os detalhes da inscrição.",
     );
   }
 }

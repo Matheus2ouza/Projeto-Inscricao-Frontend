@@ -14,7 +14,7 @@ export const ListPaymentKey = {
 export function useListPaymentQuery(
   eventId: string,
   page: number = 0,
-  pageSize: number = 10
+  pageSize: number = 10,
 ) {
   return useQuery<ListPaymentsResponse>({
     queryKey: ListPaymentKey.list(eventId, page, pageSize),

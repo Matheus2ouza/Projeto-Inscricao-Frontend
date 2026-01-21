@@ -4,7 +4,7 @@ import { ListParticipantsResponse } from "../../events/types/checkout/checkoutTy
 export async function getParticipants(
   eventId: string,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<ListParticipantsResponse> {
   try {
     const { data } = await axiosInstance.get<ListParticipantsResponse>(
@@ -14,7 +14,7 @@ export async function getParticipants(
           page,
           pageSize,
         },
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -25,8 +25,8 @@ export async function getParticipants(
 
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível carregar os participantes"
+        axiosError.message ??
+        "Não foi possível carregar os participantes",
     );
   }
 }

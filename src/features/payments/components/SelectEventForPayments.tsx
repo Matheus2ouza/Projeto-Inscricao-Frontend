@@ -1,7 +1,11 @@
 "use client";
 
 import { UserRole } from "@/features/auth/types/loginTypes";
-import { Event, EVENT_STATUS_OPTIONS, StatusEvent } from "@/features/payments/types/selectEvent";
+import {
+  Event,
+  EVENT_STATUS_OPTIONS,
+  StatusEvent,
+} from "@/features/payments/types/selectEvent";
 import EventStatusFilter from "@/shared/components/EventStatusFilter";
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Badge } from "@/shared/components/ui/badge";
@@ -14,10 +18,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
-import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Frown, Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -53,7 +57,7 @@ export default function SelectedEventForPayments({
   onViewEvent,
   onStatusFilterChange,
   onApplyStatusFilter,
-  getInfoRows
+  getInfoRows,
 }: SpensTableProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
@@ -178,12 +182,12 @@ export default function SelectedEventForPayments({
                     getInfoRows?.(event) ?? [
                       {
                         label: "Total de Pagamentos",
-                        value: event.totalPayments
+                        value: event.totalPayments,
                       },
                       {
                         label: "Total em Debito",
-                        value: event.totalDebt
-                      }
+                        value: event.totalDebt,
+                      },
                     ]
                   ).map(({ label, value }) => (
                     <div
@@ -194,10 +198,11 @@ export default function SelectedEventForPayments({
                         {label}
                       </span>
                       <span
-                        className={`font-semibold ${label.toLowerCase().includes("pendentes")
-                          ? "text-yellow-600 dark:text-yellow-400"
-                          : ""
-                          }`}
+                        className={`font-semibold ${
+                          label.toLowerCase().includes("pendentes")
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : ""
+                        }`}
                       >
                         {value}
                       </span>

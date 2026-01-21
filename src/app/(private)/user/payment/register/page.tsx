@@ -81,8 +81,8 @@ export default function SelectedEventForRegisterPayment() {
 
   return (
     <PageContainer
-      title="Inscrição Individual"
-      description="Escolha um evento para iniciar sua inscrição individual."
+      title="Realizar Pagamento"
+      description="Escolha um evento para realizar o pagamento."
       showBackButton={true}
       backButtonAction={handleBack}
     >

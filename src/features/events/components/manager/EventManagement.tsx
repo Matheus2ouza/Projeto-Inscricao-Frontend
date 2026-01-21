@@ -1,17 +1,17 @@
 "use client";
 
 import { useAccount } from "@/features/accounts/hooks/useAccount";
-import { deleteImageEvent } from "@/features/events/api/eventActions/deleteImageEvent";
-import { deleteLogoEvent } from "@/features/events/api/eventActions/deleteLogoEvent";
-import { updateEventImage } from "@/features/events/api/eventActions/updateEventImage";
-import { updateEventLogo } from "@/features/events/api/eventActions/updateEventLogo";
+import { deleteImageEvent } from "@/features/events/api/manager/eventActions/deleteImageEvent";
+import { deleteLogoEvent } from "@/features/events/api/manager/eventActions/deleteLogoEvent";
+import { updateEventImage } from "@/features/events/api/manager/eventActions/updateEventImage";
+import { updateEventLogo } from "@/features/events/api/manager/eventActions/updateEventLogo";
 import ResponsiblesDialog from "@/features/events/components/ResponsiblesDialog";
+import { useFormEditEvent } from "@/features/events/hooks/manager/useFormEditEvent";
 import { useEventResponsible } from "@/features/events/hooks/useEventResponsible";
-import { useFormEditEvent } from "@/features/events/hooks/useFormEditEvent";
-import { Event } from "@/features/events/types/eventTypes";
+import { Event } from "@/features/events/types/manager/eventManagerTypes";
 import { useInvalidateEventsQuery } from "@/features/expenses/hooks/useSelectEventsQuery";
 import TypeInscriptionDialog from "@/features/typeInscription/components/TypeInscriptionDialog";
-import { useTypeInscriptions } from "@/features/typeInscription/hook/useTypeInscriptions";
+import { useTypeInscriptionsActions } from "@/features/typeInscription/hook/useTypeInscriptionsActions";
 import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import EventMap from "@/shared/components/EventMap";
@@ -25,11 +25,11 @@ import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
-import { useCurrentUser } from "@/shared/context/user-context";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   AlertCircle,
   Calendar,
+  CreditCard,
   DollarSign,
   Edit3,
   Eye,
@@ -43,21 +43,27 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface EventManagementProps {
-  event: Event;
-  refetch: () => void;
+  event: Event | null;
+  typeInscriptions: TypeInscriptions[] | null;
+  refreshEvent: () => void;
+  refreshTypeInscriptions: () => void;
 }
 
-export default function EventManagement({
+function EventManagementContent({
   event,
-  refetch,
-}: EventManagementProps) {
-  const router = useRouter();
-  const { user } = useCurrentUser();
+  typeInscriptions,
+  refreshEvent,
+  refreshTypeInscriptions,
+}: {
+  event: Event;
+  typeInscriptions: TypeInscriptions[] | null;
+  refreshEvent: () => void;
+  refreshTypeInscriptions: () => void;
+}) {
   const { invalidateDetail } = useInvalidateEventsQuery();
   const [showAmount, setShowAmount] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -74,6 +80,7 @@ export default function EventManagement({
     handleDelete,
     handleCancel,
     handleUpdatePayment,
+    handleUpdateAllowCard,
     handleUpdateInscription,
     handleResponsiblesChange,
     getNewResponsibleIds,
@@ -87,7 +94,7 @@ export default function EventManagement({
     create,
     update,
     remove,
-  } = useTypeInscriptions(event.id);
+  } = useTypeInscriptionsActions(event.id);
 
   const { remove: removeResponsible, loading: removingResponsible } =
     useEventResponsible();
@@ -143,7 +150,7 @@ export default function EventManagement({
       toast.success("Imagem deletada com sucesso!");
       setIsDeleteImageOpen(false);
       invalidateDetail(event.id);
-      await refetch();
+      await refreshEvent();
     } catch (err) {
       const message =
         err instanceof Error
@@ -153,7 +160,7 @@ export default function EventManagement({
     } finally {
       setDeleteImage(false);
     }
-  }, [event.id, invalidateDetail, refetch]);
+  }, [event.id, invalidateDetail, refreshEvent]);
 
   const handleConfirmDeleteLogo = useCallback(async () => {
     try {
@@ -162,7 +169,7 @@ export default function EventManagement({
       toast.success("Logo deletada com sucesso!");
       setIsDeleteLogoOpen(false);
       invalidateDetail(event.id);
-      await refetch();
+      await refreshEvent();
     } catch (err) {
       const message =
         err instanceof Error
@@ -172,11 +179,12 @@ export default function EventManagement({
     } finally {
       setDeleteLogo(false);
     }
-  }, [event.id, invalidateDetail, refetch]);
+  }, [event.id, invalidateDetail, refreshEvent]);
 
   const statusBadge = getEventStatus();
   const totalRevenue = event.amountCollected;
-  const hasTypeInscriptions = event.typesInscriptions.length > 0;
+  const typesInscriptions = event.typesInscriptions ?? [];
+  const hasTypeInscriptions = typesInscriptions.length > 0;
 
   // Funções para gerenciar tipos de inscrição
   const handleCreateType = () => {
@@ -217,7 +225,8 @@ export default function EventManagement({
         await remove(type.id);
         // Invalidar cache do evento para recarregar os tipos de inscrição
         invalidateDetail(event.id);
-        refetch(); // Recarrega os dados do evento
+        await refreshTypeInscriptions(); // Recarrega os dados do evento
+        await refreshEvent();
       } catch (error) {
         // Erro já tratado no hook
       }
@@ -239,7 +248,8 @@ export default function EventManagement({
       }
       // Invalidar cache do evento para recarregar os tipos de inscrição
       invalidateDetail(event.id);
-      refetch(); // Recarrega os dados do evento
+      await refreshTypeInscriptions(); // Recarrega os dados do evento
+      await refreshEvent();
     } catch (error) {
       // Erro já tratado no hook
     }
@@ -283,6 +293,15 @@ export default function EventManagement({
                   {event.paymentEnebled
                     ? "Fechar Pagamentos"
                     : "Abrir Pagamentos"}
+                </Button>
+                <Button
+                  variant={event.allowCard ? "destructive" : "outline"}
+                  onClick={() => handleUpdateAllowCard(!event.allowCard)}
+                  className="flex items-center gap-2"
+                  disabled={loading}
+                >
+                  <CreditCard className="h-4 w-4" />
+                  {event.allowCard ? "Desabilitar Cartão" : "Habilitar Cartão"}
                 </Button>
                 <Button
                   variant="outline"
@@ -679,7 +698,7 @@ export default function EventManagement({
                 </h2>
                 <Badge variant="outline" className="flex items-center gap-1">
                   <Tag className="h-3 w-3" />
-                  {event.typesInscriptions.length} tipos
+                  {typesInscriptions.length} tipos
                 </Badge>
               </div>
 
@@ -958,7 +977,7 @@ export default function EventManagement({
                   toast.success("Imagem atualizada com sucesso!");
                   setImageDialogOpen(false);
                   invalidateDetail(event.id);
-                  await refetch();
+                  await refreshEvent();
                 } catch (err) {
                   toast.error("Falha ao atualizar imagem do evento");
                 } finally {
@@ -985,7 +1004,7 @@ export default function EventManagement({
                   toast.success("Logo atualizada com sucesso!");
                   setLogoDialogOpen(false);
                   invalidateDetail(event.id);
-                  await refetch();
+                  await refreshEvent();
                 } catch (err) {
                   toast.error("Falha ao atualizar logo do evento");
                 } finally {
@@ -1048,7 +1067,7 @@ export default function EventManagement({
                 deleteResponsibleDialog.responsibleId,
                 () => {
                   // Callback de sucesso: recarregar e atualizar lista local
-                  refetch();
+                  refreshEvent();
                   handleResponsiblesChange(
                     formData.responsibleIds.filter(
                       (id) => id !== deleteResponsibleDialog.responsibleId,
@@ -1073,4 +1092,22 @@ export default function EventManagement({
       </div>
     </div>
   );
+}
+
+export default function EventManagement(props: EventManagementProps) {
+  if (!props.event) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Evento não encontrado</h2>
+          <p className="text-muted-foreground">
+            O evento que você está tentando acessar não existe ou não foi
+            carregado.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <EventManagementContent {...props} event={props.event} />;
 }

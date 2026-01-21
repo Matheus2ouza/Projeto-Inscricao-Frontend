@@ -30,6 +30,7 @@ export function useListPaymentPending({
 
   return {
     inscriptions: data?.inscriptions || [],
+    allowCard: data?.allowCard || false,
     total: data?.total || 0,
     page: data?.page || 0,
     pageCount: data?.pageCount || 0,

@@ -12,10 +12,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
-import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Calendar, Frown, Loader2, MapPin } from "lucide-react";

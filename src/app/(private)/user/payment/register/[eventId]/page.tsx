@@ -20,6 +20,7 @@ export default function RegisterPaymentPage() {
 
   const {
     inscriptions,
+    allowCard,
     total,
     page,
     pageCount,
@@ -33,8 +34,12 @@ export default function RegisterPaymentPage() {
     pageSize: PAGE_SIZE,
   });
 
-  const handleViewPayment = (eventId: string) => {
+  const handleViewPayment = () => {
     router.push(`/user/payment/list-payments/${eventId}`);
+  };
+
+  const handleViewPaymentDetails = (paymentId: string) => {
+    router.push(`/user/payment/register/${eventId}/${paymentId}`);
   };
 
   const renderSkeletonGrid = () => {
@@ -73,12 +78,14 @@ export default function RegisterPaymentPage() {
     return (
       <RegisterPaymentTable
         inscriptions={inscriptions}
+        allowCard={allowCard}
         total={total}
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
         pageSize={PAGE_SIZE}
         onViewPayment={handleViewPayment}
+        onViewPaymentDetails={handleViewPaymentDetails}
       />
     );
   };

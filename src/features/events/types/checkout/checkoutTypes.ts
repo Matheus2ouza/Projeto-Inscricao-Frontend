@@ -50,7 +50,7 @@ export type ListParticipantsRequest = {
 };
 
 export type ListParticipantsResponse = {
-  account: Accounts;
+  accounts: Accounts;
   total: number;
   page: number;
   pageCount: number;

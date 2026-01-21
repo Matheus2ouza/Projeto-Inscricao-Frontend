@@ -82,12 +82,12 @@ export default function ParticipantsTable({
 
   const availableAccountIds = useMemo(
     () => accounts.map((account) => account.id),
-    [accounts]
+    [accounts],
   );
 
   useEffect(() => {
     setSelectedAccountIds((prev) =>
-      prev.filter((id) => availableAccountIds.includes(id))
+      prev.filter((id) => availableAccountIds.includes(id)),
     );
   }, [availableAccountIds]);
 
@@ -101,19 +101,19 @@ export default function ParticipantsTable({
     setSelectedAccountIds((prev) =>
       prev.includes(accountId)
         ? prev.filter((id) => id !== accountId)
-        : [...prev, accountId]
+        : [...prev, accountId],
     );
   };
 
   const handleToggleAll = () => {
     setSelectedAccountIds((prev) =>
-      isEverythingSelected ? [] : availableAccountIds
+      isEverythingSelected ? [] : availableAccountIds,
     );
   };
 
   const handleGenderToggle = (gender: string, enabled: boolean) => {
     setSelectedGenders((prev) =>
-      enabled ? [...prev, gender] : prev.filter((item) => item !== gender)
+      enabled ? [...prev, gender] : prev.filter((item) => item !== gender),
     );
   };
 
@@ -251,7 +251,7 @@ export default function ParticipantsTable({
               key={account.id}
               className={cn(
                 "border-0 shadow-md bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 transition-all",
-                isAccountSelected && "ring-2 ring-primary/50"
+                isAccountSelected && "ring-2 ring-primary/50",
               )}
             >
               <CardHeader>

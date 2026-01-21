@@ -7,7 +7,7 @@ export function getConvertStatusEvent(status: string): string {
     case "finalized":
       return "Evento Finalizado";
     default:
-      return status
+      return status;
   }
 }
 
@@ -22,7 +22,7 @@ export function getConvertStatusInscription(status: string): string {
     case "cancelled":
       return "CANCELADA";
     default:
-      return status
+      return status;
   }
 }
 
@@ -35,6 +35,6 @@ export function getConvertStatusPayment(status: string): string {
     case "under_review":
       return "EM ANÁLISE";
     default:
-      return status
+      return status;
   }
 }

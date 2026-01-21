@@ -38,6 +38,7 @@ export type Event = {
   description?: string;
   maxParticipants?: number;
   ticketPrice?: number;
+  allowCard?: boolean;
   address?: string;
 };
 

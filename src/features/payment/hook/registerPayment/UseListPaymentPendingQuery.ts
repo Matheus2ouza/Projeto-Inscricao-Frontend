@@ -14,7 +14,7 @@ export const ListPaymentPendingKeys = {
 export function UseListPaymentPendingQuery(
   eventId: string,
   page: number = 1,
-  pageSize: number = 20
+  pageSize: number = 20,
 ) {
   return useQuery<ListAllPaymentsPendingResponse>({
     queryKey: ListPaymentPendingKeys.list(eventId, page, pageSize),

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { updateEventPayment } from "../api/eventActions/updateEventPayment";
+import { updateEventPayment } from "../api/manager/eventActions/updateEventPayment";
 
 export function useEventPayment() {
   const [loading, setLoading] = useState(false);

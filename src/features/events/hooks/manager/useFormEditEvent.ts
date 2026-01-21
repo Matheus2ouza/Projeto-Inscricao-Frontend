@@ -1,12 +1,16 @@
+import {
+  Event,
+  UpdateEventInput,
+} from "@/features/events/types/manager/eventManagerTypes";
 import { useCurrentUser } from "@/shared/context/user-context";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../expenses/hooks/useSelectEventsQuery";
-import { deleteEvent } from "../api/eventActions/deleteEvent";
-import { updateEvent } from "../api/eventActions/updateEvent";
-import { Event, UpdateEventInput } from "../types/eventTypes";
-import { useEventInscriptions } from "./useEventInscriptions";
-import { useEventPayment } from "./useEventPayment";
+import { useInvalidateEventsQuery } from "../../../expenses/hooks/useSelectEventsQuery";
+import { deleteEvent } from "../../api/manager/eventActions/deleteEvent";
+import { updateAllowCard } from "../../api/manager/eventActions/updateAllowCard";
+import { updateEvent } from "../../api/manager/eventActions/updateEvent";
+import { useEventInscriptions } from "../useEventInscriptions";
+import { useEventPayment } from "../useEventPayment";
 
 export function useFormEditEvent(event: Event) {
   const { user } = useCurrentUser();
@@ -44,7 +48,7 @@ export function useFormEditEvent(event: Event) {
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -112,6 +116,17 @@ export function useFormEditEvent(event: Event) {
       setLoading(false);
     }
   };
+
+  const handleUpdateAllowCard = async (allowCard: boolean) => {
+    const success = await updateAllowCard(event.id, allowCard);
+    if (success) {
+      toast.success("Configuração de pagamento atualizada com sucesso!");
+      // Invalidar cache do evento
+      invalidateDetail(event.id);
+      invalidateList();
+    }
+  };
+
   const handleUpdatePayment = async (paymentEnabled: boolean) => {
     const success = await updatePayment(event.id, paymentEnabled);
     if (success) {
@@ -157,7 +172,7 @@ export function useFormEditEvent(event: Event) {
   // Função para obter apenas os IDs dos novos responsáveis adicionados
   const getNewResponsibleIds = (): string[] => {
     return formData.responsibleIds.filter(
-      (id) => !originalResponsibleIds.includes(id)
+      (id) => !originalResponsibleIds.includes(id),
     );
   };
 
@@ -179,6 +194,7 @@ export function useFormEditEvent(event: Event) {
     handleDelete,
     handleCancel,
     handleUpdatePayment,
+    handleUpdateAllowCard,
     handleUpdateInscription,
     handleResponsiblesChange,
     getNewResponsibleIds,

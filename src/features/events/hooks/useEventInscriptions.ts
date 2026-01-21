@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { updateEventInscriptions } from "../api/eventActions/updateEventInscriptions";
+import { updateEventInscriptions } from "../api/manager/eventActions/updateEventInscriptions";
 
 export function useEventInscriptions() {
   const [loading, setLoading] = useState(false);
 
   const updateInscriptions = async (
     eventId: string,
-    status: "OPEN" | "CLOSE"
+    status: "OPEN" | "CLOSE",
   ) => {
     setLoading(true);
     try {

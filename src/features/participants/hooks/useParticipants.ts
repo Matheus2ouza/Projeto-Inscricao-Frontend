@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { UseParticipantsParams, UseParticipantsResult } from "../../events/types/checkout/checkoutTypes";
+import {
+  UseParticipantsParams,
+  UseParticipantsResult,
+} from "../../events/types/checkout/checkoutTypes";
 import {
   useParticipantsQuery,
   usePrefetchParticipants,
@@ -29,7 +32,7 @@ export function useParticipants({
   }
 
   return {
-    accounts: data?.account || [],
+    accounts: data?.accounts || [],
     total: data?.total || 0,
     countAccounts: data?.countAccounts || 0,
     countParticipants: data?.countParticipants || 0,

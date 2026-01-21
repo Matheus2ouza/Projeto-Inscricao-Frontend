@@ -1,7 +1,11 @@
 "use client";
 
 import { UserRole } from "@/features/auth/types/loginTypes";
-import { Event, EVENT_STATUS_OPTIONS, StatusEvent } from "@/features/events/types/check-in/selectEvent";
+import {
+  Event,
+  EVENT_STATUS_OPTIONS,
+  StatusEvent,
+} from "@/features/events/types/check-in/selectEvent";
 import EventStatusFilter from "@/shared/components/EventStatusFilter";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -13,10 +17,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
-import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Frown, Loader2 } from "lucide-react";
@@ -27,7 +31,6 @@ type InfoRow = {
   label: string;
   value: number | string;
 };
-
 
 interface SelectEventTableProps {
   events: Event[];
@@ -54,7 +57,7 @@ export default function SelectEventForCheckin({
   onViewEvent,
   onStatusFilterChange,
   onApplyStatusFilter,
-  getInfoRows
+  getInfoRows,
 }: SelectEventTableProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
@@ -179,12 +182,12 @@ export default function SelectEventForCheckin({
                     getInfoRows?.(event) ?? [
                       {
                         label: "Total de Localidades",
-                        value: event.countAccounts
+                        value: event.countAccounts,
                       },
                       {
                         label: "Total de Participantes",
-                        value: event.countParticipants
-                      }
+                        value: event.countParticipants,
+                      },
                     ]
                   ).map(({ label, value }) => (
                     <div
@@ -195,10 +198,11 @@ export default function SelectEventForCheckin({
                         {label}
                       </span>
                       <span
-                        className={`font-semibold ${label.toLowerCase().includes("pendentes")
-                          ? "text-yellow-600 dark:text-yellow-400"
-                          : ""
-                          }`}
+                        className={`font-semibold ${
+                          label.toLowerCase().includes("pendentes")
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : ""
+                        }`}
                       >
                         {value}
                       </span>

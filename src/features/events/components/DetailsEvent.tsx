@@ -3,9 +3,9 @@
 import EventMap from "@/shared/components/EventMap";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
-import { getEventStatusInfo } from "@/shared/utils/grtEventStatusInfo";
 import { Calendar, Car, Clock, Loader2, MapPin, Share2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";

@@ -15,7 +15,12 @@ import { useParams } from "next/navigation";
 
 export default function ListParticipantsAdminPage() {
   const params = useParams();
-  const eventId = params?.eventId as string;
+  const rawEventId = params.eventId;
+  const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
+
+  if (!eventId) {
+    return null;
+  }
 
   const {
     accounts,
@@ -27,7 +32,7 @@ export default function ListParticipantsAdminPage() {
     countAccounts,
     countParticipants,
   } = useParticipants({
-    eventId: eventId || "",
+    eventId: eventId,
     initialPage: 1,
     pageSize: 10,
   });

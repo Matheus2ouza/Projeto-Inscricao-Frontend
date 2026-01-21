@@ -2,7 +2,7 @@ import { useGlobalLoading } from "@/components/GlobalLoading";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useInvalidateEventsQuery } from "../../expenses/hooks/useSelectEventsQuery";
-import { deleteEventResponsible } from "../api/eventActions/deleteEventResponsible";
+import { deleteEventResponsible } from "../api/manager/eventActions/deleteEventResponsible";
 
 export function useEventResponsible() {
   const { invalidateDetail } = useInvalidateEventsQuery();
@@ -12,7 +12,7 @@ export function useEventResponsible() {
   const remove = async (
     eventId: string,
     accountId: string,
-    onSuccess?: () => void
+    onSuccess?: () => void,
   ): Promise<boolean> => {
     try {
       setLoading(true);
@@ -44,4 +44,3 @@ export function useEventResponsible() {
     remove,
   };
 }
-

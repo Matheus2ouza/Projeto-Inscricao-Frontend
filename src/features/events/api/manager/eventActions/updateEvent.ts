@@ -1,14 +1,14 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { Event, UpdateEventInput } from "../../types/eventTypes";
+import { Event, UpdateEventInput } from "../../../types/eventTypes";
 
 export async function updateEvent(
   eventId: string,
-  input: UpdateEventInput
+  input: UpdateEventInput,
 ): Promise<Event> {
   try {
     const response = await axiosInstance.put<Event>(
       `/events/${eventId}`,
-      input
+      input,
     );
     return response.data;
   } catch (error) {

@@ -15,39 +15,35 @@ export default function AnalysisPaymentAdminPage() {
       pageSize: 8,
     });
 
-  if (loading) {
+  const renderSkeletonGrid = () => {
     return (
-      <PageContainer
-        title="Análise de Pagamentos"
-        description="Monitore o progresso da análise dos pagamentos dos eventos"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <Card
-              key={index}
-              className="w-full border border-transparent shadow-md bg-white dark:bg-zinc-900 dark:border-zinc-800"
-            >
-              <CardBody className="p-0">
-                <Skeleton className="w-full h-48 rounded-t-xl" />
-              </CardBody>
-              <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800">
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/2 mb-2" />
-                <Skeleton className="h-4 w-1/2" />
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </PageContainer>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <Card
+            key={index}
+            className="w-full border border-transparent shadow-md bg-white dark:bg-zinc-900 dark:border-zinc-800"
+          >
+            <CardBody className="p-0">
+              <Skeleton className="w-full h-48 rounded-t-xl" />
+            </CardBody>
+            <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800">
+              <Skeleton className="h-6 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-2" />
+              <Skeleton className="h-4 w-1/2" />
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
     );
-  }
+  };
 
-  if (error) {
-    return (
-      <PageContainer
-        title="Análise de Pagamentos"
-        description="Monitore o progresso da análise dos pagamentos dos eventos"
-      >
+  const renderContent = () => {
+    if (loading) {
+      return renderSkeletonGrid();
+    }
+
+    if (error) {
+      return (
         <div className="flex justify-center items-center min-h-96">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-red-600 mb-2">
@@ -56,15 +52,25 @@ export default function AnalysisPaymentAdminPage() {
             <p className="text-gray-600">{error}</p>
           </div>
         </div>
-      </PageContainer>
+      );
+    }
+
+    return (
+      <AnalysisPaymentTable
+        events={events}
+        page={page}
+        pageCount={pageCount}
+        onPageChange={setPage}
+        onIndividualInscription={handleAnalysisPayment}
+      />
     );
-  }
+  };
 
   const handleBack = () => {
     router.push("/admin/inscriptions/avulsa");
   };
 
-  const handleIndividualInscription = (eventId: string) => {
+  const handleAnalysisPayment = (eventId: string) => {
     router.push(`/admin/payments/analysis/${eventId}`);
   };
 
@@ -75,13 +81,7 @@ export default function AnalysisPaymentAdminPage() {
       showBackButton={true}
       backButtonAction={handleBack}
     >
-      <AnalysisPaymentTable
-        events={events}
-        page={page}
-        pageCount={pageCount}
-        onPageChange={setPage}
-        onIndividualInscription={handleIndividualInscription}
-      />
+      {renderContent()}
     </PageContainer>
   );
 }

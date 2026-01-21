@@ -11,7 +11,7 @@ export const eventsWithPaymentsKeys = {
 export function useEventsWithPaymentsQuery(
   page = 1,
   pageSize = 8,
-  status?: string[]
+  status?: string[],
 ) {
   return useQuery({
     queryKey: eventsWithPaymentsKeys.list(page, pageSize),

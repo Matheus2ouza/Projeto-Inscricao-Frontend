@@ -6,11 +6,11 @@ const parseDate = (value: Date | string): Date => {
 };
 
 export async function getReportGeneral(
-  eventId: string
+  eventId: string,
 ): Promise<ReportGeneralResponse> {
   try {
     const { data } = await axiosInstance.get<ReportGeneralResponse>(
-      `/report/general/${eventId}`
+      `/report/general/${eventId}`,
     );
 
     return {
@@ -22,7 +22,7 @@ export async function getReportGeneral(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao carregar relatório do evento"
+        "Falha ao carregar relatório do evento",
     );
   }
 }
