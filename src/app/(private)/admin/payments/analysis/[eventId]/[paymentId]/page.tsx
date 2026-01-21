@@ -7,7 +7,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
 
-export default function PaymentDetailsPage() {
+export default function PaymentDetailsAdminPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;

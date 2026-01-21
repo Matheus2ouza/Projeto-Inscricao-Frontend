@@ -8,7 +8,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
 
 const PAGE_SIZE = 10;
-export default function AnalysisPaymentAdminPage() {
+export default function AnalysisPaymentSuperPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
@@ -84,7 +84,7 @@ export default function AnalysisPaymentAdminPage() {
   };
 
   const handleViewDetail = (paymentId: string) => {
-    router.push(`/admin/payments/analysis/${eventId}/${paymentId}`);
+    router.push(`/super/payments/analysis/${eventId}/${paymentId}`);
   };
 
   const handleBack = () => {

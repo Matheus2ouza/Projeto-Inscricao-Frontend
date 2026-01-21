@@ -1,40 +1,39 @@
 "use client";
-
-import AnalysisPaymentTable from "@/features/payment/components/analysisPayment/analysisPayment";
-import { useAnalysisPayment } from "@/features/payment/hook/analysisPayment/analysisPayment";
+import DetailsPaymentTable from "@/features/payment/components/analysisPayment/detailsPayment";
+import { useAnalysisPaymentDetails } from "@/features/payment/hook/analysisPayment/analysisPaymentDetails";
+import { usePaymentActions } from "@/features/payment/hook/analysisPayment/usePaymentActions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
 
-const PAGE_SIZE = 10;
-export default function AnalysisPaymentAdminPage() {
+export default function PaymentDetailsSuperPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
+  const rawPaymentId = params.paymentId;
+  const paymentId = Array.isArray(rawPaymentId)
+    ? rawPaymentId[0]
+    : rawPaymentId;
 
-  if (!eventId) {
+  if (!eventId || !paymentId) {
     return null;
   }
 
+  const { payment, loading, fetching, fetched, error, refresh } =
+    useAnalysisPaymentDetails({
+      paymentId,
+    });
+
   const {
-    event,
-    payments,
-    total,
-    page,
-    pageCount,
-    loading,
-    fetching,
-    fetched,
-    error,
-    setPage,
-    refresh,
-  } = useAnalysisPayment({
-    eventId,
-    initialPage: 1,
-    pageSize: PAGE_SIZE,
-  });
+    approvePayment,
+    rejectPayment,
+    reversePayment,
+    isApproving,
+    isRejecting,
+    isReversing,
+  } = usePaymentActions();
 
   const renderSkeletonGrid = () => {
     return (
@@ -70,25 +69,32 @@ export default function AnalysisPaymentAdminPage() {
     }
 
     return (
-      <AnalysisPaymentTable
-        event={event}
-        payments={payments}
-        total={total}
-        page={page}
-        pageCount={pageCount}
-        pageSize={PAGE_SIZE}
-        onPageChange={setPage}
-        onViewDetail={handleViewDetail}
+      <DetailsPaymentTable
+        payment={payment}
+        onApprovePayment={() => handleApprovePayment(paymentId)}
+        onRejectPayment={(reason) => handleRejectPayment(paymentId, reason)}
+        onRevertPayment={() => handleRevertPayment(paymentId)}
+        isApproving={isApproving}
+        isRejecting={isRejecting}
+        isReversing={isReversing}
       />
     );
   };
 
-  const handleViewDetail = (paymentId: string) => {
-    router.push(`/admin/payments/analysis/${eventId}/${paymentId}`);
+  const handleApprovePayment = async (paymentId: string) => {
+    await approvePayment(paymentId);
+  };
+
+  const handleRejectPayment = async (paymentId: string, reason: string) => {
+    await rejectPayment({ paymentId, reason });
+  };
+
+  const handleRevertPayment = async (paymentId: string) => {
+    await reversePayment(paymentId);
   };
 
   const handleBack = () => {
-    router.replace(`/super/home`);
+    router.back();
   };
 
   return (
