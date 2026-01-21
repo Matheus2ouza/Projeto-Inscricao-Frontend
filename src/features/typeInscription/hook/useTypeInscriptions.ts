@@ -17,7 +17,7 @@ export function useTypeInscriptions({
   } = useTypeInscriptionsQuery(eventId);
 
   return {
-    typeInscriptions: data?.typeInscriptions || [],
+    typeInscriptions: data || [],
     loading,
     fetching,
     fetched,
