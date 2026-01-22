@@ -1,5 +1,5 @@
+import { ReportGeneralResponse } from "@/features/report/types/reportGeral/reportTypes";
 import axiosInstance from "@/shared/lib/apiClient";
-import { ReportGeneralResponse } from "../types/reportTypes";
 
 const parseDate = (value: Date | string): Date => {
   return value instanceof Date ? value : new Date(value);
@@ -10,7 +10,7 @@ export async function getReportGeneral(
 ): Promise<ReportGeneralResponse> {
   try {
     const { data } = await axiosInstance.get<ReportGeneralResponse>(
-      `/report/general/${eventId}`,
+      `/report/${eventId}/general`,
     );
 
     return {

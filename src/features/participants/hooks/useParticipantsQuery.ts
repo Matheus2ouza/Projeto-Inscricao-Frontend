@@ -24,7 +24,6 @@ export function useParticipantsQuery(
     gcTime: 10 * 60 * 1000, // 10 minutos
     retry: 2,
     refetchOnWindowFocus: false,
-    enabled: !!eventId, // Só executa se eventId estiver disponível
   });
 }
 

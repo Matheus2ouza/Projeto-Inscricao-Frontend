@@ -34,7 +34,7 @@ export default function ListParticipantsAdminPage() {
   } = useParticipants({
     eventId: eventId,
     initialPage: 1,
-    pageSize: 10,
+    pageSize: 1,
   });
 
   if (loading) {

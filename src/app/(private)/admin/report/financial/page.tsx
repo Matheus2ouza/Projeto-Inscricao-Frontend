@@ -95,7 +95,7 @@ export default function ReportSuperPage() {
   };
 
   const handleViewReport = (eventId: string) => {
-    router.push(`/admin/report/${eventId}`);
+    router.push(`/admin/report/financial/${eventId}`);
   };
 
   const handleBack = () => {

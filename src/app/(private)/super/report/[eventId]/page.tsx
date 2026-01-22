@@ -1,8 +1,8 @@
 "use client";
 
-import { genaratePdfReport } from "@/features/report/api/genaratePdfReport";
-import ReportDetails from "@/features/report/components/ReportDetails";
-import { useReportGeneral } from "@/features/report/hooks/useReportGeneral";
+import { genaratePdfReport } from "@/features/report/api/reportGeral/genaratePdfReport";
+import ReportDetails from "@/features/report/components/reportGeral/ReportDetails";
+import { useReportGeneral } from "@/features/report/hooks/reportGeral/useReportGeneral";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";

@@ -13,6 +13,16 @@ export type GenaratePdfReportOutput = {
   filename: string;
 };
 
+export type GenaratePdfFinancialInput = {
+  eventId: string;
+  details: boolean;
+};
+
+export type GenaratePdfFinancialOutput = {
+  pdfBase64: string;
+  filename: string;
+};
+
 export type ReportGeneralInput = {
   eventId: string;
 };
@@ -32,7 +42,6 @@ export type ReportGeneralResponse = {
   inscriptionAvuls: InscriptionAvuls;
   ticketSale: TicketSale;
   expenses: ExpensesReport;
-  gastos: ExpensesReport;
 };
 
 export type TypeInscription = {
@@ -93,10 +102,13 @@ export type ExpenseDetail = {
   updatedAt: Date;
 };
 
+export type UseReportGeneralParam = {
+  eventId: string;
+};
+
 export type UseReportGeneralResult = {
   data: ReportGeneralResponse | null;
   loading: boolean;
-  error: string | null;
+  error: Error | null;
   refetch: () => Promise<void>;
-  isFetching: boolean;
 };

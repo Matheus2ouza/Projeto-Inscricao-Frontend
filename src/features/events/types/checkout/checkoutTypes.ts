@@ -56,6 +56,8 @@ export type ListParticipantsResponse = {
   pageCount: number;
   countAccounts: number;
   countParticipants: number;
+  countParticipantsMale: number;
+  countParticipantsFemale: number;
 };
 
 export type UseParticipantsParams = {

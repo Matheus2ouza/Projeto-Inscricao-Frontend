@@ -52,8 +52,8 @@ import {
   Map,
   ScrollText,
   Settings,
-  SquareChartGantt,
   Tickets,
+  TrendingUp,
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -71,6 +71,7 @@ export default function AppSidebarAdminManager({
   const [paymentsOpen, setPaymentsOpen] = React.useState(true);
   const [eventsOpen, setEventsOpen] = React.useState(true);
   const [ticketsOpen, setTicketsOpen] = React.useState(true);
+  const [reportOpen, setReportOpen] = React.useState(true);
 
   const isMobile = useIsMobile();
 
@@ -102,7 +103,7 @@ export default function AppSidebarAdminManager({
       ({
         "--sidebar-width": "18rem",
       }) as React.CSSProperties,
-    []
+    [],
   );
 
   return (
@@ -138,7 +139,7 @@ export default function AppSidebarAdminManager({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              inscriptionsOpen && "rotate-90"
+                              inscriptionsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -181,7 +182,7 @@ export default function AppSidebarAdminManager({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              paymentsOpen && "rotate-90"
+                              paymentsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -244,7 +245,7 @@ export default function AppSidebarAdminManager({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              eventsOpen && "rotate-90"
+                              eventsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -297,7 +298,7 @@ export default function AppSidebarAdminManager({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              eventsOpen && "rotate-90"
+                              eventsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -356,15 +357,44 @@ export default function AppSidebarAdminManager({
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href="/admin/report"
-                        className="flex items-center gap-1"
-                      >
-                        <SquareChartGantt className="size-4" />
-                        Relatórios
-                      </a>
-                    </SidebarMenuButton>
+                    <Collapsible open={reportOpen} onOpenChange={setReportOpen}>
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuButton className="justify-between">
+                          <span className="flex items-center gap-1">
+                            <TrendingUp className="size-4" />
+                            Relatórios
+                          </span>
+                          <ChevronRight
+                            className={cn(
+                              "size-4 text-muted-foreground transition-transform",
+                              eventsOpen && "rotate-90",
+                            )}
+                          />
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub className="mt-1 border-0 pl-6">
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/report/geral"
+                              className="gap-1"
+                            >
+                              <CardSim className="size-4" />
+                              <span>Relatorio Geral</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/report/financial"
+                              className="gap-1"
+                            >
+                              <CardSim className="size-4" />
+                              <span>Relatorio Financeiro</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
@@ -412,7 +442,7 @@ export default function AppSidebarAdminManager({
                   "overflow-hidden rounded-xl border bg-popover shadow-lg lg:mb-5",
                   isMobile
                     ? "mx-auto w-full min-w-[15rem] max-w-[15rem]"
-                    : "w-60"
+                    : "w-60",
                 )}
               >
                 <div className="flex items-center gap-3 border-b border-border px-4 py-3">
