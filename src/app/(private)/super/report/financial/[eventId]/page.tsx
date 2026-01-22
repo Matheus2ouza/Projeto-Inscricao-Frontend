@@ -9,7 +9,7 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function ReportDetalheSuperPage() {
+export default function ReportDetalheAdminPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
@@ -25,7 +25,7 @@ export default function ReportDetalheSuperPage() {
   });
 
   const handleBack = () => {
-    router.push("/super/report/financial");
+    router.push("/admin/report/financial");
   };
 
   if (loading) {

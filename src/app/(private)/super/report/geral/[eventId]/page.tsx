@@ -10,7 +10,7 @@ import { Skeleton } from "@/shared/components/ui/skeleton";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
-export default function ReportDetalheSuperPage() {
+export default function ReportDetalheAdminPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
@@ -84,7 +84,7 @@ export default function ReportDetalheSuperPage() {
   };
 
   const handleBack = () => {
-    router.push("/super/report/geral");
+    router.push("/admin/report/geral");
   };
 
   return (

@@ -8,7 +8,7 @@ import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function ReportSuperPage() {
+export default function ReportAdminPage() {
   const router = useRouter();
   const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
   const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
