@@ -37,8 +37,6 @@ const GENDERS = [
   { label: "Feminino", value: "FEMININO" },
 ];
 
-const formatDate = (date: string) => new Date(date).toLocaleDateString("pt-BR");
-
 const calculateAge = (birthDate: string) => {
   const today = new Date();
   const birth = new Date(birthDate);
@@ -140,6 +138,24 @@ export default function ParticipantsTable({
     }
   };
 
+  const stats = useMemo(() => {
+    return accounts.reduce(
+      (acc, account) => {
+        acc.total += account.countParticipants;
+        account.participants.forEach((p) => {
+          const gender = p.gender?.toUpperCase();
+          if (["MASCULINO", "MALE"].includes(gender)) {
+            acc.male++;
+          } else if (["FEMININO", "FEMALE"].includes(gender)) {
+            acc.female++;
+          }
+        });
+        return acc;
+      },
+      { total: 0, male: 0, female: 0 },
+    );
+  }, [accounts]);
+
   if (!accounts.length) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
@@ -184,6 +200,39 @@ export default function ParticipantsTable({
             : "Sem filtro de gênero"}
         </p>
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <Card className="border-0 shadow-sm bg-blue-50 dark:bg-blue-900/20">
+          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              {stats.total}
+            </span>
+            <span className="text-xs uppercase tracking-wider text-muted-foreground">
+              Total Participantes
+            </span>
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-sm bg-slate-50 dark:bg-slate-900/50">
+          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+            <span className="text-2xl font-bold text-slate-700 dark:text-slate-300">
+              {stats.male}
+            </span>
+            <span className="text-xs uppercase tracking-wider text-muted-foreground">
+              Masculino
+            </span>
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-sm bg-slate-50 dark:bg-slate-900/50">
+          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+            <span className="text-2xl font-bold text-slate-700 dark:text-slate-300">
+              {stats.female}
+            </span>
+            <span className="text-xs uppercase tracking-wider text-muted-foreground">
+              Feminino
+            </span>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="rounded-2xl border border-border bg-white/80 p-6 mb-6 shadow-sm">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">

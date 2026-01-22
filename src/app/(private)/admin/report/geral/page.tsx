@@ -30,13 +30,13 @@ export default function ReportSuperPage() {
   const getInfoRows = (event: Event) => [
     {
       label: "Total de Localidades",
-      value: event.countAccounts
+      value: event.countAccounts,
     },
     {
       label: "Total de Participantes",
-      value: event.countParticipants
-    }
-  ]
+      value: event.countParticipants,
+    },
+  ];
 
   const renderSkeletonGrid = () => {
     return (
@@ -57,12 +57,12 @@ export default function ReportSuperPage() {
           </Card>
         ))}
       </div>
-    )
-  }
+    );
+  };
 
   const renderContent = () => {
     if (loading) {
-      return renderSkeletonGrid()
+      return renderSkeletonGrid();
     }
 
     if (error) {
@@ -81,7 +81,7 @@ export default function ReportSuperPage() {
     return (
       <SelectEventForReport
         events={events}
-        buttonLabel="Começar Check-In"
+        buttonLabel="Visualizar Relatório"
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
@@ -91,11 +91,11 @@ export default function ReportSuperPage() {
         onApplyStatusFilter={handleApplyStatusFilter}
         getInfoRows={getInfoRows}
       />
-    )
-  }
+    );
+  };
 
   const handleViewReport = (eventId: string) => {
-    router.push(`/super/report/${eventId}`);
+    router.push(`/super/report/geral/${eventId}`);
   };
 
   const handleBack = () => {
