@@ -32,7 +32,7 @@ const formatStatusLabel = (status: string) => {
 };
 
 const statusBadgeVariant = (
-  status: string
+  status: string,
 ): "default" | "secondary" | "destructive" | "outline" => {
   const normalized = status?.toLowerCase();
   switch (normalized) {
@@ -78,7 +78,7 @@ export default function AvulsaByEvent({
         style: "currency",
         currency: "BRL",
       }),
-    []
+    [],
   );
 
   const dateFormatter = useMemo(
@@ -87,7 +87,7 @@ export default function AvulsaByEvent({
         dateStyle: "short",
         timeStyle: "short",
       }),
-    []
+    [],
   );
 
   const totals = data?.totals;

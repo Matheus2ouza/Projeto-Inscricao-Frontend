@@ -190,7 +190,7 @@ function AddParticipantDialog({ onAddParticipant }: AddParticipantDialogProps) {
                   variant="ghost"
                   size="sm"
                   onClick={addPayment}
-                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                  className="text-blue-600 hover:text-blue-600"
                   disabled={paymentFields.length >= 3}
                 >
                   <Plus className="h-4 w-4 mr-1" />
@@ -298,12 +298,8 @@ function AddParticipantDialog({ onAddParticipant }: AddParticipantDialogProps) {
               >
                 Cancelar
               </Button>
-              <Button
-                type="button"
-                onClick={() => handleDialogSubmit()}
-                className="bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900"
-              >
-                Adicionar Participante
+              <Button type="button" onClick={() => handleDialogSubmit()}>
+                Adicionar
               </Button>
             </DialogFooter>
           </form>
@@ -326,7 +322,7 @@ export default function CreateAvulsaForm({
       status: "PENDING",
       participants: [],
     }),
-    []
+    [],
   );
 
   const form = useForm<CreateAvulsaFormData>({
@@ -350,7 +346,7 @@ export default function CreateAvulsaForm({
         currency: "BRL",
         minimumFractionDigits: 2,
       }),
-    []
+    [],
   );
 
   const participantSummaries = participantFields.map((participant, index) => {
@@ -370,7 +366,7 @@ export default function CreateAvulsaForm({
 
   const overallTotal = participantSummaries.reduce(
     (sum, participant) => sum + participant.total,
-    0
+    0,
   );
 
   const handleAddParticipant = (participant: ParticipantFormData) => {
@@ -526,12 +522,12 @@ export default function CreateAvulsaForm({
                   ) : (
                     participantFields.map((participant, participantIndex) => {
                       const participantData = form.getValues(
-                        `participants.${participantIndex}`
+                        `participants.${participantIndex}`,
                       );
                       const payments = participantData?.payments || [];
                       const total = payments.reduce(
                         (sum, payment) => sum + Number(payment?.value || 0),
-                        0
+                        0,
                       );
 
                       return (
@@ -592,7 +588,7 @@ export default function CreateAvulsaForm({
                                   >
                                     {payment.paymentMethod}:{" "}
                                     {currencyFormatter.format(
-                                      Number(payment.value || 0)
+                                      Number(payment.value || 0),
                                     )}
                                   </Badge>
                                 ))}
@@ -665,7 +661,7 @@ export default function CreateAvulsaForm({
                                   <span>{payment.paymentMethod}</span>
                                   <span>
                                     {currencyFormatter.format(
-                                      Number(payment.value || 0)
+                                      Number(payment.value || 0),
                                     )}
                                   </span>
                                 </div>
@@ -697,7 +693,6 @@ export default function CreateAvulsaForm({
               <Button
                 type="submit"
                 disabled={isSubmitting || participantFields.length === 0}
-                className="bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 dark:text-gray-900"
               >
                 {isSubmitting ? "Criando..." : "Criar Inscrição"}
               </Button>

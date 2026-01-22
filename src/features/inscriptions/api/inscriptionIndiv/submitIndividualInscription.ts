@@ -17,12 +17,12 @@ export type AxiosError = {
 };
 
 export const submitIndividualInscription = async (
-  data: IndividualInscriptionSubmit
+  data: IndividualInscriptionSubmit,
 ): Promise<IndivUploadRouteResponse> => {
   try {
     const response = await axiosInstance.post<IndivUploadRouteResponse>(
       "/inscription/indiv/register",
-      data
+      data,
     );
     return response.data;
   } catch (error: unknown) {

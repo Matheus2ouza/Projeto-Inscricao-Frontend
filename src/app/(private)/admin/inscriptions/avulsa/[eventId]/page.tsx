@@ -21,7 +21,7 @@ export default function AvulsaByEventAdminPage() {
   const { data, isLoading, error } = useAvulsaRegistrations(
     eventId,
     page,
-    PAGE_SIZE
+    PAGE_SIZE,
   );
 
   const errorMessage =
@@ -36,12 +36,12 @@ export default function AvulsaByEventAdminPage() {
   };
 
   const handleCreate = () => {
-    router.push(`/admin/inscriptions/avulsa/create/${eventId}`);
+    router.push(`/admin/inscriptions/avulsa/${eventId}/create`);
   };
 
   const handleViewDetails = (registrationId: string) => {
     router.push(
-      `/admin/inscriptions/avulsa/${eventId}/details/${registrationId}`
+      `/admin/inscriptions/avulsa/${eventId}/details/${registrationId}`,
     );
   };
 

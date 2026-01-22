@@ -9,12 +9,12 @@ export const memberSchema = z.object({
 // Schema para o formulário principal
 export const groupInscriptionSchema = z.object({
   responsible: z.string().min(1, "Nome do responsável é obrigatório"),
-  email: z.optional(z.email({ message: "Informe um e-mail válido" })),
+  email: z.string().optional(),
   phone: z
     .string()
     .regex(
       /^\(\d{2}\)\s9\d{4}-?\d{4}$/,
-      "Informe um telefone válido no formato (DDD) 9XXXX-XXXX"
+      "Informe um telefone válido no formato (DDD) 9XXXX-XXXX",
     ),
 });
 

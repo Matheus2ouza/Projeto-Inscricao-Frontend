@@ -2,10 +2,11 @@
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { MemberSingleOption } from "@/features/members/components/combobox/ComboboxMemberSingle";
+import { useInvalidateMembersQuery } from "@/features/members/hook/useMembersQuery";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { useForm, UseFormRegister } from "react-hook-form";
+import { SubmitHandler, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "sonner";
 import {
   IndividualInscriptionFormInputs,
@@ -42,7 +43,7 @@ export function useFormCreateIndividualInscription({
     resolver: zodResolver(individualInscriptionSchema),
     defaultValues: {
       responsible: "",
-      email: undefined,
+      email: "",
       phone: "",
       participantName: "",
       birthDate: "",
@@ -62,6 +63,9 @@ export function useFormCreateIndividualInscription({
   // Usar React Query para submeter inscrição
   const submitMutation = useSubmitIndividualInscription();
 
+  // Hook para invalidar cache de membros
+  const { invalidateLists } = useInvalidateMembersQuery();
+
   // Processar dados dos tipos de inscrição
   const typeInscriptions = typeInscriptionsData
     ? Array.isArray(typeInscriptionsData)
@@ -73,7 +77,7 @@ export function useFormCreateIndividualInscription({
   if (typeInscriptionsError) {
     console.error(
       "Erro ao carregar tipos de inscrição:",
-      typeInscriptionsError
+      typeInscriptionsError,
     );
     toast.error("Erro ao carregar tipos de inscrição");
   }
@@ -89,12 +93,6 @@ export function useFormCreateIndividualInscription({
       // Formatação automática da data
       const formattedDate = formatDate(value);
       setValue(name as keyof IndividualInscriptionFormInputs, formattedDate);
-    } else if (name === "email") {
-      const trimmed = value.trim();
-      setValue(
-        name as keyof IndividualInscriptionFormInputs,
-        (trimmed.length === 0 ? undefined : trimmed) as never
-      );
     } else {
       setValue(name as keyof IndividualInscriptionFormInputs, value);
     }
@@ -106,7 +104,7 @@ export function useFormCreateIndividualInscription({
   // Função para lidar com a seleção de um membro
   const handleMemberSelect = (
     memberId: string,
-    member?: MemberSingleOption
+    member?: MemberSingleOption,
   ) => {
     setSelectedMemberId(memberId);
 
@@ -137,7 +135,7 @@ export function useFormCreateIndividualInscription({
     // Limpa todos os campos do formulário
     reset({
       responsible: "",
-      email: undefined,
+      email: "",
       phone: "",
       participantName: "",
       birthDate: "",
@@ -163,12 +161,12 @@ export function useFormCreateIndividualInscription({
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
     } else if (numbers.length <= 10) {
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
-        7
+        7,
       )}`;
     } else {
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
         7,
-        11
+        11,
       )}`;
     }
   };
@@ -186,12 +184,14 @@ export function useFormCreateIndividualInscription({
     } else {
       return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(
         4,
-        8
+        8,
       )}`;
     }
   };
 
-  const onSubmit = async (data: IndividualInscriptionFormInputs) => {
+  const onSubmit: SubmitHandler<IndividualInscriptionFormInputs> = async (
+    data,
+  ) => {
     const apiData: IndividualInscriptionSubmit = {
       responsible: data.responsible,
       phone: data.phone,
@@ -216,12 +216,15 @@ export function useFormCreateIndividualInscription({
 
       // Limpa o formulário após sucesso
       clearForm();
+
+      // Invalida o cache dos membros para garantir que a lista esteja atualizada
+      await invalidateLists();
     } catch (error: unknown) {
       console.error("Erro:", error);
 
       // Type guard para verificar se é um erro com estrutura de resposta
       const isErrorWithResponse = (
-        err: unknown
+        err: unknown,
       ): err is {
         response?: { status?: number; data?: { message?: string } };
       } => {
@@ -230,7 +233,7 @@ export function useFormCreateIndividualInscription({
 
       // Type guard para verificar se é um erro do Next.js Server Action
       const isServerActionError = (
-        err: unknown
+        err: unknown,
       ): err is { message?: string; name?: string } => {
         return (
           typeof err === "object" &&
