@@ -29,7 +29,7 @@ export default function CreateAvulsaAdminPage() {
             total +
             participant.payments.reduce(
               (sum, payment) => sum + Number(payment.value || 0),
-              0
+              0,
             )
           );
         }, 0),
@@ -54,7 +54,7 @@ export default function CreateAvulsaAdminPage() {
         setErrorMessage(message);
       }
     },
-    [createAvulsaMutation, eventId, router]
+    [createAvulsaMutation, eventId, router],
   );
 
   if (!eventId) return null;

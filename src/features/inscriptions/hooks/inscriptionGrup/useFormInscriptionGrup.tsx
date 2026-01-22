@@ -5,8 +5,8 @@ import {
   GroupInscriptionFormInputs,
   groupInscriptionSchema,
 } from "@/features/inscriptions/schema/inscriptionGrup/grupInscriptionSchema";
+import { useInvalidateMembersQuery } from "@/features/members/hook/useMembersQuery";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -20,8 +20,6 @@ import {
 export function useFormInscriptionGrup({
   eventId,
 }: UseFormInscriptionGrupProps): UseFormInscriptionGrupReturn {
-  const router = useRouter();
-
   // Inicializar o react-hook-form com Zod
   const {
     register,
@@ -43,6 +41,7 @@ export function useFormInscriptionGrup({
   const [members, setMembers] = useState<MemberDisplayData[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setLoading } = useGlobalLoading();
+  const { invalidateLists } = useInvalidateMembersQuery();
 
   // Observar os valores do formulário
   const formData = watch();
@@ -58,7 +57,7 @@ export function useFormInscriptionGrup({
       const trimmed = value.trim();
       setValue(
         name as keyof GroupInscriptionFormInputs,
-        trimmed.length === 0 ? undefined : trimmed
+        trimmed.length === 0 ? undefined : trimmed,
       );
     } else {
       setValue(name as keyof GroupInscriptionFormInputs, value);
@@ -80,12 +79,12 @@ export function useFormInscriptionGrup({
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
     } else if (numbers.length <= 10) {
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
-        7
+        7,
       )}`;
     } else {
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
         7,
-        11
+        11,
       )}`;
     }
   };
@@ -133,6 +132,7 @@ export function useFormInscriptionGrup({
       });
 
       // Limpar formulário e lista
+      invalidateLists();
       setMembers([]);
       setValue("responsible", "");
       setValue("email", undefined);
@@ -145,7 +145,7 @@ export function useFormInscriptionGrup({
 
       // Type guard para verificar se é um erro com estrutura de resposta
       const isErrorWithResponse = (
-        err: unknown
+        err: unknown,
       ): err is {
         response?: { status?: number; data?: { message?: string } };
       } => {
@@ -154,7 +154,7 @@ export function useFormInscriptionGrup({
 
       // Type guard para verificar se é um erro do Next.js Server Action
       const isServerActionError = (
-        err: unknown
+        err: unknown,
       ): err is { message?: string; name?: string } => {
         return (
           typeof err === "object" &&
