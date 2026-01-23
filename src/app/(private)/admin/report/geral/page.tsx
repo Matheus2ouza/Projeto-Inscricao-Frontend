@@ -95,11 +95,11 @@ export default function ReportSuperPage() {
   };
 
   const handleViewReport = (eventId: string) => {
-    router.push(`/super/report/geral/${eventId}`);
+    router.push(`/admin/report/geral/${eventId}`);
   };
 
   const handleBack = () => {
-    router.push("/super/home");
+    router.push("/admin/home");
   };
 
   return (

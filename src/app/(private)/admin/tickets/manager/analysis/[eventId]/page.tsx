@@ -36,7 +36,7 @@ export default function TicketsAnalysisByEventAdminPage() {
 
   const handleViewSales = (ticketId: string) => {
     router.push(
-      `/admin/tickets/manager/analysis/${eventId}/ticket/${ticketId}`
+      `/admin/tickets/manager/analysis/${eventId}/ticket/${ticketId}`,
     );
   };
 

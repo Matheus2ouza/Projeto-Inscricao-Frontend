@@ -1,5 +1,4 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
 import { ReportFinancialResponse } from "../../types/reportFinancial/reportFinancialTypes";
 
 export async function getReportFinancial(eventId: string, details: boolean) {
@@ -10,7 +9,6 @@ export async function getReportFinancial(eventId: string, details: boolean) {
         params: {
           details,
         },
-        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
       },
     );
     return data;

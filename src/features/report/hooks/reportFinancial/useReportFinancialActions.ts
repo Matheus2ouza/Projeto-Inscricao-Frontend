@@ -1,21 +1,30 @@
-"use client";
-
-import { genaratePdfReport } from "@/features/report/api/reportGeral/genaratePdfReport";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { genaratePdfFinancialReport } from "../../api/reportFinancial/genaratePdfFinancial";
 
-interface UseReportActionsProps {
+interface UseReportFinancialActionsParam {
   eventId: string;
+  details: boolean;
 }
 
-export function useReportActions({ eventId }: UseReportActionsProps) {
+export function useReportFinancialActions({
+  eventId,
+  details,
+}: UseReportFinancialActionsParam) {
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const downloadReport = useCallback(async () => {
+  const downloadReportFinancial = useCallback(async () => {
     if (!eventId) return;
     setIsDownloading(true);
+
     try {
-      const { pdfBase64, filename } = await genaratePdfReport({ eventId });
+      const { pdfBase64, filename } = await genaratePdfFinancialReport({
+        eventId,
+        details,
+      });
+
+      if (!pdfBase64 || !filename) return;
+
       const byteCharacters = atob(pdfBase64);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
@@ -40,10 +49,10 @@ export function useReportActions({ eventId }: UseReportActionsProps) {
     } finally {
       setIsDownloading(false);
     }
-  }, [eventId]);
+  }, [eventId, details]);
 
   return {
-    downloadReport,
+    downloadReportFinancial,
     isDownloading,
   };
 }
