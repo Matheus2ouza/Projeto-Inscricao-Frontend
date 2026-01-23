@@ -29,20 +29,20 @@ export type UseEventsResult = {
   refetch: () => Promise<void>;
 };
 
-export type Participants = {
+export type Participant = {
   id: string;
   name: string;
   birthDate: string;
   typeInscription: string;
   gender: string;
-}[];
+};
 
-export type Accounts = {
+export type Account = {
   id: string;
   username: string;
   countParticipants: number;
-  participants: Participants;
-}[];
+  participants: Participant[];
+};
 
 export type ListParticipantsRequest = {
   page: number;
@@ -50,14 +50,14 @@ export type ListParticipantsRequest = {
 };
 
 export type ListParticipantsResponse = {
-  accounts: Accounts;
-  total: number;
-  page: number;
-  pageCount: number;
+  accounts: Account[];
   countAccounts: number;
   countParticipants: number;
   countParticipantsMale: number;
   countParticipantsFemale: number;
+  total: number;
+  page: number;
+  pageCount: number;
 };
 
 export type UseParticipantsParams = {
@@ -67,12 +67,14 @@ export type UseParticipantsParams = {
 };
 
 export type UseParticipantsResult = {
-  accounts: Accounts;
+  accounts: Account[];
   total: number;
   page: number;
   pageCount: number;
   countAccounts: number;
   countParticipants: number;
+  countParticipantsMale: number;
+  countParticipantsFemale: number;
   loading: boolean;
   error: string | null;
   setPage: (p: number) => void;

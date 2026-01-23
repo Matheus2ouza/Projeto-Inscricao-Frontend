@@ -2,11 +2,11 @@ import { FindTicketDetailsResponse } from "@/features/tickets/types/ticketDetail
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function getTicketDetails(
-  ticketId: string
+  ticketId: string,
 ): Promise<FindTicketDetailsResponse> {
   try {
     const { data } = await axiosInstance.get<FindTicketDetailsResponse>(
-      `/tickets/${ticketId}/details`
+      `/tickets/${ticketId}/details`,
     );
     return data;
   } catch (error) {
@@ -16,8 +16,8 @@ export async function getTicketDetails(
     };
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível carregar os detalhes do ticket"
+        axiosError.message ??
+        "Não foi possível carregar os detalhes do ticket",
     );
   }
 }

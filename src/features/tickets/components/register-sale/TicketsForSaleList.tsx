@@ -75,10 +75,10 @@ export default function TicketsForSaleList({
                   Expira em{" "}
                   {ticket.expirationDate
                     ? format(
-                      new Date(ticket.expirationDate),
-                      "dd 'de' MMMM 'de' yyyy",
-                      { locale: ptBR }
-                    )
+                        new Date(ticket.expirationDate),
+                        "dd 'de' MMMM 'de' yyyy",
+                        { locale: ptBR },
+                      )
                     : "—"}
                 </p>
               </CardContent>

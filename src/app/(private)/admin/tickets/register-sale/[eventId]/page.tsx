@@ -61,10 +61,9 @@ export default function RegisterTicketSaleAdminPage() {
     );
   };
 
-
   const renderContent = () => {
     if (loading) {
-      return renderSkeletonGrid()
+      return renderSkeletonGrid();
     }
 
     if (error) {
@@ -73,7 +72,7 @@ export default function RegisterTicketSaleAdminPage() {
           <AlertCircle className="h-4 w-4" />
           {error}
         </div>
-      )
+      );
     }
 
     return (
@@ -81,8 +80,8 @@ export default function RegisterTicketSaleAdminPage() {
         event={data}
         onRegisterTicket={handleRegisterTicket}
       />
-    )
-  }
+    );
+  };
 
   const handleBack = () => {
     router.push("/admin/tickets/register-sale");

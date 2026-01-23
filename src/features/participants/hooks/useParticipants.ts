@@ -36,6 +36,8 @@ export function useParticipants({
     total: data?.total || 0,
     countAccounts: data?.countAccounts || 0,
     countParticipants: data?.countParticipants || 0,
+    countParticipantsFemale: data?.countParticipantsFemale || 0,
+    countParticipantsMale: data?.countParticipantsMale || 0,
     page,
     pageCount: data?.pageCount || 0,
     loading,
