@@ -20,22 +20,21 @@ import {
 } from "@/shared/components/ui/pagination";
 import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
-import { Download, User, Users } from "lucide-react";
+import { Download, User, UserPlus, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Accounts } from "../../events/types/checkout/checkoutTypes";
+import { Account } from "../../events/types/checkout/checkoutTypes";
 
 interface ParticipantsTableProps {
   eventId: string;
-  accounts: Accounts;
+  accounts: Account[];
+  countAccounts: number;
+  countParticipants: number;
+  countParticipantsMale: number;
+  countParticipantsFemale: number;
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
 }
-
-const GENDERS = [
-  { label: "Masculino", value: "MASCULINO" },
-  { label: "Feminino", value: "FEMININO" },
-];
 
 const calculateAge = (birthDate: string) => {
   const today = new Date();
@@ -48,22 +47,13 @@ const calculateAge = (birthDate: string) => {
   return age;
 };
 
-const getGenderText = (gender: string) => {
-  switch (gender.toLowerCase()) {
-    case "male":
-      return "Masculino";
-    case "female":
-      return "Feminino";
-    case "other":
-      return "Outro";
-    default:
-      return gender;
-  }
-};
-
 export default function ParticipantsTable({
   eventId,
   accounts,
+  countAccounts,
+  countParticipants,
+  countParticipantsMale,
+  countParticipantsFemale,
   page,
   pageCount,
   onPageChange,
@@ -91,21 +81,12 @@ export default function ParticipantsTable({
 
   const totalSelected = selectedAccountIds.length;
   const hasSelection = totalSelected > 0;
-  const isEverythingSelected =
-    availableAccountIds.length > 0 &&
-    totalSelected === availableAccountIds.length;
 
   const toggleAccount = (accountId: string) => {
     setSelectedAccountIds((prev) =>
       prev.includes(accountId)
         ? prev.filter((id) => id !== accountId)
         : [...prev, accountId],
-    );
-  };
-
-  const handleToggleAll = () => {
-    setSelectedAccountIds((prev) =>
-      isEverythingSelected ? [] : availableAccountIds,
     );
   };
 
@@ -138,24 +119,6 @@ export default function ParticipantsTable({
     }
   };
 
-  const stats = useMemo(() => {
-    return accounts.reduce(
-      (acc, account) => {
-        acc.total += account.countParticipants;
-        account.participants.forEach((p) => {
-          const gender = p.gender?.toUpperCase();
-          if (["MASCULINO", "MALE"].includes(gender)) {
-            acc.male++;
-          } else if (["FEMININO", "FEMALE"].includes(gender)) {
-            acc.female++;
-          }
-        });
-        return acc;
-      },
-      { total: 0, male: 0, female: 0 },
-    );
-  }, [accounts]);
-
   if (!accounts.length) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
@@ -178,102 +141,204 @@ export default function ParticipantsTable({
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground">
-        <div className="flex flex-wrap gap-3">
-          {GENDERS.map((gender) => (
-            <label key={gender.value} className="flex items-center gap-2">
-              <Switch
-                checked={selectedGenders.includes(gender.value)}
-                onCheckedChange={(checked) =>
-                  handleGenderToggle(gender.value, Boolean(checked))
-                }
-              />
-              <span className="uppercase tracking-[0.3em] text-xs">
-                {gender.label}
-              </span>
-            </label>
-          ))}
-        </div>
-        <p className="text-xs uppercase tracking-[0.3em]">
-          {selectedGenders.length
-            ? `Filtrando: ${selectedGenders.join(", ")}`
-            : "Sem filtro de gênero"}
-        </p>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <Card className="border-0 shadow-sm bg-blue-50 dark:bg-blue-900/20">
-          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {stats.total}
-            </span>
-            <span className="text-xs uppercase tracking-wider text-muted-foreground">
-              Total Participantes
-            </span>
+      {/* Seção de Dados Principais - 4 cards no topo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Total de Contas */}
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-blue-400">
+                  Contas
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {countAccounts}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                <UserPlus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Contas de usuários com inscrições
+            </p>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm bg-slate-50 dark:bg-slate-900/50">
-          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-            <span className="text-2xl font-bold text-slate-700 dark:text-slate-300">
-              {stats.male}
-            </span>
-            <span className="text-xs uppercase tracking-wider text-muted-foreground">
-              Masculino
-            </span>
+
+        {/* Total de Participantes */}
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-gray-800">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider font-semibold text-emerald-600 dark:text-emerald-400">
+                  Participantes
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {countParticipants}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Total de pessoas inscritas
+            </p>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-sm bg-slate-50 dark:bg-slate-900/50">
-          <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-            <span className="text-2xl font-bold text-slate-700 dark:text-slate-300">
-              {stats.female}
-            </span>
-            <span className="text-xs uppercase tracking-wider text-muted-foreground">
-              Feminino
-            </span>
+
+        {/* Participantes Masculinos */}
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-900/20 dark:to-gray-800">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider font-semibold text-indigo-600 dark:text-indigo-400">
+                  Masculino
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {countParticipantsMale}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-800 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {countParticipants > 0 ? (
+                <span>
+                  {((countParticipantsMale / countParticipants) * 100).toFixed(
+                    1,
+                  )}
+                  % do total
+                </span>
+              ) : (
+                <span>0% do total</span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Participantes Femininos */}
+        <Card className="border-0 shadow-sm bg-gradient-to-br from-pink-50 to-white dark:from-pink-900/20 dark:to-gray-800">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider font-semibold text-pink-600 dark:text-pink-400">
+                  Feminino
+                </p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  {countParticipantsFemale}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-pink-100 dark:bg-pink-800 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-pink-600 dark:text-pink-400" />
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {countParticipants > 0 ? (
+                <span>
+                  {(
+                    (countParticipantsFemale / countParticipants) *
+                    100
+                  ).toFixed(1)}
+                  % do total
+                </span>
+              ) : (
+                <span>0% do total</span>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Filtros de Gênero para PDFs */}
       <div className="rounded-2xl border border-border bg-white/80 p-6 mb-6 shadow-sm">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="mb-6">
+          <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            Filtros para PDFs
+          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2">
+                <Switch
+                  checked={selectedGenders.includes("MASCULINO")}
+                  onCheckedChange={(checked) =>
+                    handleGenderToggle("MASCULINO", Boolean(checked))
+                  }
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Masculino
+                </span>
+              </label>
+              <label className="flex items-center gap-2">
+                <Switch
+                  checked={selectedGenders.includes("FEMININO")}
+                  onCheckedChange={(checked) =>
+                    handleGenderToggle("FEMININO", Boolean(checked))
+                  }
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Feminino
+                </span>
+              </label>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {selectedGenders.length === 0 && "Nenhum filtro (inclui todos)"}
+              {selectedGenders.length === 1 &&
+                `Filtrando: ${selectedGenders[0] === "MASCULINO" ? "Masculino" : "Feminino"}`}
+              {selectedGenders.length === 2 &&
+                "Filtrando: Masculino e Feminino"}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            Os filtros acima se aplicam tanto ao "Baixar seleção" quanto ao
+            "Baixar todas"
+          </p>
+        </div>
+
+        {/* Botões de Download */}
+        <div className="grid gap-6 sm:grid-cols-2">
           <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
               Baixar seleção
             </p>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-4">
               Gera o PDF apenas das contas marcadas na lista atual.
             </p>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleGeneratePdf}
-              disabled={!hasSelection || isGenerating || isGeneratingAll}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 disabled:bg-primary/40"
-            >
-              <Download className="h-4 w-4" />
-              {isGenerating ? "Baixando..." : "Baixar PDF dos selecionados"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadEtiquetasSelecionadas}
-              disabled={
-                !hasSelection ||
-                isGenerating ||
-                isGeneratingAll ||
-                isDownloadingEtiqueta
-              }
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/60 text-xs uppercase tracking-wide"
-            >
-              <Download className="h-4 w-4" />
-              Gerar etiquetas selecionadas
-            </Button>
+            <div className="space-y-3">
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleGeneratePdf}
+                disabled={!hasSelection || isGenerating || isGeneratingAll}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90 disabled:bg-primary/40"
+              >
+                <Download className="h-4 w-4" />
+                {isGenerating ? "Baixando..." : "Baixar PDF dos selecionados"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadEtiquetasSelecionadas}
+                disabled={
+                  !hasSelection ||
+                  isGenerating ||
+                  isGeneratingAll ||
+                  isDownloadingEtiqueta
+                }
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary/60 text-xs uppercase tracking-wide"
+              >
+                <Download className="h-4 w-4" />
+                Gerar etiquetas selecionadas
+              </Button>
+            </div>
           </div>
           <div className="rounded-2xl border border-muted-foreground/40 bg-white/90 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
               Baixar todas
             </p>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-4">
               Gera o relatório completo com todos os participantes do evento.
             </p>
             <Button
@@ -291,6 +356,7 @@ export default function ParticipantsTable({
         </div>
       </div>
 
+      {/* Lista de Contas */}
       <div className="space-y-6">
         {accounts.map((account) => {
           const isAccountSelected = selectedAccountIds.includes(account.id);
@@ -418,7 +484,7 @@ export default function ParticipantsTable({
                               </td>
                               <td className="px-6 py-4 text-center">
                                 <span className="text-muted-foreground">
-                                  {getGenderText(participant.gender)}
+                                  {participant.gender}
                                 </span>
                               </td>
                             </tr>
