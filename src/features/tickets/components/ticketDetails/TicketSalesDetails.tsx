@@ -105,12 +105,12 @@ export default function TicketSalesDetails({
         currency: "BRL",
         minimumFractionDigits: 2,
       }),
-    []
+    [],
   );
 
   const dateFormatter = useMemo(
     () => new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }),
-    []
+    [],
   );
 
   const totalSoldQuantity = useMemo(() => {
@@ -397,7 +397,7 @@ export default function TicketSalesDetails({
                   "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold shadow-sm w-fit",
                   data.isActive
                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
-                    : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200"
+                    : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200",
                 )}
               >
                 {data.isActive ? "ABERTO" : "FECHADO"}

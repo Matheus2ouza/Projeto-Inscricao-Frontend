@@ -1,14 +1,23 @@
 "use client";
 
+import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Label } from "@/shared/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/components/ui/popover";
 import { Switch } from "@/shared/components/ui/switch";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
 import {
   Banknote,
   CalendarDays,
   CreditCard,
+  Download,
+  Loader2,
   Smartphone,
   Users,
   Wallet,
@@ -16,26 +25,28 @@ import {
 import Image from "next/image";
 import { ReportFinancialResponse } from "../../types/reportFinancial/reportFinancialTypes";
 
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
-
 interface ReportDetailsProps {
   data: ReportFinancialResponse | null;
   showDetails: boolean;
-  onToggleDetails: (checked: boolean) => void;
   loading: boolean;
+  isDownloading: boolean;
+  detailsPdf: boolean;
+  onToggleDetails: (checked: boolean) => void;
+  onTogglePdfDetails: (checked: boolean) => void;
+  onDownload: (details: boolean) => Promise<void>;
 }
 
 export default function ReportFinancialDetails({
   data,
   showDetails,
-  onToggleDetails,
   loading,
+  isDownloading,
+  detailsPdf,
+  onToggleDetails,
+  onTogglePdfDetails,
+  onDownload,
 }: ReportDetailsProps) {
   if (!data) return null;
-
   const gradientClass = getGradientClass(data.name);
 
   // Helper function for summary cards
@@ -119,19 +130,76 @@ export default function ReportFinancialDetails({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border shadow-sm">
-                  <Switch
-                    id="show-details"
-                    checked={showDetails}
-                    onCheckedChange={onToggleDetails}
-                    disabled={loading}
-                  />
-                  <Label
-                    htmlFor="show-details"
-                    className="text-sm font-medium text-slate-600 cursor-pointer"
-                  >
-                    Exibir Detalhes
-                  </Label>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border shadow-sm">
+                    <Switch
+                      id="show-details"
+                      checked={showDetails}
+                      onCheckedChange={onToggleDetails}
+                      disabled={loading}
+                    />
+                    <Label
+                      htmlFor="show-details"
+                      className="text-sm font-medium text-slate-600 cursor-pointer"
+                    >
+                      Exibir Detalhes
+                    </Label>
+                  </div>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-10 gap-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                        disabled={isDownloading || loading}
+                      >
+                        {isDownloading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Download className="w-4 h-4" />
+                        )}
+                        {isDownloading ? "Baixando..." : "Baixar PDF"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" align="end">
+                      <div className="grid gap-4">
+                        <div className="space-y-2">
+                          <h4 className="font-medium leading-none">
+                            Opções de Download
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            Configure o conteúdo do arquivo PDF.
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2 border rounded-lg p-3 bg-slate-50">
+                          <Switch
+                            id="pdf-details"
+                            checked={detailsPdf}
+                            onCheckedChange={onTogglePdfDetails}
+                          />
+                          <Label
+                            htmlFor="pdf-details"
+                            className="text-sm font-medium cursor-pointer"
+                          >
+                            Incluir detalhes (tabelas)
+                          </Label>
+                        </div>
+                        <Button
+                          onClick={() => onDownload(detailsPdf)}
+                          disabled={isDownloading}
+                          className="w-full"
+                        >
+                          {isDownloading ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          ) : (
+                            <Download className="w-4 h-4 mr-2" />
+                          )}
+                          Confirmar Download
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>
@@ -152,7 +220,7 @@ export default function ReportFinancialDetails({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {renderSummaryCard(
               "Total Geral",
-              currencyFormatter.format(data.totalGeral),
+              getFormatCurrency(data.totalGeral),
               "text-emerald-600",
               "bg-gradient-to-br from-emerald-50 to-white",
               "border-emerald-100",
@@ -160,7 +228,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Total Dinheiro",
-              currencyFormatter.format(data.totalCash),
+              getFormatCurrency(data.totalCash),
               "text-blue-600",
               "bg-gradient-to-br from-blue-50 to-white",
               "border-blue-100",
@@ -168,7 +236,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Total Cartão",
-              currencyFormatter.format(data.totalCard),
+              getFormatCurrency(data.totalCard),
               "text-indigo-600",
               "bg-gradient-to-br from-indigo-50 to-white",
               "border-indigo-100",
@@ -176,7 +244,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Total Pix",
-              currencyFormatter.format(data.totalPix),
+              getFormatCurrency(data.totalPix),
               "text-violet-600",
               "bg-gradient-to-br from-violet-50 to-white",
               "border-violet-100",
@@ -188,7 +256,7 @@ export default function ReportFinancialDetails({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {renderSummaryCard(
               "Total Gastos",
-              currencyFormatter.format(data.totalSpent),
+              getFormatCurrency(data.totalSpent),
               "text-rose-600",
               "bg-gradient-to-br from-rose-50 to-white",
               "border-rose-100",
@@ -201,7 +269,10 @@ export default function ReportFinancialDetails({
         {/* Inscrições */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-700">Inscrições</h3>
+            <h3 className="text-xl font-semibold text-slate-700">Inscrições</h3>
+            <span className="text-sm text-slate-600 font-medium">
+              Total: {getFormatCurrency(data.inscription.totalGeral)}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -215,7 +286,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Dinheiro",
-              currencyFormatter.format(data.inscription.totalCash),
+              getFormatCurrency(data.inscription.totalCash),
               "text-blue-600",
               "bg-gradient-to-br from-blue-50 to-white",
               "border-blue-100",
@@ -223,7 +294,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Cartão",
-              currencyFormatter.format(data.inscription.totalCard),
+              getFormatCurrency(data.inscription.totalCard),
               "text-indigo-600",
               "bg-gradient-to-br from-indigo-50 to-white",
               "border-indigo-100",
@@ -231,7 +302,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Pix",
-              currencyFormatter.format(data.inscription.totalPix),
+              getFormatCurrency(data.inscription.totalPix),
               "text-violet-600",
               "bg-gradient-to-br from-violet-50 to-white",
               "border-violet-100",
@@ -280,16 +351,16 @@ export default function ReportFinancialDetails({
                             )}
                           </td>
                           <td className="py-3 px-4 text-sm font-semibold text-slate-800">
-                            {currencyFormatter.format(detail.totalPaid)}
+                            {getFormatCurrency(detail.totalPaid)}
                           </td>
                           <td className="py-3 px-4 text-sm text-slate-700">
-                            {currencyFormatter.format(detail.paidCash)}
+                            {getFormatCurrency(detail.paidCash)}
                           </td>
                           <td className="py-3 px-4 text-sm text-slate-700">
-                            {currencyFormatter.format(detail.paidCard)}
+                            {getFormatCurrency(detail.paidCard)}
                           </td>
                           <td className="py-3 px-4 text-sm text-slate-700">
-                            {currencyFormatter.format(detail.paidPix)}
+                            {getFormatCurrency(detail.paidPix)}
                           </td>
                         </tr>
                       ))}
@@ -303,9 +374,12 @@ export default function ReportFinancialDetails({
         {/* Inscrições Avulsas */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-700">
+            <h3 className="text-xl font-semibold text-slate-700">
               Inscrições Avulsas
             </h3>
+            <span className="text-sm text-slate-600 font-medium">
+              Total: {getFormatCurrency(data.inscriptionAvuls.totalGeral)}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -319,7 +393,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Dinheiro",
-              currencyFormatter.format(data.inscriptionAvuls.totalCash),
+              getFormatCurrency(data.inscriptionAvuls.totalCash),
               "text-blue-600",
               "bg-gradient-to-br from-blue-50 to-white",
               "border-blue-100",
@@ -327,7 +401,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Cartão",
-              currencyFormatter.format(data.inscriptionAvuls.totalCard),
+              getFormatCurrency(data.inscriptionAvuls.totalCard),
               "text-indigo-600",
               "bg-gradient-to-br from-indigo-50 to-white",
               "border-indigo-100",
@@ -335,7 +409,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Pix",
-              currencyFormatter.format(data.inscriptionAvuls.totalPix),
+              getFormatCurrency(data.inscriptionAvuls.totalPix),
               "text-violet-600",
               "bg-gradient-to-br from-violet-50 to-white",
               "border-violet-100",
@@ -384,16 +458,16 @@ export default function ReportFinancialDetails({
                             )}
                           </td>
                           <td className="py-3 px-4 text-sm font-semibold text-slate-800">
-                            {currencyFormatter.format(detail.totalPaid)}
+                            {getFormatCurrency(detail.totalPaid)}
                           </td>
                           <td className="py-3 px-4 text-sm text-slate-700">
-                            {currencyFormatter.format(detail.paidCash)}
+                            {getFormatCurrency(detail.paidCash)}
                           </td>
                           <td className="py-3 px-4 text-sm text-slate-700">
-                            {currencyFormatter.format(detail.paidCard)}
+                            {getFormatCurrency(detail.paidCard)}
                           </td>
                           <td className="py-3 px-4 text-sm text-slate-700">
-                            {currencyFormatter.format(detail.paidPix)}
+                            {getFormatCurrency(detail.paidPix)}
                           </td>
                         </tr>
                       ))}
@@ -407,13 +481,16 @@ export default function ReportFinancialDetails({
         {/* Gastos */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-700">Gastos</h3>
+            <h3 className="text-xl font-semibold text-slate-700">Gastos</h3>
+            <span className="text-sm text-slate-600 font-medium">
+              Total: {getFormatCurrency(data.spent.totalGeral)}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {renderSummaryCard(
               "Dinheiro",
-              currencyFormatter.format(data.spent.totalCash),
+              getFormatCurrency(data.spent.totalCash),
               "text-blue-600",
               "bg-gradient-to-br from-blue-50 to-white",
               "border-blue-100",
@@ -421,7 +498,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Cartão",
-              currencyFormatter.format(data.spent.totalCard),
+              getFormatCurrency(data.spent.totalCard),
               "text-indigo-600",
               "bg-gradient-to-br from-indigo-50 to-white",
               "border-indigo-100",
@@ -429,7 +506,7 @@ export default function ReportFinancialDetails({
             )}
             {renderSummaryCard(
               "Pix",
-              currencyFormatter.format(data.spent.totalPix),
+              getFormatCurrency(data.spent.totalPix),
               "text-violet-600",
               "bg-gradient-to-br from-violet-50 to-white",
               "border-violet-100",
@@ -462,7 +539,7 @@ export default function ReportFinancialDetails({
                         </span>
                       </div>
                       <p className="text-lg font-bold text-slate-800">
-                        {currencyFormatter.format(detail.totalSpent)}
+                        {getFormatCurrency(detail.totalSpent)}
                       </p>
                     </div>
                   ))}

@@ -2,6 +2,7 @@
 
 import ReportFinancialDetails from "@/features/report/components/reportFinancial/reportFinancial";
 import { useReportFinancial } from "@/features/report/hooks/reportFinancial/useReportFinancial";
+import { useReportFinancialActions } from "@/features/report/hooks/reportFinancial/useReportFinancialActions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -16,12 +17,18 @@ export default function ReportDetalheAdminPage() {
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
   const [showDetails, setShowDetails] = useState(true);
+  const [pdfDetails, setPdfDetails] = useState(false);
 
   if (!eventId) return null;
 
   const { data, loading, error, refetch } = useReportFinancial({
     eventId,
     details: showDetails,
+  });
+
+  const { downloadReportFinancial, isDownloading } = useReportFinancialActions({
+    eventId,
+    details: pdfDetails,
   });
 
   const handleBack = () => {
@@ -97,8 +104,12 @@ export default function ReportDetalheAdminPage() {
       <ReportFinancialDetails
         data={data}
         showDetails={showDetails}
-        onToggleDetails={setShowDetails}
         loading={loading}
+        isDownloading={isDownloading}
+        detailsPdf={pdfDetails}
+        onToggleDetails={setShowDetails}
+        onTogglePdfDetails={setPdfDetails}
+        onDownload={downloadReportFinancial}
       />
     </PageContainer>
   );

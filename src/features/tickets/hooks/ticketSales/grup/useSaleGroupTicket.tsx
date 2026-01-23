@@ -24,7 +24,7 @@ const saleGroupTicketSchema = z.object({
         const numberValue = Number(value);
         return Number.isInteger(numberValue) && numberValue > 0;
       },
-      { message: "Quantidade deve ser um número inteiro maior que 0" }
+      { message: "Quantidade deve ser um número inteiro maior que 0" },
     ),
   paymentMethod: z.enum(paymentMethodValues),
   pricePerTicket: z
@@ -35,7 +35,7 @@ const saleGroupTicketSchema = z.object({
         const numberValue = Number(value);
         return !Number.isNaN(numberValue) && numberValue >= 0;
       },
-      { message: "Informe um valor numérico válido" }
+      { message: "Informe um valor numérico válido" },
     ),
   status: z.enum(statusValues),
 });

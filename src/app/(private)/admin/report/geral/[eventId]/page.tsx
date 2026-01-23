@@ -23,8 +23,7 @@ export default function ReportDetalheSuperPage() {
   });
 
   // Hook para ações de relatório (download, etc)
-  const { downloadReport, downloadFinancialReport, isDownloading } =
-    useReportActions({ eventId });
+  const { downloadReport, isDownloading } = useReportActions({ eventId });
 
   if (!eventId) return null;
 

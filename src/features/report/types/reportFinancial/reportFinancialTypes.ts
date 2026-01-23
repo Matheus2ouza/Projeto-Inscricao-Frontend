@@ -13,7 +13,27 @@ export type ReportFinancialResponse = {
   totalSpent: number;
   inscription: Inscription;
   inscriptionAvuls: InscriptionAvuls;
+  ticketsSale: TicketSale;
   spent: Spent;
+};
+
+export type TicketSale = {
+  totalGeral: number;
+  countTickets: number;
+  totalCash: number;
+  totalCard: number;
+  totalPix: number;
+  details?: TicketSaleDetail[];
+};
+
+export type TicketSaleDetail = {
+  id: string;
+  name: string;
+  quantity: number;
+  pricePerTicket: number;
+  totalCash: number;
+  totalCard: number;
+  totalPix: number;
 };
 
 export type Inscription = {
@@ -84,6 +104,6 @@ export type GenaratePdfFinancialInput = {
 };
 
 export type GenaratePdfFinancialOutput = {
-  pdfBase64: string;
-  filename: string;
+  pdfBase64?: string;
+  filename?: string;
 };
