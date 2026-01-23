@@ -12,7 +12,9 @@ export const ticketDetailsKeys = {
 
 export function useTicketDetails(ticketId?: string) {
   return useQuery<FindTicketDetailsResponse>({
-    queryKey: ticketId ? ticketDetailsKeys.detail(ticketId) : ticketDetailsKeys.all,
+    queryKey: ticketId
+      ? ticketDetailsKeys.detail(ticketId)
+      : ticketDetailsKeys.all,
     queryFn: () => {
       if (!ticketId) return Promise.reject(new Error("Ticket não informado"));
       return getTicketDetails(ticketId);

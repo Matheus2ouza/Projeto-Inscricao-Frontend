@@ -2,9 +2,10 @@
 
 import { ticketSaleRegisterSchema } from "@/features/tickets/schema/register-sale/sale/ticketSaleRegisterSchema";
 import type {
-  PaymentMethod, SaleGrupRequest,
+  PaymentMethod,
+  SaleGrupRequest,
   TicketSaleHistoryItem,
-  TicketSummary
+  TicketSummary,
 } from "@/features/tickets/types/register-sale/ticketSaleRegisterTypes";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -86,7 +87,7 @@ export default function TicketSaleDetailsContent({
   const buyerName = form.watch("name") ?? "";
   const totalUnits = paymentMethods.reduce(
     (total, method) => total + (Number(quantities[method]) || 0),
-    0
+    0,
   );
   const exceedsAvailability = totalUnits > ticket.available;
   const { isSubmitting } = form.formState;
@@ -96,7 +97,7 @@ export default function TicketSaleDetailsContent({
 
     const submittedTotalUnits = paymentMethods.reduce(
       (total, method) => total + (values.quantities[method] ?? 0),
-      0
+      0,
     );
 
     const items = [
@@ -142,10 +143,11 @@ export default function TicketSaleDetailsContent({
               {ticket.name}
             </CardTitle>
             <span
-              className={`inline-flex items-center px-2 py-0.5 text-base font-semibold rounded-full ${ticket.isActive
-                ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30"
-                : "bg-red-500/10 text-red-500 border border-red-500/30"
-                }`}
+              className={`inline-flex items-center px-2 py-0.5 text-base font-semibold rounded-full ${
+                ticket.isActive
+                  ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30"
+                  : "bg-red-500/10 text-red-500 border border-red-500/30"
+              }`}
             >
               {ticket.isActive ? "Ativo" : "Inativo"}
             </span>
@@ -243,7 +245,7 @@ export default function TicketSaleDetailsContent({
                                 onChange={(event) => {
                                   const next = event.target.value;
                                   field.onChange(
-                                    next === "" ? 0 : Number(next)
+                                    next === "" ? 0 : Number(next),
                                   );
                                 }}
                                 className="bg-white dark:bg-zinc-900"
@@ -252,7 +254,7 @@ export default function TicketSaleDetailsContent({
                             <p className="text-xs text-muted-foreground">
                               Valor total:{" "}
                               {currencyFormatter.format(
-                                field.value * ticket.price
+                                field.value * ticket.price,
                               )}
                             </p>
                           </FormItem>

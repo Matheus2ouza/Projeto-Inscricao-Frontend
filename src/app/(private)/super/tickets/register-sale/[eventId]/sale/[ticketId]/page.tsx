@@ -18,7 +18,6 @@ export default function RegisterSaleTicketSuperPage() {
   const mutation = useTicketSaleRegister(ticketId);
   const { data, isLoading, error } = useTicketSaleCache(ticketId);
 
-
   const renderSkeletonGrid = () => {
     return (
       <div className="space-y-4">
@@ -29,20 +28,24 @@ export default function RegisterSaleTicketSuperPage() {
           ))}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderContent = () => {
     if (isLoading) {
-      renderSkeletonGrid()
+      return renderSkeletonGrid();
     }
 
     if (error) {
-      <div className="flex items-center justify-center py-12">
-        <p className="text-sm text-red-600">
-          {error instanceof Error ? error.message : "Erro ao carregar o ticket."}
-        </p>
-      </div>
+      return (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-sm text-red-600">
+            {error instanceof Error
+              ? error.message
+              : "Erro ao carregar o ticket."}
+          </p>
+        </div>
+      );
     }
 
     return (
@@ -54,8 +57,8 @@ export default function RegisterSaleTicketSuperPage() {
           mutation.register(payload)
         }
       />
-    )
-  }
+    );
+  };
 
   const handleBack = () => {
     router.push(`/super/tickets/register-sale/${eventId}`);

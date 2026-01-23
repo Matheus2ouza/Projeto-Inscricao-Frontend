@@ -1,6 +1,9 @@
 "use client";
 
-import { ticketDetailsKeys, useTicketDetails } from "@/features/tickets/hooks/ticketDetails/useTicketDetails";
+import {
+  ticketDetailsKeys,
+  useTicketDetails,
+} from "@/features/tickets/hooks/ticketDetails/useTicketDetails";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function useTicketSaleCache(ticketId?: string) {

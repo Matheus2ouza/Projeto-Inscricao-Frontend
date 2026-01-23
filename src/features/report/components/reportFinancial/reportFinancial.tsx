@@ -478,6 +478,117 @@ export default function ReportFinancialDetails({
             )}
         </section>
 
+        {/* Venda de Tickets */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold text-slate-700">
+              Venda de Tickets
+            </h3>
+            <span className="text-sm text-slate-600 font-medium">
+              Total: {getFormatCurrency(data.ticketsSale.totalGeral)}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {renderSummaryCard(
+              "Tickets Vendidos",
+              data.ticketsSale.countTickets.toString(),
+              "text-slate-800",
+              "bg-gradient-to-br from-slate-50 to-white",
+              "border-slate-100",
+              <Users className="w-5 h-5" />,
+            )}
+            {renderSummaryCard(
+              "Dinheiro",
+              getFormatCurrency(data.ticketsSale.totalCash),
+              "text-blue-600",
+              "bg-gradient-to-br from-blue-50 to-white",
+              "border-blue-100",
+              <Banknote className="w-5 h-5" />,
+            )}
+            {renderSummaryCard(
+              "Cartão",
+              getFormatCurrency(data.ticketsSale.totalCard),
+              "text-indigo-600",
+              "bg-gradient-to-br from-indigo-50 to-white",
+              "border-indigo-100",
+              <CreditCard className="w-5 h-5" />,
+            )}
+            {renderSummaryCard(
+              "Pix",
+              getFormatCurrency(data.ticketsSale.totalPix),
+              "text-violet-600",
+              "bg-gradient-to-br from-violet-50 to-white",
+              "border-violet-100",
+              <Smartphone className="w-5 h-5" />,
+            )}
+          </div>
+
+          {/* Detalhes da Venda de Tickets */}
+          {showDetails &&
+            data.ticketsSale.details &&
+            data.ticketsSale.details.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                  Detalhes dos Tickets
+                </h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-200">
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Ticket
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Qtd.
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Preço Unit.
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Dinheiro
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Cartão
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Pix
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.ticketsSale.details.map((detail) => (
+                        <tr
+                          key={detail.id}
+                          className="border-b border-slate-100 hover:bg-slate-50"
+                        >
+                          <td className="py-3 px-4 text-sm font-medium text-slate-800">
+                            {detail.name}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-slate-700">
+                            {detail.quantity}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-slate-700">
+                            {getFormatCurrency(detail.pricePerTicket)}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-slate-700">
+                            {getFormatCurrency(detail.totalCash)}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-slate-700">
+                            {getFormatCurrency(detail.totalCard)}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-slate-700">
+                            {getFormatCurrency(detail.totalPix)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+        </section>
+
         {/* Gastos */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
