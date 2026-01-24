@@ -16,18 +16,18 @@ export type DashboardMetric = keyof DashboardAdminResponse;
 
 export const dashboardAdminKeys = {
   all: ["dashboard-admin"] as const,
-  summary: () => [...dashboardAdminKeys.all, "summary"] as const,
+  summary: (eventId?: string) =>
+    [...dashboardAdminKeys.all, "summary", eventId ?? "all"] as const,
 };
 
-export function useAdminDashboard() {
+export function useAdminDashboard(eventId?: string) {
   const queryClient = useQueryClient();
-  const [refreshingMetric, setRefreshingMetric] = useState<
-    DashboardMetric | null
-  >(null);
+  const [refreshingMetric, setRefreshingMetric] =
+    useState<DashboardMetric | null>(null);
 
   const summaryQuery = useQuery({
-    queryKey: dashboardAdminKeys.summary(),
-    queryFn: getDashboardAdmin,
+    queryKey: dashboardAdminKeys.summary(eventId),
+    queryFn: () => getDashboardAdmin(eventId),
     refetchOnWindowFocus: false,
     staleTime: 60 * 1000,
   });
@@ -42,27 +42,27 @@ export function useAdminDashboard() {
             value = await getDashboardActiveEvents();
             break;
           case "totalCollected":
-            value = await getDashboardTotalCollected();
+            value = await getDashboardTotalCollected(eventId);
             break;
           case "totalDebt":
-            value = await getDashboardTotalDebt();
+            value = await getDashboardTotalDebt(eventId);
             break;
           case "activeParticipants":
-            value = await getDashboardActiveParticipants();
+            value = await getDashboardActiveParticipants(eventId);
             break;
           default:
             break;
         }
 
         queryClient.setQueryData<DashboardAdminResponse | undefined>(
-          dashboardAdminKeys.summary(),
+          dashboardAdminKeys.summary(eventId),
           (old) => ({
             activeEvents: old?.activeEvents ?? 0,
             totalCollected: old?.totalCollected ?? 0,
             totalDebt: old?.totalDebt ?? 0,
             activeParticipants: old?.activeParticipants ?? 0,
             [metric]: value,
-          })
+          }),
         );
       } catch (error) {
         const message = (error as Error | null)?.message ?? "Erro inesperado";
@@ -73,7 +73,7 @@ export function useAdminDashboard() {
         setRefreshingMetric(null);
       }
     },
-    [queryClient]
+    [eventId, queryClient],
   );
 
   const refetchAll = useCallback(async () => {
@@ -98,7 +98,7 @@ export function useAdminDashboard() {
       refreshingMetric,
       refreshMetric,
       refetchAll,
-    ]
+    ],
   );
 
   return value;

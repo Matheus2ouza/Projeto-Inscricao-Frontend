@@ -28,14 +28,17 @@ const normalizeSummary = (data: unknown): DashboardAdminResponse => {
     const obj = data as Record<string, unknown>;
     return {
       activeEvents: toNumber(
-        obj.activeEvents ?? obj.active_events ?? obj.events ?? 0
+        obj.activeEvents ?? obj.active_events ?? obj.events ?? 0,
       ),
       totalCollected: toNumber(
-        obj.totalCollected ?? obj.collected ?? obj.total_collected ?? 0
+        obj.totalCollected ?? obj.collected ?? obj.total_collected ?? 0,
       ),
       totalDebt: toNumber(obj.totalDebt ?? obj.debt ?? obj.total_debt ?? 0),
       activeParticipants: toNumber(
-        obj.activeParticipants ?? obj.participants ?? obj.active_participants ?? 0
+        obj.activeParticipants ??
+          obj.participants ??
+          obj.active_participants ??
+          0,
       ),
     };
   }
@@ -47,8 +50,12 @@ const normalizeSummary = (data: unknown): DashboardAdminResponse => {
   };
 };
 
-export async function getDashboardAdmin(): Promise<DashboardAdminResponse> {
-  const { data } = await apiClient.get("/dashboard/admin");
+export async function getDashboardAdmin(
+  eventId?: string,
+): Promise<DashboardAdminResponse> {
+  const { data } = await apiClient.get("/dashboard/admin", {
+    params: eventId ? { eventId } : undefined,
+  });
   return normalizeSummary(data);
 }
 
@@ -57,17 +64,32 @@ export async function getDashboardActiveEvents(): Promise<number> {
   return pickNumber(data, ["activeEvents", "total", "count", "value"]);
 }
 
-export async function getDashboardTotalCollected(): Promise<number> {
-  const { data } = await apiClient.get("/dashboard/admin/collected");
+export async function getDashboardTotalCollected(
+  eventId?: string,
+): Promise<number> {
+  const { data } = await apiClient.get("/dashboard/admin/collected", {
+    params: eventId ? { eventId } : undefined,
+  });
   return pickNumber(data, ["totalCollected", "collected", "total", "value"]);
 }
 
-export async function getDashboardTotalDebt(): Promise<number> {
-  const { data } = await apiClient.get("/dashboard/admin/debt");
+export async function getDashboardTotalDebt(eventId?: string): Promise<number> {
+  const { data } = await apiClient.get("/dashboard/admin/debt", {
+    params: eventId ? { eventId } : undefined,
+  });
   return pickNumber(data, ["totalDebt", "debt", "total", "value"]);
 }
 
-export async function getDashboardActiveParticipants(): Promise<number> {
-  const { data } = await apiClient.get("/dashboard/admin/active-participants");
-  return pickNumber(data, ["activeParticipants", "participants", "total", "value"]);
+export async function getDashboardActiveParticipants(
+  eventId?: string,
+): Promise<number> {
+  const { data } = await apiClient.get("/dashboard/admin/active-participants", {
+    params: eventId ? { eventId } : undefined,
+  });
+  return pickNumber(data, [
+    "activeParticipants",
+    "participants",
+    "total",
+    "value",
+  ]);
 }

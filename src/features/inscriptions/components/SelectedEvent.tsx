@@ -233,12 +233,9 @@ export default function SelectedEventForInscription({
                     variant="default"
                     size="sm"
                     onClick={() => handleIndividualInscription(event.id)}
-                    disabled={event.countInscriptions === 0}
                     className="dark: text-white"
                   >
-                    {event.countInscriptions === 0
-                      ? "Sem Inscrições"
-                      : "Analisar Inscrições"}
+                    Realizar Inscrição
                   </Button>
                 </div>
               </CardFooter>

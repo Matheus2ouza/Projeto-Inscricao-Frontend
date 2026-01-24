@@ -1,6 +1,7 @@
 "use client";
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
+import { ComboboxEvent } from "@/features/events/components/combobox/ComboBoxEvent";
 import AdminManagerHomeDashboard from "@/features/home/components/admin/AdminManagerHomeDashboard";
 import { useAdminDashboard } from "@/features/home/hook/admin/useAdminDashboard";
 import PageContainer from "@/shared/components/layout/PageContainer";
@@ -17,7 +18,8 @@ export default function AdminManagerHome() {
   const { user } = useCurrentUser();
   const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date());
   const [relativeTime, setRelativeTime] = useState("há instantes");
-  const dashboard = useAdminDashboard();
+  const [selectedEventId, setSelectedEventId] = useState("");
+  const dashboard = useAdminDashboard(selectedEventId || undefined);
   const [refreshingAll, setRefreshingAll] = useState(false);
 
   const refreshDashboard = async () => {
@@ -52,6 +54,12 @@ export default function AdminManagerHome() {
     return () => setLoading(false);
   }, [loading, setLoading]);
 
+  useEffect(() => {
+    if (!dashboard.isFetching && !dashboard.loading) {
+      setLastUpdated(new Date());
+    }
+  }, [dashboard.isFetching, dashboard.loading, selectedEventId]);
+
   return (
     <PageContainer
       title={user?.username ? `Olá, ${user.username}` : "Bem-vindo!"}
@@ -59,19 +67,29 @@ export default function AdminManagerHome() {
       showBackButton={false}
       maxWidth="2xl"
       actions={
-        <button
-          type="button"
-          onClick={refreshDashboard}
-          disabled={refreshingAll || dashboard.loading || dashboard.isFetching}
-          className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
-        >
-          <RotateCw
-            className={`h-4 w-4 text-[#0C3DAD] transition-colors group-hover:text-white dark:text-[#9CC3FF] ${
-              refreshingAll || dashboard.isFetching ? "animate-spin" : ""
-            }`}
-          />
-          <span>Atualizado {relativeTime}</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="min-w-[220px]">
+            <ComboboxEvent
+              value={selectedEventId}
+              onChange={setSelectedEventId}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={refreshDashboard}
+            disabled={
+              refreshingAll || dashboard.loading || dashboard.isFetching
+            }
+            className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
+          >
+            <RotateCw
+              className={`h-4 w-4 text-[#0C3DAD] transition-colors group-hover:text-white dark:text-[#9CC3FF] ${
+                refreshingAll || dashboard.isFetching ? "animate-spin" : ""
+              }`}
+            />
+            <span>Atualizado {relativeTime}</span>
+          </button>
+        </div>
       }
     >
       <AdminManagerHomeDashboard
