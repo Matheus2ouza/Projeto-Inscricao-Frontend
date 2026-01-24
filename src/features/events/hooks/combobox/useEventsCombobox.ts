@@ -21,6 +21,7 @@ export function useEventsCombobox(): UseEventsResult {
     setError(null);
     try {
       const data = await getEventsCombobox();
+      console.log(data);
       setEvents(data.event);
     } catch (e: unknown) {
       const errorMessage =

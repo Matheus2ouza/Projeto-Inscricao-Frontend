@@ -35,6 +35,8 @@ export function ComboboxEvent({
   const [open, setOpen] = React.useState(false);
   const { events: fetched, loading, error } = useEventsCombobox();
 
+  console.log(fetched);
+
   // Preferência: props.options > API; fallback: []
   const events = React.useMemo<EventOption[]>(() => {
     if (options && options.length > 0) return options;
@@ -59,17 +61,18 @@ export function ComboboxEvent({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          type="button"
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between relative overflow-hidden min-w-[200px] max-w-[300px]"
+          className="w-full justify-between relative overflow-hidden min-w-[280px] max-w-[420px]"
         >
           <span
             className={cn(
               "truncate text-left flex-1",
               value
                 ? "text-blue-700 dark:text-blue-300 font-semibold"
-                : "text-gray-700 dark:text-gray-200"
+                : "text-gray-700 dark:text-gray-200",
             )}
             title={selectedEvent?.label ?? "Selecione o evento..."} // Tooltip com texto completo
           >
@@ -85,14 +88,15 @@ export function ComboboxEvent({
           <ChevronsUpDown
             className={cn(
               "h-4 w-4 shrink-0 opacity-50",
-              value ? "text-blue-700" : ""
+              value ? "text-blue-700" : "",
             )}
           />
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] min-w-[240px] max-w-[400px] p-0"
+        className="w-[var(--radix-popover-trigger-width)] min-w-[280px] max-w-[520px] p-0"
         align="start"
+        onOpenAutoFocus={(event) => event.preventDefault()}
       >
         <Command>
           <CommandInput
@@ -130,7 +134,7 @@ export function ComboboxEvent({
                     <Check
                       className={cn(
                         "h-4 w-4 ml-2 shrink-0",
-                        value === event.value ? "opacity-100" : "opacity-0"
+                        value === event.value ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>
