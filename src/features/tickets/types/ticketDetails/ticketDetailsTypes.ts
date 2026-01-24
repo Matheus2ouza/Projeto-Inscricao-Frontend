@@ -1,6 +1,14 @@
 export type TicketSaleItem = {
   id: string;
+  accountName: string;
   quantity: number;
+  createdAt: Date;
+};
+
+export type TicketSalePayment = {
+  id: string;
+  paymentMethod: string;
+  value: number;
   createdAt: Date;
 };
 
@@ -14,6 +22,7 @@ export type TicketDetails = {
   expirationDate: string;
   isActive: boolean;
   ticketSaleItems: TicketSaleItem[];
+  ticketSalePayments: TicketSalePayment[];
 };
 
 export type FindTicketDetailsResponse = {
@@ -26,5 +35,5 @@ export type FindTicketDetailsResponse = {
   expirationDate: Date;
   isActive: boolean;
   TicketSaleItens: TicketSaleItem[];
+  TicketSalePayments: TicketSalePayment[];
 };
-

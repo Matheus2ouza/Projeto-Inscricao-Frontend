@@ -456,6 +456,7 @@ export default function TicketSalesDetails({
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID da Venda</TableHead>
+                    <TableHead>Nome da Conta</TableHead>
                     <TableHead className="text-right">Quantidade</TableHead>
                     <TableHead className="text-right">Valor Total</TableHead>
                     <TableHead className="text-right">Data</TableHead>
@@ -467,6 +468,7 @@ export default function TicketSalesDetails({
                     return (
                       <TableRow key={sale.id}>
                         <TableCell className="font-medium">{sale.id}</TableCell>
+                        <TableCell>{sale.accountName}</TableCell>
                         <TableCell className="text-right">
                           {sale.quantity}
                         </TableCell>

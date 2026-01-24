@@ -537,13 +537,7 @@ export default function ReportFinancialDetails({
                     <thead>
                       <tr className="border-b border-slate-200">
                         <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                          Ticket
-                        </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                          Qtd.
-                        </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                          Preço Unit.
+                          Total
                         </th>
                         <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
                           Dinheiro
@@ -562,14 +556,8 @@ export default function ReportFinancialDetails({
                           key={detail.id}
                           className="border-b border-slate-100 hover:bg-slate-50"
                         >
-                          <td className="py-3 px-4 text-sm font-medium text-slate-800">
-                            {detail.name}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
-                            {detail.quantity}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
-                            {getFormatCurrency(detail.pricePerTicket)}
+                          <td className="py-3 px-4 text-sm font-semibold text-slate-800">
+                            {getFormatCurrency(detail.total)}
                           </td>
                           <td className="py-3 px-4 text-sm text-slate-700">
                             {getFormatCurrency(detail.totalCash)}
@@ -633,27 +621,48 @@ export default function ReportFinancialDetails({
                 <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
                   Detalhes dos Gastos
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.spent.spentDetails.map((detail) => (
-                    <div
-                      key={detail.id}
-                      className="rounded-lg border border-slate-200 bg-white p-4 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <span className="text-sm font-medium text-slate-700">
-                          Gasto
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          {new Date(detail.createdAt).toLocaleDateString(
-                            "pt-BR",
-                          )}
-                        </span>
-                      </div>
-                      <p className="text-lg font-bold text-slate-800">
-                        {getFormatCurrency(detail.totalSpent)}
-                      </p>
-                    </div>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-200">
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Data
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Responsável
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Método
+                        </th>
+                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          Valor
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.spent.spentDetails.map((detail) => (
+                        <tr
+                          key={detail.id}
+                          className="border-b border-slate-100 hover:bg-slate-50"
+                        >
+                          <td className="py-3 px-4 text-sm text-slate-700">
+                            {new Date(detail.createdAt).toLocaleDateString(
+                              "pt-BR",
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-slate-800">
+                            {detail.responsible}
+                          </td>
+                          <td className="py-3 px-4 text-sm text-slate-700">
+                            {detail.paymentMethod}
+                          </td>
+                          <td className="py-3 px-4 text-sm font-semibold text-slate-800">
+                            {getFormatCurrency(detail.totalSpent)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}

@@ -6,11 +6,11 @@ import type {
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function getTicketSalesDetails(
-  ticketId: string
+  ticketId: string,
 ): Promise<TicketDetails> {
   try {
     const { data } = await axiosInstance.get<FindTicketDetailsResponse>(
-      `/tickets/${ticketId}/details`
+      `/tickets/${ticketId}/details`,
     );
 
     return mapTicketDetails(data);
@@ -18,7 +18,7 @@ export async function getTicketSalesDetails(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao carregar detalhes de vendas do ticket"
+        "Falha ao carregar detalhes de vendas do ticket",
     );
   }
 }

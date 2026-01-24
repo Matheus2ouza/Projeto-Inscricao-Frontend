@@ -32,7 +32,7 @@ export default function ReportDetalheAdminPage() {
   });
 
   const handleBack = () => {
-    router.push("/admin/report/financial");
+    router.push("/super/report/financial");
   };
 
   if (loading) {

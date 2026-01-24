@@ -28,9 +28,7 @@ export type TicketSale = {
 
 export type TicketSaleDetail = {
   id: string;
-  name: string;
-  quantity: number;
-  pricePerTicket: number;
+  total: number;
   totalCash: number;
   totalCard: number;
   totalPix: number;
@@ -83,6 +81,8 @@ export type Spent = {
 export type SpentDetail = {
   id: string;
   createdAt: Date;
+  paymentMethod: string;
+  responsible: string;
   totalSpent: number;
 };
 
