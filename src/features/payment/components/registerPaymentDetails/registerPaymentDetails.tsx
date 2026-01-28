@@ -7,6 +7,7 @@ import {
 } from "@/features/payment/types/registerPaymentDetails/registerPaymentDetails";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import {
   Pagination,
   PaginationContent,
@@ -23,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
 import { getcalculateAge } from "@/shared/utils/getCalculateAge";
 import {
@@ -34,15 +36,21 @@ import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
   AlertCircle,
   Calendar,
+  Check,
+  Copy,
   DollarSign,
   Eye,
   FileText,
   ImageIcon,
+  LinkIcon,
   User,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import RegisterPaymentDialog from "../registerPayment/RegisterPaymentDialog";
 
 type RegisterPaymentDetailsProps = {
+  eventId: string;
   inscriptions: Inscription | null;
   participant: Participant[];
   payments: Payment[];
@@ -51,9 +59,14 @@ type RegisterPaymentDetailsProps = {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  onRegisterPaymentCard: (payload: {
+    inscriptionId: string;
+    totalValue: number;
+  }) => void;
 };
 
 export function RegisterPaymentDetailsTable({
+  eventId,
   inscriptions,
   participant,
   payments,
@@ -62,7 +75,13 @@ export function RegisterPaymentDetailsTable({
   page,
   pageCount,
   onPageChange,
+  onRegisterPaymentCard,
 }: RegisterPaymentDetailsProps) {
+  const { user } = useCurrentUser();
+  const [isPaymentPixDialogOpen, setIsPaymentPixDialogOpen] = useState(false);
+  const [paymentLink, setPaymentLink] = useState("");
+  const [copied, setCopied] = useState(false);
+
   if (!inscriptions) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
@@ -71,6 +90,28 @@ export function RegisterPaymentDetailsTable({
       </div>
     );
   }
+
+  const selectedInscriptions = [{ id: inscriptions.id }];
+  const remainingTotal = Math.max(inscriptions.totalValue - total, 0);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const origin = window.location.origin;
+      setPaymentLink(
+        `${origin}/events/payment/card?eventId=${eventId}&inscriptions=${inscriptions.id}&userId=${user.id}&totalValue=${remainingTotal}`,
+      );
+    }
+  }, [eventId, inscriptions.id, user.id, remainingTotal]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(paymentLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Erro ao copiar link:", error);
+    }
+  };
 
   // Função para formatar gênero
   const formatGender = (gender: string) => {
@@ -88,20 +129,46 @@ export function RegisterPaymentDetailsTable({
       <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
         <div className="p-6">
           <div className="space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Detalhes da Inscrição
-              </h1>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Detalhes da Inscrição
+                </h1>
 
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 mt-2">
-                <FileText className="h-4 w-4" />
-                <code className="font-mono bg-muted px-2 py-1 rounded">
-                  {inscriptions.id.substring(0, 12)}...
-                </code>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 mt-2">
+                  <FileText className="h-4 w-4" />
+                  <code className="font-mono bg-muted px-2 py-1 rounded">
+                    {inscriptions.id.substring(0, 12)}...
+                  </code>
+                </div>
+
+                <div className="text-xs text-muted-foreground">
+                  Criada em: {formatDateTime(inscriptions.createdAt)}
+                </div>
               </div>
 
-              <div className="text-xs text-muted-foreground">
-                Criada em: {formatDateTime(inscriptions.createdAt)}
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  onClick={() => setIsPaymentPixDialogOpen(true)}
+                  disabled={remainingTotal <= 0}
+                >
+                  Registrar pagamento Pix
+                </Button>
+                {allowCard && (
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      onRegisterPaymentCard({
+                        inscriptionId: inscriptions.id,
+                        totalValue: remainingTotal,
+                      })
+                    }
+                    disabled={remainingTotal <= 0}
+                  >
+                    Registrar pagamento Cartão
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -145,6 +212,30 @@ export function RegisterPaymentDetailsTable({
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Link de Pagamento Público */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <LinkIcon className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            Link de Pagamento
+          </h2>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">
+          Compartilhe este link para que outra pessoa possa realizar o pagamento
+          desta inscrição.
+        </p>
+        <div className="flex items-center gap-2">
+          <Input value={paymentLink} readOnly className="bg-muted" />
+          <Button onClick={handleCopy} size="icon" variant="outline">
+            {copied ? (
+              <Check className="h-4 w-4 text-green-500 animate-in zoom-in duration-300" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       </div>
 
@@ -459,6 +550,15 @@ export function RegisterPaymentDetailsTable({
           </div>
         )}
       </div>
+
+      <RegisterPaymentDialog
+        open={isPaymentPixDialogOpen}
+        onOpenChange={setIsPaymentPixDialogOpen}
+        selectedInscriptions={selectedInscriptions}
+        eventId={inscriptions.eventId}
+        totalValue={remainingTotal}
+        allowCard={false}
+      />
     </div>
   );
 }

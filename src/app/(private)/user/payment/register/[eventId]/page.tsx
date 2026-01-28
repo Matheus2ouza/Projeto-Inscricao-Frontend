@@ -87,6 +87,14 @@ export default function RegisterPaymentPage() {
         pageSize={PAGE_SIZE}
         onViewPayment={handleViewPayment}
         onViewPaymentDetails={handleViewPaymentDetails}
+        onRegisterPaymentCard={(ids, totalValue) => {
+          const search = new URLSearchParams();
+          if (ids.length > 0) search.set("inscriptions", ids.join(","));
+          search.set("totalValue", String(totalValue));
+          router.push(
+            `/user/payment/register/${eventId}/card?${search.toString()}`,
+          );
+        }}
       />
     );
   };
