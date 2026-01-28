@@ -12,6 +12,7 @@ export type RegisterPaymentDetailsResponse = {
 export type Inscription = {
   id: string;
   eventId: string;
+  userId: string;
   responsible: string;
   totalValue: number;
   status: string;

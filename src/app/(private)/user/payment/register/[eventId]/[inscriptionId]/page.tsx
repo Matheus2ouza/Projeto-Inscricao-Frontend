@@ -18,6 +18,10 @@ export default function RegisterPaymentDetailsPage() {
     ? rawInscriptionId[0]
     : rawInscriptionId;
 
+  if (!eventId) {
+    return null;
+  }
+
   if (!inscriptionId) {
     return null;
   }
@@ -76,6 +80,7 @@ export default function RegisterPaymentDetailsPage() {
 
     return (
       <RegisterPaymentDetailsTable
+        eventId={eventId}
         inscriptions={inscription}
         participant={participant}
         payments={payments}
@@ -84,8 +89,19 @@ export default function RegisterPaymentDetailsPage() {
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
+        onRegisterPaymentCard={handleRegisterPaymentCard}
       />
     );
+  };
+
+  const handleRegisterPaymentCard = (payload: {
+    inscriptionId: string;
+    totalValue: number;
+  }) => {
+    const search = new URLSearchParams();
+    search.set("inscriptions", payload.inscriptionId);
+    search.set("totalValue", String(payload.totalValue));
+    router.push(`/user/payment/register/${eventId}/card?${search.toString()}`);
   };
 
   const handleBack = () => {

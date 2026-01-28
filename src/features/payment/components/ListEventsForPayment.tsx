@@ -43,8 +43,10 @@ export default function ListEventsForPayment({
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
+  const [imageErrorStates, setImageErrorStates] = useState<
+    Record<string, boolean>
+  >({});
 
-  // Função para quando a imagem carregar
   const handleImageLoad = (eventId: string) => {
     setImageLoadingStates((prev) => ({
       ...prev,
@@ -52,12 +54,52 @@ export default function ListEventsForPayment({
     }));
   };
 
-  // Função para inicializar o estado de loading da imagem
   const initializeImageLoading = (eventId: string) => {
     setImageLoadingStates((prev) => ({
       ...prev,
       [eventId]: true,
     }));
+    setImageErrorStates((prev) => ({
+      ...prev,
+      [eventId]: false,
+    }));
+  };
+
+  const handleImageError = (eventId: string) => {
+    setImageErrorStates((prev) => ({
+      ...prev,
+      [eventId]: true,
+    }));
+    handleImageLoad(eventId);
+  };
+
+  const normalizeImageUrl = (rawUrl: unknown): string | null => {
+    if (typeof rawUrl !== "string") return null;
+    let url = rawUrl.trim();
+    if (!url) return null;
+
+    const wrappers: Array<[string, string]> = [
+      ["`", "`"],
+      ['"', '"'],
+      ["'", "'"],
+    ];
+
+    for (const [start, end] of wrappers) {
+      if (url.startsWith(start) && url.endsWith(end)) {
+        url = url.slice(start.length, url.length - end.length).trim();
+      }
+    }
+
+    if (!url) return null;
+
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:")
+        return null;
+      return parsed.toString();
+    } catch {
+      return null;
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -70,7 +112,10 @@ export default function ListEventsForPayment({
         {events.map((event) => {
           const statusInfo = getPaymentStatusInfo(event.paymentEnabled);
           const gradientClass = getGradientClass(event.name);
-          const isImageLoading = event.imageUrl
+          const normalizedImageUrl = normalizeImageUrl(event.imageUrl);
+          const hasImage =
+            Boolean(normalizedImageUrl) && imageErrorStates[event.id] !== true;
+          const isImageLoading = hasImage
             ? imageLoadingStates[event.id] !== false
             : false;
 
@@ -82,7 +127,7 @@ export default function ListEventsForPayment({
               <CardBody className="p-0 relative overflow-visible">
                 <AspectRatio ratio={16 / 9} className="w-full">
                   <div className="relative h-full w-full">
-                    {event.imageUrl ? (
+                    {hasImage && normalizedImageUrl ? (
                       <>
                         {isImageLoading && (
                           <div className="absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-muted/40 z-10">
@@ -90,7 +135,7 @@ export default function ListEventsForPayment({
                           </div>
                         )}
                         <Image
-                          src={event.imageUrl}
+                          src={normalizedImageUrl}
                           alt={event.name}
                           fill
                           sizes="(max-width: 768px) 100vw,
@@ -102,19 +147,7 @@ export default function ListEventsForPayment({
                           className="object-cover rounded-t-xl"
                           onLoad={() => handleImageLoad(event.id)}
                           onLoadStart={() => initializeImageLoading(event.id)}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = "none";
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `
-                                <div class="w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center">
-                                <span class="text-white text-5xl sm:text-6xl md:text-7xl font-semibold tracking-wide text-center px-4">${event.name}</span>
-                                </div>
-                                `;
-                            }
-                            handleImageLoad(event.id);
-                          }}
+                          onError={() => handleImageError(event.id)}
                         />
                       </>
                     ) : (

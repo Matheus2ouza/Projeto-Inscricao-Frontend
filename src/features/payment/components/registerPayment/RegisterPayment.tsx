@@ -55,6 +55,7 @@ type RegisterPaymentTableProps = {
   pageSize?: number;
   onViewPayment: () => void;
   onViewPaymentDetails: (paymentId: string) => void;
+  onRegisterPaymentCard: (inscriptionIds: string[], totalValue: number) => void;
 };
 
 export default function RegisterPaymentTable({
@@ -68,6 +69,7 @@ export default function RegisterPaymentTable({
   pageSize = 10,
   onViewPayment,
   onViewPaymentDetails,
+  onRegisterPaymentCard,
 }: RegisterPaymentTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
@@ -222,17 +224,36 @@ export default function RegisterPaymentTable({
                   </div>
                 )}
 
-                <Button
-                  onClick={handlePayment}
-                  disabled={selectedIds.length === 0}
-                  className="gap-2 w-full sm:w-auto"
-                  size="lg"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  {selectedIds.length > 0
-                    ? `Pagar ${selectedIds.length} Inscrição${selectedIds.length > 1 ? "ões" : ""}`
-                    : "Selecionar para Pagar"}
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Button
+                    onClick={handlePayment}
+                    disabled={selectedIds.length === 0}
+                    className="gap-2 w-full sm:w-auto"
+                    size="lg"
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    {selectedIds.length > 0
+                      ? `Pagar via Pix`
+                      : "Selecionar para Pagar"}
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      onRegisterPaymentCard(selectedIds, selectedTotal)
+                    }
+                    disabled={selectedIds.length === 0 || !allowCard}
+                    variant="outline"
+                    className="gap-2 w-full sm:w-auto"
+                    size="lg"
+                    title={
+                      !allowCard
+                        ? "Pagamento com cartão indisponível"
+                        : "Pagar com cartão"
+                    }
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    Pagar com Cartão
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -262,18 +283,35 @@ export default function RegisterPaymentTable({
                 </div>
               )}
 
-              {/* Botão de pagamento */}
-              <Button
-                onClick={handlePayment}
-                disabled={selectedIds.length === 0}
-                className="gap-2 w-full"
-                size="lg"
-              >
-                <CreditCard className="h-4 w-4" />
-                {selectedIds.length > 0
-                  ? `Pagar ${selectedIds.length} Inscrição${selectedIds.length > 1 ? "ões" : ""}`
-                  : "Selecionar para Pagar"}
-              </Button>
+              {/* Botões de pagamento */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Button
+                  onClick={handlePayment}
+                  disabled={selectedIds.length === 0}
+                  className="gap-2 w-full"
+                  size="lg"
+                >
+                  <CreditCard className="h-4 w-4" />
+                  {selectedIds.length > 0 ? `Pagar via Pix` : "Selecionar"}
+                </Button>
+                <Button
+                  onClick={() =>
+                    onRegisterPaymentCard(selectedIds, selectedTotal)
+                  }
+                  disabled={selectedIds.length === 0 || !allowCard}
+                  variant="outline"
+                  className="gap-2 w-full"
+                  size="lg"
+                  title={
+                    !allowCard
+                      ? "Pagamento com cartão indisponível"
+                      : "Pagar com cartão"
+                  }
+                >
+                  <CreditCard className="h-4 w-4" />
+                  Cartão
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -539,6 +577,7 @@ export default function RegisterPaymentTable({
           selectedInscriptions={selectedInscriptions}
           eventId={eventId}
           totalValue={selectedTotal}
+          allowCard={allowCard}
           onPaymentRegistered={handlePaymentRegistered}
         />
 
