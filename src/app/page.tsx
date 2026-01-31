@@ -1,6 +1,6 @@
 "use client";
 
-import { usePublicEvents } from "@/features/events/hooks/usePublicEvents";
+import { usePublicEvents } from "@/features/events/hooks/publicEvents/usePublicEvents";
 import PublicNavbar from "@/shared/components/layout/public-navbar";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -11,6 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/shared/components/ui/carousel";
+import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -18,9 +19,10 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   const {
-    data: events,
-    isLoading: eventsLoading,
+    events,
+    loading: eventsLoading,
     error: eventsError,
+    refetch: refetchEvents,
   } = usePublicEvents();
 
   const handleLoginClick = () => {
@@ -29,27 +31,6 @@ export default function Home() {
 
   const handleEventClick = (eventId: string) => {
     router.push(`/events/${eventId}`);
-  };
-
-  // Função para gerar gradiente baseado no nome do evento
-  const generateGradient = (eventName: string) => {
-    const colors = [
-      "from-purple-500 to-pink-500",
-      "from-blue-500 to-cyan-500",
-      "from-green-500 to-emerald-500",
-      "from-orange-500 to-red-500",
-      "from-indigo-500 to-purple-500",
-      "from-teal-500 to-blue-500",
-      "from-yellow-500 to-orange-500",
-      "from-pink-500 to-rose-500",
-    ];
-
-    let hash = 0;
-    for (let i = 0; i < eventName.length; i++) {
-      hash = eventName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const index = Math.abs(hash) % colors.length;
-    return colors[index];
   };
 
   return (
@@ -80,7 +61,6 @@ export default function Home() {
                 onClick={handleLoginClick}
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-lg"
               >
-                <i className="bi bi-box-arrow-in-right mr-2"></i>
                 Acessar Sistema
               </Button>
               <Button
@@ -93,7 +73,6 @@ export default function Home() {
                   }
                 }}
               >
-                <i className="bi bi-calendar-event mr-2"></i>
                 Ver Eventos
               </Button>
             </div>
@@ -149,7 +128,7 @@ export default function Home() {
                 >
                   <CarouselContent className="-ml-2 md:-ml-4">
                     {events.map((event) => {
-                      const gradientClass = generateGradient(event.name);
+                      const gradientClass = getGradientClass(event.name);
                       return (
                         <CarouselItem
                           key={event.id}
@@ -161,9 +140,9 @@ export default function Home() {
                           >
                             <CardContent className="p-0">
                               <div className="w-full h-48 relative overflow-hidden rounded-t-lg">
-                                {event.image ? (
+                                {event.imageUrl ? (
                                   <Image
-                                    src={event.image}
+                                    src={event.imageUrl}
                                     alt={event.name}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -225,7 +204,7 @@ export default function Home() {
               ) : (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {events.map((event) => {
-                    const gradientClass = generateGradient(event.name);
+                    const gradientClass = getGradientClass(event.name);
                     return (
                       <Card
                         key={event.id}
@@ -234,9 +213,9 @@ export default function Home() {
                       >
                         <CardContent className="p-0">
                           <div className="w-full h-48 relative overflow-hidden rounded-t-lg">
-                            {event.image ? (
+                            {event.imageUrl ? (
                               <Image
-                                src={event.image}
+                                src={event.imageUrl}
                                 alt={event.name}
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

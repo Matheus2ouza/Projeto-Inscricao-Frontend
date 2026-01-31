@@ -89,9 +89,21 @@ export default function RegisterPaymentDetailsPage() {
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
+        onRegisterPaymentPix={handleRegisterPaymentPix}
         onRegisterPaymentCard={handleRegisterPaymentCard}
       />
     );
+  };
+
+  const handleRegisterPaymentPix = (payload: {
+    inscriptionId: string;
+    totalValue: number;
+  }) => {
+    const search = new URLSearchParams();
+    search.set("inscriptions", payload.inscriptionId);
+    search.set("totalValue", String(payload.totalValue));
+    if (allowCard) search.set("allowCard", "1");
+    router.push(`/user/payment/register/${eventId}/pix?${search.toString()}`);
   };
 
   const handleRegisterPaymentCard = (payload: {

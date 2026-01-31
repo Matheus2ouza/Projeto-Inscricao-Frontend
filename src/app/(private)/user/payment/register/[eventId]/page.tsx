@@ -21,7 +21,6 @@ export default function RegisterPaymentPage() {
   const {
     inscriptions,
     allowCard,
-    total,
     page,
     pageCount,
     loading,
@@ -34,12 +33,23 @@ export default function RegisterPaymentPage() {
     pageSize: PAGE_SIZE,
   });
 
-  const handleViewPayment = () => {
-    router.push(`/user/payment/list-payments/${eventId}`);
-  };
-
   const handleViewPaymentDetails = (paymentId: string) => {
     router.push(`/user/payment/register/${eventId}/${paymentId}`);
+  };
+
+  const handleRegisterPaymentPix = (ids: string[], totalValue: number) => {
+    const search = new URLSearchParams();
+    if (ids.length > 0) search.set("inscriptions", ids.join(","));
+    search.set("totalValue", String(totalValue));
+    if (allowCard) search.set("allowCard", "1");
+    router.push(`/user/payment/register/${eventId}/pix?${search}`);
+  };
+
+  const handleRegisterPaymentCard = (ids: string[], totalValue: number) => {
+    const search = new URLSearchParams();
+    if (ids.length > 0) search.set("inscriptions", ids.join(","));
+    search.set("totalValue", String(totalValue));
+    router.push(`/user/payment/register/${eventId}/card?${search.toString()}`);
   };
 
   const renderSkeletonGrid = () => {
@@ -77,24 +87,15 @@ export default function RegisterPaymentPage() {
 
     return (
       <RegisterPaymentTable
-        eventId={eventId}
         inscriptions={inscriptions}
         allowCard={allowCard}
-        total={total}
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
         pageSize={PAGE_SIZE}
-        onViewPayment={handleViewPayment}
         onViewPaymentDetails={handleViewPaymentDetails}
-        onRegisterPaymentCard={(ids, totalValue) => {
-          const search = new URLSearchParams();
-          if (ids.length > 0) search.set("inscriptions", ids.join(","));
-          search.set("totalValue", String(totalValue));
-          router.push(
-            `/user/payment/register/${eventId}/card?${search.toString()}`,
-          );
-        }}
+        onRegisterPaymentPix={handleRegisterPaymentPix}
+        onRegisterPaymentCard={handleRegisterPaymentCard}
       />
     );
   };

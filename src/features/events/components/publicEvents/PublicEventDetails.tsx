@@ -1,17 +1,17 @@
 "use client";
 
+import { Event } from "@/features/events/types/publicEvents/publicEventsTypes";
 import EventMap from "@/shared/components/EventMap";
-import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
+import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { Calendar, Loader2, MapPin, Share2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PublicEvent } from "../api/getPublicEvent";
 
 type PublicEventDetailsProps = {
-  event: PublicEvent | null;
-  onSubscribe: () => void;
+  event: Event | null;
+  onSubscribe: (eventId: string) => void;
 };
 
 export default function PublicEventDetails({
@@ -20,6 +20,7 @@ export default function PublicEventDetails({
 }: PublicEventDetailsProps) {
   const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
+  const [imageFailed, setImageFailed] = useState(false);
 
   const handleImageLoad = () => {
     setImageLoading(false);
@@ -27,6 +28,7 @@ export default function PublicEventDetails({
 
   const handleImageError = () => {
     setImageLoading(false);
+    setImageFailed(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -122,53 +124,51 @@ export default function PublicEventDetails({
     );
   }
 
-  const status = getEventStatus();
+  const gradientClass = getGradientClass(event.name);
   const subscriptionStatus = getSubscriptionStatus();
+  const shouldShowImage = Boolean(event.imageUrl && !imageFailed);
 
   return (
     <div className="space-y-6">
-      <div className="relative rounded-xl overflow-hidden">
-        <div className="relative w-full max-h-[400px] aspect-[3/2] bg-muted">
-          {event.imageUrl ? (
-            <>
-              {imageLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-muted z-10">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-              )}
-              <Image
-                src={event.imageUrl}
-                alt={event.name}
-                fill
-                decoding="async"
-                className={`object-cover ${imageLoading ? "opacity-0" : "opacity-100"} transition-opacity duration-300`}
-                priority
-                onLoad={handleImageLoad}
-                onError={handleImageError}
-              />
-            </>
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-muted-foreground text-sm sm:text-xl">
-                Sem imagem
-              </span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute top-4 right-4">
-            <Badge className={`${status.color} text-white px-4 py-2`}>
-              {status.label}
-            </Badge>
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-muted">
+        {shouldShowImage ? (
+          <>
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-muted/60 dark:bg-black/40 z-20">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            )}
+            <Image
+              src={event.imageUrl as string}
+              alt={event.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+              className="object-cover"
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageFailed(true);
+                setImageLoading(false);
+              }}
+            />
+            {/* Gradient Overlay for Text Readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none z-10" />
+          </>
+        ) : (
+          <div
+            className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+          >
+            <div className="absolute inset-0 bg-black/20" />
           </div>
-          <div className="absolute bottom-6 left-6">
-            <h1 className="text-3xl font-bold text-white mb-3 line-clamp-2">
-              {event.name}
-            </h1>
-            <div className="flex items-center gap-2 text-white/90 text-lg">
-              <MapPin className="h-6 w-6" />
-              <span>{event.regionName}</span>
-            </div>
-          </div>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-10 z-20">
+          <p className="text-xs sm:text-xl uppercase tracking-[0.3em] text-white/90 mb-1 sm:mb-2 font-medium drop-shadow-md">
+            {event.regionName || "Evento"}
+          </p>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white uppercase leading-tight break-words drop-shadow-lg">
+            {event.name}
+          </h1>
         </div>
       </div>
 
@@ -189,14 +189,16 @@ export default function PublicEventDetails({
           <Calendar className="h-5 w-5" />
           Adicionar à Agenda
         </Button>
-        <Button
-          variant="outline"
-          className="flex-1 justify-center gap-2 py-4"
-          onClick={handleOpenRoute}
-        >
-          <Calendar className="h-5 w-5" />
-          Traçar Rota
-        </Button>
+        {event.longitude && event.latitude && (
+          <Button
+            variant="outline"
+            className="flex-1 justify-center gap-2 py-4"
+            onClick={handleOpenRoute}
+          >
+            <MapPin className="h-5 w-5" />
+            Traçar Rota
+          </Button>
+        )}
       </div>
 
       <div className="space-y-6">
@@ -279,10 +281,9 @@ export default function PublicEventDetails({
               </p>
             </div>
             <Button
-              size="lg"
               className={`font-semibold px-8 py-6 w-full sm:w-auto ${subscriptionStatus.status !== "open" ? "bg-muted text-muted-foreground hover:bg-muted cursor-not-allowed" : ""}`}
               disabled={subscriptionStatus.status !== "open"}
-              onClick={onSubscribe}
+              onClick={() => onSubscribe(event.id)}
             >
               {subscriptionStatus.status === "finalized"
                 ? "Evento Encerrado"

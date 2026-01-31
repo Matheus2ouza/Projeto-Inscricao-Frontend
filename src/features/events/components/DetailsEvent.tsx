@@ -148,53 +148,47 @@ export default function DetailsEvent({
 
   return (
     <div className="space-y-6 sm:space-y-8">
-      <section className="rounded-3xl border border-gray-200/80 dark:border-white/10 bg-white/95 dark:bg-white/5 backdrop-blur-md shadow-lg overflow-hidden">
-        <div className="relative h-64 sm:h-80 w-full">
-          {shouldShowImage ? (
-            <>
-              {imageLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-muted/60 dark:bg-black/40 z-10">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-              )}
-              <Image
-                src={event.imageUrl as string}
-                alt={event.name}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                className="object-cover"
-                onLoad={() => setImageLoading(false)}
-                onError={() => {
-                  setImageFailed(true);
-                  setImageLoading(false);
-                }}
-              />
-            </>
-          ) : (
-            <div
-              className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
-            >
-              <span className="text-white font-bold text-3xl text-center px-4">
-                {event.name}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="p-6 sm:p-8 md:p-10 space-y-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2">
-                Evento
-              </p>
-              <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900 dark:text-white uppercase leading-tight break-words">
-                {event.name}
-              </h1>
-            </div>
+      <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg bg-muted">
+        {shouldShowImage ? (
+          <>
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-muted/60 dark:bg-black/40 z-20">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            )}
+            <Image
+              src={event.imageUrl as string}
+              alt={event.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+              className="object-cover"
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageFailed(true);
+                setImageLoading(false);
+              }}
+            />
+            {/* Gradient Overlay for Text Readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none z-10" />
+          </>
+        ) : (
+          <div
+            className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+          >
+            <div className="absolute inset-0 bg-black/20" />
           </div>
+        )}
+
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-10 z-20">
+          <p className="text-xs sm:text-xl uppercase tracking-[0.3em] text-white/90 mb-1 sm:mb-2 font-medium drop-shadow-md">
+            Evento
+          </p>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white uppercase leading-tight break-words drop-shadow-lg">
+            {event.name}
+          </h1>
         </div>
-      </section>
+      </div>
 
       <div className="space-y-6">
         <section className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/95 dark:bg-white/5 backdrop-blur-md p-4 sm:p-6 shadow-sm space-y-6 sm:space-y-8">

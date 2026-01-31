@@ -11,6 +11,7 @@ function isPublicPath(pathname: string): boolean {
   if (pathname === "/" || pathname.startsWith("/documentation")) return true;
   if (pathname === "/login") return true; // pública, mas redireciona se autenticado
   if (pathname.startsWith("/events/")) return true; // página pública dinâmica
+  if (pathname.startsWith("/guest/")) return true; // página pública dinâmica
   return false;
 }
 
@@ -47,7 +48,7 @@ export default async function middleware(request: NextRequest) {
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED;
     console.warn(
       "[middleware] no auth token, redirecting to login",
-      redirectUrl.pathname
+      redirectUrl.pathname,
     );
     return NextResponse.redirect(redirectUrl);
   }
@@ -68,7 +69,7 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
     console.warn(
-      "[middleware] expected session for authenticated redirect but none found"
+      "[middleware] expected session for authenticated redirect but none found",
     );
   }
 
@@ -79,7 +80,7 @@ export default async function middleware(request: NextRequest) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED;
       console.warn(
-        "[middleware] auth token present but session invalid, redirecting to login"
+        "[middleware] auth token present but session invalid, redirecting to login",
       );
       return NextResponse.redirect(redirectUrl);
     }
