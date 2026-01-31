@@ -1,20 +1,9 @@
 "use client";
 
-import {
-  CreatePaymentResponse,
-  Inscription,
-  StatusPayment,
-} from "@/features/payment/types/registerPayment/registerPaymentTypes";
+import { Inscription } from "@/features/payment/types/registerPayment/registerPaymentTypes";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Checkbox } from "@/shared/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import {
   Pagination,
   PaginationContent,
@@ -32,50 +21,38 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { formatDateTime } from "@/shared/utils/formatDate";
-import {
-  getConvertStatusInscription,
-  getConvertStatusPayment,
-} from "@/shared/utils/getConvertStatus";
+import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
-import { CheckCircle, CreditCard, Eye, HelpCircle, Info } from "lucide-react";
+import { CreditCard, Eye, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-import RegisterPaymentDialog from "./RegisterPaymentDialog";
 
 type RegisterPaymentTableProps = {
-  eventId: string;
   inscriptions: Inscription[];
   allowCard: boolean;
-  total: number;
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
   pageSize?: number;
-  onViewPayment: () => void;
   onViewPaymentDetails: (paymentId: string) => void;
+  onRegisterPaymentPix: (inscriptionIds: string[], totalValue: number) => void;
   onRegisterPaymentCard: (inscriptionIds: string[], totalValue: number) => void;
 };
 
 export default function RegisterPaymentTable({
-  eventId,
   inscriptions,
   allowCard,
-  total,
   page,
   pageCount,
   onPageChange,
   pageSize = 10,
-  onViewPayment,
   onViewPaymentDetails,
+  onRegisterPaymentPix,
   onRegisterPaymentCard,
 }: RegisterPaymentTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-  const [paymentResult, setPaymentResult] =
-    useState<CreatePaymentResponse | null>(null);
-  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
 
   // Calcular o total das inscrições selecionadas (Valor Total - Valor Pago)
   const selectedTotal = selectedIds.reduce((sum, id) => {
@@ -84,9 +61,6 @@ export default function RegisterPaymentTable({
       (inscription?.totalValue || 0) - (inscription?.totalPaid || 0);
     return sum + remaining;
   }, 0);
-
-  // Preparar o array de inscrições selecionadas para o dialog
-  const selectedInscriptions = selectedIds.map((id) => ({ id }));
 
   // Função para calcular o índice global
   const calculateGlobalIndex = (localIndex: number): number => {
@@ -122,14 +96,7 @@ export default function RegisterPaymentTable({
       toast.error("Selecione pelo menos uma inscrição para pagar");
       return;
     }
-
-    setIsPaymentDialogOpen(true);
-  };
-
-  const handlePaymentRegistered = (payment: CreatePaymentResponse) => {
-    setSelectedIds([]);
-    setPaymentResult(payment);
-    setIsSuccessDialogOpen(true);
+    onRegisterPaymentPix(selectedIds, selectedTotal);
   };
 
   return (
@@ -232,9 +199,7 @@ export default function RegisterPaymentTable({
                     size="lg"
                   >
                     <CreditCard className="h-4 w-4" />
-                    {selectedIds.length > 0
-                      ? `Pagar via Pix`
-                      : "Selecionar para Pagar"}
+                    Registrar pagamento Pix
                   </Button>
                   <Button
                     onClick={() =>
@@ -251,7 +216,7 @@ export default function RegisterPaymentTable({
                     }
                   >
                     <CreditCard className="h-4 w-4" />
-                    Pagar com Cartão
+                    Registrar pagamento Cartão
                   </Button>
                 </div>
               </div>
@@ -292,7 +257,7 @@ export default function RegisterPaymentTable({
                   size="lg"
                 >
                   <CreditCard className="h-4 w-4" />
-                  {selectedIds.length > 0 ? `Pagar via Pix` : "Selecionar"}
+                  Registrar pagamento Pix
                 </Button>
                 <Button
                   onClick={() =>
@@ -309,7 +274,7 @@ export default function RegisterPaymentTable({
                   }
                 >
                   <CreditCard className="h-4 w-4" />
-                  Cartão
+                  Registrar pagamento Cartão
                 </Button>
               </div>
             </div>
@@ -569,135 +534,6 @@ export default function RegisterPaymentTable({
             </PaginationContent>
           </Pagination>
         </div>
-
-        {/* Dialog de Registro de Pagamento */}
-        <RegisterPaymentDialog
-          open={isPaymentDialogOpen}
-          onOpenChange={setIsPaymentDialogOpen}
-          selectedInscriptions={selectedInscriptions}
-          eventId={eventId}
-          totalValue={selectedTotal}
-          allowCard={allowCard}
-          onPaymentRegistered={handlePaymentRegistered}
-        />
-
-        {/* Dialog de Sucesso no Registro de Pagamento */}
-        <Dialog
-          open={isSuccessDialogOpen}
-          onOpenChange={(open) => {
-            setIsSuccessDialogOpen(open);
-            if (!open) {
-              setPaymentResult(null);
-            }
-          }}
-        >
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader className="flex flex-col items-center text-center space-y-4">
-              {/* Ícone de sucesso com animação */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-emerald-200 rounded-full opacity-75"></div>
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-green-500 text-white shadow-lg">
-                  <CheckCircle className="h-8 w-8" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                  Pagamento registrado
-                </DialogTitle>
-                <DialogDescription className="text-base">
-                  O pagamento foi registrado e está aguardando análise.
-                </DialogDescription>
-              </div>
-            </DialogHeader>
-
-            {paymentResult && (
-              <div className="mt-6 space-y-4">
-                {/* Card com resumo do pagamento */}
-                <div className="rounded-lg border bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/20 dark:to-green-950/20 p-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        ID do pagamento
-                      </span>
-                      <span className="text-sm font-medium">
-                        {paymentResult.id.substring(0, 12)}...
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Valor total
-                      </span>
-                      <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
-                        {getFormatCurrency(paymentResult.totalValue)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Status
-                      </span>
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                          paymentResult.status === StatusPayment.UNDER_REVIEW
-                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-                            : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
-                        }`}
-                      >
-                        {getConvertStatusPayment(paymentResult.status)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        Criado em
-                      </span>
-                      <span className="text-sm font-medium">
-                        {formatDateTime(paymentResult.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Informação adicional */}
-                <div className="rounded-lg border border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 p-3">
-                  <p className="text-xs text-blue-700 dark:text-blue-400 flex items-start gap-2">
-                    <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />O pagamento
-                    será processado e você receberá uma confirmação por email em
-                    breve.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Ações */}
-            <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsSuccessDialogOpen(false)}
-                className="flex-1"
-              >
-                Fechar
-              </Button>
-
-              <Button
-                type="button"
-                onClick={() => {
-                  if (paymentResult?.id) {
-                    onViewPayment();
-                    setIsSuccessDialogOpen(false);
-                  }
-                }}
-                className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-              >
-                <Eye className="h-4 w-4" />
-                Visualizar pagamentos
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );

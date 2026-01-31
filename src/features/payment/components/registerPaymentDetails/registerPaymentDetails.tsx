@@ -47,7 +47,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import RegisterPaymentDialog from "../registerPayment/RegisterPaymentDialog";
 
 type RegisterPaymentDetailsProps = {
   eventId: string;
@@ -59,6 +58,10 @@ type RegisterPaymentDetailsProps = {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  onRegisterPaymentPix: (payload: {
+    inscriptionId: string;
+    totalValue: number;
+  }) => void;
   onRegisterPaymentCard: (payload: {
     inscriptionId: string;
     totalValue: number;
@@ -75,10 +78,10 @@ export function RegisterPaymentDetailsTable({
   page,
   pageCount,
   onPageChange,
+  onRegisterPaymentPix,
   onRegisterPaymentCard,
 }: RegisterPaymentDetailsProps) {
   const { user } = useCurrentUser();
-  const [isPaymentPixDialogOpen, setIsPaymentPixDialogOpen] = useState(false);
   const [paymentLink, setPaymentLink] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -91,7 +94,6 @@ export function RegisterPaymentDetailsTable({
     );
   }
 
-  const selectedInscriptions = [{ id: inscriptions.id }];
   const remainingTotal = Math.max(inscriptions.totalValue - total, 0);
 
   useEffect(() => {
@@ -150,7 +152,12 @@ export function RegisterPaymentDetailsTable({
               <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                 <Button
                   type="button"
-                  onClick={() => setIsPaymentPixDialogOpen(true)}
+                  onClick={() =>
+                    onRegisterPaymentPix({
+                      inscriptionId: inscriptions.id,
+                      totalValue: remainingTotal,
+                    })
+                  }
                   disabled={remainingTotal <= 0}
                 >
                   Registrar pagamento Pix
@@ -550,15 +557,6 @@ export function RegisterPaymentDetailsTable({
           </div>
         )}
       </div>
-
-      <RegisterPaymentDialog
-        open={isPaymentPixDialogOpen}
-        onOpenChange={setIsPaymentPixDialogOpen}
-        selectedInscriptions={selectedInscriptions}
-        eventId={inscriptions.eventId}
-        totalValue={remainingTotal}
-        allowCard={false}
-      />
     </div>
   );
 }

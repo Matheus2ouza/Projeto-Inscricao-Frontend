@@ -37,3 +37,14 @@ export function formatDate(dateString: string | Date) {
 
   return `${day}/${month}/${year}`;
 }
+
+export const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "long",
+  year: "numeric",
+});
+
+export const timeFormatter = new Intl.DateTimeFormat("pt-BR", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
