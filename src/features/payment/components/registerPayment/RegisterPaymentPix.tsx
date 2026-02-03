@@ -1,4 +1,5 @@
-import { useRegisterPayment } from "@/features/payment/hook/registerPayment/useRegisterPayment";
+"use client";
+
 import type { CreatePaymentResponse } from "@/features/payment/types/registerPayment/registerPaymentTypes";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -15,21 +16,20 @@ import {
   QrCode,
   X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-interface RegisterPaymentDialogProps {
+interface RegisterPaymentPixProps {
   selectedInscriptions: { id: string }[];
   eventId: string;
   totalValue: number;
   allowCard?: boolean;
   onPaymentRegistered?: (payment: CreatePaymentResponse) => void;
-  onSubmitPayment?: (payload: {
+  onSubmitPayment: (payload: {
     value: number;
     image: string;
-  }) => Promise<void> | void;
-  autoRegisterOnExactAmount?: boolean;
+  }) => Promise<CreatePaymentResponse | void> | CreatePaymentResponse | void;
   allowCustomValue?: boolean;
 }
 
@@ -40,21 +40,19 @@ export default function RegisterPaymentPix({
   allowCard = false,
   onPaymentRegistered,
   onSubmitPayment,
-  autoRegisterOnExactAmount = false,
   allowCustomValue = true,
-}: RegisterPaymentDialogProps) {
+}: RegisterPaymentPixProps) {
   const [paymentValue, setPaymentValue] = useState<string>("");
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const registerPayment = useRegisterPayment();
   const router = useRouter();
+  const pathname = usePathname();
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB em bytes
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const ALLOWED_FILE_TYPES = [
     "image/jpeg",
     "image/jpg",
@@ -67,11 +65,19 @@ export default function RegisterPaymentPix({
     bank: "Nubank",
     agency: "0001",
     account: "53874496-8",
-    pixKey: " 400.588.752-04",
+    pixKey: "400.588.752-04",
+  };
+
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(new Error("Falha ao ler o arquivo."));
+      reader.readAsDataURL(file);
+    });
   };
 
   const validateFile = (file: File): boolean => {
-    // Validar tipo de arquivo
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
       toast.error("Tipo de arquivo não permitido", {
         description: "Por favor, selecione uma imagem JPG, PNG ou WebP.",
@@ -79,7 +85,6 @@ export default function RegisterPaymentPix({
       return false;
     }
 
-    // Validar tamanho do arquivo (5MB)
     if (file.size > MAX_FILE_SIZE) {
       toast.error("Arquivo muito grande", {
         description: "O tamanho máximo permitido é 5MB.",
@@ -93,8 +98,6 @@ export default function RegisterPaymentPix({
   const handleFileSelect = (file: File) => {
     if (validateFile(file)) {
       setReceiptFile(file);
-
-      // Criar preview da imagem
       const reader = new FileReader();
       reader.onload = (e) => {
         setReceiptPreview(e.target?.result as string);
@@ -123,18 +126,15 @@ export default function RegisterPaymentPix({
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragOver(false);
-
     const files = event.dataTransfer.files;
     if (files.length > 0) {
-      const file = files[0];
-      handleFileSelect(file);
+      handleFileSelect(files[0]);
     }
   };
 
   const handleRemoveFile = () => {
     setReceiptFile(null);
     setReceiptPreview(null);
-    // Limpa o input file
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -144,6 +144,25 @@ export default function RegisterPaymentPix({
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
+    toast.success("Copiado!", {
+      description: "Copiado para a área de transferência",
+    });
+  };
+
+  const handleGoToCardPayment = () => {
+    const isGuestFlow = pathname?.startsWith("/guest/");
+    const basePath = isGuestFlow
+      ? `/guest/${eventId}/payment/card`
+      : `/user/payment/register/${eventId}/card`;
+    const search = new URLSearchParams();
+    if (selectedInscriptions.length > 0) {
+      search.set(
+        "inscriptions",
+        selectedInscriptions.map((s) => s.id).join(","),
+      );
+    }
+    search.set("totalValue", String(totalValue));
+    router.push(`${basePath}?${search.toString()}`);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -177,33 +196,16 @@ export default function RegisterPaymentPix({
 
     setIsSubmitting(true);
 
-    const imageData = receiptPreview as string;
-    const isExactAmount = Math.abs(resolvedValue - totalValue) < 0.01;
-    const shouldRegisterWithBackend =
-      !onSubmitPayment || (autoRegisterOnExactAmount && isExactAmount);
-
     try {
-      let paymentResult: CreatePaymentResponse | undefined;
+      const imageData =
+        receiptPreview && receiptPreview.length > 0
+          ? receiptPreview
+          : await readFileAsDataURL(receiptFile);
+      const paymentResult = await onSubmitPayment({
+        value: resolvedValue,
+        image: imageData,
+      });
 
-      if (shouldRegisterWithBackend) {
-        if (!selectedInscriptions || selectedInscriptions.length === 0) {
-          throw new Error(
-            "Nenhuma inscrição selecionada para registrar pagamento.",
-          );
-        }
-        paymentResult = await registerPayment.mutateAsync({
-          eventId,
-          totalValue: resolvedValue,
-          image: imageData,
-          inscriptions: selectedInscriptions,
-        });
-      }
-
-      if (onSubmitPayment) {
-        await onSubmitPayment({ value: resolvedValue, image: imageData });
-      }
-
-      // Limpar formulário
       setPaymentValue("");
       setReceiptFile(null);
       setReceiptPreview(null);
@@ -212,14 +214,11 @@ export default function RegisterPaymentPix({
         onPaymentRegistered(paymentResult);
       }
 
-      router.back();
+      toast.success("Pagamento registrado com sucesso!");
+      setTimeout(() => router.back(), 1500);
     } catch (error) {
       console.error("Erro ao registrar pagamento:", error);
-      const errorMessage = shouldRegisterWithBackend
-        ? "Erro ao registrar pagamento"
-        : "Erro ao processar comprovante";
-
-      toast.error(errorMessage, {
+      toast.error("Erro ao registrar pagamento", {
         description: "Tente novamente.",
       });
     } finally {
@@ -245,200 +244,169 @@ export default function RegisterPaymentPix({
     return typeMap[type] || type;
   };
 
-  const handleFlip = () => {
-    setIsFlipped(!isFlipped);
-  };
-
-  useEffect(() => {
-    setIsFlipped(false);
-    if (!allowCustomValue) {
-      setPaymentValue(String(totalValue));
-    }
-  }, [allowCustomValue, totalValue]);
-
   return (
-    <div className="relative w-full h-[635px] [perspective:1000px]">
-      <div
-        className={`relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d] ${
-          isFlipped ? "[transform:rotateY(180deg)]" : ""
-        }`}
-      >
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden]">
-          <Card className="w-full h-full border-0 rounded-lg shadow-lg">
-            <CardContent className="p-6 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <QrCode className="h-5 w-5 text-primary" />
-                  <h3 className="text-lg font-semibold">
-                    Dados para Pagamento
-                  </h3>
+    <div className="w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+        <div className="space-y-6">
+          <Card className="border-0 shadow-lg w-full">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <QrCode className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Dados para Transferência PIX
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Utilize estas informações para realizar o pagamento
+                  </p>
                 </div>
               </div>
 
-              <div className="flex-1 space-y-4">
-                <div className="p-3 bg-muted rounded-lg">
-                  <Label className="text-sm font-medium">
-                    Valor Total da Inscrição
-                  </Label>
-                  <p className="text-lg font-bold text-primary">
-                    {getFormatCurrency(totalValue)}
-                  </p>
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  {Object.entries(bankData).map(([key, value]) => {
+                    const labels: { [key: string]: string } = {
+                      beneficiary: "Favorecido",
+                      bank: "Banco",
+                      agency: "Agência",
+                      account: "Conta",
+                      pixKey: "Chave PIX",
+                    };
+
+                    const isPixKey = key === "pixKey";
+
+                    return (
+                      <div key={key} className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {labels[key]}
+                        </Label>
+                        <div
+                          className={`flex items-center justify-between p-3 rounded-lg ${isPixKey ? "bg-primary/5 border border-primary/20" : "bg-gray-50 dark:bg-gray-800"}`}
+                        >
+                          <div
+                            className={`font-medium ${isPixKey ? "text-primary" : "text-gray-900 dark:text-white"}`}
+                          >
+                            {value}
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopyToClipboard(value, key)}
+                            className="h-8 w-8 p-0"
+                          >
+                            {copiedField === key ? (
+                              <CheckCheck className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                <Separator />
-
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-sm font-medium">Favorecido</Label>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm">{bankData.beneficiary}</p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          handleCopyToClipboard(
-                            bankData.beneficiary,
-                            "beneficiary",
-                          )
-                        }
-                      >
-                        {copiedField === "beneficiary" ? (
-                          <CheckCheck className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium">Banco</Label>
-                    <p className="text-sm">{bankData.bank}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium">Agência</Label>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm">{bankData.agency}</p>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            handleCopyToClipboard(bankData.agency, "agency")
-                          }
-                        >
-                          {copiedField === "agency" ? (
-                            <CheckCheck className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Conta</Label>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm">{bankData.account}</p>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            handleCopyToClipboard(bankData.account, "account")
-                          }
-                        >
-                          {copiedField === "account" ? (
-                            <CheckCheck className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium">Chave PIX</Label>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm break-all">{bankData.pixKey}</p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          handleCopyToClipboard(bankData.pixKey, "pix")
-                        }
-                      >
-                        {copiedField === "pix" ? (
-                          <CheckCheck className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t space-y-2">
-                  <Button
-                    type="button"
-                    onClick={handleFlip}
-                    className="w-full flex items-center justify-center gap-2 py-3 text-base font-semibold"
-                  >
-                    Pagar com PIX
-                  </Button>
-                  {allowCard && (
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        if (selectedInscriptions.length !== 1) {
-                          toast.error(
-                            "Selecione apenas uma inscrição para pagar com cartão.",
-                          );
-                          return;
-                        }
-                        const search = new URLSearchParams();
-                        search.set("inscriptions", selectedInscriptions[0].id);
-                        search.set("totalValue", String(totalValue));
-                        router.push(
-                          `/user/payment/register/${eventId}/card?${search.toString()}`,
-                        );
-                      }}
-                      className="w-full flex items-center justify-center gap-2 py-3 text-base font-semibold"
-                    >
-                      Pagar com Cartão
-                    </Button>
-                  )}
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/30">
+                  <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
+                    Instruções importantes:
+                  </h3>
+                  <ul className="space-y-2 text-sm text-blue-700 dark:text-blue-400">
+                    <li className="flex items-start gap-2">
+                      <div className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                      <span>
+                        Realize o pagamento via PIX com os dados acima
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                      <span>Tire um print ou foto do comprovante</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                      <span>Envie o comprovante no formulário</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                      {allowCustomValue ? (
+                        <span>O valor pode ser pago parcial ou total</span>
+                      ) : (
+                        <span>O valor deve ser exatamente o valor total</span>
+                      )}
+                    </li>
+                  </ul>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          {allowCard && (
+            <Card className="border-0 shadow-lg w-full">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      Pagar com Cartão
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Pagamento instantâneo com cartão de crédito
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleGoToCardPayment}
+                  variant="outline"
+                  className="w-full h-12"
+                >
+                  Ir para pagamento com cartão
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        <div className="absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)]">
-          <Card className="w-full h-full border-0 rounded-lg shadow-lg">
-            <CardContent className="p-6 h-full flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-primary" />
-                  <h3 className="text-lg font-semibold">Registrar Pagamento</h3>
+        <div className="w-full">
+          <Card className="border-0 shadow-lg h-full w-full">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <ImageIcon className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Enviar Comprovante
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Após realizar o pagamento, envie o comprovante aqui
+                  </p>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
-                <div className="space-y-4 flex-1">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="paymentValue"
-                      className="text-sm font-medium"
-                    >
-                      Valor Pago*
-                    </Label>
-                    {allowCustomValue ? (
-                      <>
+              <div className="bg-primary/10 rounded-xl p-4 mb-6">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Valor total
+                </div>
+                <div className="text-2xl font-bold text-primary">
+                  {getFormatCurrency(totalValue)}
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="paymentValue" className="text-sm font-medium">
+                    Valor Pago{allowCustomValue ? "*" : ""}
+                  </Label>
+                  {allowCustomValue ? (
+                    <>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                          R$
+                        </span>
                         <Input
                           id="paymentValue"
                           type="number"
@@ -449,146 +417,244 @@ export default function RegisterPaymentPix({
                           value={paymentValue}
                           onChange={(e) => setPaymentValue(e.target.value)}
                           required
-                          className="text-lg font-medium"
+                          className="pl-10 text-lg font-semibold h-12"
                         />
-                        <p className="text-xs text-muted-foreground">
-                          Valor entre R$ 0,01 e {getFormatCurrency(totalValue)}
-                        </p>
-                      </>
-                    ) : (
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between rounded-lg border px-4 py-2 text-lg font-semibold">
-                          <span>{getFormatCurrency(totalValue)}</span>
-                          <span className="text-xs text-muted-foreground">
-                            Valor fixo
-                          </span>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          O valor é definido automaticamente para este pedido.
-                        </p>
                       </div>
-                    )}
-                  </div>
+                      <p className="text-xs text-gray-500">
+                        Insira o valor que você pagou (máximo:{" "}
+                        {getFormatCurrency(totalValue)})
+                      </p>
+                    </>
+                  ) : (
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-lg font-bold text-primary">
+                            {getFormatCurrency(totalValue)}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            Valor fixo da inscrição
+                          </div>
+                        </div>
+                        <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                          Obrigatório
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                  <Separator />
+                <Separator />
 
-                  <div className="space-y-3">
-                    <Label htmlFor="receipt" className="text-sm font-medium">
-                      Comprovante de Pagamento* (Envie somente um comprovante
-                      por vez)
-                    </Label>
+                {/* Substitua a seção de upload do comprovante por esta versão: */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium">
+                    Comprovante de Pagamento*
+                  </Label>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Envie o comprovante do pagamento realizado
+                  </p>
 
-                    {receiptFile ? (
-                      <div className="space-y-3">
-                        {receiptPreview && (
-                          <div className="relative border rounded-lg overflow-hidden">
+                  {receiptFile ? (
+                    <div className="space-y-4">
+                      {/* Preview da imagem com melhor visual */}
+                      {receiptPreview && (
+                        <div className="relative group rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                          <div className="aspect-video relative">
                             <img
                               src={receiptPreview}
                               alt="Preview do comprovante"
-                              className="w-full h-40 object-contain bg-gray-50"
+                              className="w-full h-full object-contain p-4"
                             />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="icon"
-                              className="absolute top-2 right-2 h-6 w-6"
-                              onClick={handleRemoveFile}
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
+                            {/* Overlay com botão de remover */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200 flex items-center justify-center">
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                onClick={handleRemoveFile}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
-                        )}
 
-                        <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                          <FileText className="h-6 w-6 text-green-500" />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-green-700 dark:text-green-300">
-                              {receiptFile.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {formatFileSize(receiptFile.size)} •{" "}
-                              {getFileTypeName(receiptFile.type)}
-                            </p>
+                          {/* Informações do arquivo */}
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <div className="bg-black/70 backdrop-blur-sm rounded-lg p-3 text-white">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <FileText className="h-4 w-4" />
+                                  <span className="text-sm font-medium truncate">
+                                    {receiptFile.name}
+                                  </span>
+                                </div>
+                                <div className="text-xs text-gray-300">
+                                  {formatFileSize(receiptFile.size)}
+                                </div>
+                              </div>
+                              <div className="text-xs text-gray-300 mt-1">
+                                {getFileTypeName(receiptFile.type)} • Enviado
+                              </div>
+                            </div>
                           </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={handleRemoveFile}
-                          >
-                            Trocar
-                          </Button>
                         </div>
+                      )}
+
+                      {/* Botão para trocar arquivo */}
+                      <div className="flex items-center justify-center">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleRemoveFile}
+                          className="gap-2"
+                        >
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                          </svg>
+                          Trocar Comprovante
+                        </Button>
                       </div>
-                    ) : (
-                      <div
-                        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
-                          isDragOver
-                            ? "border-primary bg-primary/5"
-                            : "border-muted-foreground/25 hover:border-muted-foreground/50"
-                        }`}
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="p-2 bg-primary/10 rounded-full">
-                            <ImageIcon className="h-5 w-5 text-primary" />
+                    </div>
+                  ) : (
+                    <div
+                      className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
+                        isDragOver
+                          ? "border-primary bg-primary/5 scale-[1.02]"
+                          : "border-gray-300 dark:border-gray-700 hover:border-primary hover:bg-primary/5"
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <div className="flex flex-col items-center gap-4">
+                        {/* Ícone animado para drag and drop */}
+                        <div className="relative">
+                          <div
+                            className={`p-4 rounded-full transition-all ${isDragOver ? "bg-primary/20 scale-110" : "bg-primary/10"}`}
+                          >
+                            {isDragOver ? (
+                              <svg
+                                className="h-8 w-8 text-primary animate-bounce"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            ) : (
+                              <ImageIcon className="h-8 w-8 text-primary" />
+                            )}
                           </div>
-                          <div>
-                            <p className="text-sm font-medium text-primary hover:underline">
-                              {isDragOver
-                                ? "Solte o arquivo aqui"
-                                : "Clique para fazer upload"}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              ou arraste e solte o arquivo aqui
-                            </p>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            JPG, PNG, WebP (máx. 5MB)
+                          {isDragOver && (
+                            <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full animate-ping" />
+                          )}
+                        </div>
+
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white mb-1">
+                            {isDragOver
+                              ? "Solte o arquivo aqui"
+                              : "Clique para fazer upload"}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            ou arraste e solte o arquivo aqui
                           </p>
                         </div>
-                        <Input
-                          ref={fileInputRef}
-                          id="receipt-upload"
-                          type="file"
-                          accept=".jpg,.jpeg,.png,.webp"
-                          className="hidden"
-                          onChange={handleFileChange}
-                        />
+
+                        {/* Informações de formato */}
+                        <div className="flex items-center gap-4 mt-2">
+                          <div className="flex items-center gap-1">
+                            <div className="h-2 w-2 bg-blue-500 rounded-full" />
+                            <span className="text-xs text-gray-500">JPG</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="h-2 w-2 bg-green-500 rounded-full" />
+                            <span className="text-xs text-gray-500">PNG</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="h-2 w-2 bg-purple-500 rounded-full" />
+                            <span className="text-xs text-gray-500">WebP</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="h-2 w-2 bg-yellow-500 rounded-full" />
+                            <span className="text-xs text-gray-500">5MB</span>
+                          </div>
+                        </div>
+
+                        {/* Dica visual */}
+                        {!isDragOver && (
+                          <div className="flex items-center gap-2 mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                            <svg
+                              className="h-4 w-4 text-gray-400"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            <span className="text-xs text-gray-500">
+                              Caso seja PDF, então você pode tirar um screenshot
+                              do comprovante e enviá-lo.
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+
+                      <Input
+                        ref={fileInputRef}
+                        id="receipt-upload"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        className="hidden"
+                        onChange={handleFileChange}
+                      />
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-4 border-t mt-auto">
-                  <div className="flex justify-between gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => router.back()}
-                      disabled={isSubmitting}
-                      className="flex-1"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting || !paymentValue || !receiptFile}
-                      className="flex-1 min-w-32 dark:text-white"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                          Registrando...
-                        </>
-                      ) : (
-                        "Registrar Pagamento"
-                      )}
-                    </Button>
-                  </div>
+                <div className="pt-6 border-t">
+                  <Button
+                    type="submit"
+                    disabled={
+                      isSubmitting ||
+                      !receiptFile ||
+                      (allowCustomValue ? !paymentValue : false)
+                    }
+                    className="w-full h-12 text-base font-semibold"
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        Registrando pagamento...
+                      </div>
+                    ) : (
+                      "Registrar Pagamento"
+                    )}
+                  </Button>
+                  <p className="text-xs text-gray-500 text-center mt-3">
+                    Após registrar, sua inscrição será processada
+                  </p>
                 </div>
               </form>
             </CardContent>

@@ -1,16 +1,16 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getDetailsInscription } from "../../api/detailsInscription/getDetailsInscription";
 
-export const detailsInscriptionKeys = {
-  all: ["details-inscription"] as const,
-  lists: () => [...detailsInscriptionKeys.all, "list"] as const,
+export const detailsGuestInscriptionKeys = {
+  all: ["details-guest-inscription"] as const,
+  lists: () => [...detailsGuestInscriptionKeys.all, "list"] as const,
   list: (confirmationCode: string) =>
-    [...detailsInscriptionKeys.lists(), confirmationCode] as const,
+    [...detailsGuestInscriptionKeys.lists(), confirmationCode] as const,
 };
 
 export function useDetailsInscriptionQuery(confirmationCode: string) {
   return useQuery({
-    queryKey: detailsInscriptionKeys.list(confirmationCode),
+    queryKey: detailsGuestInscriptionKeys.list(confirmationCode),
     queryFn: () => getDetailsInscription(confirmationCode),
     enabled: !!confirmationCode,
     staleTime: 5 * 60 * 1000,
@@ -20,25 +20,25 @@ export function useDetailsInscriptionQuery(confirmationCode: string) {
   });
 }
 
-export function useInvalidateDetailsInscriptionQuery() {
+export function useInvalidateDetailsGuestInscriptionQuery() {
   const queryClient = useQueryClient();
 
   return {
     invalidateAll: () => {
       queryClient.invalidateQueries({
-        queryKey: detailsInscriptionKeys.all,
+        queryKey: detailsGuestInscriptionKeys.all,
       });
     },
 
     invalidateLists: () => {
       queryClient.invalidateQueries({
-        queryKey: detailsInscriptionKeys.lists(),
+        queryKey: detailsGuestInscriptionKeys.lists(),
       });
     },
 
     invalidateDetail: (confirmationCode: string) => {
       queryClient.invalidateQueries({
-        queryKey: detailsInscriptionKeys.list(confirmationCode),
+        queryKey: detailsGuestInscriptionKeys.list(confirmationCode),
       });
     },
   };

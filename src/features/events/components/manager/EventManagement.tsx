@@ -9,7 +9,6 @@ import ResponsiblesDialog from "@/features/events/components/ResponsiblesDialog"
 import { useFormEditEvent } from "@/features/events/hooks/manager/useFormEditEvent";
 import { useEventResponsible } from "@/features/events/hooks/useEventResponsible";
 import { Event } from "@/features/events/types/manager/eventManagerTypes";
-import { useInvalidateEventsQuery } from "@/features/expenses/hooks/useSelectEventsQuery";
 import TypeInscriptionDialog from "@/features/typeInscription/components/TypeInscriptionDialog";
 import { useTypeInscriptionsActions } from "@/features/typeInscription/hook/useTypeInscriptionsActions";
 import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
@@ -25,6 +24,7 @@ import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
+import calculateMaxAge from "@/shared/utils/calculateMaxAge";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import {
   AlertCircle,
@@ -45,6 +45,7 @@ import {
 import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useInvalidateDetailsEventQuery } from "../../hooks/manager/useEventManagerQuery";
 
 interface EventManagementProps {
   event: Event | null;
@@ -53,18 +54,26 @@ interface EventManagementProps {
   refreshTypeInscriptions: () => void;
 }
 
-function EventManagementContent({
+export default function EventManagement({
   event,
   typeInscriptions,
   refreshEvent,
   refreshTypeInscriptions,
-}: {
-  event: Event;
-  typeInscriptions: TypeInscriptions[] | null;
-  refreshEvent: () => void;
-  refreshTypeInscriptions: () => void;
-}) {
-  const { invalidateDetail } = useInvalidateEventsQuery();
+}: EventManagementProps) {
+  if (!event) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Evento não encontrado</h2>
+          <p className="text-muted-foreground">
+            O evento que você está tentando acessar não existe ou não foi
+            carregado.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const [showAmount, setShowAmount] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentType, setCurrentType] = useState<TypeInscriptions | null>(null);
@@ -85,6 +94,7 @@ function EventManagementContent({
     handleResponsiblesChange,
     getNewResponsibleIds,
   } = useFormEditEvent(event);
+  const { invalidateDetail } = useInvalidateDetailsEventQuery();
 
   // Buscar contas para obter os nomes dos responsáveis
   const { accounts } = useAccount(isEditing);
@@ -122,6 +132,7 @@ function EventManagementContent({
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
+
   const getEventStatus = () => {
     const now = new Date();
     const start = new Date(event.startDate);
@@ -149,7 +160,6 @@ function EventManagementContent({
       await deleteImageEvent(event.id);
       toast.success("Imagem deletada com sucesso!");
       setIsDeleteImageOpen(false);
-      invalidateDetail(event.id);
       await refreshEvent();
     } catch (err) {
       const message =
@@ -160,7 +170,7 @@ function EventManagementContent({
     } finally {
       setDeleteImage(false);
     }
-  }, [event.id, invalidateDetail, refreshEvent]);
+  }, [event.id, refreshEvent]);
 
   const handleConfirmDeleteLogo = useCallback(async () => {
     try {
@@ -168,8 +178,7 @@ function EventManagementContent({
       await deleteLogoEvent(event.id);
       toast.success("Logo deletada com sucesso!");
       setIsDeleteLogoOpen(false);
-      invalidateDetail(event.id);
-      await refreshEvent();
+      refreshEvent();
     } catch (err) {
       const message =
         err instanceof Error
@@ -179,11 +188,11 @@ function EventManagementContent({
     } finally {
       setDeleteLogo(false);
     }
-  }, [event.id, invalidateDetail, refreshEvent]);
+  }, [event.id, refreshEvent]);
 
   const statusBadge = getEventStatus();
   const totalRevenue = event.amountCollected;
-  const typesInscriptions = event.typesInscriptions ?? [];
+  const typesInscriptions = typeInscriptions ?? event.typesInscriptions ?? [];
   const hasTypeInscriptions = typesInscriptions.length > 0;
 
   // Funções para gerenciar tipos de inscrição
@@ -237,19 +246,24 @@ function EventManagementContent({
     description: string;
     value: number;
     specialType: boolean;
+    rule: Date | null;
   }) => {
     try {
+      const payload = {
+        ...data,
+        rule: data.rule,
+      };
       if (currentType) {
         // Edição
-        await update(currentType.id, data);
+        await update(currentType.id, payload);
       } else {
         // Criação
-        await create({ ...data, eventId: event.id });
+        await create({ ...payload, eventId: event.id });
       }
       // Invalidar cache do evento para recarregar os tipos de inscrição
       invalidateDetail(event.id);
-      await refreshTypeInscriptions(); // Recarrega os dados do evento
-      await refreshEvent();
+      refreshTypeInscriptions(); // Recarrega os dados do evento
+      refreshEvent();
     } catch (error) {
       // Erro já tratado no hook
     }
@@ -262,10 +276,24 @@ function EventManagementContent({
     }
   }, [handleDelete]);
 
+  if (!event) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Evento não encontrado</h2>
+          <p className="text-muted-foreground">
+            O evento que você está tentando acessar não existe ou não foi
+            carregado.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header com ações principais */}
         <div className="flex items-center justify-end mb-8">
           <div className="flex items-center gap-3">
             {!isEditing ? (
@@ -537,29 +565,20 @@ function EventManagementContent({
                   </AlertDescription>
                 </Alert>
               )}
-              {/* Mapa */}
-              {(isEditing
-                ? Number(formData.latitude) !== 0 &&
-                  Number(formData.longitude) !== 0
-                : (event.latitude || 0) !== 0 &&
-                  (event.longitude || 0) !== 0) && (
-                <div className="mt-6 rounded-lg overflow-hidden border border-gray-200 dark:border-white/10">
-                  <EventMap
-                    lat={
-                      isEditing
-                        ? Number(formData.latitude)
-                        : (event.latitude as number)
-                    }
-                    lng={
-                      isEditing
-                        ? Number(formData.longitude)
-                        : (event.longitude as number)
-                    }
-                    height="300px"
-                    markerTitle={isEditing ? formData.name : event.name}
-                  />
-                </div>
-              )}
+              {/* Mapa do Evento - Exibir apenas se não estiver editando e houver coordenadas válidas */}
+              {!isEditing &&
+                event.latitude &&
+                event.longitude &&
+                (event.latitude !== 0 || event.longitude !== 0) && (
+                  <div className="mt-6 rounded-lg overflow-hidden border border-gray-200 dark:border-white/10">
+                    <EventMap
+                      lat={event.latitude as number}
+                      lng={event.longitude as number}
+                      height="300px"
+                      markerTitle={event.name}
+                    />
+                  </div>
+                )}
             </div>
 
             {/* Card de Responsáveis */}
@@ -722,7 +741,7 @@ function EventManagementContent({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {event.typesInscriptions.map((type) => (
+                  {typesInscriptions.map((type) => (
                     <div
                       key={type.id}
                       className="flex items-center justify-between p-4 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
@@ -742,7 +761,8 @@ function EventManagementContent({
                           )}
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {getFormatCurrency(type.value)}
+                          {getFormatCurrency(type.value)} •{" "}
+                          {calculateMaxAge(type.rule)}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -935,6 +955,7 @@ function EventManagementContent({
           onOpenChange={setDialogOpen}
           typeInscription={currentType}
           eventId={event.id}
+          eventStartDate={event.startDate}
           onSubmit={handleSubmitType}
           loading={typeInscriptionLoading}
         />
@@ -977,7 +998,7 @@ function EventManagementContent({
                   toast.success("Imagem atualizada com sucesso!");
                   setImageDialogOpen(false);
                   invalidateDetail(event.id);
-                  await refreshEvent();
+                  refreshEvent();
                 } catch (err) {
                   toast.error("Falha ao atualizar imagem do evento");
                 } finally {
@@ -985,6 +1006,7 @@ function EventManagementContent({
                 }
               }}
             />
+
             <ImageCropDialog
               open={logoDialogOpen}
               onOpenChange={setLogoDialogOpen}
@@ -1004,7 +1026,7 @@ function EventManagementContent({
                   toast.success("Logo atualizada com sucesso!");
                   setLogoDialogOpen(false);
                   invalidateDetail(event.id);
-                  await refreshEvent();
+                  refreshEvent();
                 } catch (err) {
                   toast.error("Falha ao atualizar logo do evento");
                 } finally {
@@ -1092,22 +1114,4 @@ function EventManagementContent({
       </div>
     </div>
   );
-}
-
-export default function EventManagement(props: EventManagementProps) {
-  if (!props.event) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Evento não encontrado</h2>
-          <p className="text-muted-foreground">
-            O evento que você está tentando acessar não existe ou não foi
-            carregado.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return <EventManagementContent {...props} event={props.event} />;
 }

@@ -10,7 +10,7 @@ type UserContextValue = {
 };
 
 const UserContext = React.createContext<UserContextValue | undefined>(
-  undefined
+  undefined,
 );
 
 type UserContextProviderProps = {
@@ -34,7 +34,7 @@ export function useCurrentUser() {
 
   if (!context) {
     throw new Error(
-      "useCurrentUser deve ser usado dentro de UserContextProvider"
+      "useCurrentUser deve ser usado dentro de UserContextProvider",
     );
   }
 

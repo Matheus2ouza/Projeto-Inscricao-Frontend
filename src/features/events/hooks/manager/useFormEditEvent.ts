@@ -11,10 +11,13 @@ import { updateAllowCard } from "../../api/manager/eventActions/updateAllowCard"
 import { updateEvent } from "../../api/manager/eventActions/updateEvent";
 import { useEventInscriptions } from "../useEventInscriptions";
 import { useEventPayment } from "../useEventPayment";
+import { useInvalidateDetailsEventQuery } from "./useEventManagerQuery";
 
 export function useFormEditEvent(event: Event) {
   const { user } = useCurrentUser();
-  const { invalidateDetail, invalidateList } = useInvalidateEventsQuery();
+  const { invalidateList: invalidateExpensesList } = useInvalidateEventsQuery();
+  const { invalidateDetail, invalidateLists: invalidateManagerList } =
+    useInvalidateDetailsEventQuery();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const { loading: paymentLoading, updatePayment } = useEventPayment();
@@ -87,7 +90,8 @@ export function useFormEditEvent(event: Event) {
 
       // Invalidar cache do evento e da lista de eventos
       invalidateDetail(event.id);
-      invalidateList();
+      invalidateManagerList();
+      invalidateExpensesList();
 
       toast.success("Evento atualizado com sucesso!");
       setIsEditing(false);
@@ -123,7 +127,8 @@ export function useFormEditEvent(event: Event) {
       toast.success("Configuração de pagamento atualizada com sucesso!");
       // Invalidar cache do evento
       invalidateDetail(event.id);
-      invalidateList();
+      invalidateManagerList();
+      invalidateExpensesList();
     }
   };
 
@@ -132,7 +137,8 @@ export function useFormEditEvent(event: Event) {
     if (success) {
       // Invalidar cache do evento
       invalidateDetail(event.id);
-      invalidateList();
+      invalidateManagerList();
+      invalidateExpensesList();
     }
   };
 
@@ -141,7 +147,8 @@ export function useFormEditEvent(event: Event) {
     if (success) {
       // Invalidar cache do evento
       invalidateDetail(event.id);
-      invalidateList();
+      invalidateManagerList();
+      invalidateExpensesList();
     }
   };
 

@@ -31,10 +31,10 @@ export type Event = {
 export type TypeInscriptions = {
   id: string;
   description: string;
+  rule: Date | null;
   value: number;
   specialType: boolean;
   createdAt: Date;
-  updatedAt: Date;
 };
 
 export type Responsible = {
@@ -111,3 +111,13 @@ export type UpdateEventInput = {
   active?: boolean;
   responsibles?: string[];
 };
+
+//types para os tipos de inscrição
+export type getTypeInscriptionsByEventResponse = {
+  id: string;
+  description: string;
+  rule: Date;
+  value: number;
+  specialType: boolean;
+  createdAt: Date;
+}[];

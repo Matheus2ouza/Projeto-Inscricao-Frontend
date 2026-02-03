@@ -11,25 +11,20 @@ import { useState } from "react";
 
 type PublicEventDetailsProps = {
   event: Event | null;
+  onViewSubscription: (eventId: string) => void;
   onSubscribe: (eventId: string) => void;
+  onLogin: () => void;
 };
 
 export default function PublicEventDetails({
   event,
+  onViewSubscription,
   onSubscribe,
+  onLogin,
 }: PublicEventDetailsProps) {
   const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageFailed, setImageFailed] = useState(false);
-
-  const handleImageLoad = () => {
-    setImageLoading(false);
-  };
-
-  const handleImageError = () => {
-    setImageLoading(false);
-    setImageFailed(true);
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR", {
@@ -265,33 +260,142 @@ export default function PublicEventDetails({
           </div>
         </div>
 
-        <div className="border rounded-lg p-6 bg-card">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex-1">
-              <h3 className="font-semibold text-card-foreground text-xl mb-3">
-                Inscrições
-              </h3>
-              <p
-                className={`font-medium text-lg ${subscriptionStatus.status === "open" ? "text-green-600" : subscriptionStatus.status === "closed" ? "text-yellow-600" : "text-red-600"}`}
-              >
-                {subscriptionStatus.label}
-              </p>
-              <p className="text-muted-foreground text-sm mt-1">
-                {subscriptionStatus.description}
-              </p>
+        <div className="space-y-6">
+          {/* Card de status das inscrições */}
+          <div className="border rounded-lg p-6 bg-card">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-card-foreground text-xl">
+                  Inscrições
+                </h3>
+                <p
+                  className={`font-medium text-lg mt-2 ${subscriptionStatus.status === "open" ? "text-green-600" : subscriptionStatus.status === "closed" ? "text-yellow-600" : "text-red-600"}`}
+                >
+                  {subscriptionStatus.label}
+                </p>
+                <p className="text-muted-foreground text-sm mt-1">
+                  {subscriptionStatus.description}
+                </p>
+              </div>
+              {subscriptionStatus.status !== "open" && (
+                <div className="text-right">
+                  <Button
+                    className={`font-semibold px-6 py-4 ${subscriptionStatus.status === "finalized" ? "bg-red-600 hover:bg-red-700" : "bg-muted text-muted-foreground hover:bg-muted cursor-not-allowed"}`}
+                    disabled
+                  >
+                    {subscriptionStatus.status === "finalized"
+                      ? "Evento Encerrado"
+                      : "Inscrições Fechadas"}
+                  </Button>
+                </div>
+              )}
             </div>
-            <Button
-              className={`font-semibold px-8 py-6 w-full sm:w-auto ${subscriptionStatus.status !== "open" ? "bg-muted text-muted-foreground hover:bg-muted cursor-not-allowed" : ""}`}
-              disabled={subscriptionStatus.status !== "open"}
-              onClick={() => onSubscribe(event.id)}
-            >
-              {subscriptionStatus.status === "finalized"
-                ? "Evento Encerrado"
-                : subscriptionStatus.status === "closed"
-                  ? "Inscrições Fechadas"
-                  : "Inscrever-se"}
-            </Button>
           </div>
+
+          {/* Se as inscrições estão abertas, mostra as opções */}
+          {subscriptionStatus.status === "open" && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Card de inscrição direta - só mostra se allowGuest for true */}
+              {event.allowGuest && (
+                <div className="border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="p-3 bg-primary/10 rounded-lg">
+                      <svg
+                        className="h-6 w-6 text-primary"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-card-foreground text-lg">
+                        Inscreva-se agora
+                      </h3>
+                      <p className="text-muted-foreground text-sm mt-1">
+                        Preencha seus dados e faça sua inscrição diretamente
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Button
+                        onClick={() => onViewSubscription(event.id)}
+                        size="lg"
+                        className="w-full h-12 text-base font-semibold"
+                      >
+                        Visualizar Inscrição
+                      </Button>
+                      <Button
+                        onClick={() => onSubscribe(event.id)}
+                        size="lg"
+                        className="w-full h-12 text-base font-semibold"
+                      >
+                        Inscrever-se Agora
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Card de login - sempre mostra quando inscrições estão abertas */}
+              <div className="border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="p-3 bg-blue-500/10 rounded-lg">
+                    <svg
+                      className="h-6 w-6 text-blue-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-card-foreground text-lg">
+                      {event.allowGuest
+                        ? "Já tem uma conta?"
+                        : "Faça login para se inscrever"}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mt-1">
+                      {event.allowGuest
+                        ? "Acesse para gerenciar suas inscrições e histórico"
+                        : "Entre com sua conta para realizar a inscrição"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Button
+                    onClick={onLogin}
+                    variant={event.allowGuest ? "outline" : "default"}
+                    size="lg"
+                    className="w-full h-12 text-base font-semibold"
+                  >
+                    {event.allowGuest
+                      ? "Fazer Login"
+                      : "Inscrever-se com Login"}
+                  </Button>
+
+                  {!event.allowGuest && (
+                    <p className="text-xs text-muted-foreground text-center mt-3">
+                      É necessário ter uma conta para se inscrever neste evento
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

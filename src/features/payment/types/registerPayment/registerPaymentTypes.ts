@@ -45,3 +45,10 @@ export type CreatePaymentResponse = {
   status: StatusPayment;
   createdAt: Date;
 };
+
+export type CreatePaymentGuestResponse = {
+  id: string;
+  totalValue: number;
+  status: StatusPayment;
+  createdAt: Date;
+};

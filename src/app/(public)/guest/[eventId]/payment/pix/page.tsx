@@ -1,11 +1,11 @@
 "use client";
 
-import RegisterPaymentDialog from "@/features/payment/components/registerPayment/RegisterPaymentPix";
+import RegisterPaymentPix from "@/features/payment/components/registerPayment/RegisterPaymentPix";
+import { useGuestRegisterPayment } from "@/features/payment/hook/registerPayment/useGuestRegisterPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
-export default function RegisterPaymentPixPage() {
+export default function GuestRegisterPaymentPixPage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -36,11 +36,42 @@ export default function RegisterPaymentPixPage() {
     new Set<string>([...queryList, ...repeatedParams]),
   );
 
+  const guestNameParam = searchParams.get("guestName");
+  const guestName = guestNameParam ?? "";
+
+  const guestEmailParam = searchParams.get("guestEmail");
+  const guestEmail = guestEmailParam ?? "";
+
+  const guestRegisterPayment = useGuestRegisterPayment();
+
   const allowCardParam = searchParams.get("allowCard");
   const allowCard = allowCardParam === "1" || allowCardParam === "true";
 
   const handleBack = () => {
     router.back();
+  };
+
+  const renderContent = () => {
+    return (
+      <RegisterPaymentPix
+        selectedInscriptions={inscriptionsIds.map((id) => ({ id }))}
+        eventId={eventId}
+        totalValue={resolvedTotalValue}
+        allowCard={allowCard}
+        allowCustomValue={false}
+        onSubmitPayment={({ value, image }) =>
+          guestRegisterPayment.mutateAsync({
+            eventId,
+            guestName,
+            guestEmail,
+            isGuest: true,
+            totalValue: value,
+            image,
+            inscriptions: inscriptionsIds.map((id) => ({ id })),
+          })
+        }
+      />
+    );
   };
 
   return (
@@ -50,25 +81,7 @@ export default function RegisterPaymentPixPage() {
       showBackButton={true}
       backButtonAction={handleBack}
     >
-      {inscriptionsIds.length === 0 ? (
-        <div className="p-6 flex items-center justify-center min-h-72">
-          <div className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              Nenhuma inscrição selecionada para pagamento.
-            </p>
-            <Button onClick={handleBack}>Voltar</Button>
-          </div>
-        </div>
-      ) : (
-        <div className="mx-auto max-w-2xl">
-          <RegisterPaymentDialog
-            selectedInscriptions={inscriptionsIds.map((id) => ({ id }))}
-            eventId={eventId}
-            totalValue={resolvedTotalValue}
-            allowCard={allowCard}
-          />
-        </div>
-      )}
+      {renderContent()}
     </PageContainer>
   );
 }

@@ -21,15 +21,10 @@ export default function EventManagementAdminPage() {
   const {
     event,
     loadingEvent,
-    fetchingEvent,
-    fetchedEvent,
     errorEvent,
     refetchEvent,
     typeInscriptions,
     loadingTypeInscriptions,
-    fetchingTypeInscriptions,
-    fetchedTypeInscriptions,
-    errorTypeInscriptions,
     refetchTypeInscriptions,
   } = useEventManager({ eventId });
 
@@ -75,8 +70,8 @@ export default function EventManagementAdminPage() {
   };
 
   const renderContent = () => {
-    if (loadingEvent) {
-      renderSkeletonGrid();
+    if (loadingEvent || loadingTypeInscriptions) {
+      return renderSkeletonGrid();
     }
     if (errorEvent) {
       return (
@@ -85,9 +80,19 @@ export default function EventManagementAdminPage() {
             <p className="mb-4 text-gray-900 dark:text-white">
               {"Erro ao carregar evento"}
             </p>
-            <Button asChild>
-              <Link href="/admin/events/manager">Voltar para Eventos</Link>
-            </Button>
+            <div className="flex gap-4 justify-center">
+              <Button variant="outline" asChild>
+                <Link href="/admin/events/manager">Voltar</Link>
+              </Button>
+              <Button
+                onClick={() => {
+                  refetchEvent();
+                  refetchTypeInscriptions();
+                }}
+              >
+                Tentar Novamente
+              </Button>
+            </div>
           </div>
         </div>
       );

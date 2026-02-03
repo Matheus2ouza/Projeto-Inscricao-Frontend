@@ -11,7 +11,15 @@ export async function getTypeInscriptionsByEvent(
       );
     return data;
   } catch (error) {
-    console.error("Error fetching type inscriptions:", error);
-    throw new Error("Falha ao carregar tipos de inscrição");
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
+
+    throw new Error(
+      axiosError.response?.data?.message ??
+        axiosError.message ??
+        "Não foi possível carregar os pagamentos",
+    );
   }
 }

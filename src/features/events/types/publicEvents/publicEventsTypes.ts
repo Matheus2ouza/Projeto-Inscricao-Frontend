@@ -9,8 +9,8 @@ export type Event = {
   latitude: number;
   longitude: number;
   status: "OPEN" | "CLOSE" | "FINALIZED";
+  allowGuest: boolean;
   createdAt: string;
-  updatedAt: string;
 };
 
 export type UsePublicEventParams = {
