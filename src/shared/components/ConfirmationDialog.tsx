@@ -44,33 +44,22 @@ export function ConfirmationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <AlertDialogHeader>
-          <div className="flex items-start gap-4">
-            <div
-              className={`flex items-center justify-center w-10 h-10 rounded-full shrink-0 ${
+          <AlertDialogTitle className="flex items-center gap-2">
+            <AlertTriangle
+              className={`h-5 w-5 ${
                 variant === "destructive"
-                  ? "bg-red-100 dark:bg-red-900/20"
-                  : "bg-amber-100 dark:bg-amber-900/20"
+                  ? "text-red-600 dark:text-red-400"
+                  : "text-amber-600 dark:text-amber-400"
               }`}
-            >
-              <AlertTriangle
-                className={`h-5 w-5 ${
-                  variant === "destructive"
-                    ? "text-red-600 dark:text-red-400"
-                    : "text-amber-600 dark:text-amber-400"
-                }`}
-              />
-            </div>
-            <div className="flex-1">
-              <AlertDialogTitle className="text-lg font-semibold">
-                {title}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="mt-2 text-sm text-muted-foreground">
-                {message}
-              </AlertDialogDescription>
-            </div>
-          </div>
+            />
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription>{message}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">

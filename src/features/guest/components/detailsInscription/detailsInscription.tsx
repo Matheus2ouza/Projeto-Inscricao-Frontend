@@ -1,7 +1,9 @@
 "use client";
 
-import { InscriptionDetails } from "@/features/guest/types/detailsInscription/detailsInscriptionType";
-import RegisterPaymentDialog from "@/features/payments/components/RegisterPaymentDialog";
+import {
+  InscriptionDetails,
+  InscriptionStatus,
+} from "@/features/guest/types/detailsInscription/detailsInscriptionType";
 import { Button } from "@/shared/components/ui/button";
 import {
   Card,
@@ -45,6 +47,7 @@ interface DetailsInscriptionProps {
   loading: boolean;
   onClear: () => void;
   onRegisterPaymentCard: () => void;
+  onRegisterPaymentPix: () => void;
 }
 
 export function DetailsInscription({
@@ -54,21 +57,35 @@ export function DetailsInscription({
   loading,
   onClear,
   onRegisterPaymentCard,
+  onRegisterPaymentPix,
 }: DetailsInscriptionProps) {
   const [searchCode, setSearchCode] = useState(confirmationCode || "");
-  const [isPaymentPixDialogOpen, setIsPaymentPixDialogOpen] = useState(false);
+
+  const formatSearchCode = (value: string) => {
+    const normalized = value
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 12);
+
+    if (normalized.length <= 4) return normalized;
+    if (normalized.length <= 8)
+      return `${normalized.slice(0, 4)}-${normalized.slice(4)}`;
+    return `${normalized.slice(0, 4)}-${normalized.slice(4, 8)}-${normalized.slice(8)}`;
+  };
+
+  const searchCodeNormalized = searchCode.replace(/[^A-Z0-9]/g, "");
 
   useEffect(() => {
     if (confirmationCode) {
-      setSearchCode(confirmationCode);
+      setSearchCode(formatSearchCode(confirmationCode));
     }
   }, [confirmationCode]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchCode.trim()) return;
-    if (searchCode.length !== 12) return;
-    onSearch(searchCode);
+    if (!searchCodeNormalized.trim()) return;
+    if (searchCodeNormalized.length !== 12) return;
+    onSearch(formatSearchCode(searchCodeNormalized));
   };
 
   const calculateAge = (birthDate: Date) => {
@@ -145,23 +162,19 @@ export function DetailsInscription({
                       type="text"
                       value={searchCode}
                       onChange={(e) =>
-                        setSearchCode(
-                          e.target.value
-                            .toUpperCase()
-                            .replace(/[^A-Z0-9]/g, ""),
-                        )
+                        setSearchCode(formatSearchCode(e.target.value))
                       }
-                      placeholder="Digite o código (ex: A1B2C3D4E5F6)"
+                      placeholder="Digite o código (ex: N4LJ-3QTT-ECGL)"
                       className="w-full pl-10 pr-16 h-10 text-sm font-mono tracking-wider border border-gray-300 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500 rounded-md"
                       disabled={loading}
-                      maxLength={12}
+                      maxLength={14}
                     />
                     <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
                       <div className="flex items-center gap-2">
                         <div className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                          {searchCode.length}/12
+                          {searchCodeNormalized.length}/12
                         </div>
-                        {searchCode.length === 12 && (
+                        {searchCodeNormalized.length === 12 && (
                           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                         )}
                       </div>
@@ -171,9 +184,9 @@ export function DetailsInscription({
                     <Button
                       type="submit"
                       disabled={
-                        !searchCode.trim() ||
+                        !searchCodeNormalized.trim() ||
                         loading ||
-                        searchCode.length !== 12
+                        searchCodeNormalized.length !== 12
                       }
                       className="w-full h-10 text-sm font-semibold bg-blue-600 hover:bg-blue-700 rounded-md lg:w-36"
                     >
@@ -226,12 +239,6 @@ export function DetailsInscription({
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                       Detalhes da Inscrição
                     </h1>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 mt-2">
-                      <FileText className="h-4 w-4" />
-                      <code className="font-mono bg-muted px-2 py-1 rounded">
-                        {inscriptionDetails.id}
-                      </code>
-                    </div>
                     <div className="text-xs text-muted-foreground">
                       Criada em: {formatDateTime(inscriptionDetails.createdAt)}
                     </div>
@@ -303,11 +310,6 @@ export function DetailsInscription({
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Participantes
                 </h2>
-                <p className="text-muted-foreground">
-                  {inscriptionDetails.participants.length} participante
-                  {inscriptionDetails.participants.length !== 1 ? "s" : ""}{" "}
-                  nesta inscrição
-                </p>
               </div>
             </div>
 
@@ -326,7 +328,9 @@ export function DetailsInscription({
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="font-semibold">{participant.name}</h3>
+                          <h3 className="font-semibold uppercase">
+                            {participant.name}
+                          </h3>
                         </div>
                       </div>
 
@@ -384,7 +388,7 @@ export function DetailsInscription({
                       className="hover:bg-muted/50"
                     >
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 uppercase">
                           <User className="h-4 w-4 text-muted-foreground" />
                           {participant.name}
                         </div>
@@ -422,7 +426,7 @@ export function DetailsInscription({
                         <div className="flex flex-col gap-2">
                           <Button
                             type="button"
-                            onClick={() => setIsPaymentPixDialogOpen(true)}
+                            onClick={onRegisterPaymentPix}
                             disabled={remainingTotal <= 0}
                           >
                             Registrar pagamento Pix
@@ -539,7 +543,10 @@ export function DetailsInscription({
                 <div className="block sm:hidden">
                   {paymentInstallments.length === 0 ? (
                     <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
-                      Nenhum pagamento registrado
+                      {inscriptionDetails.status ===
+                      InscriptionStatus.UNDER_REVIEW
+                        ? "Aguardando revisão"
+                        : "Nenhum pagamento registrado"}
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -598,27 +605,41 @@ export function DetailsInscription({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {paymentInstallments.map((installment) => (
-                        <TableRow
-                          key={installment.id}
-                          className="hover:bg-muted/50"
-                        >
-                          <TableCell className="font-medium">
-                            {installment.installmentNumber}
-                          </TableCell>
-                          <TableCell className="font-semibold text-green-600 dark:text-green-400">
-                            {getFormatCurrency(installment.value)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              {installment.paidAt
-                                ? formatDateTime(installment.paidAt)
-                                : "Em aberto"}
-                            </div>
+                      {paymentInstallments.length === 0 ? (
+                        <TableRow>
+                          <TableCell
+                            colSpan={3}
+                            className="h-24 text-center text-muted-foreground"
+                          >
+                            {inscriptionDetails.status ===
+                            InscriptionStatus.UNDER_REVIEW
+                              ? "Aguardando revisão"
+                              : "Nenhum pagamento registrado"}
                           </TableCell>
                         </TableRow>
-                      ))}
+                      ) : (
+                        paymentInstallments.map((installment) => (
+                          <TableRow
+                            key={installment.id}
+                            className="hover:bg-muted/50"
+                          >
+                            <TableCell className="font-medium">
+                              {installment.installmentNumber}
+                            </TableCell>
+                            <TableCell className="font-semibold text-green-600 dark:text-green-400">
+                              {getFormatCurrency(installment.value)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                {installment.paidAt
+                                  ? formatDateTime(installment.paidAt)
+                                  : "Em aberto"}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
                     </TableBody>
                   </Table>
                 </div>
@@ -636,7 +657,7 @@ export function DetailsInscription({
                 <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                   <Button
                     type="button"
-                    onClick={() => setIsPaymentPixDialogOpen(true)}
+                    onClick={onRegisterPaymentPix}
                     disabled={remainingTotal <= 0}
                   >
                     Registrar pagamento Pix
@@ -651,16 +672,12 @@ export function DetailsInscription({
                 </div>
               </div>
               <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
-                Nenhum pagamento registrado
+                {inscriptionDetails.status === InscriptionStatus.UNDER_REVIEW
+                  ? "Aguardando revisão"
+                  : "Nenhum pagamento registrado"}
               </div>
             </div>
           )}
-          <RegisterPaymentDialog
-            open={isPaymentPixDialogOpen}
-            onOpenChange={setIsPaymentPixDialogOpen}
-            inscriptionId={inscriptionDetails.id}
-            totalValue={remainingTotal}
-          />
         </div>
       )}
     </div>

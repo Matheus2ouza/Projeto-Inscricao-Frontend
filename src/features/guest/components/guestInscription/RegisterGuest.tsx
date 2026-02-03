@@ -6,7 +6,13 @@ import {
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
 } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/shared/components/ui/alert";
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
   Card,
@@ -39,7 +45,15 @@ import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { formatDate } from "@/shared/utils/formatDate";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
-import { Calendar, Check, ChevronsUpDown, User, Users } from "lucide-react";
+import {
+  AlertCircle,
+  Calendar,
+  Check,
+  ChevronsUpDown,
+  Copy,
+  User,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -69,6 +83,7 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [successData, setSuccessData] =
     useState<RegisterGuestInscriptionResponse | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
 
   const genderOptions = [
     { value: "MASCULINO", label: "Masculino" },
@@ -184,6 +199,142 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                   </div>
                 </div>
               </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Tipos de inscrição
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {event.typeInscriptions.length}
+                  </div>
+                </div>
+
+                {event.typeInscriptions.length > 0 ? (
+                  <>
+                    {/* Layout para desktop - Grid lado a lado */}
+                    <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {event.typeInscriptions.map((type) => (
+                        <div
+                          key={type.id || type.description}
+                          className={cn(
+                            "rounded-lg border p-4 transition-all hover:shadow-sm",
+                            type.specialType
+                              ? "border-amber-200/70 bg-amber-50/60 dark:border-amber-900/60 dark:bg-amber-950/30"
+                              : "border-gray-200/70 bg-gray-50/60 dark:border-gray-700/60 dark:bg-gray-900/30",
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-2 mb-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className="text-sm font-medium truncate">
+                                  {type.description}
+                                </div>
+                                {type.specialType && (
+                                  <Badge
+                                    variant="outline"
+                                    className={cn(
+                                      "shrink-0 text-xs",
+                                      type.specialType
+                                        ? "border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+                                        : "",
+                                    )}
+                                  >
+                                    Especial
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {type.rule
+                                  ? `Até ${calculateMaxAge(type.rule)} anos`
+                                  : "Qualquer idade"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between pt-3 border-t">
+                            <div className="text-xs text-muted-foreground whitespace-nowrap">
+                              {type.specialType
+                                ? "Necessita aprovação"
+                                : "Inscrição direta"}
+                            </div>
+                            <div className="text-sm font-semibold whitespace-nowrap">
+                              {getFormatCurrency(type.value)}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Layout para mobile - Lista vertical (mantido como estava) */}
+                    <div className="lg:hidden rounded-lg border bg-muted/20 overflow-hidden">
+                      {event.typeInscriptions.map((type) => (
+                        <div
+                          key={type.id || type.description}
+                          className={cn(
+                            "flex items-center justify-between gap-4 px-4 py-3 border-b last:border-b-0",
+                            type.specialType
+                              ? "bg-amber-50/60 dark:bg-amber-950/30"
+                              : "",
+                          )}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <div className="text-sm font-medium truncate">
+                                {type.description}
+                              </div>
+                              {type.specialType && (
+                                <Badge
+                                  variant="secondary"
+                                  className={cn(
+                                    "shrink-0",
+                                    type.specialType
+                                      ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                                      : "",
+                                  )}
+                                >
+                                  Especial
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {type.rule
+                                ? `Até ${calculateMaxAge(type.rule)} anos`
+                                : "Qualquer idade"}
+                            </div>
+                          </div>
+
+                          <div className="text-sm font-semibold whitespace-nowrap flex-shrink-0 ml-4">
+                            {getFormatCurrency(type.value)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {event.typeInscriptions.some((t) => t.specialType) && (
+                      <Alert className="border-amber-200/70 bg-amber-50/60 text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-50 mt-4">
+                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <AlertTitle className="text-sm font-medium">
+                            Tipos especiais
+                          </AlertTitle>
+                          <AlertDescription className="text-sm">
+                            <span className="block break-words">
+                              As inscrições marcadas como{" "}
+                              <strong>"Especial"</strong>
+                              necessitam de aprovação. Após a inscrição, os
+                              organizadores analisarão sua solicitação.
+                            </span>
+                          </AlertDescription>
+                        </div>
+                      </Alert>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-sm text-muted-foreground">
+                    Nenhum tipo de inscrição disponível.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -199,7 +350,7 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                 Dados para Inscrição
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <FormField
                 control={control}
                 name="name"
@@ -495,126 +646,120 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                   />
                 </div>
               )}
-            </CardContent>
-          </Card>
+              <div className="space-y-4 border-t pt-6">
+                <div className="text-lg font-semibold">Tipo de Inscrição</div>
 
-          {/* Tipo de Inscrição (Combobox) */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl">
-                Tipo de Inscrição
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {formData.birthDate && formData.birthDate.length === 10 ? (
-                <FormField
-                  control={control}
-                  name="typeInscriptionId"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col w-full">
-                      <FormLabel>Selecione o tipo</FormLabel>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={open}
-                              type="button"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground",
-                              )}
-                            >
-                              {field.value
-                                ? (() => {
-                                    const type = typeInscriptions.find(
-                                      (t) =>
-                                        (t.id || t.description) === field.value,
-                                    );
-                                    return type
-                                      ? `${type.description} - ${getFormatCurrency(
-                                          type.value,
-                                        )} (Max: ${calculateMaxAge(
-                                          type.rule,
-                                        )} anos)`
-                                      : "Selecione o tipo de inscrição";
-                                  })()
-                                : "Selecione o tipo de inscrição"}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent
-                          className="w-[var(--radix-popover-trigger-width)] p-0"
-                          align="start"
-                          onOpenAutoFocus={(e) => e.preventDefault()}
-                        >
-                          <Command>
-                            <CommandList>
-                              <CommandEmpty>
-                                Nenhum tipo encontrado.
-                              </CommandEmpty>
-                              <CommandGroup>
-                                {typeInscriptions.length > 0 ? (
-                                  typeInscriptions.map((type) => (
-                                    <CommandItem
-                                      value={type.description}
-                                      key={type.id || type.description}
-                                      onSelect={() => {
-                                        field.onChange(
-                                          type.id || type.description,
-                                        );
-                                        setOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          (type.id || type.description) ===
-                                            field.value
-                                            ? "opacity-100"
-                                            : "opacity-0",
-                                        )}
-                                      />
-                                      {type.description} -{" "}
-                                      {getFormatCurrency(type.value)} (Max:{" "}
-                                      {calculateMaxAge(type.rule)} anos)
-                                    </CommandItem>
-                                  ))
-                                ) : (
-                                  <div className="py-6 text-center text-sm text-muted-foreground">
-                                    Nenhum tipo disponível para esta idade
-                                  </div>
+                {formData.birthDate && formData.birthDate.length === 10 ? (
+                  <FormField
+                    control={control}
+                    name="typeInscriptionId"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col w-full">
+                        <FormLabel>Selecione o tipo</FormLabel>
+                        <Popover open={open} onOpenChange={setOpen}>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={open}
+                                type="button"
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground",
                                 )}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ) : (
-                <div className="p-4 text-center border rounded-lg bg-muted/50 text-muted-foreground text-sm">
-                  Preencha a data de nascimento para ver os tipos de inscrição
-                  disponíveis.
-                </div>
-              )}
+                              >
+                                {field.value
+                                  ? (() => {
+                                      const type = typeInscriptions.find(
+                                        (t) =>
+                                          (t.id || t.description) ===
+                                          field.value,
+                                      );
+                                      return type
+                                        ? `${type.description} - ${getFormatCurrency(
+                                            type.value,
+                                          )} (Max: ${calculateMaxAge(
+                                            type.rule,
+                                          )} anos)`
+                                        : "Selecione o tipo de inscrição";
+                                    })()
+                                  : "Selecione o tipo de inscrição"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[var(--radix-popover-trigger-width)] p-0"
+                            align="start"
+                            onOpenAutoFocus={(e) => e.preventDefault()}
+                          >
+                            <Command>
+                              <CommandList>
+                                <CommandEmpty>
+                                  Nenhum tipo encontrado.
+                                </CommandEmpty>
+                                <CommandGroup>
+                                  {typeInscriptions.length > 0 ? (
+                                    typeInscriptions.map((type) => (
+                                      <CommandItem
+                                        value={type.description}
+                                        key={type.id || type.description}
+                                        onSelect={() => {
+                                          field.onChange(
+                                            type.id || type.description,
+                                          );
+                                          setOpen(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            (type.id || type.description) ===
+                                              field.value
+                                              ? "opacity-100"
+                                              : "opacity-0",
+                                          )}
+                                        />
+                                        {type.description} -{" "}
+                                        {getFormatCurrency(type.value)} (Max:{" "}
+                                        {calculateMaxAge(type.rule)} anos)
+                                      </CommandItem>
+                                    ))
+                                  ) : (
+                                    <div className="py-6 text-center text-sm text-muted-foreground">
+                                      Nenhum tipo disponível para esta idade
+                                    </div>
+                                  )}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <div className="p-4 text-center border rounded-lg bg-muted/50 text-muted-foreground text-sm">
+                    Preencha a data de nascimento para ver os tipos de inscrição
+                    disponíveis.
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t pt-6">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Enviando..." : "Realizar Inscrição"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
-
-          <div className="flex justify-end pt-4">
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full sm:w-auto"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Enviando..." : "Realizar Inscrição"}
-            </Button>
-          </div>
         </form>
       </Form>
 
@@ -671,7 +816,7 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
 
               {/* Conteúdo */}
               <div className="px-8 pb-8 space-y-6">
-                {/* Código de confirmação */}
+                {/* Código de confirmação - APENAS ESTA PARTE FOI ALTERADA */}
                 <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -682,56 +827,37 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                         navigator.clipboard.writeText(
                           successData?.confirmationCode || "",
                         );
-                        // Toast de confirmação
+                        setIsCopied(true);
+                        setTimeout(() => setIsCopied(false), 2000);
                       }}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
+                      className={cn(
+                        "text-sm font-medium transition-colors flex items-center gap-1",
+                        isCopied
+                          ? "text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
+                          : "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
+                      )}
                     >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Copiar
+                      {isCopied ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                      {isCopied ? "Copiado!" : "Copiar"}
                     </button>
                   </div>
                   <div className="font-mono text-2xl font-bold tracking-wider text-center py-3 px-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                     {successData?.confirmationCode}
                   </div>
+                  {/* LINHA ADICIONADA CONFORME SOLICITADO */}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                    Este código é único e com ele você pode encontrar sua
+                    inscrição a qualquer momento.
+                  </p>
                 </div>
 
                 {/* Status e informações */}
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Status
-                    </div>
-                    <div
-                      className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                        successData?.status === InscriptionStatus.PENDING
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
-                          : successData?.status ===
-                              InscriptionStatus.UNDER_REVIEW
-                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
-                            : "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
-                      }`}
-                    >
-                      {successData?.status === InscriptionStatus.PENDING
-                        ? "PENDENTE"
-                        : successData?.status === InscriptionStatus.UNDER_REVIEW
-                          ? "EM ANÁLISE"
-                          : successData?.status || ""}
-                    </div>
-                  </div>
-
-                  {/* Mensagem contextual */}
+                  {/* Mensagem contextual - APENAS ESTA PARTE FOI ALTERADA */}
                   {successData?.status === InscriptionStatus.PENDING && (
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-xl">
                       <div className="flex items-start gap-3">
@@ -753,7 +879,8 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                             Próximo passo
                           </p>
                           <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                            Você pode realizar o pagamento agora ou mais tarde.
+                            Sua inscrição foi realizada com sucesso. Clicando no
+                            botão abaixo você pode visualizar a inscrição.
                           </p>
                         </div>
                       </div>
@@ -781,8 +908,8 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                             Aguardando aprovação
                           </p>
                           <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                            Você receberá um e-mail quando a análise for
-                            concluída.
+                            Sua inscrição entrou em análise. Você receberá um
+                            e-mail quando a análise for concluída.
                           </p>
                         </div>
                       </div>

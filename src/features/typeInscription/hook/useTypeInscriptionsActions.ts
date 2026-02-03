@@ -1,3 +1,7 @@
+import {
+  updateTypeInscription,
+  UpdateTypeInscriptionInput,
+} from "@/features/typeInscription/api/updateTypeInscription";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -5,18 +9,17 @@ import {
   CreateTypeInscriptionInput,
 } from "../api/createTypeInscription";
 import { deleteTypeInscription } from "../api/deleteTypeInscription";
-import {
-  updateTypeInscription,
-  UpdateTypeInscriptionInput,
-} from "../api/updateTypeInscription";
+import { useInvalidateTypeInscriptionsQuery } from "./useTypeInscriptionsQuery";
 
 export function useTypeInscriptionsActions(eventId: string) {
   const [loading, setLoading] = useState(false);
+  const { invalidateDetail } = useInvalidateTypeInscriptionsQuery();
 
   const create = async (input: CreateTypeInscriptionInput) => {
     try {
       setLoading(true);
       const newType = await createTypeInscription(input);
+      invalidateDetail(eventId);
       toast.success("Tipo de inscrição criado com sucesso!");
       return newType;
     } catch (error) {
@@ -37,6 +40,7 @@ export function useTypeInscriptionsActions(eventId: string) {
     try {
       setLoading(true);
       const updatedType = await updateTypeInscription(typeInscriptionId, input);
+      invalidateDetail(eventId);
       toast.success("Tipo de inscrição atualizado com sucesso!");
       return updatedType;
     } catch (error) {
@@ -51,6 +55,7 @@ export function useTypeInscriptionsActions(eventId: string) {
     try {
       setLoading(true);
       await deleteTypeInscription(typeInscriptionId);
+      invalidateDetail(eventId);
       toast.success("Tipo de inscrição excluído com sucesso!");
     } catch (error) {
       toast.error("Erro ao excluir tipo de inscrição");

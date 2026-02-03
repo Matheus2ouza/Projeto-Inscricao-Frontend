@@ -1,9 +1,9 @@
+import { useEventManagerQuery } from "@/features/events/hooks/manager/useEventManagerQuery";
 import {
   UseEventManagerParams,
   UseEventManagerResult,
 } from "@/features/events/types/manager/eventManagerTypes";
 import { useTypeInscriptionsQuery } from "@/features/typeInscription/hook/useTypeInscriptionsQuery";
-import { useEventManagerQuery } from "./useEventManagerQuery";
 
 export function useEventManager({
   eventId,
@@ -16,9 +16,6 @@ export function useEventManager({
     error: errorEvent,
     refetch: refetchEvent,
   } = useEventManagerQuery(eventId);
-
-  console.log("dentro do useEventManager");
-  console.log(event);
 
   const {
     data: typeInscriptions,

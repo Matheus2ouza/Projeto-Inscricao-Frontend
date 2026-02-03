@@ -1,11 +1,14 @@
 "use client";
 
-import RegisterPaymentDialog from "@/features/payment/components/registerPayment/RegisterPaymentPix";
+import RegisterPaymentPix from "@/features/payment/components/registerPayment/RegisterPaymentPix";
+import { useRegisterPayment } from "@/features/payment/hook/registerPayment/useRegisterPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function RegisterPaymentPixPage() {
+  const { user } = useCurrentUser();
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -36,6 +39,8 @@ export default function RegisterPaymentPixPage() {
     new Set<string>([...queryList, ...repeatedParams]),
   );
 
+  const registerPayment = useRegisterPayment();
+
   const allowCardParam = searchParams.get("allowCard");
   const allowCard = allowCardParam === "1" || allowCardParam === "true";
 
@@ -61,11 +66,21 @@ export default function RegisterPaymentPixPage() {
         </div>
       ) : (
         <div className="mx-auto max-w-2xl">
-          <RegisterPaymentDialog
+          <RegisterPaymentPix
             selectedInscriptions={inscriptionsIds.map((id) => ({ id }))}
             eventId={eventId}
             totalValue={resolvedTotalValue}
             allowCard={allowCard}
+            allowCustomValue={false}
+            onSubmitPayment={({ value, image }) =>
+              registerPayment.mutateAsync({
+                eventId,
+                accountId: user.id,
+                totalValue: value,
+                image,
+                inscriptions: inscriptionsIds.map((id) => ({ id })),
+              })
+            }
           />
         </div>
       )}

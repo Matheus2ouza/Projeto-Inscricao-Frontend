@@ -4,22 +4,31 @@ import { TypeInscriptions } from "../types/typesInscriptionsTypes";
 export type UpdateTypeInscriptionInput = {
   description?: string;
   value?: number;
-  specialtype?: boolean;
+  specialType?: boolean;
+  ruleDate?: Date | null;
 };
 
 export async function updateTypeInscription(
   typeInscriptionId: string,
-  input: UpdateTypeInscriptionInput
+  input: UpdateTypeInscriptionInput,
 ): Promise<TypeInscriptions> {
   try {
-    console.log(input)
+    console.log(input);
     const response = await axiosInstance.put<TypeInscriptions>(
       `/type-inscription/${typeInscriptionId}/update`,
-      input
+      input,
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating type inscription:", error);
-    throw new Error("Falha ao atualizar tipo de inscrição");
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
+
+    throw new Error(
+      axiosError.response?.data?.message ??
+        axiosError.message ??
+        "Não foi possível carregar os pagamentos",
+    );
   }
 }

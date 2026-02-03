@@ -19,8 +19,16 @@ export default function EventPage() {
 
   const { event, loading, error, refetch } = usePublicEvent({ eventId });
 
+  const handleViewSubscription = (eventId: string) => {
+    router.push(`/guest/${eventId}/inscription`);
+  };
+
   const handleSubscribe = (eventId: string) => {
     router.push(`/guest/${eventId}`);
+  };
+
+  const handleLogin = () => {
+    router.push("/login");
   };
 
   const renderSkeletonGrid = () => {
@@ -107,7 +115,14 @@ export default function EventPage() {
       );
     }
 
-    return <PublicEventDetails event={event} onSubscribe={handleSubscribe} />;
+    return (
+      <PublicEventDetails
+        event={event}
+        onViewSubscription={handleViewSubscription}
+        onSubscribe={handleSubscribe}
+        onLogin={handleLogin}
+      />
+    );
   };
 
   return (

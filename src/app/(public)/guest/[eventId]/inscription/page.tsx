@@ -57,6 +57,25 @@ export default function GuestInscription() {
     router.push(`/guest/${eventId}/payment/card?${search.toString()}`);
   };
 
+  const handleRegisterPaymentPix = () => {
+    if (!inscriptionDetails || !eventId) return;
+    const participantsTotal = inscriptionDetails.participants.reduce(
+      (total, participant) => total + participant.typeInscription.price,
+      0,
+    );
+    const totalValue =
+      inscriptionDetails.payment?.totalValue ?? participantsTotal;
+    const totalPaid = inscriptionDetails.payment?.totalPaid ?? 0;
+    const remainingTotal = Math.max(totalValue - totalPaid, 0);
+    const search = new URLSearchParams();
+    search.set("inscriptions", inscriptionDetails.id);
+    search.set("confirmationCode", confirmationCode ?? "");
+    search.set("guestName", inscriptionDetails.guestName ?? "");
+    search.set("guestEmail", inscriptionDetails.guestEmail ?? "");
+    search.set("totalValue", String(remainingTotal));
+    router.push(`/guest/${eventId}/payment/pix?${search.toString()}`);
+  };
+
   const renderContent = () => {
     return (
       <div className="space-y-6">
@@ -67,6 +86,7 @@ export default function GuestInscription() {
           onSearch={(code) => setConfirmationCode(code)}
           onClear={() => setConfirmationCode(null)}
           onRegisterPaymentCard={handleRegisterPaymentCard}
+          onRegisterPaymentPix={handleRegisterPaymentPix}
         />
         {error && (
           <div className="min-h-[120px] flex items-center justify-center">

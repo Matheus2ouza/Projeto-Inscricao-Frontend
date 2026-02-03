@@ -23,6 +23,7 @@ export type TypeInscription = {
   description: string;
   value: number;
   rule?: Date;
+  specialType: boolean;
 };
 
 export type UseDetailsEventParams = {

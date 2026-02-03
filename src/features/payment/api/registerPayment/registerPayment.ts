@@ -3,6 +3,7 @@ import { CreatePaymentResponse } from "../../types/registerPayment/registerPayme
 
 export type CreatePaymentInscriptionRequest = {
   eventId: string;
+  accountId: string;
   totalValue: number;
   image: string;
   inscriptions: inscription[];
@@ -16,7 +17,7 @@ export async function registerPayment(
   body: CreatePaymentInscriptionRequest,
 ): Promise<CreatePaymentResponse> {
   const { data } = await axiosInstance.post<CreatePaymentResponse>(
-    "/payments/register",
+    `/payments/${body.eventId}/register/pix`,
     body,
   );
   return data;
