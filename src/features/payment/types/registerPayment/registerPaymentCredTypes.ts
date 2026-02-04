@@ -1,9 +1,11 @@
 export type CreatePaymentInscriptiInput = {
   eventId: string;
+  accountId?: string;
+  guestEmail?: string;
+  isGuest?: boolean;
   totalValue: number;
   client: Client;
   inscriptions: Inscription[];
-  accountId?: string;
 };
 
 type Client = {

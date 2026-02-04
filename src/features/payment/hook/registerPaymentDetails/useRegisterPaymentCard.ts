@@ -14,7 +14,9 @@ export type UseFormCreatePaymentCard = {
     eventId: string,
     totalValue: number,
     inscriptionIds: string[],
-    userId?: string,
+    userIdOrOptions?:
+      | string
+      | { accountId?: string; isGuest?: boolean; guestEmail?: string },
   ) => Promise<{
     success: boolean;
     error?: string;
@@ -75,7 +77,9 @@ export default function useFormCreatePaymentCard(): UseFormCreatePaymentCard {
     eventId: string,
     totalValue: number,
     inscriptionIds: string[],
-    userId?: string,
+    userIdOrOptions?:
+      | string
+      | { accountId?: string; isGuest?: boolean; guestEmail?: string },
   ) {
     const isValid = await form.trigger();
     if (!isValid) {
@@ -93,12 +97,22 @@ export default function useFormCreatePaymentCard(): UseFormCreatePaymentCard {
     }
 
     const values = form.getValues();
+    const options =
+      typeof userIdOrOptions === "string" ? undefined : userIdOrOptions;
+    const accountId =
+      typeof userIdOrOptions === "string"
+        ? userIdOrOptions
+        : options?.accountId;
+    const isGuest = options?.isGuest;
+    const guestEmail = options?.guestEmail;
     setLoading(true);
     try {
       const result = await registerPaymentCard({
         eventId,
         totalValue,
-        accountId: userId,
+        accountId,
+        isGuest,
+        guestEmail: isGuest ? (guestEmail ?? values.email) : undefined,
         inscriptions: inscriptionIds.map((id) => ({ id })),
         client: {
           name: values.name,
