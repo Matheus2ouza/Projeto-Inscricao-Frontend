@@ -3,6 +3,10 @@ import z from "zod";
 export const guestInscriptionSchema = z
   .object({
     name: z.string().trim().min(1, "Nome é obrigatório"),
+    preferredName: z
+      .string()
+      .trim()
+      .min(1, "Como quer ser chamado é obrigatório"),
     email: z.string().email("Email inválido"),
     phone: z
       .string()
@@ -14,6 +18,12 @@ export const guestInscriptionSchema = z
     participantName: z.string().trim().optional(),
     birthDate: z.string().trim().min(1, "Data de nascimento é obrigatória"),
     gender: z.string().trim().min(1, "Gênero é obrigatório"),
+    shirtSize: z.enum(["PP", "P", "M", "G", "GG", "XG"], {
+      message: "Tamanho da camisa é obrigatório",
+    }),
+    shirtType: z.enum(["TRADICIONAL", "BABYLOOK"], {
+      message: "Modelo da camisa é obrigatório",
+    }),
     typeInscriptionId: z
       .string()
       .trim()

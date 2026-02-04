@@ -47,12 +47,15 @@ export function useFormCreateGuestInscription({
     resolver: zodResolver(guestInscriptionSchema),
     defaultValues: {
       name: "",
+      preferredName: "",
       email: "",
       phone: "",
       locality: "",
       participantName: "",
       birthDate: "",
       gender: "",
+      shirtSize: undefined,
+      shirtType: undefined,
       typeInscriptionId: "",
       isResponsibleParticipant: false,
     },
@@ -129,8 +132,11 @@ export function useFormCreateGuestInscription({
           name: data.isResponsibleParticipant
             ? data.participantName || ""
             : data.name,
+          preferredName: data.preferredName,
           birthDate: birthDate,
           gender: data.gender,
+          shirtSize: data.shirtSize,
+          shirtType: data.shirtType,
           typeInscriptionId: data.typeInscriptionId,
         },
       };

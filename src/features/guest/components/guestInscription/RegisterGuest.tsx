@@ -80,6 +80,8 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
   const [open, setOpen] = useState(false);
   const [openGender, setOpenGender] = useState(false);
   const [openGenderParticipant, setOpenGenderParticipant] = useState(false);
+  const [openShirtSize, setOpenShirtSize] = useState(false);
+  const [openShirtType, setOpenShirtType] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [successData, setSuccessData] =
     useState<RegisterGuestInscriptionResponse | null>(null);
@@ -88,6 +90,18 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
   const genderOptions = [
     { value: "MASCULINO", label: "Masculino" },
     { value: "FEMININO", label: "Feminino" },
+  ];
+  const shirtSizeOptions = [
+    { value: "PP", label: "PP" },
+    { value: "P", label: "P" },
+    { value: "M", label: "M" },
+    { value: "G", label: "G" },
+    { value: "GG", label: "GG" },
+    { value: "XG", label: "XG" },
+  ];
+  const shirtTypeOptions = [
+    { value: "TRADICIONAL", label: "Tradicional" },
+    { value: "BABYLOOK", label: "Babylook" },
   ];
 
   const {
@@ -365,6 +379,25 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                 )}
               />
 
+              {!formData.isResponsibleParticipant && (
+                <FormField
+                  control={control}
+                  name="preferredName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Como quer ser chamado</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Como você quer ser chamado"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               <FormField
                 control={control}
                 name="email"
@@ -450,6 +483,23 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                         <FormControl>
                           <Input
                             placeholder="Nome do participante"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={control}
+                    name="preferredName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Como quer ser chamado</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Como o participante quer ser chamado"
                             {...field}
                           />
                         </FormControl>
@@ -551,6 +601,152 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                       )}
                     />
                   </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={control}
+                      name="shirtSize"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Tamanho da camisa</FormLabel>
+                          <Popover
+                            open={openShirtSize}
+                            onOpenChange={setOpenShirtSize}
+                          >
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={openShirtSize}
+                                  type="button"
+                                  className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground",
+                                  )}
+                                >
+                                  {field.value
+                                    ? shirtSizeOptions.find(
+                                        (s) => s.value === field.value,
+                                      )?.label
+                                    : "Selecione"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-[var(--radix-popover-trigger-width)] p-0"
+                              align="start"
+                              onOpenAutoFocus={(e) => e.preventDefault()}
+                            >
+                              <Command>
+                                <CommandEmpty>
+                                  Nenhum tamanho encontrado.
+                                </CommandEmpty>
+                                <CommandList>
+                                  <CommandGroup>
+                                    {shirtSizeOptions.map((size) => (
+                                      <CommandItem
+                                        key={size.value}
+                                        value={size.value}
+                                        onSelect={() => {
+                                          field.onChange(size.value);
+                                          setOpenShirtSize(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            size.value === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0",
+                                          )}
+                                        />
+                                        {size.label}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={control}
+                      name="shirtType"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Modelo da camisa</FormLabel>
+                          <Popover
+                            open={openShirtType}
+                            onOpenChange={setOpenShirtType}
+                          >
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={openShirtType}
+                                  type="button"
+                                  className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground",
+                                  )}
+                                >
+                                  {field.value
+                                    ? shirtTypeOptions.find(
+                                        (s) => s.value === field.value,
+                                      )?.label
+                                    : "Selecione"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-[var(--radix-popover-trigger-width)] p-0"
+                              align="start"
+                              onOpenAutoFocus={(e) => e.preventDefault()}
+                            >
+                              <Command>
+                                <CommandEmpty>
+                                  Nenhum modelo encontrado.
+                                </CommandEmpty>
+                                <CommandList>
+                                  <CommandGroup>
+                                    {shirtTypeOptions.map((type) => (
+                                      <CommandItem
+                                        key={type.value}
+                                        value={type.value}
+                                        onSelect={() => {
+                                          field.onChange(type.value);
+                                          setOpenShirtType(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            type.value === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0",
+                                          )}
+                                        />
+                                        {type.label}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -633,6 +829,154 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                                         )}
                                       />
                                       {gender.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {!formData.isResponsibleParticipant && (
+                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-4">
+                  <FormField
+                    control={control}
+                    name="shirtSize"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Tamanho da camisa</FormLabel>
+                        <Popover
+                          open={openShirtSize}
+                          onOpenChange={setOpenShirtSize}
+                        >
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={openShirtSize}
+                                type="button"
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground",
+                                )}
+                              >
+                                {field.value
+                                  ? shirtSizeOptions.find(
+                                      (s) => s.value === field.value,
+                                    )?.label
+                                  : "Selecione"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[var(--radix-popover-trigger-width)] p-0"
+                            align="start"
+                            onOpenAutoFocus={(e) => e.preventDefault()}
+                          >
+                            <Command>
+                              <CommandEmpty>
+                                Nenhum tamanho encontrado.
+                              </CommandEmpty>
+                              <CommandList>
+                                <CommandGroup>
+                                  {shirtSizeOptions.map((size) => (
+                                    <CommandItem
+                                      key={size.value}
+                                      value={size.value}
+                                      onSelect={() => {
+                                        field.onChange(size.value);
+                                        setOpenShirtSize(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          size.value === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0",
+                                        )}
+                                      />
+                                      {size.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={control}
+                    name="shirtType"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Modelo da camisa</FormLabel>
+                        <Popover
+                          open={openShirtType}
+                          onOpenChange={setOpenShirtType}
+                        >
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={openShirtType}
+                                type="button"
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground",
+                                )}
+                              >
+                                {field.value
+                                  ? shirtTypeOptions.find(
+                                      (s) => s.value === field.value,
+                                    )?.label
+                                  : "Selecione"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-[var(--radix-popover-trigger-width)] p-0"
+                            align="start"
+                            onOpenAutoFocus={(e) => e.preventDefault()}
+                          >
+                            <Command>
+                              <CommandEmpty>
+                                Nenhum modelo encontrado.
+                              </CommandEmpty>
+                              <CommandList>
+                                <CommandGroup>
+                                  {shirtTypeOptions.map((type) => (
+                                    <CommandItem
+                                      key={type.value}
+                                      value={type.value}
+                                      onSelect={() => {
+                                        field.onChange(type.value);
+                                        setOpenShirtType(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          type.value === field.value
+                                            ? "opacity-100"
+                                            : "opacity-0",
+                                        )}
+                                      />
+                                      {type.label}
                                     </CommandItem>
                                   ))}
                                 </CommandGroup>
