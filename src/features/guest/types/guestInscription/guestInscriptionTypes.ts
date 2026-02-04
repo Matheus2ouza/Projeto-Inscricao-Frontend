@@ -54,10 +54,17 @@ export enum InscriptionStatus {
 
 export type GenderType = "M" | "F" | "O" | string;
 
+export type ShirtSizeType = "PP" | "P" | "M" | "G" | "GG" | "XG";
+
+export type ShirtType = "TRADICIONAL" | "BABYLOOK";
+
 export type ParticipantGuest = {
   name: string;
+  preferredName: string;
   birthDate: Date;
   gender: GenderType;
+  shirtSize: ShirtSizeType;
+  shirtType: ShirtType;
   typeInscriptionId: string;
 };
 
