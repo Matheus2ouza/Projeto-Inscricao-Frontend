@@ -1,10 +1,13 @@
 "use client";
 
 import RegisterPaymentCardDialog from "@/features/payment/components/registerPayment/RegisterPaymentCard";
+import useFormCreatePaymentCard from "@/features/payment/hook/registerPaymentDetails/useRegisterPaymentCard";
 import PageContainer from "@/shared/components/layout/PageContainer";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
-export default function RegisterPaymentViaCard() {
+export default function RegisterPaymentCardPage() {
+  const { user } = useCurrentUser();
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -46,6 +49,8 @@ export default function RegisterPaymentViaCard() {
     router.back();
   };
 
+  const { form, onSubmit } = useFormCreatePaymentCard();
+
   return (
     <PageContainer
       title="Pagamento com cartão"
@@ -54,10 +59,16 @@ export default function RegisterPaymentViaCard() {
       backButtonAction={handleBack}
     >
       <RegisterPaymentCardDialog
-        eventId={eventId}
         inscriptionsIds={inscriptionsIds}
         totalValue={resolvedTotalValue}
         onCancel={handleBack}
+        form={form}
+        onSubmitPayment={() =>
+          onSubmit(eventId, resolvedTotalValue, inscriptionsIds, {
+            accountId: user.id,
+            isGuest: false,
+          })
+        }
       />
     </PageContainer>
   );

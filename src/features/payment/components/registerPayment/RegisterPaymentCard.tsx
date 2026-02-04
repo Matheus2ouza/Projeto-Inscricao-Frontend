@@ -1,29 +1,35 @@
-import useFormCreatePaymentCard from "@/features/payment/hook/registerPaymentDetails/useRegisterPaymentCard";
+import type { RegisterPaymentCardSchema } from "@/features/payment/schema/registerPaymendCarcSchema";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { useEffect, useRef, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import { Controller, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 type RegisterPaymentCardDialogProps = {
-  eventId: string;
   inscriptionsIds: string[];
   totalValue: number;
   onCancel: () => void;
+  form: UseFormReturn<RegisterPaymentCardSchema>;
+  onSubmitPayment: () => Promise<{
+    success: boolean;
+    error?: string;
+    redirectUrl?: string;
+  }>;
 };
 
 type Step = "dados-titular" | "endereco";
 
 export default function RegisterPaymentCard({
-  eventId,
   inscriptionsIds,
   totalValue,
   onCancel,
+  form,
+  onSubmitPayment,
 }: RegisterPaymentCardDialogProps) {
-  const { form, onSubmit } = useFormCreatePaymentCard();
   const {
     register,
     formState: { errors },
@@ -231,7 +237,7 @@ export default function RegisterPaymentCard({
       return;
     }
 
-    const result = await onSubmit(eventId, totalValue, inscriptionsIds);
+    const result = await onSubmitPayment();
     if (result.success) {
       if (result.redirectUrl) {
         window.location.assign(result.redirectUrl);
@@ -626,7 +632,7 @@ export default function RegisterPaymentCard({
                   Voltar para dados
                 </Button>
                 <Button type="submit" disabled={isCepLoading}>
-                  Finalizar pagamento
+                  Seguir para pagamento
                 </Button>
               </>
             )}
