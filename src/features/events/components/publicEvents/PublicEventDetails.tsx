@@ -2,12 +2,14 @@
 
 import { Event } from "@/features/events/types/publicEvents/publicEventsTypes";
 import EventMap from "@/shared/components/EventMap";
+import { GuestInscriptionAlready } from "@/shared/components/GuestInscriptionAlready";
 import { Button } from "@/shared/components/ui/button";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
+import { getWithExpiry, setWithExpiry } from "@/shared/utils/storageWithExpiry";
 import { Calendar, Loader2, MapPin, Share2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type PublicEventDetailsProps = {
   event: Event | null;
@@ -25,6 +27,33 @@ export default function PublicEventDetails({
   const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageFailed, setImageFailed] = useState(false);
+  const [alreadyDialogOpen, setAlreadyDialogOpen] = useState(false);
+  const throttleKey = "guest_inscription_already_throttle_5m";
+
+  useEffect(() => {
+    if (!event?.id) {
+      setAlreadyDialogOpen(false);
+      return;
+    }
+
+    const cached = getWithExpiry<{
+      eventId: string;
+      confirmationCode: string;
+    }>("guest_inscription");
+
+    if (!cached || cached.eventId !== event.id || !cached.confirmationCode) {
+      setAlreadyDialogOpen(false);
+      return;
+    }
+
+    const throttled = getWithExpiry<boolean>(throttleKey);
+    if (throttled) {
+      setAlreadyDialogOpen(false);
+      return;
+    }
+
+    setAlreadyDialogOpen(true);
+  }, [event?.id]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR", {
@@ -125,6 +154,20 @@ export default function PublicEventDetails({
 
   return (
     <div className="space-y-6">
+      <GuestInscriptionAlready
+        open={alreadyDialogOpen}
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            setWithExpiry(throttleKey, true, 5 * 60 * 1000);
+          }
+          setAlreadyDialogOpen(open);
+        }}
+        onView={() => {
+          setWithExpiry(throttleKey, true, 5 * 60 * 1000);
+          setAlreadyDialogOpen(false);
+          onViewSubscription(event.id);
+        }}
+      />
       <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-muted">
         {shouldShowImage ? (
           <>

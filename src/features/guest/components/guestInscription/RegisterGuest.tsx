@@ -6,6 +6,7 @@ import {
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
 } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
+import { GuestInscriptionAlready } from "@/shared/components/GuestInscriptionAlready";
 import {
   Alert,
   AlertDescription,
@@ -45,24 +46,30 @@ import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { formatDate } from "@/shared/utils/formatDate";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+import { getWithExpiry, setWithExpiry } from "@/shared/utils/storageWithExpiry";
 import {
   AlertCircle,
   Calendar,
   Check,
   ChevronsUpDown,
+  Clock,
   Copy,
   User,
   Users,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface RegisterGuestProps {
   event: Event | null;
+  onViewInscription: () => void;
 }
 
-export function RegisterGuest({ event }: RegisterGuestProps) {
+export function RegisterGuest({
+  event,
+  onViewInscription,
+}: RegisterGuestProps) {
   if (!event) {
     return (
       <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
@@ -86,6 +93,62 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
   const [successData, setSuccessData] =
     useState<RegisterGuestInscriptionResponse | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [paymentCountdownSeconds, setPaymentCountdownSeconds] = useState<
+    number | null
+  >(null);
+  const [alreadyDialogOpen, setAlreadyDialogOpen] = useState(false);
+  const throttleKey = "guest_inscription_already_throttle_5m";
+
+  useEffect(() => {
+    if (
+      !successModalOpen ||
+      successData?.status !== InscriptionStatus.PENDING
+    ) {
+      setPaymentCountdownSeconds(null);
+      return;
+    }
+
+    setPaymentCountdownSeconds(30 * 60);
+    const intervalId = window.setInterval(() => {
+      setPaymentCountdownSeconds((prev) => {
+        if (prev === null) return prev;
+        return prev > 0 ? prev - 1 : 0;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [successModalOpen, successData?.status]);
+
+  useEffect(() => {
+    if (successModalOpen) {
+      setAlreadyDialogOpen(false);
+      return;
+    }
+
+    const cached = getWithExpiry<{
+      eventId: string;
+      confirmationCode: string;
+    }>("guest_inscription");
+
+    if (!cached || cached.eventId !== event.id || !cached.confirmationCode) {
+      setAlreadyDialogOpen(false);
+      return;
+    }
+
+    const throttled = getWithExpiry<boolean>(throttleKey);
+    if (throttled) {
+      setAlreadyDialogOpen(false);
+      return;
+    }
+
+    setAlreadyDialogOpen(true);
+  }, [event.id, successModalOpen, throttleKey]);
+
+  const formatCountdown = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
 
   const genderOptions = [
     { value: "MASCULINO", label: "Masculino" },
@@ -137,6 +200,20 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
 
   return (
     <div className="space-y-8">
+      <GuestInscriptionAlready
+        open={alreadyDialogOpen}
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            setWithExpiry(throttleKey, true, 5 * 60 * 1000);
+          }
+          setAlreadyDialogOpen(open);
+        }}
+        onView={() => {
+          setWithExpiry(throttleKey, true, 5 * 60 * 1000);
+          setAlreadyDialogOpen(false);
+          onViewInscription();
+        }}
+      />
       {/* Event Details Card */}
       <Card className="border-0 shadow-sm overflow-hidden">
         <CardContent className="p-0">
@@ -1142,29 +1219,38 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
               {/* Header */}
               <div className="p-8 pt-12 text-center">
                 <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-                  {successData?.status === InscriptionStatus.PENDING
-                    ? "Inscrição Confirmada"
-                    : successData?.status === InscriptionStatus.UNDER_REVIEW
-                      ? "Em Análise"
-                      : "Inscrição Registrada"}
+                  {successData?.status === InscriptionStatus.UNDER_REVIEW
+                    ? "Em Análise"
+                    : "Inscrição Reservada"}
                 </h3>
 
-                <p className="text-gray-500 dark:text-gray-400 mb-6">
-                  {successData?.status === InscriptionStatus.PENDING
-                    ? "Sua inscrição foi realizada com sucesso."
-                    : successData?.status === InscriptionStatus.UNDER_REVIEW
-                      ? "Aguarde a análise da organização do evento."
-                      : "Sua inscrição foi registrada."}
+                <p className="text-gray-500 dark:text-gray-400 ">
+                  {successData?.status === InscriptionStatus.UNDER_REVIEW
+                    ? "Sua inscrição entrou em analise, aguarde o retorno dos organizadores."
+                    : "Sua inscrição foi reservada."}
                 </p>
               </div>
 
               {/* Conteúdo */}
               <div className="px-8 pb-8 space-y-6">
-                {/* Código de confirmação - APENAS ESTA PARTE FOI ALTERADA */}
+                {successData?.status === InscriptionStatus.PENDING &&
+                  paymentCountdownSeconds !== null && (
+                    <div className="rounded-xl border border-green-200/70 dark:border-green-800/40 bg-green-50/70 dark:bg-green-900/20 px-4 py-3">
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-green-800 dark:text-green-200">
+                        <Clock className="h-4 w-4" />
+                        Tempo restante para pagamento
+                      </div>
+                      <div className="mt-1 text-center text-3xl font-extrabold tabular-nums text-green-900 dark:text-green-100">
+                        {formatCountdown(paymentCountdownSeconds)}
+                      </div>
+                    </div>
+                  )}
+
                 <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Código de confirmação
+                  ,
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium uppercase tracking-wider text-gray-600 dark:text-gray-400">
+                      Código de inscrição
                     </span>
                     <button
                       onClick={() => {
@@ -1189,7 +1275,7 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                       {isCopied ? "Copiado!" : "Copiar"}
                     </button>
                   </div>
-                  <div className="font-mono text-2xl font-bold tracking-wider text-center py-3 px-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="font-mono text-xl font-bold tracking-wider text-center py-2 px-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                     {successData?.confirmationCode}
                   </div>
                   {/* LINHA ADICIONADA CONFORME SOLICITADO */}
@@ -1201,7 +1287,6 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
 
                 {/* Status e informações */}
                 <div className="space-y-4">
-                  {/* Mensagem contextual - APENAS ESTA PARTE FOI ALTERADA */}
                   {successData?.status === InscriptionStatus.PENDING && (
                     <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-xl">
                       <div className="flex items-start gap-3">
@@ -1223,8 +1308,9 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                             Próximo passo
                           </p>
                           <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                            Sua inscrição foi realizada com sucesso. Clicando no
-                            botão abaixo você pode visualizar a inscrição.
+                            Sua Inscrição foi registrada, para garantir sua
+                            participação é necessário realizar o pagamento da
+                            sua inscrição dentro de <strong>30 minutos</strong>.
                           </p>
                         </div>
                       </div>
@@ -1249,11 +1335,12 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                            Aguardando aprovação
+                            Aguarde a análise
                           </p>
                           <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                            Sua inscrição entrou em análise. Você receberá um
-                            e-mail quando a análise for concluída.
+                            Infelizmente, sua inscrição entrou em análise assim
+                            que for validade pelos organizadores receberá um
+                            e-mail com o resultado da análise.
                           </p>
                         </div>
                       </div>
@@ -1264,21 +1351,10 @@ export function RegisterGuest({ event }: RegisterGuestProps) {
                 {/* Botões de ação */}
                 <div className="space-y-3 pt-4">
                   <div className="flex gap-3">
-                    <Button
-                      onClick={() =>
-                        router.push(`/guest/${event.id}/inscription`)
-                      }
-                      className="flex-1"
-                    >
-                      Visualizar Inscrição
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      onClick={() => setSuccessModalOpen(false)}
-                      className="flex-1"
-                    >
-                      Fechar
+                    <Button onClick={onViewInscription} className="flex-1">
+                      {successData?.status === InscriptionStatus.PENDING
+                        ? "Seguir para Pagamento"
+                        : "Visualizar Inscrição"}
                     </Button>
                   </div>
                 </div>

@@ -10,6 +10,7 @@ import {
   UseFormGuestInscriptionProps,
   UseFormGuestInscriptionReturn,
 } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
+import { setWithExpiry } from "@/shared/utils/storageWithExpiry";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -145,9 +146,13 @@ export function useFormCreateGuestInscription({
         await registerGuest(payload);
 
       if (typeof window !== "undefined") {
-        localStorage.setItem(
-          "guestInscriptionConfirmationCode",
-          response.confirmationCode,
+        setWithExpiry(
+          "guest_inscription",
+          {
+            eventId,
+            confirmationCode: response.confirmationCode,
+          },
+          30 * 60 * 1000,
         );
       }
 
