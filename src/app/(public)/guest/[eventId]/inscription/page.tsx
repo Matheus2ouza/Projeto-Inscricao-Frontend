@@ -4,16 +4,18 @@ import { DetailsInscription } from "@/features/guest/components/detailsInscripti
 import { useDetailsInscription } from "@/features/guest/hook/detailsInscription/useDetailsInscription";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
+import { getWithExpiry } from "@/shared/utils/storageWithExpiry";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function GuestInscription() {
+export default function GuestInscriptionPage() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
+  const hasAutoScrolledRef = useRef(false);
 
   if (!eventId) {
     return null;
@@ -21,19 +23,24 @@ export default function GuestInscription() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Verifica se o código de confirmação foi fornecido na URL
-      // Se não, tenta recuperar do localStorage
-      const storedCode = localStorage.getItem(
-        "guestInscriptionConfirmationCode",
-      );
-      if (storedCode) {
-        setConfirmationCode(storedCode);
+      const urlCode = searchParams.get("confirmationCode");
+      if (urlCode) {
+        setConfirmationCode(urlCode);
         return;
       }
-      const urlCode = searchParams.get("confirmationCode");
-      setConfirmationCode(urlCode);
+
+      const cached = getWithExpiry<{
+        eventId: string;
+        confirmationCode: string;
+      }>("guest_inscription");
+      if (cached?.eventId === eventId && cached.confirmationCode) {
+        setConfirmationCode(cached.confirmationCode);
+        return;
+      }
+
+      setConfirmationCode(null);
     }
-  }, [searchParams]);
+  }, [eventId, searchParams]);
 
   const { inscriptionDetails, loading, error, refetch } = useDetailsInscription(
     {
@@ -41,15 +48,31 @@ export default function GuestInscription() {
     },
   );
 
+  useEffect(() => {
+    if (hasAutoScrolledRef.current) return;
+    if (searchParams.get("scroll") !== "payment") return;
+    if (loading) return;
+    if (!inscriptionDetails) return;
+    if (error) return;
+
+    requestAnimationFrame(() => {
+      const el = document.getElementById("guest-payment");
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 96;
+      window.scrollTo({ top, behavior: "smooth" });
+      hasAutoScrolledRef.current = true;
+    });
+  }, [searchParams, loading, inscriptionDetails, error]);
+
   const handleRegisterPaymentCard = () => {
     if (!inscriptionDetails || !eventId) return;
     const participantsTotal = inscriptionDetails.participants.reduce(
       (total, participant) => total + participant.typeInscription.price,
       0,
     );
-    const totalValue =
-      inscriptionDetails.payment?.totalValue ?? participantsTotal;
-    const totalPaid = inscriptionDetails.payment?.totalPaid ?? 0;
+    const payment = inscriptionDetails.payments?.[0];
+    const totalValue = payment?.totalValue ?? participantsTotal;
+    const totalPaid = payment?.totalPaid ?? 0;
     const remainingTotal = Math.max(totalValue - totalPaid, 0);
     const search = new URLSearchParams();
     search.set("inscriptions", inscriptionDetails.id);
@@ -63,9 +86,9 @@ export default function GuestInscription() {
       (total, participant) => total + participant.typeInscription.price,
       0,
     );
-    const totalValue =
-      inscriptionDetails.payment?.totalValue ?? participantsTotal;
-    const totalPaid = inscriptionDetails.payment?.totalPaid ?? 0;
+    const payment = inscriptionDetails.payments?.[0];
+    const totalValue = payment?.totalValue ?? participantsTotal;
+    const totalPaid = payment?.totalPaid ?? 0;
     const remainingTotal = Math.max(totalValue - totalPaid, 0);
     const search = new URLSearchParams();
     search.set("inscriptions", inscriptionDetails.id);

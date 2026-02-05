@@ -8,7 +8,24 @@ export async function getDetailsInscription(
     const { data } = await axiosInstance.get<InscriptionDetails>(
       `inscription/guest/${confirmationCode}/details`,
     );
-    return data;
+    const raw = data as unknown as Record<string, unknown>;
+    const rawPayments = (raw as { payments?: unknown }).payments;
+    if (Array.isArray(rawPayments)) {
+      (raw as { payments?: unknown[] }).payments = rawPayments.map((item) => {
+        if (!item || typeof item !== "object") return item as unknown;
+        const payment = item as Record<string, unknown>;
+        const rawInstallments =
+          payment.PaymentInstallment ??
+          payment.paymentInstallments ??
+          payment.paymentInstallment;
+        if (Array.isArray(rawInstallments)) {
+          payment.PaymentInstallment = rawInstallments;
+        }
+        return payment;
+      });
+    }
+
+    return raw as unknown as InscriptionDetails;
   } catch (error) {
     const axiosError = error as {
       response?: { data?: { message?: string } };

@@ -20,6 +20,10 @@ export default function RegisterGuestInscription() {
 
   const { event, loading, error, refetch } = useDetailsEvent({ eventId });
 
+  const handleViewInscription = () => {
+    router.push(`/guest/${eventId}/inscription?scroll=payment`);
+  };
+
   const renderSkeletonGrid = () => {
     return (
       <Card className="border-0 shadow-sm">
@@ -83,7 +87,9 @@ export default function RegisterGuestInscription() {
       );
     }
 
-    return <RegisterGuest event={event} />;
+    return (
+      <RegisterGuest event={event} onViewInscription={handleViewInscription} />
+    );
   };
 
   return (

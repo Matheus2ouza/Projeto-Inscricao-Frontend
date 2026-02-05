@@ -3,7 +3,12 @@
 import {
   InscriptionDetails,
   InscriptionStatus,
+  Payment,
+  PaymentInstallment,
 } from "@/features/guest/types/detailsInscription/detailsInscriptionType";
+import ImageViewerDialog, {
+  ImageViewerDownloadExtension,
+} from "@/shared/components/ImageViewerDialog";
 import { Button } from "@/shared/components/ui/button";
 import {
   Card,
@@ -60,6 +65,11 @@ export function DetailsInscription({
   onRegisterPaymentPix,
 }: DetailsInscriptionProps) {
   const [searchCode, setSearchCode] = useState(confirmationCode || "");
+  const [receiptViewerOpen, setReceiptViewerOpen] = useState(false);
+  const [receiptViewerUrl, setReceiptViewerUrl] = useState<string | null>(null);
+  const [receiptViewerFileName, setReceiptViewerFileName] = useState<
+    string | undefined
+  >(undefined);
 
   const formatSearchCode = (value: string) => {
     const normalized = value
@@ -117,29 +127,31 @@ export function DetailsInscription({
     return method;
   };
 
-  const payment = inscriptionDetails?.payment;
-  const paymentInstallments = payment?.PaymentInstallment ?? [];
+  const openReceiptViewer = (payment: Payment) => {
+    if (!payment.imageUrl) return;
+    setReceiptViewerUrl(payment.imageUrl);
+    setReceiptViewerFileName(`comprovante-${payment.id}`);
+    setReceiptViewerOpen(true);
+  };
+
+  const payments: Payment[] = inscriptionDetails?.payments ?? [];
+
+  const summaryPayment = payments[0];
   const participantsTotal = inscriptionDetails
     ? inscriptionDetails.participants.reduce(
         (total, participant) => total + participant.typeInscription.price,
         0,
       )
     : 0;
-  const paymentTotalValue = payment?.totalValue ?? participantsTotal;
+  const paymentTotalValue = summaryPayment?.totalValue ?? participantsTotal;
+  const paymentTotalPaid = summaryPayment?.totalPaid ?? 0;
   const paymentProgress =
-    payment && payment.totalValue > 0
-      ? Math.min(
-          Math.round((payment.totalPaid / payment.totalValue) * 100),
-          100,
-        )
+    paymentTotalValue > 0
+      ? Math.min(Math.round((paymentTotalPaid / paymentTotalValue) * 100), 100)
       : 0;
-  const paymentDebt = payment
-    ? Math.max(payment.totalValue - payment.totalPaid, 0)
-    : 0;
-  const remainingTotal = Math.max(
-    paymentTotalValue - (payment?.totalPaid ?? 0),
-    0,
-  );
+  const paymentDebt = Math.max(paymentTotalValue - paymentTotalPaid, 0);
+  const paidInstallments = summaryPayment?.paidInstallments ?? 0;
+  const remainingTotal = Math.max(paymentTotalValue - paymentTotalPaid, 0);
 
   return (
     <div className="w-full space-y-8">
@@ -410,35 +422,184 @@ export function DetailsInscription({
             </div>
           </div>
 
-          {payment ? (
-            <>
-              <div className="space-y-6">
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    <div className="space-y-4 flex-1">
+          <div className="space-y-6">
+            <div
+              id="guest-payment"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 scroll-mt-24"
+            >
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div className="space-y-4 flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        Resumo Financeiro
+                      </h3>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        type="button"
+                        onClick={onRegisterPaymentPix}
+                        disabled={remainingTotal <= 0}
+                      >
+                        Registrar pagamento Pix
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={onRegisterPaymentCard}
+                        disabled={remainingTotal <= 0}
+                        variant="outline"
+                      >
+                        Registrar pagamento Cartão
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Total pago
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {getFormatCurrency(paymentTotalPaid)}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        {paidInstallments} parcela
+                        {paidInstallments !== 1 ? "s" : ""} paga
+                        {paidInstallments !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Valor total
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {getFormatCurrency(paymentTotalValue)}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Saldo pendente
+                      </p>
+                      <p
+                        className={`text-2xl font-bold ${
+                          paymentDebt > 0
+                            ? "text-amber-600 dark:text-amber-500"
+                            : "text-green-600 dark:text-green-500"
+                        }`}
+                      >
+                        {getFormatCurrency(paymentDebt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Progresso
+                      </span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {paymentProgress}%
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-green-500 rounded-full transition-all duration-300"
+                        style={{ width: `${paymentProgress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {summaryPayment ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                          summaryPayment.status,
+                        )}`}
+                      >
+                        {getConvertStatusPayment(summaryPayment.status)}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Método: {getPaymentMethodLabel(summaryPayment.method)}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Parcelas: {paidInstallments}/
+                        {summaryPayment.installments}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      Nenhum pagamento registrado
+                    </div>
+                  )}
+
+                  {summaryPayment?.rejectionReason && (
+                    <div className="mt-2 p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-md text-sm text-red-700 dark:text-red-200">
+                      {summaryPayment.rejectionReason}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Histórico de Pagamentos
+                </h2>
+                <p className="text-muted-foreground">
+                  {payments.length} pagamento{payments.length !== 1 ? "s" : ""}{" "}
+                  registrado{payments.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+            </div>
+
+            {payments.length === 0 ? (
+              <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
+                {inscriptionDetails.status === InscriptionStatus.UNDER_REVIEW
+                  ? "Aguardando revisão"
+                  : "Nenhum pagamento registrado"}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {payments.map((p, idx) => {
+                  const installments: PaymentInstallment[] =
+                    p.PaymentInstallment ?? [];
+                  const isApproved =
+                    String(p.status).toUpperCase() === "APPROVED";
+                  const debt = Math.max(p.totalValue - p.totalPaid, 0);
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4"
+                    >
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-2">
-                          <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            Resumo Financeiro
+                          <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                            Pagamento {idx + 1}
                           </h3>
                         </div>
-                        <div className="flex flex-col gap-2">
-                          <Button
-                            type="button"
-                            onClick={onRegisterPaymentPix}
-                            disabled={remainingTotal <= 0}
+
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                              p.status,
+                            )}`}
                           >
-                            Registrar pagamento Pix
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={onRegisterPaymentCard}
-                            disabled={remainingTotal <= 0}
-                            variant="outline"
-                          >
-                            Registrar pagamento Cartão
-                          </Button>
+                            {getConvertStatusPayment(p.status)}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            Método: {getPaymentMethodLabel(p.method)}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            Parcelas: {p.paidInstallments}/{p.installments}
+                          </span>
                         </div>
                       </div>
 
@@ -447,13 +608,8 @@ export function DetailsInscription({
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             Total pago
                           </p>
-                          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                            {getFormatCurrency(payment.totalPaid)}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-500">
-                            {payment.paidInstallments} parcela
-                            {payment.paidInstallments !== 1 ? "s" : ""} paga
-                            {payment.paidInstallments !== 1 ? "s" : ""}
+                          <p className="text-xl font-bold text-gray-900 dark:text-white">
+                            {getFormatCurrency(p.totalPaid)}
                           </p>
                         </div>
 
@@ -461,8 +617,8 @@ export function DetailsInscription({
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             Valor total
                           </p>
-                          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                            {getFormatCurrency(payment.totalValue)}
+                          <p className="text-xl font-bold text-gray-900 dark:text-white">
+                            {getFormatCurrency(p.totalValue)}
                           </p>
                         </div>
 
@@ -471,214 +627,171 @@ export function DetailsInscription({
                             Saldo pendente
                           </p>
                           <p
-                            className={`text-2xl font-bold ${
-                              paymentDebt > 0
+                            className={`text-xl font-bold ${
+                              debt > 0
                                 ? "text-amber-600 dark:text-amber-500"
                                 : "text-green-600 dark:text-green-500"
                             }`}
                           >
-                            {getFormatCurrency(paymentDebt)}
+                            {getFormatCurrency(debt)}
                           </p>
                         </div>
                       </div>
 
-                      <div className="pt-2">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-600 dark:text-gray-400">
-                            Progresso
-                          </span>
-                          <span className="font-medium text-gray-700 dark:text-gray-300">
-                            {paymentProgress}%
-                          </span>
+                      {p.rejectionReason && (
+                        <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-md text-sm text-red-700 dark:text-red-200">
+                          {p.rejectionReason}
                         </div>
-                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-green-500 rounded-full transition-all duration-300"
-                            style={{ width: `${paymentProgress}%` }}
-                          />
-                        </div>
-                      </div>
+                      )}
 
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                            payment.status,
-                          )}`}
+                      {p.imageUrl && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-fit"
+                          onClick={() => openReceiptViewer(p)}
                         >
-                          {getConvertStatusPayment(payment.status)}
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Método: {getPaymentMethodLabel(payment.method)}
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Parcelas: {payment.paidInstallments}/
-                          {payment.installments}
-                        </span>
-                      </div>
+                          <FileText className="h-4 w-4" />
+                          Visualizar comprovante
+                        </Button>
+                      )}
 
-                      {payment.rejectionReason && (
-                        <div className="mt-2 p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-md text-sm text-red-700 dark:text-red-200">
-                          {payment.rejectionReason}
+                      {isApproved && (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                              Parcelas
+                            </h4>
+                            <span className="text-xs text-muted-foreground">
+                              {installments.length} parcela
+                              {installments.length !== 1 ? "s" : ""}
+                            </span>
+                          </div>
+
+                          <div className="block sm:hidden">
+                            {installments.length === 0 ? (
+                              <div className="px-4 py-6 text-center text-muted-foreground border rounded-lg">
+                                Nenhuma parcela registrada
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {installments.map((installment) => (
+                                  <div
+                                    key={installment.id}
+                                    className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                                  >
+                                    <div className="flex items-center justify-between mb-3">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-sm font-medium text-muted-foreground">
+                                          #
+                                        </span>
+                                        <span className="font-semibold">
+                                          {installment.installmentNumber}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div className="space-y-1">
+                                        <p className="text-xs text-muted-foreground">
+                                          Valor
+                                        </p>
+                                        <p className="text-base font-bold text-green-600 dark:text-green-400">
+                                          {getFormatCurrency(installment.value)}
+                                        </p>
+                                      </div>
+                                      <div className="space-y-1 col-span-2">
+                                        <p className="text-xs text-muted-foreground">
+                                          Data
+                                        </p>
+                                        <div className="flex items-center gap-2">
+                                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                                          <p className="text-sm font-medium">
+                                            {installment.paidAt
+                                              ? formatDateTime(
+                                                  installment.paidAt,
+                                                )
+                                              : "Em aberto"}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="hidden sm:block rounded-md border">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead className="w-16">#</TableHead>
+                                  <TableHead>Valor</TableHead>
+                                  <TableHead className="w-[200px]">
+                                    Data
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {installments.length === 0 ? (
+                                  <TableRow>
+                                    <TableCell
+                                      colSpan={3}
+                                      className="h-24 text-center text-muted-foreground"
+                                    >
+                                      Nenhuma parcela registrada
+                                    </TableCell>
+                                  </TableRow>
+                                ) : (
+                                  installments.map((installment) => (
+                                    <TableRow
+                                      key={installment.id}
+                                      className="hover:bg-muted/50"
+                                    >
+                                      <TableCell className="font-medium">
+                                        {installment.installmentNumber}
+                                      </TableCell>
+                                      <TableCell className="font-semibold text-green-600 dark:text-green-400">
+                                        {getFormatCurrency(installment.value)}
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className="flex items-center gap-2">
+                                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                                          {installment.paidAt
+                                            ? formatDateTime(installment.paidAt)
+                                            : "Em aberto"}
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))
+                                )}
+                              </TableBody>
+                            </Table>
+                          </div>
                         </div>
                       )}
                     </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      Histórico de Pagamentos
-                    </h2>
-                    <p className="text-muted-foreground">
-                      {paymentInstallments.length} parcela
-                      {paymentInstallments.length !== 1 ? "s" : ""} registrada
-                      {paymentInstallments.length !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="block sm:hidden">
-                  {paymentInstallments.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
-                      {inscriptionDetails.status ===
-                      InscriptionStatus.UNDER_REVIEW
-                        ? "Aguardando revisão"
-                        : "Nenhum pagamento registrado"}
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {paymentInstallments.map((installment) => (
-                        <div
-                          key={installment.id}
-                          className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-muted-foreground">
-                                #
-                              </span>
-                              <span className="font-semibold">
-                                {installment.installmentNumber}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                              <p className="text-xs text-muted-foreground">
-                                Valor
-                              </p>
-                              <p className="text-base font-bold text-green-600 dark:text-green-400">
-                                {getFormatCurrency(installment.value)}
-                              </p>
-                            </div>
-                            <div className="space-y-1 col-span-2">
-                              <p className="text-xs text-muted-foreground">
-                                Data
-                              </p>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                <p className="text-sm font-medium">
-                                  {installment.paidAt
-                                    ? formatDateTime(installment.paidAt)
-                                    : "Em aberto"}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="hidden sm:block rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-16">#</TableHead>
-                        <TableHead>Valor</TableHead>
-                        <TableHead className="w-[200px]">Data</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paymentInstallments.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={3}
-                            className="h-24 text-center text-muted-foreground"
-                          >
-                            {inscriptionDetails.status ===
-                            InscriptionStatus.UNDER_REVIEW
-                              ? "Aguardando revisão"
-                              : "Nenhum pagamento registrado"}
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        paymentInstallments.map((installment) => (
-                          <TableRow
-                            key={installment.id}
-                            className="hover:bg-muted/50"
-                          >
-                            <TableCell className="font-medium">
-                              {installment.installmentNumber}
-                            </TableCell>
-                            <TableCell className="font-semibold text-green-600 dark:text-green-400">
-                              {getFormatCurrency(installment.value)}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
-                                {installment.paidAt
-                                  ? formatDateTime(installment.paidAt)
-                                  : "Em aberto"}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Histórico de Pagamentos
-                  </h2>
-                  <p className="text-muted-foreground">0 pagamentos</p>
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                  <Button
-                    type="button"
-                    onClick={onRegisterPaymentPix}
-                    disabled={remainingTotal <= 0}
-                  >
-                    Registrar pagamento Pix
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={onRegisterPaymentCard}
-                    disabled={remainingTotal <= 0}
-                  >
-                    Registrar pagamento Cartão
-                  </Button>
-                </div>
-              </div>
-              <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
-                {inscriptionDetails.status === InscriptionStatus.UNDER_REVIEW
-                  ? "Aguardando revisão"
-                  : "Nenhum pagamento registrado"}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+      )}
+      {receiptViewerUrl && (
+        <ImageViewerDialog
+          isOpen={receiptViewerOpen}
+          onClose={() => {
+            setReceiptViewerOpen(false);
+            setReceiptViewerUrl(null);
+            setReceiptViewerFileName(undefined);
+          }}
+          imageUrl={receiptViewerUrl}
+          title="Comprovante"
+          downloadFileName={receiptViewerFileName}
+          downloadFileExtension={ImageViewerDownloadExtension.WEBP}
+        />
       )}
     </div>
   );

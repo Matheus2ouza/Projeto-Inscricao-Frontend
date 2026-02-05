@@ -48,6 +48,12 @@ export default function ImageViewerDialog({
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
+    if (!isOpen) return;
+    setImageLoading(true);
+    setImageDimensions(null);
+  }, [imageUrl, isOpen]);
+
+  useEffect(() => {
     const updateViewportSize = () => {
       setViewportSize({ width: window.innerWidth, height: window.innerHeight });
     };
@@ -141,7 +147,7 @@ export default function ImageViewerDialog({
 
     const maxWidth = Math.min(
       imageDimensions.width + horizontalAllowance,
-      viewportSize.width * maxWidthPercentage
+      viewportSize.width * maxWidthPercentage,
     );
 
     return isMobile ? Math.max(280, maxWidth) : maxWidth;
@@ -160,7 +166,7 @@ export default function ImageViewerDialog({
 
     return Math.min(
       imageDimensions.height + verticalAllowance,
-      viewportSize.height * maxHeightPercentage
+      viewportSize.height * maxHeightPercentage,
     );
   })();
 
@@ -270,19 +276,21 @@ export default function ImageViewerDialog({
             )}
             <div className="relative">
               <Image
+                key={imageUrl}
                 src={imageUrl}
                 alt="Imagem ampliada"
                 width={imageDimensions?.width ?? 800}
                 height={imageDimensions?.height ?? 600}
-                className="rounded-lg transition-transform duration-200"
+                className={`rounded-lg transition-transform duration-200 ${
+                  imageLoading ? "opacity-0" : "opacity-100"
+                }`}
                 style={{
                   transform: `scale(${zoom})`,
                   transformOrigin: "top center",
                   maxWidth: "none",
                   cursor: zoom > 1 ? "move" : "default",
                 }}
-                onLoad={(event) => {
-                  const img = event.currentTarget;
+                onLoadingComplete={(img) => {
                   setImageDimensions({
                     width: img.naturalWidth,
                     height: img.naturalHeight,
