@@ -423,7 +423,10 @@ export function DetailsInscription({
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <div
+              id="guest-payment"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 scroll-mt-24"
+            >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="space-y-4 flex-1">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

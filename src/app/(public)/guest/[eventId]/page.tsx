@@ -21,7 +21,7 @@ export default function RegisterGuestInscription() {
   const { event, loading, error, refetch } = useDetailsEvent({ eventId });
 
   const handleViewInscription = () => {
-    router.push(`/guest/${eventId}/inscription`);
+    router.push(`/guest/${eventId}/inscription?scroll=payment`);
   };
 
   const renderSkeletonGrid = () => {

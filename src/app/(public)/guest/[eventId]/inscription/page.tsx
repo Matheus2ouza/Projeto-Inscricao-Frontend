@@ -6,15 +6,16 @@ import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { getWithExpiry } from "@/shared/utils/storageWithExpiry";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function GuestInscription() {
+export default function GuestInscriptionPage() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
+  const hasAutoScrolledRef = useRef(false);
 
   if (!eventId) {
     return null;
@@ -46,6 +47,22 @@ export default function GuestInscription() {
       confirmationCode: confirmationCode ?? "",
     },
   );
+
+  useEffect(() => {
+    if (hasAutoScrolledRef.current) return;
+    if (searchParams.get("scroll") !== "payment") return;
+    if (loading) return;
+    if (!inscriptionDetails) return;
+    if (error) return;
+
+    requestAnimationFrame(() => {
+      const el = document.getElementById("guest-payment");
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 96;
+      window.scrollTo({ top, behavior: "smooth" });
+      hasAutoScrolledRef.current = true;
+    });
+  }, [searchParams, loading, inscriptionDetails, error]);
 
   const handleRegisterPaymentCard = () => {
     if (!inscriptionDetails || !eventId) return;
