@@ -7,14 +7,15 @@ import {
   UseEventsResult,
 } from "../types/selectEvent";
 import {
-  useAnalysisEventsQuery,
-  usePrefetchAnalysisEvents,
-} from "./useSelectEventQuery";
+  usePrefetchSelectEventForListParticipants,
+  useSelectEventForListParticipantsQuery,
+} from "./useSelectEventForListParticipantsQuery";
 
-export function useEventsForAnalysis({
+export function useSelectEventForListParticipants({
   initialPage = 1,
   pageSize = 8,
   status,
+  guest,
 }: UseEventsParams = {}): UseEventsResult {
   const [page, setPage] = useState(initialPage);
   const statusFilter = status?.length ? status : undefined;
@@ -26,16 +27,21 @@ export function useEventsForAnalysis({
     isLoading: loading,
     error,
     refetch,
-  } = useAnalysisEventsQuery(page, pageSize, queryStatuses);
+  } = useSelectEventForListParticipantsQuery(
+    page,
+    pageSize,
+    queryStatuses,
+    guest,
+  );
 
-  const { prefetchNextPage } = usePrefetchAnalysisEvents();
+  const { prefetchNextPage } = usePrefetchSelectEventForListParticipants();
 
   useEffect(() => {
     setPage(initialPage);
   }, [initialPage, statusKey]);
 
   if (data && page < data.pageCount) {
-    prefetchNextPage(page, pageSize, queryStatuses);
+    prefetchNextPage(page, pageSize, queryStatuses, guest);
   }
 
   return {

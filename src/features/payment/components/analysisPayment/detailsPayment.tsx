@@ -48,6 +48,7 @@ import {
   Link,
   Receipt,
   Undo2,
+  User,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -158,21 +159,20 @@ export default function DetailsPaymentTable({
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Detalhes do Pagamento
                 </h1>
-
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 mt-2">
-                  <DollarSign className="h-4 w-4" />
-                  <code className="font-mono bg-muted px-2 py-1 rounded">
-                    {payment.id.substring(0, 12)}...
-                  </code>
-                </div>
-
-                <div className="text-xs text-muted-foreground">
-                  Criado em: {formatDateTime(payment.createdAt)}
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide truncate">
+                    {payment.responsible || "-"}
+                  </div>
+                  {payment.isGuest && (
+                    <Badge variant="secondary" className="h-5 px-2 text-[10px]">
+                      N/ Associado
+                    </Badge>
+                  )}
                 </div>
               </div>
 
               {/* Informações do Pagamento */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
                 {/* Valor Total */}
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
@@ -206,6 +206,27 @@ export default function DetailsPaymentTable({
                   <p className="text-lg font-semibold">
                     {getPaymentMethodText(payment.methodPayment)}
                   </p>
+                </div>
+
+                {/* Responsável */}
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Responsável</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-semibold truncate">
+                      {payment.responsible || "-"}
+                    </p>
+                    {payment.isGuest && (
+                      <Badge
+                        variant="secondary"
+                        className="h-5 px-2 text-[10px]"
+                      >
+                        Convidado
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -273,6 +294,7 @@ export default function DetailsPaymentTable({
                 <TableRow>
                   <TableHead className="w-16">#</TableHead>
                   <TableHead className="w-[250px]">ID da Inscrição</TableHead>
+                  <TableHead className="w-[220px]">Responsável</TableHead>
                   <TableHead className="w-[140px] text-right">Valor</TableHead>
                   <TableHead className="w-[100px] text-center">Ações</TableHead>
                 </TableRow>
@@ -288,6 +310,9 @@ export default function DetailsPaymentTable({
                     </TableCell>
                     <TableCell className="font-mono text-sm">
                       {alloc.inscriptionId.substring(0, 8)}...
+                    </TableCell>
+                    <TableCell className="max-w-[220px] truncate">
+                      {alloc.responsible || "-"}
                     </TableCell>
                     <TableCell className="text-right font-medium">
                       {getFormatCurrency(alloc.value)}
@@ -323,6 +348,15 @@ export default function DetailsPaymentTable({
                     <code className="font-mono text-xs bg-muted px-2 py-1 rounded block">
                       {alloc.inscriptionId.substring(0, 12)}...
                     </code>
+                  </div>
+
+                  <div className="mb-3">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Responsável
+                    </p>
+                    <p className="font-medium truncate">
+                      {alloc.responsible || "-"}
+                    </p>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -368,6 +402,28 @@ export default function DetailsPaymentTable({
                   <code className="font-mono text-sm bg-muted px-3 py-2 rounded block break-all">
                     {payment.id}
                   </code>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Responsável
+                </span>
+                <div className="mt-2">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">
+                      {payment.responsible || "-"}
+                    </span>
+                    {payment.isGuest && (
+                      <Badge
+                        variant="secondary"
+                        className="h-5 px-2 text-[10px]"
+                      >
+                        Convidado
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
 

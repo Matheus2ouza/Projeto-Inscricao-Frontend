@@ -14,7 +14,7 @@ export const paymentsListKeys = {
 export function usePaymentsListQuery(
   eventId: string,
   page: number = 1,
-  pageSize: number = 10
+  pageSize: number = 10,
 ) {
   return useQuery<ListAllPaymentsResponse>({
     queryKey: paymentsListKeys.list(eventId, page, pageSize),
@@ -53,7 +53,7 @@ export function usePrefetchPaymentsList() {
     prefetchNextPage: (
       eventId: string,
       currentPage: number,
-      pageSize: number
+      pageSize: number,
     ) => {
       if (!eventId) return;
 

@@ -1,7 +1,7 @@
 "use client";
 
-import ParticipantsTable from "@/features/participants/components/ParticipantsTable";
-import { useParticipants } from "@/features/participants/hooks/useParticipants";
+import ParticipantsTable from "@/features/participants/components/listParticipants/ParticipantsTable";
+import { useParticipants } from "@/features/participants/hooks/listParticipants/useParticipants";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams } from "next/navigation";

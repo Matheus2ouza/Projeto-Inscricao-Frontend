@@ -6,7 +6,7 @@ type PaymentsListApiResponse = ListAllPaymentsResponse;
 export async function getPaymentsList(
   eventId: string,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<ListAllPaymentsResponse> {
   try {
     const { data } = await axiosInstance.get<PaymentsListApiResponse>(
@@ -16,11 +16,10 @@ export async function getPaymentsList(
           page,
           pageSize,
         },
-      }
+      },
     );
 
     return data;
-
   } catch (error) {
     const axiosError = error as {
       response?: { data?: { message?: string } };
@@ -29,8 +28,8 @@ export async function getPaymentsList(
 
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível carregar os pagamentos"
+        axiosError.message ??
+        "Não foi possível carregar os pagamentos",
     );
   }
 }

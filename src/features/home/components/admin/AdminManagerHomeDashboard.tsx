@@ -64,7 +64,7 @@ export default function AdminManagerHomeDashboard({
       "Quantidade de eventos ativos e publicados atualmente na região.",
 
     activeParticipants:
-      "Número total de participantes confirmados no evento mais próximo (inclui apenas inscrições ativas).",
+      "Número total de participantes confirmados no evento mais próximo (inclui apenas inscrições pagas).",
   };
 
   const cards: {

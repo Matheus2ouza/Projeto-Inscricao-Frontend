@@ -1,6 +1,8 @@
 export type Payment = {
   id: string;
   status: StatusPayment;
+  isGuest: boolean;
+  responsible: string;
   methodPayment: PaymentMethod;
   totalValue: number;
   createdAt: Date;
@@ -24,6 +26,8 @@ export enum PaymentMethod {
 export type AnalysisPaymentsDetailsResponse = {
   id: string;
   status: StatusPayment;
+  isGuest: boolean;
+  responsible: string;
   methodPayment: PaymentMethod;
   totalValue: number;
   createdAt: Date;
@@ -35,6 +39,7 @@ export type AnalysisPaymentsDetailsResponse = {
 type PaymentAllocation = {
   value: number;
   inscriptionId: string;
+  responsible?: string;
 };
 
 export type UseAnalysisPaymentDetailsParams = {

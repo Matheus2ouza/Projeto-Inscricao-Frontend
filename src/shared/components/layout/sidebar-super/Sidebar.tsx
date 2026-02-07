@@ -103,7 +103,7 @@ export default function AppSidebarSuper({
       ({
         "--sidebar-width": "18rem",
       }) as React.CSSProperties,
-    []
+    [],
   );
 
   return (
@@ -139,7 +139,7 @@ export default function AppSidebarSuper({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              inscriptionsOpen && "rotate-90"
+                              inscriptionsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -180,7 +180,7 @@ export default function AppSidebarSuper({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              paymentsOpen && "rotate-90"
+                              paymentsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -240,7 +240,7 @@ export default function AppSidebarSuper({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              eventsOpen && "rotate-90"
+                              eventsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -263,6 +263,15 @@ export default function AppSidebarSuper({
                             >
                               <ListOrdered className="size-4" />
                               <span>Lista de Participantes</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/super/participants/list-guest-participants"
+                              className="gap-1"
+                            >
+                              <ListOrdered className="size-4" />
+                              <span>Participantes Não Vinculados</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
@@ -293,7 +302,7 @@ export default function AppSidebarSuper({
                           <ChevronRight
                             className={cn(
                               "size-4 text-muted-foreground transition-transform",
-                              eventsOpen && "rotate-90"
+                              eventsOpen && "rotate-90",
                             )}
                           />
                         </SidebarMenuButton>
@@ -408,7 +417,7 @@ export default function AppSidebarSuper({
                   "overflow-hidden rounded-xl border bg-popover shadow-lg lg:mb-5",
                   isMobile
                     ? "mx-auto w-full min-w-[15rem] max-w-[15rem]"
-                    : "w-60"
+                    : "w-60",
                 )}
               >
                 <div className="flex items-center gap-3 border-b border-border px-4 py-3">

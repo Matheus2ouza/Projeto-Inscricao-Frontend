@@ -19,6 +19,7 @@ export type Payment = {
   id: string;
   responsible?: string;
   status: string;
+  isGuest: boolean;
   value: number;
   createdAt: Date;
 };

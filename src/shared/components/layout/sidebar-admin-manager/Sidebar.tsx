@@ -272,6 +272,15 @@ export default function AppSidebarAdminManager({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
+                              href="/admin/participants/list-guest-participants"
+                              className="gap-1"
+                            >
+                              <ListOrdered className="size-4" />
+                              <span>Participantes Não Vinculados</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
                               href="/admin/events/check-in"
                               className="gap-1"
                             >

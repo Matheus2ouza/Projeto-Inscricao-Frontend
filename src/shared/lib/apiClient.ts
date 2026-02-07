@@ -70,9 +70,9 @@ axiosInstance.interceptors.response.use(
     // Evita loop: não tenta refresh se já for a chamada de refresh
     const isRefreshCall =
       originalRequest.url && originalRequest.url.includes("/users/refresh");
-    if (error.response && error.response.status === 403 && !isRefreshCall) {
+    if (error.response && error.response.status === 400 && !isRefreshCall) {
       console.warn(
-        "[apiClient] response interceptor: 403 received, attempting refresh",
+        "[apiClient] response interceptor: 400 received, attempting refresh",
         {
           url: originalRequest.url,
           method: originalRequest.method,

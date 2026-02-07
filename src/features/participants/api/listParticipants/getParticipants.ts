@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { ListParticipantsResponse } from "../../events/types/checkout/checkoutTypes";
+import { ListParticipantsResponse } from "../../../events/types/checkout/checkoutTypes";
 
 export async function getParticipants(
   eventId: string,

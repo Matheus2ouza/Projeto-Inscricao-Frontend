@@ -3,7 +3,7 @@
 import {
   downloadEtiquetaPdf,
   downloadParticipantsPdfResponse,
-} from "@/features/participants/api/downloadParticipantsPdf";
+} from "@/features/participants/api/listParticipants/downloadParticipantsPdf";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -14,9 +14,7 @@ type ProcessDownloadOptions = {
   successMessage?: string;
 };
 
-function extractPayload(
-  response: downloadParticipantsPdfResponse | undefined
-) {
+function extractPayload(response: downloadParticipantsPdfResponse | undefined) {
   return response?.data ?? response;
 }
 
@@ -46,7 +44,7 @@ export function useDownloadEtiqueta(eventId: string) {
   const processDownload = useCallback(
     async (
       fetchPdf: () => Promise<downloadParticipantsPdfResponse | undefined>,
-      options?: ProcessDownloadOptions
+      options?: ProcessDownloadOptions,
     ): Promise<boolean> => {
       if (!eventId) {
         toast.error("Evento não encontrado.");
@@ -66,13 +64,13 @@ export function useDownloadEtiqueta(eventId: string) {
 
         if (!pdfBase64) {
           throw new Error(
-            payload?.message ?? "O servidor não retornou o arquivo PDF."
+            payload?.message ?? "O servidor não retornou o arquivo PDF.",
           );
         }
 
         downloadPdf(pdfBase64, filename);
         toast.success(
-          options?.successMessage ?? "Etiqueta baixada com sucesso."
+          options?.successMessage ?? "Etiqueta baixada com sucesso.",
         );
         success = true;
       } catch (error) {
@@ -86,7 +84,7 @@ export function useDownloadEtiqueta(eventId: string) {
 
       return success;
     },
-    [eventId]
+    [eventId],
   );
 
   const downloadEtiqueta = useCallback(
@@ -96,11 +94,11 @@ export function useDownloadEtiqueta(eventId: string) {
         return false;
       }
 
-      return processDownload(
-        () => downloadEtiquetaPdf({ eventId, accountsId: [accountId] })
+      return processDownload(() =>
+        downloadEtiquetaPdf({ eventId, accountsId: [accountId] }),
       );
     },
-    [eventId, processDownload]
+    [eventId, processDownload],
   );
 
   const downloadEtiquetas = useCallback(
@@ -112,10 +110,10 @@ export function useDownloadEtiqueta(eventId: string) {
 
       return processDownload(
         () => downloadEtiquetaPdf({ eventId, accountsId }),
-        { successMessage: "Etiquetas baixadas com sucesso." }
+        { successMessage: "Etiquetas baixadas com sucesso." },
       );
     },
-    [eventId, processDownload]
+    [eventId, processDownload],
   );
 
   return { downloadEtiqueta, downloadEtiquetas, isDownloadingEtiqueta };

@@ -16,6 +16,7 @@ export default function GuestInscriptionPage() {
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const hasAutoScrolledRef = useRef(false);
+  const persistKey = "guest_inscription_persist";
 
   if (!eventId) {
     return null;
@@ -36,6 +37,22 @@ export default function GuestInscriptionPage() {
       if (cached?.eventId === eventId && cached.confirmationCode) {
         setConfirmationCode(cached.confirmationCode);
         return;
+      }
+
+      const persistedRaw = window.localStorage.getItem(persistKey);
+      if (persistedRaw) {
+        try {
+          const persisted = JSON.parse(persistedRaw) as {
+            eventId?: string;
+            confirmationCode?: string;
+          };
+          if (persisted?.eventId === eventId && persisted.confirmationCode) {
+            setConfirmationCode(persisted.confirmationCode);
+            return;
+          }
+        } catch {
+          window.localStorage.removeItem(persistKey);
+        }
       }
 
       setConfirmationCode(null);
