@@ -33,24 +33,51 @@ export type ReportGeneralResponse = {
   startDate: Date;
   endDate: Date;
   image: string;
+  logo?: string;
   totalInscriptions: number;
   countTypeInscription: number;
   countParticipants: number;
   totalValue: number;
   totalDebt: number;
-  typeInscription: TypeInscription;
+
+  typeInscriptions: TypeInscription;
+  inscriptions: Inscription[];
+  guestInscriptions: GuestInscription[];
   inscriptionAvuls: InscriptionAvuls;
   ticketSale: TicketSale;
   expenses: ExpensesReport;
+  gastos: ExpensesReport;
 };
 
 export type TypeInscription = {
   id: string;
   description: string;
   amount: number;
+}[];
+
+type Inscription = {
   countParticipants: number;
   totalValue: number;
-}[];
+  byPaymentMethod: InscriptionPaymentMethodReport[];
+};
+
+type GuestInscription = {
+  countParticipants: number;
+  totalValue: number;
+  byPaymentMethod: GuestInscriptionPaymentMethodReport[];
+};
+
+type GuestInscriptionPaymentMethodReport = {
+  paymentMethod: PaymentMethod;
+  countParticipants: number;
+  totalValue: number;
+};
+
+type InscriptionPaymentMethodReport = {
+  paymentMethod: PaymentMethod;
+  countParticipants: number;
+  totalValue: number;
+};
 
 export type InscriptionAvuls = {
   countParticipants: number;
