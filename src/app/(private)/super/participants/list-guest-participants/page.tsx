@@ -10,7 +10,7 @@ import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SelectedEventAdminPage() {
+export default function SelectedEventSuperPage() {
   const router = useRouter();
   const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
   const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
@@ -19,15 +19,15 @@ export default function SelectedEventAdminPage() {
       initialPage: 1,
       pageSize: 8,
       status: appliedFilter.length > 0 ? appliedFilter : undefined,
-      guest: false,
+      guest: true,
     });
 
   const handleBack = () => {
-    router.push("/admin/home");
+    router.push("/super/home");
   };
 
   const handleViewEvent = (eventId: string) => {
-    router.push(`/admin/participants/list-participants/${eventId}`);
+    router.push(`/super/participants/list-guest-participants/${eventId}`);
   };
 
   const handleStatusChange = (value: StatusEvent[]) => {
@@ -129,7 +129,7 @@ export default function SelectedEventAdminPage() {
   return (
     <PageContainer
       title="Selecionar Evento"
-      description="Escolha um evento para visualizar os participantes"
+      description="Escolha um evento para visualizar os participantes não vinculados"
       showBackButton
       backButtonAction={handleBack}
     >

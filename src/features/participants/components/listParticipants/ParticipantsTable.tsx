@@ -1,7 +1,7 @@
 "use client";
 
-import { useDownloadEtiqueta } from "@/features/participants/hooks/useDownloadEtiqueta";
-import { useDownloadParticipantsPdf } from "@/features/participants/hooks/useDownloadParticipantsPdf";
+import { useDownloadEtiqueta } from "@/features/participants/hooks/listParticipants/useDownloadEtiqueta";
+import { useDownloadParticipantsPdf } from "@/features/participants/hooks/listParticipants/useDownloadParticipantsPdf";
 import { Button } from "@/shared/components/ui/button";
 import {
   Card,
@@ -22,7 +22,7 @@ import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { Download, User, UserPlus, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Account } from "../../events/types/checkout/checkoutTypes";
+import { Account } from "../../../events/types/checkout/checkoutTypes";
 
 interface ParticipantsTableProps {
   eventId: string;

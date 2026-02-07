@@ -34,7 +34,7 @@ export default function ListPaymentAdminPage() {
 
   const handleDetails = (paymentsInscriptionId: string) => {
     router.push(
-      `/admin/payments/list-payments/${eventId}/details/${paymentsInscriptionId}`
+      `/admin/payments/list-payments/${eventId}/details/${paymentsInscriptionId}`,
     );
   };
 

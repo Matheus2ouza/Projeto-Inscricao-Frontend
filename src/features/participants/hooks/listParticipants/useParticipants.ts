@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   UseParticipantsParams,
   UseParticipantsResult,
-} from "../../events/types/checkout/checkoutTypes";
+} from "../../../events/types/checkout/checkoutTypes";
 import {
   useParticipantsQuery,
   usePrefetchParticipants,

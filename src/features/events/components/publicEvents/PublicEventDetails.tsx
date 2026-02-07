@@ -39,9 +39,15 @@ export default function PublicEventDetails({
     const cached = getWithExpiry<{
       eventId: string;
       confirmationCode: string;
+      thereIsPayment?: boolean;
     }>("guest_inscription");
 
-    if (!cached || cached.eventId !== event.id || !cached.confirmationCode) {
+    if (
+      !cached ||
+      cached.eventId !== event.id ||
+      !cached.confirmationCode ||
+      cached.thereIsPayment
+    ) {
       setAlreadyDialogOpen(false);
       return;
     }

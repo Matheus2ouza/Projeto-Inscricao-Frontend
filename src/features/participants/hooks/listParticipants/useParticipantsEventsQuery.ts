@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FindAllToParticipantsResponse } from "../../events/types/checkout/checkoutTypes";
-import { getEvents } from "../api/getEvents";
+import { FindAllToParticipantsResponse } from "../../../events/types/checkout/checkoutTypes";
+import { getEvents } from "../../api/getEvents";
 
 // Chaves de query para organização - específicas para participantes
 export const participantsEventsKeys = {
@@ -14,7 +14,7 @@ export const participantsEventsKeys = {
 
 export function useParticipantsEventsQuery(
   page: number = 1,
-  pageSize: number = 8
+  pageSize: number = 8,
 ) {
   return useQuery<FindAllToParticipantsResponse>({
     queryKey: participantsEventsKeys.list(page, pageSize),

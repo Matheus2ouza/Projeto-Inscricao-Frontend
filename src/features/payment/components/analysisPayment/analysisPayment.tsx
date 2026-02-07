@@ -181,7 +181,11 @@ export default function AnalysisPaymentTable({
             {payments.map((payment, idx) => (
               <div
                 key={payment.id}
-                className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                className={`p-4 border rounded-lg hover:bg-muted/30 transition-colors ${
+                  payment.isGuest
+                    ? "border-amber-200 dark:border-amber-900/40"
+                    : ""
+                }`}
               >
                 {/* Primeira linha: Número e Status */}
                 <div className="flex items-center justify-between mb-3">
@@ -202,7 +206,15 @@ export default function AnalysisPaymentTable({
                 <div className="mb-3">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
-                    <p className="font-medium">{payment.responsible}</p>
+                    <p className="font-medium">{payment.responsible || "-"}</p>
+                    {payment.isGuest && (
+                      <Badge
+                        variant="secondary"
+                        className="h-5 px-2 text-[10px]"
+                      >
+                        Convidado
+                      </Badge>
+                    )}
                   </div>
                 </div>
 
@@ -278,14 +290,29 @@ export default function AnalysisPaymentTable({
               </TableRow>
             ) : (
               payments.map((payment, idx) => (
-                <TableRow key={payment.id} className="hover:bg-muted/50">
+                <TableRow
+                  key={payment.id}
+                  className={`hover:bg-muted/50 ${
+                    payment.isGuest ? "bg-amber-50/40 dark:bg-amber-900/10" : ""
+                  }`}
+                >
                   <TableCell className="font-medium">
                     {calculateGlobalIndex(idx, page, pageSize)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      {payment.responsible}
+                      <span className="truncate">
+                        {payment.responsible || "-"}
+                      </span>
+                      {payment.isGuest && (
+                        <Badge
+                          variant="secondary"
+                          className="h-5 px-2 text-[10px]"
+                        >
+                          N/ Associado
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>

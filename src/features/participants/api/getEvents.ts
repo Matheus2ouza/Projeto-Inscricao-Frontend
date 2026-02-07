@@ -1,19 +1,25 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { FindAllToParticipantsResponse } from "../../events/types/checkout/checkoutTypes";
+import qs from "qs";
+import { getEventsResponse, StatusEvent } from "../types/selectEvent";
 
-export async function getEvents(
-  page: number,
-  pageSize: number
-): Promise<FindAllToParticipantsResponse> {
+export async function getEvents(params: {
+  page: number;
+  pageSize: number;
+  status?: StatusEvent[];
+  guest?: boolean;
+}): Promise<getEventsResponse> {
   try {
-    const { data } = await axiosInstance.get<FindAllToParticipantsResponse>(
-      `/events/participants`,
+    const { data } = await axiosInstance.get<getEventsResponse>(
+      "/events/participants",
       {
         params: {
-          page,
-          pageSize,
+          page: params.page,
+          pageSize: params.pageSize,
+          status: params.status,
+          guest: params.guest,
         },
-      }
+        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+      },
     );
     return data;
   } catch (error) {
@@ -25,7 +31,7 @@ export async function getEvents(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os eventos."
+        "Não foi possível carregar os eventos.",
     );
   }
 }

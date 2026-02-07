@@ -151,6 +151,7 @@ export function useFormCreateGuestInscription({
           {
             eventId,
             confirmationCode: response.confirmationCode,
+            thereIsPayment: false,
           },
           30 * 60 * 1000,
         );

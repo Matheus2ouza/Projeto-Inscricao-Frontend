@@ -1,7 +1,7 @@
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { downloadParticipantsPdf } from "@/features/inscriptions/api/downloadParticipantsPdf";
 import { useUpdateInscription } from "@/features/inscriptions/hooks/useEditInscription";
-import { useParticipantActions } from "@/features/participants/hooks/useParticipantActions";
+import { useParticipantActions } from "@/features/participants/hooks/listParticipants/useParticipantActions";
 import RegisterPaymentDialog from "@/features/payments/components/RegisterPaymentDialog";
 import {
   ComboboxTypeInscription,

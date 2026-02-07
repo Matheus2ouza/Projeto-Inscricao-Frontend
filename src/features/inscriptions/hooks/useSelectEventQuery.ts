@@ -16,7 +16,7 @@ export const analysisEventsKeys = {
 export function useAnalysisEventsQuery(
   page: number = 1,
   pageSize: number = 8,
-  status?: StatusEvent[]
+  status?: StatusEvent[],
 ) {
   return useQuery({
     queryKey: analysisEventsKeys.list(page, pageSize, status),
@@ -42,7 +42,7 @@ export function useInvalidateAnalysisEvents() {
       queryClient.invalidateQueries({ queryKey: analysisEventsKeys.lists() });
       queryClient.invalidateQueries({
         queryKey: analysisInscriptionsKeys.all,
-        predicate: (query) => query.queryKey.includes("events")
+        predicate: (query) => query.queryKey.includes("events"),
       });
     },
     invalidateDetail: (id: string) =>
@@ -60,14 +60,10 @@ export function usePrefetchAnalysisEvents() {
     prefetchNextPage: (
       currentPage: number,
       pageSize: number,
-      status?: StatusEvent[]
+      status?: StatusEvent[],
     ) => {
       queryClient.prefetchQuery({
-        queryKey: analysisEventsKeys.list(
-          currentPage + 1,
-          pageSize,
-          status
-        ),
+        queryKey: analysisEventsKeys.list(currentPage + 1, pageSize, status),
         queryFn: () =>
           getEventsToAnalysis({
             page: currentPage + 1,

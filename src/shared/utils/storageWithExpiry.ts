@@ -4,13 +4,20 @@
  * @param value - Value to store
  * @param ttlMs - Time to live in milliseconds
  */
-export function setWithExpiry(key: string, value: unknown, ttlMs: number) {
+export function setWithExpiry(
+  key: string,
+  value: unknown,
+  ttlMs?: number | null,
+) {
   const now = Date.now();
 
-  const item = {
-    value,
-    expiresAt: now + ttlMs,
-  };
+  const item =
+    ttlMs == null
+      ? { value }
+      : {
+          value,
+          expiresAt: now + ttlMs,
+        };
 
   localStorage.setItem(key, JSON.stringify(item));
 }
@@ -23,12 +30,19 @@ export function getWithExpiry<T>(key: string): T | null {
   const itemStr = localStorage.getItem(key);
   if (!itemStr) return null;
 
-  const item = JSON.parse(itemStr);
-
-  if (Date.now() > item.expiresAt) {
+  let item: unknown;
+  try {
+    item = JSON.parse(itemStr);
+  } catch {
     localStorage.removeItem(key);
     return null;
   }
 
-  return item.value as T;
+  const expiresAt = (item as { expiresAt?: unknown }).expiresAt;
+  if (typeof expiresAt === "number" && Date.now() > expiresAt) {
+    localStorage.removeItem(key);
+    return null;
+  }
+
+  return (item as { value?: unknown }).value as T;
 }

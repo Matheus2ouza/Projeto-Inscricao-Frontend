@@ -1,7 +1,7 @@
 import {
   downloadAllParticipantsPdf,
   downloadParticipantsPdf,
-} from "@/features/participants/api/downloadParticipantsPdf";
+} from "@/features/participants/api/listParticipants/downloadParticipantsPdf";
 import { Dispatch, SetStateAction, useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,16 +13,18 @@ const DEFAULT_ERROR_MESSAGE =
   "Não foi possível gerar o PDF dos participantes. Tente novamente.";
 
 function extractPayload(
-  response: {
-    data?: {
-      pdfBase64?: string;
-      filename?: string;
-      message?: string;
-    };
-    pdfBase64?: string;
-    filename?: string;
-    message?: string;
-  } | undefined
+  response:
+    | {
+        data?: {
+          pdfBase64?: string;
+          filename?: string;
+          message?: string;
+        };
+        pdfBase64?: string;
+        filename?: string;
+        message?: string;
+      }
+    | undefined,
 ) {
   return response?.data ?? response;
 }
@@ -49,7 +51,7 @@ function downloadPdf(pdfBase64: string, filename: string) {
 
 export function useDownloadParticipantsPdf(
   eventId: string,
-  options?: UseDownloadParticipantsPdfOptions
+  options?: UseDownloadParticipantsPdfOptions,
 ) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
@@ -59,18 +61,18 @@ export function useDownloadParticipantsPdf(
     async (
       fetchPdf: () => Promise<
         | {
-          data?: {
+            data?: {
+              pdfBase64?: string;
+              filename?: string;
+              message?: string;
+            };
             pdfBase64?: string;
             filename?: string;
             message?: string;
-          };
-          pdfBase64?: string;
-          filename?: string;
-          message?: string;
-        }
+          }
         | undefined
       >,
-      setGenerating: Dispatch<SetStateAction<boolean>>
+      setGenerating: Dispatch<SetStateAction<boolean>>,
     ) => {
       if (!eventId) {
         toast.error("Evento não encontrado.");
@@ -88,7 +90,7 @@ export function useDownloadParticipantsPdf(
 
         if (!pdfBase64) {
           throw new Error(
-            payload?.message ?? "O servidor não retornou o arquivo PDF."
+            payload?.message ?? "O servidor não retornou o arquivo PDF.",
           );
         }
 
@@ -104,7 +106,7 @@ export function useDownloadParticipantsPdf(
         setGenerating(false);
       }
     },
-    [eventId, onSuccess]
+    [eventId, onSuccess],
   );
 
   const generateSelectedPdf = useCallback(
@@ -116,18 +118,21 @@ export function useDownloadParticipantsPdf(
 
       await processDownload(
         () => downloadParticipantsPdf({ eventId, accountsId, genders }),
-        setIsGenerating
+        setIsGenerating,
       );
     },
-    [eventId, processDownload]
+    [eventId, processDownload],
   );
 
-  const generateAllPdf = useCallback(async (genders?: string[]) => {
-    await processDownload(
-      () => downloadAllParticipantsPdf({ eventId, genders }),
-      setIsGeneratingAll
-    );
-  }, [eventId, processDownload]);
+  const generateAllPdf = useCallback(
+    async (genders?: string[]) => {
+      await processDownload(
+        () => downloadAllParticipantsPdf({ eventId, genders }),
+        setIsGeneratingAll,
+      );
+    },
+    [eventId, processDownload],
+  );
 
   return {
     generateSelectedPdf,

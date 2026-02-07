@@ -1,14 +1,14 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { UpdateParticipantInput } from "../../events/types/checkout/checkoutTypes";
+import { UpdateParticipantInput } from "../../../events/types/checkout/checkoutTypes";
 
 export async function updateParticipant(
   participantId: string,
-  input: UpdateParticipantInput
+  input: UpdateParticipantInput,
 ) {
   try {
     const { data } = await axiosInstance.put(
       `/participants/${participantId}/update`,
-      input
+      input,
     );
     return data;
   } catch (error) {
@@ -20,7 +20,7 @@ export async function updateParticipant(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível atualizar o participante"
+        "Não foi possível atualizar o participante",
     );
   }
 }

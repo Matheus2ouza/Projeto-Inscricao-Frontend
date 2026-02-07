@@ -19,7 +19,7 @@ export default function SelectedEventAdminPage() {
       initialPage: 1,
       pageSize: 8,
       status: appliedFilter.length > 0 ? appliedFilter : undefined,
-      guest: false,
+      guest: true,
     });
 
   const handleBack = () => {
@@ -27,7 +27,7 @@ export default function SelectedEventAdminPage() {
   };
 
   const handleViewEvent = (eventId: string) => {
-    router.push(`/admin/participants/list-participants/${eventId}`);
+    router.push(`/admin/participants/list-guest-participants/${eventId}`);
   };
 
   const handleStatusChange = (value: StatusEvent[]) => {
@@ -129,7 +129,7 @@ export default function SelectedEventAdminPage() {
   return (
     <PageContainer
       title="Selecionar Evento"
-      description="Escolha um evento para visualizar os participantes"
+      description="Escolha um evento para visualizar os participantes não vinculados"
       showBackButton
       backButtonAction={handleBack}
     >

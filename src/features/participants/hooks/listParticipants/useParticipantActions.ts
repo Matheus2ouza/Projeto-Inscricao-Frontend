@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { inscriptionDetailsKeys } from "@/features/inscriptions/hooks/useInscriptionDetails";
-import { deleteParticipant } from "@/features/participants/api/deleteParticipant";
-import { updateParticipant } from "@/features/participants/api/updateParticipant";
+import { deleteParticipant } from "@/features/participants/api/listParticipants/deleteParticipant";
+import { updateParticipant } from "@/features/participants/api/listParticipants/updateParticipant";
 import {
   UpdateParticipantFormInputs,
   UpdateParticipantSchema,
@@ -112,7 +112,7 @@ export function useParticipantActions({
   });
 
   const handleSubmit = form.handleSubmit((values) =>
-    updateMutation.mutate(values)
+    updateMutation.mutate(values),
   );
 
   const handleDelete = async () => {
