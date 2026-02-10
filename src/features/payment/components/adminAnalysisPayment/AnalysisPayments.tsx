@@ -38,7 +38,7 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 
-interface AnalysisPaymentProps {
+interface AnalysisPaymentsProps {
   event?: Event;
   payments: Payment[];
   total: number;
@@ -49,7 +49,7 @@ interface AnalysisPaymentProps {
   onViewDetail: (paymentId: string) => void;
 }
 
-export default function AnalysisPayment({
+export default function AnalysisPayments({
   event,
   payments,
   total,
@@ -58,7 +58,7 @@ export default function AnalysisPayment({
   pageSize,
   onPageChange,
   onViewDetail,
-}: AnalysisPaymentProps) {
+}: AnalysisPaymentsProps) {
   const [imageError, setImageError] = useState(false);
 
   if (!event) {

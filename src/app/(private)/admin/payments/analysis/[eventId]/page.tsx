@@ -1,6 +1,6 @@
 "use client";
 
-import AnalysisPayment from "@/features/payment/components/analysisPayment/AnalysisPayment";
+import AnalysisPayments from "@/features/payment/components/adminAnalysisPayment/AnalysisPayments";
 import { useAnalysisPayment } from "@/features/payment/hooks/analysisPayment/analysisPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
@@ -68,7 +68,7 @@ export default function AnalysisPaymentAdminPage() {
     }
 
     return (
-      <AnalysisPayment
+      <AnalysisPayments
         event={event}
         payments={payments}
         total={total}
