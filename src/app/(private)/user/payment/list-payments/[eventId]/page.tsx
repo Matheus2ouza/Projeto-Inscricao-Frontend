@@ -1,6 +1,6 @@
 "use client";
 
-import ListPaymentsTable from "@/features/payment/components/listPayment/ListPayments";
+import ListPaymentsTable from "../../../../../../features/payment/components/listPayment/ListPayments";
 import { useListPayment } from "@/features/payment/hooks/listPayment/useListPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";

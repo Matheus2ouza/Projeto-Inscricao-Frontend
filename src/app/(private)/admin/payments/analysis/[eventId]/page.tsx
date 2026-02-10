@@ -1,11 +1,11 @@
 "use client";
 
-import AnalysisPaymentTable from "@/features/payment/components/analysisPayment/AnalysisPayment";
 import { useAnalysisPayment } from "@/features/payment/hooks/analysisPayment/analysisPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
+import AnalysisPaymentTable from "../../../../../../features/payment/components/analysisPayment/AnalysisPayment";
 
 const PAGE_SIZE = 10;
 export default function AnalysisPaymentAdminPage() {
