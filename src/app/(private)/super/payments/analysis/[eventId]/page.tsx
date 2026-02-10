@@ -1,6 +1,6 @@
 "use client";
 
-import AnalysisPaymentTable from "../../../../../../features/payment/components/analysisPayment/AnalysisPayment";
+import AnalysisPayment from "@/features/payment/components/analysisPayment/AnalysisPayment";
 import { useAnalysisPayment } from "@/features/payment/hooks/analysisPayment/analysisPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
@@ -70,7 +70,7 @@ export default function AnalysisPaymentSuperPage() {
     }
 
     return (
-      <AnalysisPaymentTable
+      <AnalysisPayment
         event={event}
         payments={payments}
         total={total}

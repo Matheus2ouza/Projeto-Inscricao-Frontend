@@ -38,7 +38,7 @@ import { ptBR } from "date-fns/locale";
 import { Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-type ListPaymentsTableProps = {
+type ListPaymentsProps = {
   payments: Payment[];
   summary: PaymentsSummary;
   total: number;
@@ -50,7 +50,7 @@ type ListPaymentsTableProps = {
   pageSize?: number;
 };
 
-export default function ListPaymentsTable({
+export default function ListPayments({
   payments,
   summary,
   total,
@@ -60,7 +60,7 @@ export default function ListPaymentsTable({
   onViewPayment,
   onViewInscription,
   pageSize = 10,
-}: ListPaymentsTableProps) {
+}: ListPaymentsProps) {
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);

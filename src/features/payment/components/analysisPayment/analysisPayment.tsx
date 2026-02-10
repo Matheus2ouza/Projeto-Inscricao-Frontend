@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Event,
   Payment,
@@ -51,7 +49,7 @@ interface AnalysisPaymentProps {
   onViewDetail: (paymentId: string) => void;
 }
 
-export default function AnalysisPaymentTable({
+export default function AnalysisPayment({
   event,
   payments,
   total,
