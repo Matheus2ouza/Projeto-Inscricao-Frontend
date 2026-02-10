@@ -1,6 +1,5 @@
 "use client";
 
-import { StatusEvent } from "@/features/inscriptions/types/selectEvent";
 import { Button } from "@/shared/components/ui/button";
 import {
   Command,
@@ -17,6 +16,8 @@ import {
 import { cn } from "@/shared/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import React from "react";
+
+type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
 
 export type EventStatusOption = {
   value: StatusEvent;
@@ -98,7 +99,7 @@ export default function EventStatusFilter({
                     <Check
                       className={cn(
                         "ml-auto h-4 w-4 text-blue-600 transition-opacity",
-                        isSelected ? "opacity-100" : "opacity-0"
+                        isSelected ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>

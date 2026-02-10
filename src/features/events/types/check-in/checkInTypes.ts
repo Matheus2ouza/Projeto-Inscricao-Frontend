@@ -1,8 +1,7 @@
-import type {
+import {
   InscriptionStatus,
   StatusPayment,
-} from "@/features/payments/types/paymentsDetails.types";
-
+} from "@/features/events/api/check-in/details/getCheckInAccountDetails";
 export type CheckInAccount = {
   id: string;
   username: string;

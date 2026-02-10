@@ -156,7 +156,7 @@ export default function PublicEventDetails({
 
   const gradientClass = getGradientClass(event.name);
   const subscriptionStatus = getSubscriptionStatus();
-  const shouldShowImage = Boolean(event.imageUrl && !imageFailed);
+  const shouldShowImage = Boolean(event.image && !imageFailed);
 
   return (
     <div className="space-y-6">
@@ -183,7 +183,7 @@ export default function PublicEventDetails({
               </div>
             )}
             <Image
-              src={event.imageUrl as string}
+              src={event.image as string}
               alt={event.name}
               fill
               priority

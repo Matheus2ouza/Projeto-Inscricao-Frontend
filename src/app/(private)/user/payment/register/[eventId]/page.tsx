@@ -1,7 +1,7 @@
 "use client";
 
 import RegisterPaymentTable from "@/features/payment/components/registerPayment/RegisterPayment";
-import { useListPaymentPending } from "@/features/payment/hook/registerPayment/useListPaymentPending";
+import { useListPaymentPending } from "@/features/payment/hooks/registerPayment/useListPaymentPending";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";

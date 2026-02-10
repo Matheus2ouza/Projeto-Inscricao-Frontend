@@ -1,7 +1,7 @@
 "use client";
 
-import AnalysisPaymentTable from "@/features/payment/components/analysisPayment/analysisPayment";
-import { useAnalysisPayment } from "@/features/payment/hook/analysisPayment/analysisPayment";
+import AnalysisPaymentTable from "@/features/payment/components/analysisPayment/AnalysisPayment";
+import { useAnalysisPayment } from "@/features/payment/hooks/analysisPayment/analysisPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";

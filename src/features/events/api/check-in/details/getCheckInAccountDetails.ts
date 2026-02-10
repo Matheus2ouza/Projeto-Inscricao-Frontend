@@ -1,5 +1,4 @@
 import type { FindAccountsDetailsResponse } from "@/features/events/types/check-in/checkInTypes";
-import type { InscriptionStatus, StatusPayment } from "@/features/payments/types/paymentsDetails.types";
 import axiosInstance from "@/shared/lib/apiClient";
 
 type RawPaymentInscription = {
@@ -8,6 +7,12 @@ type RawPaymentInscription = {
   image: string;
   createdAt: string;
 };
+
+export enum StatusPayment {
+  APPROVED = "APROVADO",
+  UNDER_REVIEW = "EM ANALISE",
+  REFUSED = "REJEITADO",
+}
 
 type RawParticipant = {
   name: string;
@@ -28,6 +33,13 @@ type RawInscription = {
   paymentInscription: RawPaymentInscription[];
 };
 
+export enum InscriptionStatus {
+  PENDING = "PENDENTE",
+  UNDER_REVIEW = "EM ANALISE",
+  PAID = "PAGO",
+  CANCELLED = "CANCELADO",
+}
+
 type FindAccountsDetailsApiResponse = Omit<
   FindAccountsDetailsResponse,
   "inscriptions"
@@ -36,7 +48,7 @@ type FindAccountsDetailsApiResponse = Omit<
 };
 
 const normalizeInscription = (
-  inscription: RawInscription
+  inscription: RawInscription,
 ): FindAccountsDetailsResponse["inscriptions"][number] => ({
   ...inscription,
   createdAt: new Date(inscription.createdAt),
@@ -52,13 +64,12 @@ const normalizeInscription = (
 
 export async function getCheckInAccountDetails(
   eventId: string,
-  accountId: string
+  accountId: string,
 ) {
   try {
-    const { data } =
-      await axiosInstance.get<FindAccountsDetailsApiResponse>(
-        `/events/${eventId}/check-in/accounts/${accountId}/details`
-      );
+    const { data } = await axiosInstance.get<FindAccountsDetailsApiResponse>(
+      `/events/${eventId}/check-in/accounts/${accountId}/details`,
+    );
     const normalizedData: FindAccountsDetailsResponse = {
       ...data,
       inscriptions: data.inscriptions.map(normalizeInscription),
@@ -71,8 +82,8 @@ export async function getCheckInAccountDetails(
     };
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível carregar os detalhes da conta"
+        axiosError.message ??
+        "Não foi possível carregar os detalhes da conta",
     );
   }
 }

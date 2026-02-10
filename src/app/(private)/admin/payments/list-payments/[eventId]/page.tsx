@@ -1,29 +1,35 @@
 "use client";
 
-import PaymentsListTable from "@/features/payments/components/PaymentsListTable";
-import { usePaymentsList } from "@/features/payments/hooks/usePaymentsList";
+import PaymentListTable from "@/features/payment/components/adminListPaymant/PaymentListTable";
+import { usePaymentList } from "@/features/payment/hooks/adminListPaymants/usePaymentList";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { AlertTriangle } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
-export default function ListPaymentAdminPage() {
+export default function PaymentListAdminPage() {
   const params = useParams();
   const router = useRouter();
-  const eventId = params?.eventId as string;
+  const rawEventId = params.eventId;
+  const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
+
+  if (!eventId) {
+    return null;
+  }
 
   const {
-    groups,
-    totalDates,
+    summary,
+    payments,
+    total,
     page,
     pageCount,
     loading,
     error,
     setPage,
     refetch,
-  } = usePaymentsList({
-    eventId: eventId || "",
+  } = usePaymentList({
+    eventId: eventId,
     initialPage: 1,
     pageSize: 12,
   });
@@ -32,64 +38,32 @@ export default function ListPaymentAdminPage() {
     router.push("/admin/payments/list-payments");
   };
 
-  const handleDetails = (paymentsInscriptionId: string) => {
+  const handleDetails = (paymentId: string) => {
     router.push(
-      `/admin/payments/list-payments/${eventId}/details/${paymentsInscriptionId}`,
+      `/admin/payments/list-payments/${eventId}/details/${paymentId}`,
     );
   };
 
-  if (!eventId) {
+  const renderSkeletonGrid = () => {
     return (
-      <PageContainer
-        title="Pagamentos por inscrição"
-        description="Selecione um evento para visualizar os pagamentos associados"
-        backButtonAction={handleBack}
-      >
-        <div className="flex min-h-96 items-center justify-center text-center">
-          <div className="space-y-2 max-w-sm">
-            <AlertTriangle className="mx-auto h-8 w-8 text-amber-500" />
-            <p className="text-lg font-medium text-foreground">
-              Nenhum evento selecionado
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Utilize a tela anterior para escolher o evento que deseja
-              consultar.
-            </p>
-            <Button onClick={handleBack} className="mt-4">
-              Voltar para seleção
-            </Button>
-          </div>
+      <div className="space-y-4">
+        <Skeleton className="h-24 w-full" />
+        <div className="space-y-2 rounded-xl border p-6">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Skeleton key={index} className="h-10 w-full" />
+          ))}
         </div>
-      </PageContainer>
+      </div>
     );
-  }
+  };
 
-  if (loading) {
-    return (
-      <PageContainer
-        title="Pagamentos por inscrição"
-        description="Acompanhe os comprovantes enviados para o evento"
-        backButtonAction={handleBack}
-      >
-        <div className="space-y-4">
-          <Skeleton className="h-24 w-full" />
-          <div className="space-y-2 rounded-xl border p-6">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <Skeleton key={index} className="h-10 w-full" />
-            ))}
-          </div>
-        </div>
-      </PageContainer>
-    );
-  }
+  const renderContent = () => {
+    if (loading) {
+      return renderSkeletonGrid();
+    }
 
-  if (error) {
-    return (
-      <PageContainer
-        title="Pagamentos por inscrição"
-        description="Acompanhe os comprovantes enviados para o evento"
-        backButtonAction={handleBack}
-      >
+    if (error) {
+      return (
         <div className="flex min-h-96 items-center justify-center text-center">
           <div className="space-y-4 max-w-sm">
             <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-950/40 flex items-center justify-center mx-auto">
@@ -104,24 +78,30 @@ export default function ListPaymentAdminPage() {
             <Button onClick={() => refetch()}>Tentar novamente</Button>
           </div>
         </div>
-      </PageContainer>
-    );
-  }
+      );
+    }
 
-  return (
-    <PageContainer
-      title="Pagamentos por Inscrição"
-      description="Acompanhe os comprovantes enviados para o evento"
-      backButtonAction={handleBack}
-    >
-      <PaymentsListTable
-        groups={groups}
-        totalDates={totalDates}
+    return (
+      <PaymentListTable
+        summary={summary}
+        payments={payments}
+        total={total}
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
         onViewDetails={handleDetails}
       />
+    );
+  };
+
+  return (
+    <PageContainer
+      title="Pagamentos por Inscrição"
+      description="Acompanhe os comprovantes enviados para o evento"
+      showBackButton={true}
+      backButtonAction={handleBack}
+    >
+      {renderContent()}
     </PageContainer>
   );
 }

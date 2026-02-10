@@ -3,7 +3,7 @@ export type Event = {
   name: string;
   startDate: string;
   endDate: string;
-  imageUrl: string;
+  image: string;
   regionName: string;
   location: string;
   latitude: number;

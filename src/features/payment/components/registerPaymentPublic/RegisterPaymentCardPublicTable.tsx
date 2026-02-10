@@ -1,4 +1,4 @@
-import useFormCreatePaymentCard from "@/features/payment/hook/registerPaymentDetails/useRegisterPaymentCard";
+import useFormCreatePaymentCard from "@/features/payment/hooks/registerPaymentDetails/useRegisterPaymentCard";
 import { Event } from "@/features/payment/types/registerPaymentPublic/registerPaymentPublicType";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";

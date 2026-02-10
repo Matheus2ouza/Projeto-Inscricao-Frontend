@@ -1,7 +1,7 @@
 "use client";
 
-import AnalysisPaymentTable from "@/features/payment/components/analysisPayment/analysisPayment";
-import { useAnalysisPayment } from "@/features/payment/hook/analysisPayment/analysisPayment";
+import AnalysisPaymentTable from "@/features/payment/components/analysisPayment/AnalysisPayment";
+import { useAnalysisPayment } from "@/features/payment/hooks/analysisPayment/analysisPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -25,8 +25,6 @@ export default function AnalysisPaymentAdminPage() {
     page,
     pageCount,
     loading,
-    fetching,
-    fetched,
     error,
     setPage,
     refresh,
@@ -88,7 +86,7 @@ export default function AnalysisPaymentAdminPage() {
   };
 
   const handleBack = () => {
-    router.replace(`/admin/home`);
+    router.replace(`/admin/payments/analysis`);
   };
 
   return (

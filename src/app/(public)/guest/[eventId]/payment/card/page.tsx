@@ -1,7 +1,7 @@
 "use client";
 
 import RegisterPaymentCardDialog from "@/features/payment/components/registerPayment/RegisterPaymentCard";
-import useFormCreatePaymentCard from "@/features/payment/hook/registerPaymentDetails/useRegisterPaymentCard";
+import useFormCreatePaymentCard from "@/features/payment/hooks/registerPaymentDetails/useRegisterPaymentCard";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
@@ -61,9 +61,10 @@ export default function GuestRegisterPaymentCardPage() {
         totalValue={resolvedTotalValue}
         onCancel={handleBack}
         form={form}
-        onSubmitPayment={() =>
+        onSubmitPayment={(passCustomerToAsaas) =>
           onSubmit(eventId, resolvedTotalValue, inscriptionsIds, {
             isGuest: true,
+            passCustomerToAsaas,
           })
         }
       />

@@ -12,8 +12,11 @@ import { useState } from "react";
 
 export default function SelectedEventAdminPage() {
   const router = useRouter();
-  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
-  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
+  const defaultStatusFilter: StatusEvent[] = ["OPEN"];
+  const [pendingFilter, setPendingFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
   const { events, loading, error, page, pageCount, setPage } =
     useEventsForAnalysis({
       initialPage: 1,

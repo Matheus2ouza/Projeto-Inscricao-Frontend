@@ -1,7 +1,7 @@
 "use client";
 
 import type { Event } from "@/features/events/types/selectEvent";
-import SelectedEventForInscription from "@/features/inscriptions/components/SelectedEvent";
+import SelectedEventForPayment from "@/features/inscriptions/components/SelectedEvent";
 import { useEventsForAnalysis } from "@/features/inscriptions/hooks/useSelectEvent";
 import { StatusEvent } from "@/features/inscriptions/types/selectEvent";
 import PageContainer from "@/shared/components/layout/PageContainer";
@@ -11,8 +11,11 @@ import { useState } from "react";
 
 export default function SelectedEventForAnalysisInscriptionAdminPage() {
   const router = useRouter();
-  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
-  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
+  const defaultStatusFilter: StatusEvent[] = ["OPEN"];
+  const [pendingFilter, setPendingFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
   const { events, loading, error, page, pageCount, setPage } =
     useEventsForAnalysis({
       initialPage: 1,
@@ -86,7 +89,7 @@ export default function SelectedEventForAnalysisInscriptionAdminPage() {
     }
 
     return (
-      <SelectedEventForInscription
+      <SelectedEventForPayment
         events={events}
         page={page}
         pageCount={pageCount}

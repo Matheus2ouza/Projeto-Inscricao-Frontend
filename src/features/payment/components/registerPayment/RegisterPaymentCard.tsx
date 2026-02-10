@@ -1,5 +1,13 @@
 import type { RegisterPaymentCardSchema } from "@/features/payment/schema/registerPaymendCarcSchema";
 import { Button } from "@/shared/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
@@ -14,7 +22,7 @@ type RegisterPaymentCardDialogProps = {
   totalValue: number;
   onCancel: () => void;
   form: UseFormReturn<RegisterPaymentCardSchema>;
-  onSubmitPayment: () => Promise<{
+  onSubmitPayment: (passCustomerToAsaas: boolean) => Promise<{
     success: boolean;
     error?: string;
     redirectUrl?: string;
@@ -39,6 +47,8 @@ export default function RegisterPaymentCard({
   const [currentStep, setCurrentStep] = useState<Step>("dados-titular");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isCepLoading, setIsCepLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passCustomerDialogOpen, setPassCustomerDialogOpen] = useState(false);
 
   const [extraAddressDetails, setExtraAddressDetails] = useState({
     bairro: "",
@@ -237,19 +247,29 @@ export default function RegisterPaymentCard({
       return;
     }
 
-    const result = await onSubmitPayment();
+    setPassCustomerDialogOpen(true);
+  };
+
+  const handleSubmitPayment = async (passCustomerToAsaas: boolean) => {
+    setPassCustomerDialogOpen(false);
+    setIsSubmitting(true);
+
+    const result = await onSubmitPayment(passCustomerToAsaas);
     if (result.success) {
       if (result.redirectUrl) {
         window.location.assign(result.redirectUrl);
+        setIsSubmitting(false);
         return;
       }
       toast.error("Link de redirecionamento inválido.");
+      setIsSubmitting(false);
       return;
     }
 
     toast.error("Não foi possível registrar o pagamento no cartão", {
       description: result.error,
     });
+    setIsSubmitting(false);
   };
 
   return (
@@ -628,16 +648,51 @@ export default function RegisterPaymentCard({
                   type="button"
                   variant="outline"
                   onClick={handlePreviousStep}
+                  disabled={isSubmitting}
                 >
                   Voltar para dados
                 </Button>
-                <Button type="submit" disabled={isCepLoading}>
+                <Button type="submit" disabled={isCepLoading || isSubmitting}>
                   Seguir para pagamento
                 </Button>
               </>
             )}
           </div>
         </form>
+
+        <Dialog
+          open={passCustomerDialogOpen}
+          onOpenChange={(open) => {
+            if (isSubmitting) return;
+            setPassCustomerDialogOpen(open);
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Usar os dados?</DialogTitle>
+              <DialogDescription>
+                Deseja utilizar os dados informados também como dados do cartão?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isSubmitting}
+                onClick={() => handleSubmitPayment(false)}
+              >
+                Não
+              </Button>
+              <Button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => handleSubmitPayment(true)}
+              >
+                Sim
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

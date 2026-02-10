@@ -13,17 +13,13 @@ export const paymentDetailsKeys = {
 export function usePaymentDetailsQuery(
   inscriptionId: string,
   initialPage: number = 1,
-  pageSize: number = 3
+  pageSize: number = 3,
 ) {
   const [page, setPage] = useState(initialPage);
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: paymentDetailsKeys.detail(
-      inscriptionId,
-      page,
-      pageSize
-    ),
+    queryKey: paymentDetailsKeys.detail(inscriptionId, page, pageSize),
     queryFn: () =>
       getPaymentDetails(inscriptionId, {
         page,
@@ -56,14 +52,7 @@ export function usePaymentDetailsQuery(
         staleTime: 5 * 60 * 1000,
       });
     }
-  }, [
-    query.data,
-    page,
-    pageCount,
-    inscriptionId,
-    pageSize,
-    queryClient,
-  ]);
+  }, [query.data, page, pageCount, inscriptionId, pageSize, queryClient]);
 
   // Prefetch da página anterior se existir
   useEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import RegisterPaymentPix from "@/features/payment/components/registerPayment/RegisterPaymentPix";
-import { useGuestRegisterPayment } from "@/features/payment/hook/registerPayment/useGuestRegisterPayment";
+import { useGuestRegisterPayment } from "@/features/payment/hooks/registerPayment/useGuestRegisterPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 

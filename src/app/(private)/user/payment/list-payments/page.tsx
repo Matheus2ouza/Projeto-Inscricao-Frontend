@@ -1,19 +1,50 @@
 "use client";
 
 import ListEventsForPayment from "@/features/payment/components/ListEventsForPayment";
-import { useEventsForPayment } from "@/features/payment/hook/useEventsForPayment";
+import { useEventsForPayment } from "@/features/payment/hooks/useEventsForPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 export default function SelectEventForListPayments() {
   const router = useRouter();
+  const defaultStatusFilter: boolean[] = [true];
+  const [pendingFilter, setPendingFilter] =
+    useState<boolean[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<boolean[]>(defaultStatusFilter);
+  const wasClearedRef = useRef(false);
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
     useEventsForPayment({
       pageSize: 8,
+      paymentEnabled: appliedFilter.length > 0 ? appliedFilter : undefined,
     });
+
+  const handleStatusChange = (value: boolean[]) => {
+    setPendingFilter(value);
+  };
+
+  const handleApplyStatusFilter = () => {
+    setAppliedFilter(pendingFilter);
+    setPage(1);
+  };
+
+  const handleClearStatusFilter = () => {
+    wasClearedRef.current = true;
+    setPendingFilter([]);
+    setAppliedFilter([]);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    if (!wasClearedRef.current) return;
+    if (appliedFilter.length > 0) return;
+    wasClearedRef.current = false;
+    void refetch();
+  }, [appliedFilter.length, refetch]);
 
   const handleSelectEvent = (eventId: string) => {
     router.push(`/user/payment/list-payments/${eventId}`);
@@ -72,9 +103,13 @@ export default function SelectEventForListPayments() {
         events={events}
         total={total}
         page={page}
+        statusFilter={pendingFilter}
         pageCount={pageCount}
         setPage={setPage}
         onSelectEvent={handleSelectEvent}
+        onStatusFilterChange={handleStatusChange}
+        onApplyStatusFilter={handleApplyStatusFilter}
+        onClearStatusFilter={handleClearStatusFilter}
       />
     );
   };

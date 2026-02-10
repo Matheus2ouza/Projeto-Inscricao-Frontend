@@ -6,7 +6,7 @@ export async function getDetailsPayment(
 ): Promise<AnalysisPaymentsDetailsResponse> {
   try {
     const { data } = await axiosInstance.get<AnalysisPaymentsDetailsResponse>(
-      `/payments/${paymentId}/analysis-pending/details`,
+      `/payments/${paymentId}/details`,
     );
     return data;
   } catch (error) {

@@ -1,4 +1,8 @@
-import { useActionsPayments } from "@/features/payment/hook/listPayment/useActionsPayments";
+import { useActionsPayments } from "@/features/payment/hooks/listPayment/useActionsPayments";
+import {
+  Payment,
+  PaymentsSummary,
+} from "@/features/payment/types/listPayment/listPaymentTypes";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import ImageViewerDialog from "@/shared/components/ImageViewerDialog";
 import { Button } from "@/shared/components/ui/button";
@@ -25,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { formatDateTime } from "@/shared/utils/formatDate";
 import { getConvertStatusPayment } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
@@ -32,10 +37,6 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
-import {
-  Payment,
-  PaymentsSummary,
-} from "../../types/listPayment/listPaymentTypes";
 
 type ListPaymentsTableProps = {
   payments: Payment[];
@@ -45,6 +46,7 @@ type ListPaymentsTableProps = {
   pageCount: number;
   onPageChange: (page: number) => void;
   onViewPayment?: (payment: Payment) => void;
+  onViewInscription?: (inscriptionId: string) => void;
   pageSize?: number;
 };
 
@@ -56,18 +58,13 @@ export default function ListPaymentsTable({
   pageCount,
   onPageChange,
   onViewPayment,
+  onViewInscription,
   pageSize = 10,
 }: ListPaymentsTableProps) {
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const { handleDeletePayment, isDeleting } = useActionsPayments();
-
-  // Função auxiliar para formatar data
-  const formatDate = (date: Date | string) => {
-    if (!date) return "-";
-    return format(new Date(date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
-  };
 
   // Função para calcular o índice global
   const calculateGlobalIndex = (localIndex: number): number => {
@@ -249,7 +246,7 @@ export default function ListPaymentsTable({
                   {getFormatCurrency(payment.totalValue)}
                 </TableCell>
                 <TableCell className="font-medium align-middle">
-                  {formatDate(payment.createdAt)}
+                  {formatDateTime(payment.createdAt)}
                 </TableCell>
                 <TableCell className="align-middle">
                   <div className="flex justify-center gap-1">
@@ -416,7 +413,7 @@ export default function ListPaymentsTable({
                       Data e Hora
                     </span>
                     <p className="text-sm font-medium">
-                      {formatDate(selectedPayment.createdAt)}
+                      {formatDateTime(selectedPayment.createdAt)}
                     </p>
                   </div>
 
@@ -482,35 +479,55 @@ export default function ListPaymentsTable({
                   </span>
                   {selectedPayment.allocation &&
                   selectedPayment.allocation.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-2">
-                      {selectedPayment.allocation.map((alloc, index) => (
-                        <div
-                          key={alloc.inscriptionId}
-                          className="border rounded-md bg-muted/30 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                            <div className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold flex-shrink-0">
-                              {index + 1}
-                            </div>
-                            <div className="flex flex-col min-w-0 ml-2">
-                              <span className="text-xs font-medium">
-                                Inscrição
-                              </span>
-                              <span className="font-mono text-xs sm:text-sm truncate">
-                                {alloc.inscriptionId.substring(0, 12)}...
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end flex-shrink-0 ml-2">
-                            <span className="text-xs font-medium text-muted-foreground">
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[60px]">#</TableHead>
+                            <TableHead>Inscrição</TableHead>
+                            <TableHead className="w-[140px] text-right">
                               Valor
-                            </span>
-                            <span className="font-semibold text-green-600 dark:text-green-400 text-sm sm:text-base">
-                              {getFormatCurrency(alloc.value)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                            </TableHead>
+                            <TableHead className="w-[70px] text-center">
+                              Ação
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedPayment.allocation.map((alloc, index) => (
+                            <TableRow
+                              key={alloc.inscriptionId}
+                              className="hover:bg-muted/50"
+                            >
+                              <TableCell className="text-sm text-muted-foreground">
+                                {index + 1}
+                              </TableCell>
+                              <TableCell className="font-mono text-xs sm:text-sm">
+                                {alloc.inscriptionId}
+                              </TableCell>
+                              <TableCell className="text-right font-semibold text-green-600 dark:text-green-400">
+                                {getFormatCurrency(alloc.value)}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {onViewInscription && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                                    onClick={() =>
+                                      onViewInscription(alloc.inscriptionId)
+                                    }
+                                    title="Visualizar Inscrição"
+                                  >
+                                    <Eye className="h-5 w-5" />
+                                  </Button>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
                     </div>
                   ) : (
                     <div className="border rounded-md bg-muted/30 px-4 py-3 sm:py-4 flex items-center justify-center">
@@ -532,7 +549,7 @@ export default function ListPaymentsTable({
           onClose={() => setIsImageViewerOpen(false)}
           imageUrl={selectedPayment.imageUrl}
           title={`Comprovante do pagamento ${selectedPayment.id}`}
-          description={formatDate(selectedPayment.createdAt)}
+          description={formatDateTime(selectedPayment.createdAt)}
         />
       )}
     </div>
