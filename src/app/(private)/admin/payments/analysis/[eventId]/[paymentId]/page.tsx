@@ -1,7 +1,7 @@
 "use client";
-import DetailsPaymentTable from "@/features/payment/components/analysisPayment/detailsPayment";
-import { useAnalysisPaymentDetails } from "@/features/payment/hook/analysisPayment/analysisPaymentDetails";
-import { usePaymentActions } from "@/features/payment/hook/analysisPayment/usePaymentActions";
+import DetailsPaymentTable from "@/features/payment/components/adminDetailsPayment/DetailsPayment";
+import { useAnalysisPaymentDetails } from "@/features/payment/hooks/analysisPayment/analysisPaymentDetails";
+import { usePaymentActions } from "@/features/payment/hooks/analysisPayment/usePaymentActions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";

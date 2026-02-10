@@ -6,6 +6,7 @@ export type CreatePaymentInscriptiInput = {
   totalValue: number;
   client: Client;
   inscriptions: Inscription[];
+  passCustomerToAsaas?: boolean;
 };
 
 type Client = {

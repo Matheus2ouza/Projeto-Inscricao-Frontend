@@ -26,7 +26,9 @@ export default function EventInscriptionsAnalysisAdminPage() {
   };
 
   const handleViewInscription = (inscriptionId: string) => {
-    router.push(`/admin/inscriptions/analysis/inscription/${inscriptionId}`);
+    router.push(
+      `/admin/inscriptions/analysis/${eventId}/inscription/${inscriptionId}`,
+    );
   };
 
   return (

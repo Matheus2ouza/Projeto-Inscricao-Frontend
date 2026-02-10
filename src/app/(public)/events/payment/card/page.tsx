@@ -1,7 +1,7 @@
 "use client";
 
 import RegisterPaymentCardPublicTable from "@/features/payment/components/registerPaymentPublic/RegisterPaymentCardPublicTable";
-import { useRegisterPaymentPublic } from "@/features/payment/hook/registerPaymentPublic/useRegisterPaymentPublic";
+import { useRegisterPaymentPublic } from "@/features/payment/hooks/registerPaymentPublic/useRegisterPaymentPublic";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";

@@ -29,7 +29,7 @@ export function getConvertStatusInscription(status: string): string {
 export function getConvertStatusPayment(status: string): string {
   switch (status.toLowerCase()) {
     case "approved":
-      return "PAGO";
+      return "APROVADO";
     case "refused":
       return "RECUSADO";
     case "under_review":

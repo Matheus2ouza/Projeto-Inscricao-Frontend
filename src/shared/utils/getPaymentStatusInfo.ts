@@ -7,7 +7,7 @@ export function getPaymentStatusInfo(
 } {
   if (status === true || status === "true" || status === 1) {
     return {
-      label: "Pagamento Liberado",
+      label: "Pagamentos Liberados",
       badgeClass: "bg-green-500 text-white",
       disabled: false,
     };
@@ -15,7 +15,7 @@ export function getPaymentStatusInfo(
 
   if (status === false || status === "false" || status === 0) {
     return {
-      label: "Pagamento Bloqueado",
+      label: "Pagamentos Bloqueados",
       badgeClass: "bg-red-500 text-white",
       disabled: true,
     };

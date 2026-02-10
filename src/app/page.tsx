@@ -140,9 +140,9 @@ export default function Home() {
                           >
                             <CardContent className="p-0">
                               <div className="w-full h-48 relative overflow-hidden rounded-t-lg">
-                                {event.imageUrl ? (
+                                {event.image ? (
                                   <Image
-                                    src={event.imageUrl}
+                                    src={event.image}
                                     alt={event.name}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -213,9 +213,9 @@ export default function Home() {
                       >
                         <CardContent className="p-0">
                           <div className="w-full h-48 relative overflow-hidden rounded-t-lg">
-                            {event.imageUrl ? (
+                            {event.image ? (
                               <Image
-                                src={event.imageUrl}
+                                src={event.image}
                                 alt={event.name}
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

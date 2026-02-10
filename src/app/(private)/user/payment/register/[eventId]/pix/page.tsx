@@ -1,7 +1,7 @@
 "use client";
 
 import RegisterPaymentPix from "@/features/payment/components/registerPayment/RegisterPaymentPix";
-import { useRegisterPayment } from "@/features/payment/hook/registerPayment/useRegisterPayment";
+import { useRegisterPayment } from "@/features/payment/hooks/registerPayment/useRegisterPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { useCurrentUser } from "@/shared/context/user-context";

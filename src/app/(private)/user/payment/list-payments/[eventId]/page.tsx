@@ -1,7 +1,7 @@
 "use client";
 
-import ListPaymentsTable from "@/features/payment/components/listPayment/listPayments";
-import { useListPayment } from "@/features/payment/hook/listPayment/useListPayment";
+import ListPayments from "@/features/payment/components/userListPayment/ListPayments";
+import { useListPayment } from "@/features/payment/hooks/listPayment/useListPayment";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -55,6 +55,12 @@ export default function ListPaymentsPage() {
 
   const handleRegisterPayment = () => {
     router.push(`/user/payment/register/${eventId}`);
+  };
+
+  const handleViewInscription = (inscriptionId: string) => {
+    router.push(
+      `/user/inscription/my-inscriptions/${eventId}/${inscriptionId}`,
+    );
   };
 
   const renderContent = () => {
@@ -122,13 +128,14 @@ export default function ListPaymentsPage() {
     }
 
     return (
-      <ListPaymentsTable
+      <ListPayments
         summary={summary}
         payments={payments}
         total={total}
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
+        onViewInscription={handleViewInscription}
       />
     );
   };

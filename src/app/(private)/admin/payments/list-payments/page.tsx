@@ -1,35 +1,31 @@
 "use client";
 
-import SelectedEventForPayments from "@/features/payments/components/SelectEventForPayments";
-import { useSelectEvents } from "@/features/payments/hooks/useSelectEvents";
-import { Event, StatusEvent } from "@/features/payments/types/selectEvent";
+import ListEventsForPayment from "@/features/payment/components/ListEventsForPayment";
+import { useEventsForPayment } from "@/features/payment/hooks/useEventsForPayment";
+import { Event } from "@/features/payment/types/listEventsTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/shared/components/ui/button";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+import { Card, CardBody, CardFooter } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function SelectEventForListPaymentSuperPage() {
   const router = useRouter();
-  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
-  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
-  const { events, page, pageCount, setPage, loading, error } = useSelectEvents({
-    initialPage: 1,
-    pageSize: 8,
-    status: appliedFilter.length > 0 ? appliedFilter : undefined,
-  });
+  const defaultStatusFilter: boolean[] = [true];
+  const [pendingFilter, setPendingFilter] =
+    useState<boolean[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<boolean[]>(defaultStatusFilter);
+  const wasClearedRef = useRef(false);
+  const { events, total, page, pageCount, loading, error, setPage, refetch } =
+    useEventsForPayment({
+      pageSize: 8,
+      paymentEnabled: appliedFilter.length > 0 ? appliedFilter : undefined,
+    });
 
-  const getInfoRows = (event: Event) => [
-    {
-      label: "Total de Pagamentos",
-      value: event.totalPayments,
-    },
-    {
-      label: "Total em Debito",
-      value: event.totalDebt,
-    },
-  ];
-
-  const handleStatusChange = (value: StatusEvent[]) => {
+  const handleStatusChange = (value: boolean[]) => {
     setPendingFilter(value);
   };
 
@@ -38,13 +34,57 @@ export default function SelectEventForListPaymentSuperPage() {
     setPage(1);
   };
 
-  const renderSkeletonGrid = () => {
-    return (
-      <div className="flex justify-center items-center min-h-96">
-        <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
-      </div>
-    );
+  const handleClearStatusFilter = () => {
+    wasClearedRef.current = true;
+    setPendingFilter([]);
+    setAppliedFilter([]);
+    setPage(1);
   };
+
+  useEffect(() => {
+    if (!wasClearedRef.current) return;
+    if (appliedFilter.length > 0) return;
+    wasClearedRef.current = false;
+    void refetch();
+  }, [appliedFilter.length, refetch]);
+
+  const infoRows = (event: Event) => [
+    {
+      label: "Total de Pagamentos",
+      value: event?.totalPayments || 0,
+    },
+    {
+      label: "Valor Total",
+      value: getFormatCurrency(event?.amountCollected || 0),
+    },
+  ];
+  const handleSelectEvent = (eventId: string) => {
+    router.push(`/admin/payments/list-payments/${eventId}`);
+  };
+
+  const handleBack = () => {
+    router.push("/admin/home");
+  };
+
+  const renderSkeletonGrid = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <Card
+          key={index}
+          className="w-full border border-transparent shadow-md rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800"
+        >
+          <CardBody className="p-0">
+            <Skeleton className="w-full h-48 rounded-t-xl" />
+          </CardBody>
+          <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
 
   const renderContent = () => {
     if (loading) {
@@ -53,39 +93,39 @@ export default function SelectEventForListPaymentSuperPage() {
 
     if (error) {
       return (
-        <div className="flex justify-center items-center min-h-96">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-red-600 mb-2">
-              Erro ao carregar eventos
-            </h2>
-            <p className="text-gray-600">{error}</p>
+        <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
+          <div>
+            <p className="text-red-600 dark:text-red-400 font-semibold">
+              Não foi possível carregar os eventos.
+            </p>
+            <p className="text-muted-foreground mt-1 max-w-md">
+              {error || "Tente novamente em instantes."}
+            </p>
           </div>
+          <Button onClick={() => refetch()} variant="outline">
+            Tentar novamente
+          </Button>
         </div>
       );
     }
 
     return (
-      <SelectedEventForPayments
+      <ListEventsForPayment
+        buttonLabel="Visualizar Pagamentos"
         events={events}
-        buttonLabel="Visualizar Gastos"
+        total={total}
         page={page}
         pageCount={pageCount}
-        onPageChange={setPage}
-        onViewEvent={handleViewEvent}
         statusFilter={pendingFilter}
+        showDateLocation={false}
+        getInfoRows={infoRows}
+        setPage={setPage}
+        onSelectEvent={handleSelectEvent}
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
-        getInfoRows={getInfoRows}
+        onClearStatusFilter={handleClearStatusFilter}
       />
     );
-  };
-
-  const handleViewEvent = (eventId: string) => {
-    router.push(`/admin/payments/list-payments/${eventId}`);
-  };
-
-  const handleBack = () => {
-    router.push("/admin/home");
   };
 
   return (

@@ -1,9 +1,11 @@
 import axiosInstance from "@/shared/lib/apiClient";
+import qs from "qs";
 import type { EventsListResponse } from "../types/listEventsTypes";
 
 export type GetEventsForPaymentParams = {
   page: number;
   pageSize: number;
+  paymentEnabled?: boolean;
 };
 
 export async function getEventsForPayment(
@@ -15,7 +17,9 @@ export async function getEventsForPayment(
       params: {
         page: params.page,
         pageSize: params.pageSize,
+        paymentEnabled: params.paymentEnabled,
       },
+      paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
     },
   );
 

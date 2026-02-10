@@ -1,6 +1,7 @@
 "use client";
 
-import type { Event } from "@/features/payment/types/listEventsTypes";
+import { Event } from "@/features/payment/types/listEventsTypes";
+import EventSPaymentStatusFilter from "@/shared/components/EventSPaymentStatusFilter";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -21,14 +22,26 @@ import { Calendar, Frown, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 
+type InfoRow = {
+  label: string;
+  value: number | string;
+};
+
 interface ListEventsForPaymentProps {
   buttonLabel: string;
   events: Event[];
+  disableWhenPaymentDisabled?: boolean;
+  statusFilter: boolean[];
+  onStatusFilterChange: (value: boolean[]) => void;
+  onApplyStatusFilter: () => void;
+  onClearStatusFilter: () => void;
+  showDateLocation?: boolean;
   total: number;
   page: number;
   pageCount: number;
   setPage: (page: number) => void;
   onSelectEvent: (eventId: string) => void;
+  getInfoRows?: (event: Event) => InfoRow[];
 }
 
 export default function ListEventsForPayment({
@@ -37,8 +50,15 @@ export default function ListEventsForPayment({
   total,
   page,
   pageCount,
+  disableWhenPaymentDisabled = false,
+  statusFilter,
+  onStatusFilterChange,
+  onApplyStatusFilter,
+  onClearStatusFilter,
+  showDateLocation = true,
   setPage,
   onSelectEvent,
+  getInfoRows,
 }: ListEventsForPaymentProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
@@ -108,6 +128,24 @@ export default function ListEventsForPayment({
 
   return (
     <div className="space-y-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <EventSPaymentStatusFilter
+            value={statusFilter}
+            onChange={onStatusFilterChange}
+            onClear={onClearStatusFilter}
+            className="w-full sm:w-[220px]"
+          />
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs"
+            onClick={onApplyStatusFilter}
+          >
+            Aplicar
+          </Button>
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {events.map((event) => {
           const statusInfo = getPaymentStatusInfo(event.paymentEnabled);
@@ -176,18 +214,41 @@ export default function ListEventsForPayment({
                   {event.name}
                 </h3>
 
-                <div className="flex items-center text-sm text-gray-700 dark:text-gray-300 mb-1">
-                  <Calendar className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
-                  <span className="line-clamp-1">
-                    {formatDate(event.startDate)} - {formatDate(event.endDate)}
-                  </span>
-                </div>
+                {showDateLocation && (
+                  <>
+                    <div className="flex items-center text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      <Calendar className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
+                      {event.startDate && event.endDate ? (
+                        <span className="line-clamp-1">
+                          {formatDate(event.startDate)} -{" "}
+                          {formatDate(event.endDate)}
+                        </span>
+                      ) : (
+                        <span className="line-clamp-1">Data não informada</span>
+                      )}
+                    </div>
 
-                <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
-                  <MapPin className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
-                  <span className="line-clamp-1">
-                    {event.location || "Local não informado"}
-                  </span>
+                    <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                      <MapPin className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
+                      <span className="line-clamp-1">
+                        {event.location || "Local não informado"}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex flex-col gap-2 w-full">
+                  {getInfoRows?.(event)?.map(({ label, value }) => (
+                    <div
+                      key={label}
+                      className="flex justify-between items-center text-sm dark:text-white"
+                    >
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {label}
+                      </span>
+                      <span className="font-semibold">{value}</span>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="flex flex-col w-full gap-2 mt-2">
@@ -195,34 +256,13 @@ export default function ListEventsForPayment({
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
                     onClick={() => onSelectEvent(event.id)}
-                    disabled={!event.paymentEnabled}
+                    disabled={
+                      disableWhenPaymentDisabled && !event.paymentEnabled
+                    }
                   >
                     {buttonLabel}
                   </Button>
                 </div>
-
-                {event.typesInscriptions &&
-                  event.typesInscriptions.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {event.typesInscriptions.slice(0, 3).map((type) => (
-                        <Badge
-                          key={type.id}
-                          variant="outline"
-                          className="text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-zinc-800"
-                        >
-                          {type.description}
-                        </Badge>
-                      ))}
-                      {event.typesInscriptions.length > 3 && (
-                        <Badge
-                          variant="outline"
-                          className="text-xs rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-zinc-800"
-                        >
-                          +{event.typesInscriptions.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
               </CardFooter>
             </Card>
           );
