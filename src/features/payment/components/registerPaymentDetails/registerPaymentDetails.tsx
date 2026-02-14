@@ -26,7 +26,7 @@ import {
 } from "@/shared/components/ui/table";
 import { useCurrentUser } from "@/shared/context/user-context";
 import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
-import { getcalculateAge } from "@/shared/utils/getCalculateAge";
+import { getCalculateAge } from "@/shared/utils/getCalculateAge";
 import {
   getConvertStatusInscription,
   getConvertStatusPayment,
@@ -280,7 +280,7 @@ export function RegisterPaymentDetailsTable({
                       {p.name}
                     </div>
                   </TableCell>
-                  <TableCell>{getcalculateAge(p.birthDate)} anos</TableCell>
+                  <TableCell>{getCalculateAge(p.birthDate)} anos</TableCell>
                   <TableCell>{formatGender(p.gender)}</TableCell>
                   <TableCell>{formatDate(p.birthDate)}</TableCell>
                 </TableRow>
@@ -311,7 +311,7 @@ export function RegisterPaymentDetailsTable({
                     <div className="space-y-1">
                       <p className="text-xs text-muted-foreground">Idade</p>
                       <p className="text-sm font-medium">
-                        {getcalculateAge(p.birthDate)} anos
+                        {getCalculateAge(p.birthDate)} anos
                       </p>
                     </div>
                     <div className="space-y-1">

@@ -5,13 +5,13 @@ import {
   STATUS_EVENT_VALUES,
   UseEventsParams,
   UseEventsResult,
-} from "../types/selectEvent";
+} from "../types/listEventsForParticipants";
 import {
   usePrefetchSelectEventForListParticipants,
   useSelectEventForListParticipantsQuery,
 } from "./useSelectEventForListParticipantsQuery";
 
-export function useSelectEventForListParticipants({
+export function useListEventsForParticipants({
   initialPage = 1,
   pageSize = 8,
   status,

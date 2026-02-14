@@ -165,9 +165,12 @@ export default function DetailsPaymentTable({
                   </div>
                   {payment.isGuest && (
                     <Badge variant="secondary" className="h-5 px-2 text-[10px]">
-                      N/ Associado
+                      N/ Alocado
                     </Badge>
                   )}
+                </div>
+                <div className="mt-2 font-mono text-xs text-muted-foreground break-all">
+                  {payment.id}
                 </div>
               </div>
 
@@ -206,27 +209,6 @@ export default function DetailsPaymentTable({
                   <p className="text-lg font-semibold">
                     {getPaymentMethodText(payment.methodPayment)}
                   </p>
-                </div>
-
-                {/* Responsável */}
-                <div className="bg-muted/30 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Responsável</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-lg font-semibold truncate">
-                      {payment.responsible || "-"}
-                    </p>
-                    {payment.isGuest && (
-                      <Badge
-                        variant="secondary"
-                        className="h-5 px-2 text-[10px]"
-                      >
-                        Convidado
-                      </Badge>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
@@ -420,7 +402,7 @@ export default function DetailsPaymentTable({
                         variant="secondary"
                         className="h-5 px-2 text-[10px]"
                       >
-                        Convidado
+                        N/ Alocado
                       </Badge>
                     )}
                   </div>
@@ -489,27 +471,39 @@ export default function DetailsPaymentTable({
                   </span>
                 </div>
               </div>
+              <div className="pt-3 border-t">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Última Atualização
+                </span>
+                <div className="mt-1 flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">
+                    {formatDateTime(payment.updatedAt)}
+                  </span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Motivo de Rejeição */}
-      {payment.status === StatusPayment.REFUSED && payment.rejectionReason && (
-        <Card className="border-destructive/20 bg-destructive/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
-              <AlertCircle className="h-5 w-5" />
-              Motivo da Rejeição
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-3 bg-white dark:bg-gray-800 border border-destructive/20 rounded-md">
-              <p className="text-destructive">{payment.rejectionReason}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {getConvertStatusPayment(payment.status) === StatusPayment.REFUSED &&
+        payment.rejectionReason && (
+          <Card className="border-destructive/20 bg-destructive/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="h-5 w-5" />
+                Motivo da Rejeição
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-3 bg-white dark:bg-gray-800 border border-destructive/20 rounded-md">
+                <p className="text-destructive">{payment.rejectionReason}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Comprovante Visual */}
       {payment.imageUrl && (
@@ -561,7 +555,7 @@ export default function DetailsPaymentTable({
         onOpenChange={setApproveDialogOpen}
         onConfirm={handleConfirmApprove}
         title="Aprovar Pagamento"
-        message="Tem certeza que deseja aprovar este pagamento? Esta ação notificará o usuário."
+        message="Tem certeza que deseja aprovar este pagamento? Tenha certeza de que o pagamento foi realizado corretamente."
         confirmText="Aprovar"
         isLoading={isApproving}
       />
@@ -571,7 +565,7 @@ export default function DetailsPaymentTable({
         onOpenChange={setRevertDialogOpen}
         onConfirm={handleConfirmRevert}
         title="Reverter Status"
-        message="Tem certeza que deseja reverter o status deste pagamento para 'Em Análise'? Isso permitirá editar o pagamento novamente."
+        message="Ao reverter o pagamento ele voltará para o status de 'Em Análise'."
         confirmText="Reverter"
         isLoading={isReversing}
         variant="destructive"

@@ -11,6 +11,8 @@ export function usePaymentDetail({
 
   return {
     payment: data || null,
+    allocations: data?.allocations || [],
+    installments: data?.installments || [],
     loading: isLoading,
     error: error?.message || null,
     refetch: async () => {

@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPaymentDetails } from "../../api/adminDetailsPayment/getPaymentDetails";
-import type { PaymentsDetailsOutput } from "../../types/adminDetailsPayment/paymentsDetailsTypes";
+import type { PaymentsDetailsResponse } from "../../types/adminDetailsPayment/paymentsDetailsTypes";
 
 export const paymentDetailKeys = {
   all: ["payment-details"] as const,
@@ -10,7 +10,7 @@ export const paymentDetailKeys = {
 };
 
 export function usePaymentDetailQuery(paymentId: string) {
-  return useQuery<PaymentsDetailsOutput>({
+  return useQuery<PaymentsDetailsResponse>({
     queryKey: paymentDetailKeys.detail(paymentId),
     queryFn: () => getPaymentDetails(paymentId),
     enabled: !!paymentId,
@@ -19,4 +19,28 @@ export function usePaymentDetailQuery(paymentId: string) {
     retry: 2,
     refetchOnWindowFocus: false,
   });
+}
+
+export function useInvalidatePaymentDetailQuery() {
+  const queryClient = useQueryClient();
+
+  return {
+    invalidateAll: () => {
+      queryClient.invalidateQueries({
+        queryKey: paymentDetailKeys.all,
+      });
+    },
+
+    invalidateDetails: () => {
+      queryClient.invalidateQueries({
+        queryKey: paymentDetailKeys.details(),
+      });
+    },
+
+    invalidateDetail: (id: string) => {
+      queryClient.invalidateQueries({
+        queryKey: paymentDetailKeys.detail(id),
+      });
+    },
+  };
 }

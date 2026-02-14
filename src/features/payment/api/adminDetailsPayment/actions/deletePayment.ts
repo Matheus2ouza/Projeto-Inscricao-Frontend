@@ -1,13 +1,8 @@
-import { InscriptionDetails } from "@/features/guest/types/detailsInscription/detailsInscriptionType";
 import axiosInstance from "@/shared/lib/apiClient";
 
-export async function getDetailsInscription(
-  confirmationCode: string,
-): Promise<InscriptionDetails> {
+export async function deletePayment(paymentId: string) {
   try {
-    const { data } = await axiosInstance.get<InscriptionDetails>(
-      `inscription/guest/${confirmationCode}/details`,
-    );
+    const { data } = await axiosInstance.delete(`/payments/${paymentId}`);
     return data;
   } catch (error) {
     const axiosError = error as {

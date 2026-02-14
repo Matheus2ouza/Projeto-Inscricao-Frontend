@@ -6,6 +6,7 @@ export type Payment = {
   methodPayment: PaymentMethod;
   totalValue: number;
   createdAt: Date;
+  updatedAt: Date;
   imageUrl: string;
   rejectionReason?: string;
   allocation?: PaymentAllocation[];
@@ -14,7 +15,7 @@ export type Payment = {
 export enum StatusPayment {
   APPROVED = "APROVADO",
   UNDER_REVIEW = "EM_ANALISE",
-  REFUSED = "REJEITADO",
+  REFUSED = "RECUSADO",
 }
 
 export enum PaymentMethod {
@@ -23,18 +24,7 @@ export enum PaymentMethod {
   CARTAO = "CARTAO",
 }
 
-export type AnalysisPaymentsDetailsResponse = {
-  id: string;
-  status: StatusPayment;
-  isGuest: boolean;
-  responsible: string;
-  methodPayment: PaymentMethod;
-  totalValue: number;
-  createdAt: Date;
-  imageUrl: string;
-  rejectionReason?: string;
-  allocation?: PaymentAllocation[];
-};
+export type AnalysisPaymentsDetailsResponse = Payment;
 
 type PaymentAllocation = {
   value: number;

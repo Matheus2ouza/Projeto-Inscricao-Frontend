@@ -41,14 +41,11 @@ export enum StatusPayment {
 
 export type CreatePaymentResponse = {
   id: string;
-  totalValue: number;
   status: StatusPayment;
-  createdAt: Date;
 };
 
-export type CreatePaymentGuestResponse = {
+export type RegisterPaymentPixResponse = {
   id: string;
-  totalValue: number;
   status: StatusPayment;
-  createdAt: Date;
+  confirmationCode: string;
 };

@@ -213,9 +213,6 @@ export default function RegisterPaymentPix({
       if (onPaymentRegistered && paymentResult) {
         onPaymentRegistered(paymentResult);
       }
-
-      toast.success("Pagamento registrado com sucesso!");
-      setTimeout(() => router.back(), 1500);
     } catch (error) {
       console.error("Erro ao registrar pagamento:", error);
       toast.error("Erro ao registrar pagamento", {
@@ -322,7 +319,11 @@ export default function RegisterPaymentPix({
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
-                      <span>Tire um print ou foto do comprovante</span>
+                      <span>
+                        Caso o comprovante esteja em formato{" "}
+                        <strong>PDF</strong> então poderá tirar um print ou foto
+                        do comprovante e enviá-lo no formulário
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />

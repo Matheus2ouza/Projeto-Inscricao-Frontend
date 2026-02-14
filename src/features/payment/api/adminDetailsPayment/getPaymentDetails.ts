@@ -1,11 +1,11 @@
-import type { PaymentsDetailsOutput } from "@/features/payment/types/adminDetailsPayment/paymentsDetailsTypes";
+import type { PaymentsDetailsResponse } from "@/features/payment/types/adminDetailsPayment/paymentsDetailsTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function getPaymentDetails(
   paymentId: string,
-): Promise<PaymentsDetailsOutput> {
+): Promise<PaymentsDetailsResponse> {
   try {
-    const { data } = await axiosInstance.get<PaymentsDetailsOutput>(
+    const { data } = await axiosInstance.get<PaymentsDetailsResponse>(
       `/payments/${paymentId}/details`,
     );
 

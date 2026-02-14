@@ -1,6 +1,9 @@
 import axiosInstance from "@/shared/lib/apiClient";
 import qs from "qs";
-import { getEventsResponse, StatusEvent } from "../types/selectEvent";
+import {
+  getEventsResponse,
+  StatusEvent,
+} from "../types/listEventsForParticipants";
 
 export async function getEvents(params: {
   page: number;

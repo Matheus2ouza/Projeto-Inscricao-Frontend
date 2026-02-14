@@ -1,5 +1,5 @@
 "use client";
-import DetailsPaymentTable from "@/features/payment/components/adminDetailsPayment/DetailsPayment";
+import DetailsPaymentTable from "@/features/payment/components/adminAnalysisPayment/DetailsPayment";
 import { useAnalysisPaymentDetails } from "@/features/payment/hooks/analysisPayment/analysisPaymentDetails";
 import { usePaymentActions } from "@/features/payment/hooks/analysisPayment/usePaymentActions";
 import PageContainer from "@/shared/components/layout/PageContainer";

@@ -1,7 +1,7 @@
 "use client";
 
 import RegisterPaymentPix from "@/features/payment/components/registerPayment/RegisterPaymentPix";
-import { useGuestRegisterPayment } from "@/features/payment/hooks/registerPayment/useGuestRegisterPayment";
+import { useRegisterPaymentPix } from "@/features/payment/hooks/registerPayment/useRegisterPaymentPix";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
@@ -20,6 +20,7 @@ export default function GuestRegisterPaymentPixPage() {
   const totalValue = Number(totalValueParam ?? 0);
   const resolvedTotalValue = Number.isFinite(totalValue) ? totalValue : 0;
 
+  // Pega inscrições do query string
   const queryCsv = searchParams.get("inscriptions");
   const queryList = queryCsv
     ? queryCsv
@@ -36,13 +37,14 @@ export default function GuestRegisterPaymentPixPage() {
     new Set<string>([...queryList, ...repeatedParams]),
   );
 
+  // Pega nome e email do convidado do query string
   const guestNameParam = searchParams.get("guestName");
   const guestName = guestNameParam ?? "";
 
   const guestEmailParam = searchParams.get("guestEmail");
   const guestEmail = guestEmailParam ?? "";
 
-  const guestRegisterPayment = useGuestRegisterPayment();
+  const registerPaymentPix = useRegisterPaymentPix();
 
   const allowCardParam = searchParams.get("allowCard");
   const allowCard = allowCardParam === "1" || allowCardParam === "true";
@@ -60,7 +62,7 @@ export default function GuestRegisterPaymentPixPage() {
         allowCard={allowCard}
         allowCustomValue={false}
         onSubmitPayment={({ value, image }) =>
-          guestRegisterPayment.mutateAsync({
+          registerPaymentPix.mutateAsync({
             eventId,
             guestName,
             guestEmail,

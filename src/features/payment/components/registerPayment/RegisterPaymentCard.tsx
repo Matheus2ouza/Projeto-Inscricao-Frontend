@@ -137,13 +137,6 @@ export default function RegisterPaymentCard({
           bairro?: string;
         };
 
-        console.log("[ViaCEP]", {
-          cep: cleanCep,
-          ok: response.ok,
-          status: response.status,
-          data,
-        });
-
         if (data.erro) {
           throw new Error("CEP não encontrado");
         }
