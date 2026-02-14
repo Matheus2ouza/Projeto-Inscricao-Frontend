@@ -1,8 +1,8 @@
 /**
- * Set item in localStorage with expiry time
- * @param key - Key to store the item
- * @param value - Value to store
- * @param ttlMs - Time to live in milliseconds
+ * Armazena item no localStorage com tempo de expiração
+ * @param key - Chave para armazenar o item
+ * @param value - Valor a ser armazenado
+ * @param ttlMs - Tempo de vida em milissegundos
  */
 export function setWithExpiry(
   key: string,
@@ -22,9 +22,9 @@ export function setWithExpiry(
   localStorage.setItem(key, JSON.stringify(item));
 }
 /**
- * Get item from localStorage with expiry time
- * @param key - Key to retrieve the item
- * @returns The item if it exists and is not expired, otherwise null
+ * Recupera item do localStorage com tempo de expiração
+ * @param key - Chave para recuperar o item
+ * @returns O item se existir e não estiver expirado, caso contrário null
  */
 export function getWithExpiry<T>(key: string): T | null {
   const itemStr = localStorage.getItem(key);

@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/shared/components/ui/card";
 import { Clock, ExternalLink } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface SuccessPaymentProps {
   clientName: string;
@@ -16,6 +17,36 @@ export default function SuccessPayment({
   clientName,
   onViewInscription,
 }: SuccessPaymentProps) {
+  const storageKey = "success-payment-unlock-at";
+  const [remainingSeconds, setRemainingSeconds] = useState(10);
+
+  useEffect(() => {
+    const now = Date.now();
+    const storedUnlockAt = sessionStorage.getItem(storageKey);
+    const unlockAt =
+      storedUnlockAt && !Number.isNaN(Number(storedUnlockAt))
+        ? Number(storedUnlockAt)
+        : now + 10_000;
+
+    if (!storedUnlockAt) {
+      sessionStorage.setItem(storageKey, String(unlockAt));
+    }
+
+    setRemainingSeconds(Math.max(0, Math.ceil((unlockAt - now) / 1000)));
+
+    const intervalId = window.setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((unlockAt - Date.now()) / 1000));
+      setRemainingSeconds(remaining);
+      if (remaining <= 0) {
+        window.clearInterval(intervalId);
+      }
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [storageKey]);
+
+  const isButtonDisabled = remainingSeconds > 0;
+
   return (
     <div className="flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg border-blue-200">
@@ -29,7 +60,9 @@ export default function SuccessPayment({
             Pagamento em Processo
           </CardTitle>
           <p className="text-muted-foreground mt-2">
-            Obrigado, {clientName}! Seu pagamento está sendo processado.
+            Obrigado, {clientName}! Recebemos seu pagamento. Ele agora passará
+            por um processo de análise e será confirmado em breve pelos
+            organizadores.
           </p>
         </CardHeader>
 
@@ -45,10 +78,12 @@ export default function SuccessPayment({
 
           <Button
             onClick={onViewInscription}
+            disabled={isButtonDisabled}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6"
           >
             <ExternalLink className="mr-2 h-5 w-5" />
             Ir para Minha Inscrição
+            {isButtonDisabled ? ` (${remainingSeconds}s)` : ""}
           </Button>
 
           <p className="text-xs text-center text-muted-foreground">

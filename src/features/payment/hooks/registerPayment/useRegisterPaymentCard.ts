@@ -6,7 +6,7 @@ import {
   registerPaymentCardSchema,
   RegisterPaymentCardSchema,
 } from "../../schema/registerPaymendCarcSchema";
-import { useInvalidateRegisterPaymentDetailsQuery } from "./registerPaymentDetailsQuery";
+import { useInvalidateRegisterPaymentDetailsQuery } from "../registerPaymentDetails/registerPaymentDetailsQuery";
 
 export type UseFormCreatePaymentCard = {
   form: ReturnType<typeof useForm<RegisterPaymentCardSchema>>;

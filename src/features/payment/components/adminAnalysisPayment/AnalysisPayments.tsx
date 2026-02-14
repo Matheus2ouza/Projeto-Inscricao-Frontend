@@ -82,7 +82,7 @@ export default function AnalysisPayments({
         <div className="p-6">
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Imagem do Evento */}
-            <div className="relative w-full sm:w-48 h-48 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+            <div className="relative w-full sm:w-72 h-48 rounded-lg overflow-hidden bg-muted flex-shrink-0">
               {event.imageUrl && !imageError ? (
                 <Image
                   src={event.imageUrl}

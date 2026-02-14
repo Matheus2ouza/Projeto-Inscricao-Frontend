@@ -1,14 +1,17 @@
 "use client";
 
 import PaymentDetailsContent from "@/features/payment/components/adminDetailsPayment/PaymentDetailsContent";
+import { useDeletePayment } from "@/features/payment/hooks/adminDetailsPayment/actions/useDeletePayment";
 import { usePaymentDetail } from "@/features/payment/hooks/adminDetailsPayment/usePaymentdetail";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { useParams, useRouter } from "next/navigation";
 
 export default function PaymentDetailsSuperPage() {
+  const { user } = useCurrentUser();
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
@@ -26,16 +29,19 @@ export default function PaymentDetailsSuperPage() {
     return null;
   }
 
-  const { payment, loading, error, refetch } = usePaymentDetail({
-    paymentId,
-  });
+  const { payment, allocations, installments, loading, error, refetch } =
+    usePaymentDetail({
+      paymentId,
+    });
+
+  const { deletePaymentMutation } = useDeletePayment(eventId, user.role);
 
   const handleBack = () => {
-    if (eventId) {
-      router.push(`/super/payments/list-payments/${eventId}`);
-    } else {
-      router.push("/super/payments/list-payments");
-    }
+    router.push(`/super/payments/list-payments/${eventId}`);
+  };
+
+  const handleValidPayment = () => {
+    router.push(`/super/payments/analysis/${eventId}/${paymentId}`);
   };
 
   const renderSkeletonGrid = () => {
@@ -68,7 +74,15 @@ export default function PaymentDetailsSuperPage() {
       );
     }
 
-    return <PaymentDetailsContent payment={payment} />;
+    return (
+      <PaymentDetailsContent
+        payment={payment}
+        allocations={allocations}
+        installments={installments}
+        onValidPayment={handleValidPayment}
+        onDeletePayment={deletePaymentMutation.mutate}
+      />
+    );
   };
 
   return (

@@ -1,21 +1,23 @@
 "use client";
 
 import { StatusEvent } from "@/features/inscriptions/types/selectEvent";
-import SelectedEventForListParticipants from "@/features/participants/components/SelectedEvent";
-import { useSelectEventForListParticipants } from "@/features/participants/hooks/useSelectEventForListParticipants";
-import type { Event } from "@/features/participants/types/selectEvent";
+import ListEventsForParticipants from "@/features/participants/components/ListEventsForParticipants";
+import { useListEventsForParticipants } from "@/features/participants/hooks/useListEventsForParticipants";
+import type { Event } from "@/features/participants/types/listEventsForParticipants";
 import PageContainer from "@/shared/components/layout/PageContainer";
-import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function SelectedEventAdminPage() {
   const router = useRouter();
-  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
-  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
+  const defaultStatusFilter: StatusEvent[] = ["OPEN"];
+  const [pendingFilter, setPendingFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
   const { events, loading, error, page, pageCount, setPage } =
-    useSelectEventForListParticipants({
+    useListEventsForParticipants({
       initialPage: 1,
       pageSize: 8,
       status: appliedFilter.length > 0 ? appliedFilter : undefined,
@@ -50,48 +52,25 @@ export default function SelectedEventAdminPage() {
     },
   ];
 
-  const renderSkeletonGrid = () => {
-    const skeletonCards = Array.from({ length: 6 });
-
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-2">
-            <Skeleton className="h-10 w-full sm:w-[220px] rounded-full" />
-            <Skeleton className="h-10 w-28 rounded-full" />
-          </div>
-          <Skeleton className="h-10 w-28 rounded-full" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {skeletonCards.map((_, index) => (
-            <Card
-              key={index}
-              className="w-full border border-transparent shadow-md rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800"
-            >
-              <CardBody className="p-0">
-                <AspectRatio ratio={16 / 9} className="w-full">
-                  <Skeleton className="w-full h-full rounded-t-xl" />
-                </AspectRatio>
-              </CardBody>
-              <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl space-y-3">
-                <Skeleton className="h-6 w-3/4" />
-                <div className="flex w-full justify-between gap-4">
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-4 w-14" />
-                </div>
-                <div className="flex w-full justify-between gap-4">
-                  <Skeleton className="h-4 w-1/4" />
-                  <Skeleton className="h-4 w-10" />
-                </div>
-                <Skeleton className="h-10 w-full rounded-full" />
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  const renderSkeletonGrid = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <Card
+          key={index}
+          className="w-full border border-transparent shadow-md rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800"
+        >
+          <CardBody className="p-0">
+            <Skeleton className="w-full h-48 rounded-t-xl" />
+          </CardBody>
+          <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
 
   const renderContent = () => {
     if (loading) {
@@ -112,7 +91,8 @@ export default function SelectedEventAdminPage() {
     }
 
     return (
-      <SelectedEventForListParticipants
+      <ListEventsForParticipants
+        buttonLabel="Visualizar Participantes"
         events={events}
         page={page}
         pageCount={pageCount}

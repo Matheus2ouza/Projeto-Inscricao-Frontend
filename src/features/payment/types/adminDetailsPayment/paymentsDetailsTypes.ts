@@ -1,4 +1,18 @@
-export type PaymentsDetailsOutput = {
+export type PaymentsDetailsResponse = {
+  id: string;
+  status: StatusPayment;
+  isGuest: boolean;
+  responsible: string;
+  methodPayment: PaymentMethod;
+  totalValue: number;
+  createdAt: string;
+  imageUrl: string;
+  rejectionReason?: string;
+  allocations?: PaymentAllocation[];
+  installments?: PaymentInstallment[];
+};
+
+export type PaymentsDetails = {
   id: string;
   status: StatusPayment;
   isGuest: boolean;
@@ -43,7 +57,9 @@ export type PaymentDetailParams = {
 };
 
 export type PaymentDetailResult = {
-  payment: PaymentsDetailsOutput | null;
+  payment: PaymentsDetails | null;
+  allocations?: PaymentAllocation[];
+  installments?: PaymentInstallment[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;

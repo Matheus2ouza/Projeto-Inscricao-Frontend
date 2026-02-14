@@ -18,15 +18,19 @@ import { Card, CardBody, CardFooter } from "@heroui/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import type { Event } from "../types/selectEvent";
-import { EVENT_STATUS_OPTIONS, StatusEvent } from "../types/selectEvent";
+import type { Event } from "../types/listEventsForParticipants";
+import {
+  EVENT_STATUS_OPTIONS,
+  StatusEvent,
+} from "../types/listEventsForParticipants";
 
 type InfoRow = {
   label: string;
   value: number | string;
 };
 
-interface SelecteEventForListParticipantsProps {
+interface ListEventsForParticipantsProps {
+  buttonLabel: string;
   events: Event[];
   page: number;
   pageCount: number;
@@ -38,7 +42,8 @@ interface SelecteEventForListParticipantsProps {
   getInfoRows?: (event: Event) => InfoRow[];
 }
 
-export default function SelectedEventForListParticipants({
+export default function ListEventsForParticipants({
+  buttonLabel,
   events,
   page,
   pageCount,
@@ -48,7 +53,7 @@ export default function SelectedEventForListParticipants({
   onStatusFilterChange,
   onApplyStatusFilter,
   getInfoRows,
-}: SelecteEventForListParticipantsProps) {
+}: ListEventsForParticipantsProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
@@ -77,22 +82,6 @@ export default function SelectedEventForListParticipants({
     }));
   };
 
-  // Função para determinar o status da análise
-  const getAnalysisStatusInfo = (countInscritpionsAnalysis: number) => {
-    if (countInscritpionsAnalysis === 0) {
-      return { badgeClass: "bg-green-500", count: 0 };
-    }
-
-    const badgeClass =
-      countInscritpionsAnalysis <= 5
-        ? "bg-blue-500"
-        : countInscritpionsAnalysis <= 15
-          ? "bg-blue-600"
-          : "bg-blue-700";
-
-    return { badgeClass, count: countInscritpionsAnalysis };
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -116,9 +105,6 @@ export default function SelectedEventForListParticipants({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {events.map((event) => {
-          const statusInfo = getAnalysisStatusInfo(
-            event.countParticipantsInAnalysis,
-          );
           const gradientClass = getGradientClass(event.name);
           const isImageLoading = event.imageUrl
             ? imageLoadingStates[event.id] !== false
@@ -178,15 +164,6 @@ export default function SelectedEventForListParticipants({
                     )}
                   </div>
                 </AspectRatio>
-                {!isImageLoading && (
-                  <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 select-none pointer-events-none">
-                    <div
-                      className={`w-8 h-8 rounded-full ${statusInfo.badgeClass} border-2 border-white dark:border-zinc-900 shadow-lg flex items-center justify-center text-white font-bold text-xs`}
-                    >
-                      {statusInfo.count === 0 ? "✓" : statusInfo.count}
-                    </div>
-                  </div>
-                )}
               </CardBody>
               <CardFooter className="flex flex-col items-start p-4 gap-3 rounded-b-xl">
                 <h3
@@ -235,7 +212,7 @@ export default function SelectedEventForListParticipants({
                     onClick={() => handleIndividualInscription(event.id)}
                     className="dark: text-white"
                   >
-                    Realizar Inscrição
+                    {buttonLabel}
                   </Button>
                 </div>
               </CardFooter>

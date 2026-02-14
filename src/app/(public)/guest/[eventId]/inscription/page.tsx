@@ -1,10 +1,12 @@
 "use client";
 
 import { DetailsInscription } from "@/features/guest/components/detailsInscription/detailsInscription";
+import { useDeletePayment } from "@/features/guest/hook/detailsInscription/actions/useDeletePayment";
 import { useDetailsInscription } from "@/features/guest/hook/detailsInscription/useDetailsInscription";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { getWithExpiry } from "@/shared/utils/storageWithExpiry";
+import { Frown } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -64,6 +66,8 @@ export default function GuestInscriptionPage() {
       confirmationCode: confirmationCode ?? "",
     },
   );
+
+  const { deletePaymentMutation } = useDeletePayment();
 
   useEffect(() => {
     if (hasAutoScrolledRef.current) return;
@@ -127,12 +131,23 @@ export default function GuestInscriptionPage() {
           onClear={() => setConfirmationCode(null)}
           onRegisterPaymentCard={handleRegisterPaymentCard}
           onRegisterPaymentPix={handleRegisterPaymentPix}
+          onDeletePayment={deletePaymentMutation.mutate}
         />
         {error && (
-          <div className="min-h-[120px] flex items-center justify-center">
-            <div className="text-center">
-              <p className="mb-4 text-foreground">{error}</p>
-              <Button onClick={() => refetch()}>Tentar Novamente</Button>
+          <div className="min-h-[160px] flex items-center justify-center">
+            <div className="w-full max-w-xl rounded-xl border border-gray-200 p-6 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900/50">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                <Frown className="h-9 w-9" />
+              </div>
+              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                Não foi possível carregar sua inscrição
+              </p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                {error}
+              </p>
+              <Button className="mt-4" onClick={() => refetch()}>
+                Tentar Novamente
+              </Button>
             </div>
           </div>
         )}

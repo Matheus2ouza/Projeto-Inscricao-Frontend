@@ -4,8 +4,7 @@ import { getDetailsInscription } from "../../api/detailsInscription/getDetailsIn
 export const detailsGuestInscriptionKeys = {
   all: ["details-guest-inscription"] as const,
   lists: () => [...detailsGuestInscriptionKeys.all, "list"] as const,
-  list: (confirmationCode: string) =>
-    [...detailsGuestInscriptionKeys.lists(), confirmationCode] as const,
+  list: (id: string) => [...detailsGuestInscriptionKeys.lists(), id] as const,
 };
 
 export function useDetailsInscriptionQuery(confirmationCode: string) {
@@ -36,9 +35,9 @@ export function useInvalidateDetailsGuestInscriptionQuery() {
       });
     },
 
-    invalidateDetail: (confirmationCode: string) => {
+    invalidateDetail: (id: string) => {
       queryClient.invalidateQueries({
-        queryKey: detailsGuestInscriptionKeys.list(confirmationCode),
+        queryKey: detailsGuestInscriptionKeys.list(id),
       });
     },
   };

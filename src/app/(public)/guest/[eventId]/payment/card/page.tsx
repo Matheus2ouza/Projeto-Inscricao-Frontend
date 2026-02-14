@@ -1,7 +1,7 @@
 "use client";
 
 import RegisterPaymentCardDialog from "@/features/payment/components/registerPayment/RegisterPaymentCard";
-import useFormCreatePaymentCard from "@/features/payment/hooks/registerPaymentDetails/useRegisterPaymentCard";
+import useFormCreatePaymentCard from "@/features/payment/hooks/registerPayment/useRegisterPaymentCard";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
