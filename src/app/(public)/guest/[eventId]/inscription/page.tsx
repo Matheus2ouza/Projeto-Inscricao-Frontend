@@ -2,6 +2,8 @@
 
 import { DetailsInscription } from "@/features/guest/components/detailsInscription/detailsInscription";
 import { useDeletePayment } from "@/features/guest/hook/detailsInscription/actions/useDeletePayment";
+import { useUpdateGuestInscription } from "@/features/guest/hook/detailsInscription/actions/useUpdateInscription";
+import { useUpdateGuestParticipant } from "@/features/guest/hook/detailsInscription/actions/useUpdateParticipant";
 import { useDetailsInscription } from "@/features/guest/hook/detailsInscription/useDetailsInscription";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
@@ -19,6 +21,10 @@ export default function GuestInscriptionPage() {
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const hasAutoScrolledRef = useRef(false);
   const persistKey = "guest_inscription_persist";
+  const [isEditingInscription, setIsEditingInscription] = useState(false);
+  const [editingParticipantId, setEditingParticipantId] = useState<
+    string | null
+  >(null);
 
   if (!eventId) {
     return null;
@@ -61,11 +67,89 @@ export default function GuestInscriptionPage() {
     }
   }, [eventId, searchParams]);
 
-  const { inscriptionDetails, loading, error, refetch } = useDetailsInscription(
-    {
+  const { inscription, participants, payments, loading, error, refetch } =
+    useDetailsInscription({
       confirmationCode: confirmationCode ?? "",
-    },
-  );
+    });
+
+  const { form: updateInscriptionForm, handleUpdateInscription } =
+    useUpdateGuestInscription({
+      inscriptionId: inscription?.id ?? "",
+      initialValues: inscription
+        ? {
+            guestName: inscription.guestName,
+            guestEmail: inscription.guestEmail,
+            guestLocality: inscription.guestLocality,
+            phone: inscription.phone,
+          }
+        : undefined,
+      onSuccess: () => {
+        setIsEditingInscription(false);
+      },
+    });
+
+  const handleStartEditInscription = () => {
+    if (!inscription) return;
+    setIsEditingInscription(true);
+  };
+
+  const handleCancelEditInscription = () => {
+    setIsEditingInscription(false);
+    updateInscriptionForm.reset({
+      guestName: inscription?.guestName ?? "",
+      guestEmail: inscription?.guestEmail ?? "",
+      guestLocality: inscription?.guestLocality ?? "",
+      phone: inscription?.phone ?? "",
+    });
+  };
+
+  const toDateInputValue = (value: string | Date | null | undefined) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toISOString().slice(0, 10);
+  };
+
+  const participantBeingEdited =
+    participants?.find((p) => p.id === editingParticipantId) ?? null;
+
+  const { form: updateParticipantForm, handleUpdateParticipant } =
+    useUpdateGuestParticipant({
+      participantId: editingParticipantId ?? "",
+      initialValues: participantBeingEdited
+        ? {
+            name: participantBeingEdited.name ?? "",
+            preferredName: participantBeingEdited.preferredName ?? "",
+            birthDate: toDateInputValue(participantBeingEdited.birthDate),
+            gender: String(participantBeingEdited.gender ?? ""),
+            shirtSize: String(participantBeingEdited.shirtSize ?? ""),
+            shirtType: String(participantBeingEdited.shirtType ?? ""),
+          }
+        : undefined,
+      onSuccess: () => {
+        setEditingParticipantId(null);
+      },
+    });
+
+  const handleStartEditParticipant = (participantId: string) => {
+    if (!participants?.length) return;
+    const exists = participants.some((p) => p.id === participantId);
+    if (!exists) return;
+    setEditingParticipantId(participantId);
+  };
+
+  const handleCancelEditParticipant = () => {
+    const current = participants?.find((p) => p.id === editingParticipantId);
+    updateParticipantForm.reset({
+      name: current?.name ?? "",
+      preferredName: current?.preferredName ?? "",
+      birthDate: toDateInputValue(current?.birthDate),
+      gender: String(current?.gender ?? ""),
+      shirtSize: String(current?.shirtSize ?? ""),
+      shirtType: String(current?.shirtType ?? ""),
+    });
+    setEditingParticipantId(null);
+  };
 
   const { deletePaymentMutation } = useDeletePayment();
 
@@ -73,7 +157,7 @@ export default function GuestInscriptionPage() {
     if (hasAutoScrolledRef.current) return;
     if (searchParams.get("scroll") !== "payment") return;
     if (loading) return;
-    if (!inscriptionDetails) return;
+    if (!inscription) return;
     if (error) return;
 
     requestAnimationFrame(() => {
@@ -83,39 +167,41 @@ export default function GuestInscriptionPage() {
       window.scrollTo({ top, behavior: "smooth" });
       hasAutoScrolledRef.current = true;
     });
-  }, [searchParams, loading, inscriptionDetails, error]);
+  }, [searchParams, loading, inscription, error]);
 
   const handleRegisterPaymentCard = () => {
-    if (!inscriptionDetails || !eventId) return;
-    const participantsTotal = inscriptionDetails.participants.reduce(
+    if (!inscription || !eventId || !participants) return;
+
+    const participantsTotal = participants.reduce(
       (total, participant) => total + participant.typeInscription.price,
       0,
     );
-    const payment = inscriptionDetails.payments?.[0];
+    const payment = payments?.[0];
     const totalValue = payment?.totalValue ?? participantsTotal;
     const totalPaid = payment?.totalPaid ?? 0;
     const remainingTotal = Math.max(totalValue - totalPaid, 0);
     const search = new URLSearchParams();
-    search.set("inscriptions", inscriptionDetails.id);
+    search.set("inscriptions", inscription.id);
     search.set("totalValue", String(remainingTotal));
     router.push(`/guest/${eventId}/payment/card?${search.toString()}`);
   };
 
   const handleRegisterPaymentPix = () => {
-    if (!inscriptionDetails || !eventId) return;
-    const participantsTotal = inscriptionDetails.participants.reduce(
+    if (!inscription || !eventId || !participants) return;
+
+    const participantsTotal = participants.reduce(
       (total, participant) => total + participant.typeInscription.price,
       0,
     );
-    const payment = inscriptionDetails.payments?.[0];
+    const payment = payments?.[0];
     const totalValue = payment?.totalValue ?? participantsTotal;
     const totalPaid = payment?.totalPaid ?? 0;
     const remainingTotal = Math.max(totalValue - totalPaid, 0);
     const search = new URLSearchParams();
-    search.set("inscriptions", inscriptionDetails.id);
+    search.set("inscriptions", inscription.id);
     search.set("confirmationCode", confirmationCode ?? "");
-    search.set("guestName", inscriptionDetails.guestName ?? "");
-    search.set("guestEmail", inscriptionDetails.guestEmail ?? "");
+    search.set("guestName", inscription.guestName ?? "");
+    search.set("guestEmail", inscription.guestEmail ?? "");
     search.set("totalValue", String(remainingTotal));
     router.push(`/guest/${eventId}/payment/pix?${search.toString()}`);
   };
@@ -125,8 +211,24 @@ export default function GuestInscriptionPage() {
       <div className="space-y-6">
         <DetailsInscription
           confirmationCode={confirmationCode}
-          inscriptionDetails={inscriptionDetails}
+          inscription={inscription}
+          participants={participants}
+          payments={payments}
           loading={loading}
+          inscriptionEdit={{
+            isEditing: isEditingInscription,
+            form: updateInscriptionForm,
+            onStart: handleStartEditInscription,
+            onCancel: handleCancelEditInscription,
+            onSubmit: handleUpdateInscription,
+          }}
+          participantEdit={{
+            editingParticipantId,
+            form: updateParticipantForm,
+            onStart: handleStartEditParticipant,
+            onCancel: handleCancelEditParticipant,
+            onSubmit: handleUpdateParticipant,
+          }}
           onSearch={(code) => setConfirmationCode(code)}
           onClear={() => setConfirmationCode(null)}
           onRegisterPaymentCard={handleRegisterPaymentCard}

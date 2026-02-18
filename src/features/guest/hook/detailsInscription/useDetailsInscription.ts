@@ -11,7 +11,9 @@ export function useDetailsInscription({
     useDetailsInscriptionQuery(confirmationCode);
 
   return {
-    inscriptionDetails: data || null,
+    inscription: data || null,
+    participants: data?.participants || [],
+    payments: data?.payments || [],
     loading: isLoading,
     error: error?.message || null,
     refetch: async () => {

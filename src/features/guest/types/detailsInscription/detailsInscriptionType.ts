@@ -15,6 +15,27 @@ export enum GenderType {
   MASCULINO = "MASCULINO",
   FEMININO = "FEMININO",
 }
+
+export enum PaymentMethod {
+  DINHEIRO = "DINHEIRO",
+  PIX = "PIX",
+  CARTAO = "CARTAO",
+}
+
+export enum ShirtSize {
+  PP = "PP",
+  P = "P",
+  M = "M",
+  G = "G",
+  GG = "GG",
+  XG = "XG",
+}
+
+export enum ShirtType {
+  TRADICIONAL = "TRADICIONAL",
+  BABYLOOK = "BABYLOOK",
+}
+
 export type InscriptionDetails = {
   id: string;
   status: InscriptionStatus;
@@ -26,26 +47,23 @@ export type InscriptionDetails = {
   totalValue: number;
   totalPaid: number;
   participants: Participant[];
-  payments?: Payment[];
+  payments: Payment[];
+};
+
+export type TypeInscription = {
+  description: string;
+  price: number;
 };
 
 export type Participant = {
   id: string;
   name: string;
   birthDate: Date;
+  preferredName?: string;
+  shirtSize?: ShirtSize;
+  shirtType?: ShirtType;
   gender: GenderType;
   typeInscription: TypeInscription;
-};
-
-export enum PaymentMethod {
-  DINHEIRO = "DINHEIRO",
-  PIX = "PIX",
-  CARTAO = "CARTAO",
-}
-
-export type TypeInscription = {
-  description: string;
-  price: number;
 };
 
 export type Payment = {
@@ -73,7 +91,9 @@ export type DetailsInscriptionParams = {
 };
 
 export type DetailsInscriptionResult = {
-  inscriptionDetails: InscriptionDetails | null;
+  inscription: InscriptionDetails | null;
+  participants: Participant[] | null;
+  payments: Payment[] | null;
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
