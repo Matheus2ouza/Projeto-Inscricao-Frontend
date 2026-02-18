@@ -1,8 +1,11 @@
 "use client";
 
+import type { UpdateGuestInscriptionFormInputs } from "@/features/guest/schema/actions/updateGuestInscriptionSchema";
+import type { UpdateGuestParticipantFormInputs } from "@/features/guest/schema/actions/updateGuestParticipantSchema";
 import {
   InscriptionDetails,
   InscriptionStatus,
+  Participant,
   Payment,
   PaymentInstallment,
   StatusPayment,
@@ -18,7 +21,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/shared/components/ui/command";
 import { Input } from "@/shared/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/components/ui/popover";
 import {
   Table,
   TableBody,
@@ -27,7 +42,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
+import { cn } from "@/shared/lib/utils";
+import { formatDateTime } from "@/shared/utils/formatDate";
 import { getCalculateAge } from "@/shared/utils/getCalculateAge";
 import {
   getConvertStatusInscription,
@@ -37,20 +53,40 @@ import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
   Calendar,
+  Check,
+  ChevronsUpDown,
   CreditCard,
   FileText,
   HelpCircle,
   Mail,
   MapPin,
+  Pencil,
   Phone,
   Search,
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
 
 interface DetailsInscriptionProps {
   confirmationCode: string | null;
-  inscriptionDetails: InscriptionDetails | null;
+  inscription: InscriptionDetails | null;
+  participants: Participant[] | null;
+  payments: Payment[] | null;
+  inscriptionEdit?: {
+    isEditing: boolean;
+    form: UseFormReturn<UpdateGuestInscriptionFormInputs>;
+    onStart: () => void;
+    onCancel: () => void;
+    onSubmit: () => void;
+  };
+  participantEdit?: {
+    editingParticipantId: string | null;
+    form: UseFormReturn<UpdateGuestParticipantFormInputs>;
+    onStart: (participantId: string) => void;
+    onCancel: () => void;
+    onSubmit: () => void;
+  };
   onSearch: (code: string) => void;
   loading: boolean;
   onClear: () => void;
@@ -61,7 +97,11 @@ interface DetailsInscriptionProps {
 
 export function DetailsInscription({
   confirmationCode,
-  inscriptionDetails,
+  inscription,
+  participants,
+  payments,
+  inscriptionEdit,
+  participantEdit,
   onSearch,
   loading,
   onClear,
@@ -79,6 +119,28 @@ export function DetailsInscription({
   const [paymentIdToDelete, setPaymentIdToDelete] = useState<string | null>(
     null,
   );
+  const [openGenderParticipant, setOpenGenderParticipant] = useState(false);
+  const [openShirtSizeParticipant, setOpenShirtSizeParticipant] =
+    useState(false);
+  const [openShirtTypeParticipant, setOpenShirtTypeParticipant] =
+    useState(false);
+
+  const genderOptions = [
+    { value: "MASCULINO", label: "Masculino" },
+    { value: "FEMININO", label: "Feminino" },
+  ];
+  const shirtSizeOptions = [
+    { value: "PP", label: "PP" },
+    { value: "P", label: "P" },
+    { value: "M", label: "M" },
+    { value: "G", label: "G" },
+    { value: "GG", label: "GG" },
+    { value: "XG", label: "XG" },
+  ];
+  const shirtTypeOptions = [
+    { value: "TRADICIONAL", label: "Tradicional" },
+    { value: "BABYLOOK", label: "Babylook" },
+  ];
 
   const formatSearchCode = (value: string) => {
     const normalized = value
@@ -114,19 +176,22 @@ export function DetailsInscription({
     setReceiptViewerOpen(true);
   };
 
-  const payments: Payment[] = inscriptionDetails?.payments ?? [];
+  const inscriptionDetails = inscription;
+  const participantsList =
+    participants ?? inscriptionDetails?.participants ?? [];
+  const paymentsList = payments ?? inscriptionDetails?.payments ?? [];
 
   // variavel para armazenar o valor total a ser pago
   const paymentTotalValue = inscriptionDetails?.totalValue || 0;
 
   // variavel para armazenar o valor total pago
-  const paymentTotalPaid = payments.reduce((total, payment) => {
+  const paymentTotalPaid = paymentsList.reduce((total, payment) => {
     if (payment.status !== StatusPayment.APPROVED) return total;
     const value = Number(payment.totalPaid) || 0;
     return total + Math.max(value, 0);
   }, 0);
 
-  const paymentTotalPaidAll = payments.reduce((total, payment) => {
+  const paymentTotalPaidAll = paymentsList.reduce((total, payment) => {
     const value = Number(payment.totalValue) || 0;
     return total + Math.max(value, 0);
   }, 0);
@@ -139,6 +204,8 @@ export function DetailsInscription({
 
   // variavel para armazenar o valor restante a ser pago
   const paymentDebt = Math.max(paymentTotalValue - paymentTotalPaidAll, 0);
+
+  const isEditingCurrentInscription = inscriptionEdit?.isEditing ?? false;
 
   return (
     <div className="w-full space-y-8">
@@ -235,12 +302,52 @@ export function DetailsInscription({
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div className="space-y-4 flex-1">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      Detalhes da Inscrição
-                    </h1>
-                    <div className="text-xs text-muted-foreground">
-                      Registrada em:{" "}
-                      {formatDateTime(inscriptionDetails.createdAt)}
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                          Detalhes da Inscrição
+                        </h1>
+                        <div className="text-xs text-muted-foreground">
+                          Registrada em:{" "}
+                          {formatDateTime(inscriptionDetails.createdAt)}
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className={`gap-2 ${
+                          isEditingCurrentInscription || !inscriptionEdit
+                            ? "hidden"
+                            : ""
+                        }`}
+                        onClick={() => inscriptionEdit?.onStart()}
+                      >
+                        <Pencil className="h-4 w-4" />
+                        Editar Inscrição
+                      </Button>
+                      {isEditingCurrentInscription && (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => inscriptionEdit?.onCancel()}
+                            disabled={loading}
+                          >
+                            Cancelar
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => inscriptionEdit?.onSubmit()}
+                            disabled={loading}
+                          >
+                            Salvar
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -250,9 +357,17 @@ export function DetailsInscription({
                         <User className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Responsável</span>
                       </div>
-                      <p className="text-lg font-semibold">
-                        {inscriptionDetails.guestName}
-                      </p>
+                      {isEditingCurrentInscription ? (
+                        <Input
+                          disabled={loading}
+                          className="h-10"
+                          {...inscriptionEdit?.form.register("guestName")}
+                        />
+                      ) : (
+                        <p className="text-lg font-semibold">
+                          {inscriptionDetails.guestName}
+                        </p>
+                      )}
                     </div>
 
                     <div className="bg-muted/30 p-4 rounded-lg">
@@ -260,9 +375,17 @@ export function DetailsInscription({
                         <Mail className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Email</span>
                       </div>
-                      <p className="text-sm font-medium break-all">
-                        {inscriptionDetails.guestEmail}
-                      </p>
+                      {isEditingCurrentInscription ? (
+                        <Input
+                          disabled={loading}
+                          className="h-10"
+                          {...inscriptionEdit?.form.register("guestEmail")}
+                        />
+                      ) : (
+                        <p className="text-sm font-medium break-all">
+                          {inscriptionDetails.guestEmail}
+                        </p>
+                      )}
                     </div>
 
                     <div className="bg-muted/30 p-4 rounded-lg">
@@ -270,9 +393,17 @@ export function DetailsInscription({
                         <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Telefone</span>
                       </div>
-                      <p className="text-sm font-medium">
-                        {inscriptionDetails.phone}
-                      </p>
+                      {isEditingCurrentInscription ? (
+                        <Input
+                          disabled={loading}
+                          className="h-10"
+                          {...inscriptionEdit?.form.register("phone")}
+                        />
+                      ) : (
+                        <p className="text-sm font-medium">
+                          {inscriptionDetails.phone}
+                        </p>
+                      )}
                     </div>
 
                     <div className="bg-muted/30 p-4 rounded-lg">
@@ -280,9 +411,17 @@ export function DetailsInscription({
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Localidade</span>
                       </div>
-                      <p className="text-sm font-medium">
-                        {inscriptionDetails.guestLocality}
-                      </p>
+                      {isEditingCurrentInscription ? (
+                        <Input
+                          disabled={loading}
+                          className="h-10"
+                          {...inscriptionEdit?.form.register("guestLocality")}
+                        />
+                      ) : (
+                        <p className="text-sm font-medium">
+                          {inscriptionDetails.guestLocality}
+                        </p>
+                      )}
                     </div>
 
                     <div className="bg-muted/30 p-4 rounded-lg">
@@ -313,101 +452,458 @@ export function DetailsInscription({
               </div>
             </div>
 
-            <div className="block sm:hidden">
-              {inscriptionDetails.participants.length === 0 ? (
-                <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
-                  Nenhum participante encontrado
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {inscriptionDetails.participants.map((participant) => (
-                    <div
-                      key={participant.id}
-                      className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <h3 className="font-semibold uppercase">
-                            {participant.name}
-                          </h3>
-                        </div>
-                      </div>
+            {participantsList.length === 0 ? (
+              <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
+                Nenhum participante encontrado
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {participantsList.map((participant) => (
+                  <div
+                    key={participant.id}
+                    className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden"
+                  >
+                    <div className="p-6">
+                      <div className="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-6">
+                        <div className="space-y-4 flex-1 w-full">
+                          <div>
+                            <div className="flex items-start justify-between gap-4">
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                {participant.preferredName || participant.name}
+                              </h3>
+                              {(() => {
+                                if (!participantEdit) return null;
+                                const isEditingCurrentParticipant =
+                                  participantEdit.editingParticipantId ===
+                                  participant.id;
+                                const isEditingOtherParticipant =
+                                  !!participantEdit.editingParticipantId &&
+                                  participantEdit.editingParticipantId !==
+                                    participant.id;
 
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground">
-                            Inscrição
-                          </p>
-                          <p className="text-sm font-medium">
-                            {participant.typeInscription.description}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground">Idade</p>
-                          <p className="text-sm font-medium">
-                            {getCalculateAge(participant.birthDate)} anos
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground">
-                            Gênero
-                          </p>
-                          <p className="text-sm font-medium">
-                            {participant.gender}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-xs text-muted-foreground">
-                            Nascimento
-                          </p>
-                          <p className="text-sm font-medium">
-                            {formatDate(participant.birthDate)}
-                          </p>
+                                if (isEditingCurrentParticipant) {
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                          participantEdit.onCancel()
+                                        }
+                                        disabled={loading}
+                                      >
+                                        Cancelar
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={() =>
+                                          participantEdit.onSubmit()
+                                        }
+                                        disabled={loading}
+                                      >
+                                        Salvar
+                                      </Button>
+                                    </div>
+                                  );
+                                }
+
+                                if (isEditingOtherParticipant) return null;
+
+                                return (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="gap-2"
+                                    onClick={() =>
+                                      participantEdit.onStart(participant.id)
+                                    }
+                                    disabled={loading}
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                    Editar Participante
+                                  </Button>
+                                );
+                              })()}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="bg-muted/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  Nome
+                                </span>
+                              </div>
+                              {participantEdit?.editingParticipantId ===
+                              participant.id ? (
+                                <Input
+                                  disabled={loading}
+                                  className="h-10"
+                                  {...participantEdit.form.register("name")}
+                                />
+                              ) : (
+                                <p className="text-sm font-medium">
+                                  {participant.name || "-"}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="bg-muted/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  Nome Preferido
+                                </span>
+                              </div>
+                              {participantEdit?.editingParticipantId ===
+                              participant.id ? (
+                                <Input
+                                  disabled={loading}
+                                  className="h-10"
+                                  {...participantEdit.form.register(
+                                    "preferredName",
+                                  )}
+                                />
+                              ) : (
+                                <p className="text-sm font-medium">
+                                  {participant.preferredName || "N/ Definido"}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="bg-muted/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  Gênero
+                                </span>
+                              </div>
+                              {participantEdit?.editingParticipantId ===
+                              participant.id ? (
+                                <Popover
+                                  open={openGenderParticipant}
+                                  onOpenChange={setOpenGenderParticipant}
+                                >
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      aria-expanded={openGenderParticipant}
+                                      type="button"
+                                      disabled={loading}
+                                      className={cn(
+                                        "w-full justify-between",
+                                        !participantEdit.form.watch("gender") &&
+                                          "text-muted-foreground",
+                                      )}
+                                    >
+                                      {participantEdit.form.watch("gender")
+                                        ? genderOptions.find(
+                                            (gender) =>
+                                              gender.value ===
+                                              participantEdit.form.watch(
+                                                "gender",
+                                              ),
+                                          )?.label
+                                        : "Selecione"}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent
+                                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                                    align="start"
+                                    onOpenAutoFocus={(e) => e.preventDefault()}
+                                  >
+                                    <Command>
+                                      <CommandList>
+                                        <CommandEmpty>
+                                          Nenhum gênero encontrado.
+                                        </CommandEmpty>
+                                        <CommandGroup>
+                                          {genderOptions.map((gender) => (
+                                            <CommandItem
+                                              value={gender.label}
+                                              key={gender.value}
+                                              onSelect={() => {
+                                                participantEdit.form.setValue(
+                                                  "gender",
+                                                  gender.value,
+                                                  {
+                                                    shouldDirty: true,
+                                                    shouldTouch: true,
+                                                    shouldValidate: true,
+                                                  },
+                                                );
+                                                setOpenGenderParticipant(false);
+                                              }}
+                                            >
+                                              <Check
+                                                className={cn(
+                                                  "mr-2 h-4 w-4",
+                                                  gender.value ===
+                                                    participantEdit.form.watch(
+                                                      "gender",
+                                                    )
+                                                    ? "opacity-100"
+                                                    : "opacity-0",
+                                                )}
+                                              />
+                                              {gender.label}
+                                            </CommandItem>
+                                          ))}
+                                        </CommandGroup>
+                                      </CommandList>
+                                    </Command>
+                                  </PopoverContent>
+                                </Popover>
+                              ) : (
+                                <p className="text-sm font-medium">
+                                  {participant.gender}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="bg-muted/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  {participantEdit?.editingParticipantId ===
+                                  participant.id
+                                    ? "Data de nascimento"
+                                    : "Idade"}
+                                </span>
+                              </div>
+                              {participantEdit?.editingParticipantId ===
+                              participant.id ? (
+                                <Input
+                                  type="date"
+                                  disabled={loading}
+                                  className="h-10"
+                                  {...participantEdit.form.register(
+                                    "birthDate",
+                                  )}
+                                />
+                              ) : (
+                                <p className="text-sm font-medium">
+                                  {getCalculateAge(participant.birthDate)} anos
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="bg-muted/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  Inscrição
+                                </span>
+                              </div>
+                              <p className="text-sm font-medium uppercase">
+                                {participant.typeInscription.description ||
+                                  "N/ Definido"}
+                              </p>
+                            </div>
+
+                            <div className="bg-muted/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  Tamanho da camisa
+                                </span>
+                              </div>
+                              {participantEdit?.editingParticipantId ===
+                              participant.id ? (
+                                <Popover
+                                  open={openShirtSizeParticipant}
+                                  onOpenChange={setOpenShirtSizeParticipant}
+                                >
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      aria-expanded={openShirtSizeParticipant}
+                                      type="button"
+                                      disabled={loading}
+                                      className={cn(
+                                        "w-full justify-between",
+                                        !participantEdit.form.watch(
+                                          "shirtSize",
+                                        ) && "text-muted-foreground",
+                                      )}
+                                    >
+                                      {participantEdit.form.watch("shirtSize")
+                                        ? shirtSizeOptions.find(
+                                            (s) =>
+                                              s.value ===
+                                              participantEdit.form.watch(
+                                                "shirtSize",
+                                              ),
+                                          )?.label
+                                        : "Selecione"}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent
+                                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                                    align="start"
+                                    onOpenAutoFocus={(e) => e.preventDefault()}
+                                  >
+                                    <Command>
+                                      <CommandEmpty>
+                                        Nenhum tamanho encontrado.
+                                      </CommandEmpty>
+                                      <CommandList>
+                                        <CommandGroup>
+                                          {shirtSizeOptions.map((size) => (
+                                            <CommandItem
+                                              key={size.value}
+                                              value={size.value}
+                                              onSelect={() => {
+                                                participantEdit.form.setValue(
+                                                  "shirtSize",
+                                                  size.value,
+                                                  {
+                                                    shouldDirty: true,
+                                                    shouldTouch: true,
+                                                    shouldValidate: true,
+                                                  },
+                                                );
+                                                setOpenShirtSizeParticipant(
+                                                  false,
+                                                );
+                                              }}
+                                            >
+                                              <Check
+                                                className={cn(
+                                                  "mr-2 h-4 w-4",
+                                                  size.value ===
+                                                    participantEdit.form.watch(
+                                                      "shirtSize",
+                                                    )
+                                                    ? "opacity-100"
+                                                    : "opacity-0",
+                                                )}
+                                              />
+                                              {size.label}
+                                            </CommandItem>
+                                          ))}
+                                        </CommandGroup>
+                                      </CommandList>
+                                    </Command>
+                                  </PopoverContent>
+                                </Popover>
+                              ) : (
+                                <p className="text-sm font-medium">
+                                  {participant.shirtSize || "-"}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="bg-muted/30 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium">
+                                  Modelo da camisa
+                                </span>
+                              </div>
+                              {participantEdit?.editingParticipantId ===
+                              participant.id ? (
+                                <Popover
+                                  open={openShirtTypeParticipant}
+                                  onOpenChange={setOpenShirtTypeParticipant}
+                                >
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      aria-expanded={openShirtTypeParticipant}
+                                      type="button"
+                                      disabled={loading}
+                                      className={cn(
+                                        "w-full justify-between",
+                                        !participantEdit.form.watch(
+                                          "shirtType",
+                                        ) && "text-muted-foreground",
+                                      )}
+                                    >
+                                      {participantEdit.form.watch("shirtType")
+                                        ? shirtTypeOptions.find(
+                                            (s) =>
+                                              s.value ===
+                                              participantEdit.form.watch(
+                                                "shirtType",
+                                              ),
+                                          )?.label
+                                        : "Selecione"}
+                                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent
+                                    className="w-[var(--radix-popover-trigger-width)] p-0"
+                                    align="start"
+                                    onOpenAutoFocus={(e) => e.preventDefault()}
+                                  >
+                                    <Command>
+                                      <CommandEmpty>
+                                        Nenhum modelo encontrado.
+                                      </CommandEmpty>
+                                      <CommandList>
+                                        <CommandGroup>
+                                          {shirtTypeOptions.map((type) => (
+                                            <CommandItem
+                                              key={type.value}
+                                              value={type.value}
+                                              onSelect={() => {
+                                                participantEdit.form.setValue(
+                                                  "shirtType",
+                                                  type.value,
+                                                  {
+                                                    shouldDirty: true,
+                                                    shouldTouch: true,
+                                                    shouldValidate: true,
+                                                  },
+                                                );
+                                                setOpenShirtTypeParticipant(
+                                                  false,
+                                                );
+                                              }}
+                                            >
+                                              <Check
+                                                className={cn(
+                                                  "mr-2 h-4 w-4",
+                                                  type.value ===
+                                                    participantEdit.form.watch(
+                                                      "shirtType",
+                                                    )
+                                                    ? "opacity-100"
+                                                    : "opacity-0",
+                                                )}
+                                              />
+                                              {type.label}
+                                            </CommandItem>
+                                          ))}
+                                        </CommandGroup>
+                                      </CommandList>
+                                    </Command>
+                                  </PopoverContent>
+                                </Popover>
+                              ) : (
+                                <p className="text-sm font-medium">
+                                  {participant.shirtType || "-"}
+                                </p>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="hidden sm:block rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead className="w-[200px]">Inscrição</TableHead>
-                    <TableHead className="w-[120px]">Idade</TableHead>
-                    <TableHead className="w-[150px]">Gênero</TableHead>
-                    <TableHead className="w-[180px]">Nascimento</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {inscriptionDetails.participants.map((participant) => (
-                    <TableRow
-                      key={participant.id}
-                      className="hover:bg-muted/50"
-                    >
-                      <TableCell>
-                        <div className="flex items-center gap-2 uppercase">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          {participant.name}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {participant.typeInscription.description}
-                      </TableCell>
-                      <TableCell>
-                        {getCalculateAge(participant.birthDate)} anos
-                      </TableCell>
-                      <TableCell>{participant.gender}</TableCell>
-                      <TableCell>{formatDate(participant.birthDate)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-6">
@@ -508,13 +1004,14 @@ export function DetailsInscription({
                   Histórico de Pagamentos
                 </h2>
                 <p className="text-muted-foreground">
-                  {payments.length} pagamento{payments.length !== 1 ? "s" : ""}{" "}
-                  registrado{payments.length !== 1 ? "s" : ""}
+                  {paymentsList.length} pagamento
+                  {paymentsList.length !== 1 ? "s" : ""} registrado
+                  {paymentsList.length !== 1 ? "s" : ""}
                 </p>
               </div>
             </div>
 
-            {payments.length === 0 ? (
+            {paymentsList.length === 0 ? (
               <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
                 {inscriptionDetails.status === InscriptionStatus.UNDER_REVIEW
                   ? "Aguardando revisão"
@@ -522,7 +1019,7 @@ export function DetailsInscription({
               </div>
             ) : (
               <div className="space-y-4">
-                {payments.map((p, idx) => {
+                {paymentsList.map((p) => {
                   const installments: PaymentInstallment[] =
                     p.paymentInstallment ?? [];
                   const isApproved =
