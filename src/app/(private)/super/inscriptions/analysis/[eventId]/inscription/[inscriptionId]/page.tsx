@@ -1,8 +1,8 @@
 "use client";
 
 import InscriptionDetailAnalysis from "@/features/inscriptions/components/analysis/inscription/InscriptionDetailAnalysis";
+import { useInscriptionActions } from "@/features/inscriptions/hooks/analysis/inscription/actions/useInscriptionActions";
 import { useInscriptionDetails } from "@/features/inscriptions/hooks/analysis/inscription/useInscriptionDetails";
-import { useInscriptionActions } from "@/features/inscriptions/hooks/analysis/useInscriptionActions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
