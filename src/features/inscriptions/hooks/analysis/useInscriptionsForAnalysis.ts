@@ -1,14 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useInscriptionsForAnalysisQuery } from "@/features/inscriptions/hooks/analysis/useInscriptionsForAnalysisQuery";
 import {
   UseAnalysisParams,
   UseAnalysisResult,
-} from "../../types/analysis/analysisTypes";
-import {
-  useAnalysisInscriptionsQuery,
-  usePrefetchAnalysisInscriptions,
-} from "./useAnalysisInscriptionsQuery";
+} from "@/features/inscriptions/types/analysis/analysisTypes";
+import { useState } from "react";
 
 export function useInscriptionsForAnalysis({
   eventId,
@@ -23,10 +20,7 @@ export function useInscriptionsForAnalysis({
     isLoading: loading,
     error,
     refetch,
-  } = useAnalysisInscriptionsQuery(eventId, page, pageSize);
-
-  // Pré-carregar próxima página
-  const { prefetchNextPage } = usePrefetchAnalysisInscriptions();
+  } = useInscriptionsForAnalysisQuery(eventId, page, pageSize);
 
   return {
     analysisData: data ?? null,

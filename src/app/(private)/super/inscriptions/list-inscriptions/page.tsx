@@ -2,6 +2,7 @@
 
 import ListEventsForInscription from "@/features/inscriptions/components/ListEventsForInscription";
 import { useEventsForInscription } from "@/features/inscriptions/hooks/useEventsForInscription";
+import type { Event } from "@/features/inscriptions/types/listEventsTypes";
 import { StatusEvent } from "@/features/inscriptions/types/listEventsTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
@@ -10,7 +11,7 @@ import { Card, CardBody, CardFooter } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SelectedEventMyInscriptionPage() {
+export default function SelectEventForListInscriptionAdminPage() {
   const router = useRouter();
   const defaultStatusFilter: StatusEvent[] = ["OPEN"];
   const [pendingFilter, setPendingFilter] =
@@ -33,12 +34,23 @@ export default function SelectedEventMyInscriptionPage() {
     setPage(1);
   };
 
+  const infoRows = (event: Event) => [
+    {
+      label: "Total de Inscrições",
+      value: event?.countInscriptions || 0,
+    },
+    {
+      label: "Total de Inscrições N/ Alocadas",
+      value: event?.countGuestInscriptions || 0,
+    },
+  ];
+
   const handleSelectEvent = (eventId: string) => {
-    router.push(`/user/inscription/my-inscriptions/${eventId}`);
+    router.push(`/super/inscriptions/list-inscriptions/${eventId}`);
   };
 
   const handleBack = () => {
-    router.push("/user/home");
+    router.push("/super/home");
   };
 
   const renderSkeletonGrid = () => (
@@ -92,18 +104,20 @@ export default function SelectedEventMyInscriptionPage() {
         page={page}
         pageCount={pageCount}
         statusFilter={pendingFilter}
+        showDateLocation={false}
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
         setPage={setPage}
         onSelectEvent={handleSelectEvent}
+        getInfoRows={infoRows}
       />
     );
   };
 
   return (
     <PageContainer
-      title="Minhas Inscrições"
-      description="Escolha um evento para ver seus inscrições."
+      title="Lista de Inscrições"
+      description="Escolha um evento para ver todas as inscrições."
       showBackButton={true}
       backButtonAction={handleBack}
     >

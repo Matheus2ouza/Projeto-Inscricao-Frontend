@@ -12,7 +12,7 @@ export const eventsForInscriptionKeys = {
 export function useEventsForInscriptionQuery(
   page: number,
   pageSize: number,
-  status?: StatusEvent[]
+  status?: StatusEvent[],
 ) {
   return useQuery<EventsListResponse>({
     queryKey: eventsForInscriptionKeys.list(page, pageSize, status),

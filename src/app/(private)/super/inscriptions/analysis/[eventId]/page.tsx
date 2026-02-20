@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
 
-export default function EventInscriptionsAnalysisAdminPage() {
+export default function EventInscriptionsAnalysisSuperPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
@@ -17,7 +17,6 @@ export default function EventInscriptionsAnalysisAdminPage() {
   if (!eventId) {
     return null;
   }
-
   const {
     analysisData,
     loading,
@@ -34,12 +33,12 @@ export default function EventInscriptionsAnalysisAdminPage() {
   });
 
   const handleBack = () => {
-    router.push("/admin/inscriptions/analysis");
+    router.push("/super/inscriptions/analysis");
   };
 
   const handleViewInscription = (inscriptionId: string) => {
     router.push(
-      `/admin/inscriptions/analysis/${eventId}/inscription/${inscriptionId}`,
+      `/super/inscriptions/analysis/${eventId}/inscription/${inscriptionId}`,
     );
   };
 

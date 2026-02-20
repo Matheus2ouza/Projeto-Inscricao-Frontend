@@ -21,7 +21,12 @@ import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Calendar, Frown, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { EVENT_STATUS_OPTIONS, StatusEvent } from "../types/selectEvent";
+import { EVENT_STATUS_OPTIONS, StatusEvent } from "../types/listEventsTypes";
+
+type InfoRow = {
+  label: string;
+  value: number | string;
+};
 
 interface ListEventsForInscriptionProps {
   events: Event[];
@@ -30,10 +35,12 @@ interface ListEventsForInscriptionProps {
   pageCount: number;
   buttonLabel?: string;
   statusFilter: StatusEvent[];
+  showDateLocation?: boolean;
   onStatusFilterChange: (value: StatusEvent[]) => void;
   onApplyStatusFilter: () => void;
   setPage: (page: number) => void;
   onSelectEvent: (eventId: string) => void;
+  getInfoRows?: (event: Event) => InfoRow[];
 }
 
 export default function ListEventsForInscription({
@@ -43,10 +50,12 @@ export default function ListEventsForInscription({
   pageCount,
   buttonLabel = "Realizar Inscrição",
   statusFilter,
+  showDateLocation = true,
   onStatusFilterChange,
   onApplyStatusFilter,
   setPage,
   onSelectEvent,
+  getInfoRows,
 }: ListEventsForInscriptionProps) {
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
@@ -169,21 +178,44 @@ export default function ListEventsForInscription({
                   {event.name}
                 </h3>
 
-                <div className="flex items-center text-sm text-gray-700 dark:text-gray-300 mb-1">
-                  <Calendar className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
-                  <span className="line-clamp-1">
-                    {formatDate(event.startDate)} - {formatDate(event.endDate)}
-                  </span>
+                {showDateLocation && (
+                  <>
+                    <div className="flex items-center text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      <Calendar className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
+                      {event.startDate && event.endDate ? (
+                        <span className="line-clamp-1">
+                          {formatDate(event.startDate)} -{" "}
+                          {formatDate(event.endDate)}
+                        </span>
+                      ) : (
+                        <span className="line-clamp-1">Data não informada</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                      <MapPin className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
+                      <span className="line-clamp-1">
+                        {event.location || "Local não informado"}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex flex-col gap-2 w-full">
+                  {getInfoRows?.(event)?.map(({ label, value }) => (
+                    <div
+                      key={label}
+                      className="flex justify-between items-center text-sm dark:text-white"
+                    >
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {label}
+                      </span>
+                      <span className="font-semibold">{value}</span>
+                    </div>
+                  ))}
                 </div>
 
-                <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
-                  <MapPin className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
-                  <span className="line-clamp-1">
-                    {event.location || "Local não informado"}
-                  </span>
-                </div>
-
-                <div className="flex flex-col w-full gap-2 mt-2">
+                <div className="flex flex-col w-full gap-2">
                   <Button
                     size="sm"
                     className="w-full dark:text-white rounded-lg"

@@ -1,3 +1,11 @@
+export type Inscription = {
+  id: string;
+  responsible: string;
+  status: string;
+  isGuest: boolean;
+  totalParticipant: number;
+};
+
 export type Event = {
   id: string;
   name: string;
@@ -5,34 +13,29 @@ export type Event = {
   startDate: string;
   endDate: string;
   totalInscription: number;
+  totalGuestInscription?: number;
   totalParticipants: number;
   totalPaid: number;
   totalDue: number;
   inscriptions: Inscription[];
 };
 
-export type Inscription = {
-  id: string;
-  responsible: string;
-  status: string;
-  totalParticipant: number;
-};
-
-export type MyInscriptionsResponse = {
+export type ListInscriptionsResponse = {
   event: Event;
   total: number;
   page: number;
   pageCount: number;
 };
 
-export type UseMyInscriptionsParams = {
+export type ListInscriptionsParams = {
   eventId: string;
   initialPage: number;
   pageSize: number;
-  limitTime?: string;
+  isGuest?: boolean;
+  orderBy?: "asc" | "desc";
 };
 
-export type UseMyInscriptionsResult = {
+export type ListInscriptionsResult = {
   event: Event | null;
   inscriptions: Inscription[];
   total: number;

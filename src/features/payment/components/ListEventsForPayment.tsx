@@ -251,7 +251,7 @@ export default function ListEventsForPayment({
                   ))}
                 </div>
 
-                <div className="flex flex-col w-full gap-2 mt-2">
+                <div className="flex flex-col w-full gap-2">
                   <Button
                     size="sm"
                     className="w-full dark:text-white rounded-lg"

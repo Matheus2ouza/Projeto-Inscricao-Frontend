@@ -8,13 +8,12 @@ import PageContainer from "@/shared/components/layout/PageContainer";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-export default function CreateAvulsaSuperPage() {
+export default function CreateAvulsaAdminPage() {
   const params = useParams();
   const router = useRouter();
-  const rawEventId = params.id;
+  const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
   const createAvulsaMutation = useCreateAvulsaRegistration();
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = useCallback(
@@ -30,7 +29,7 @@ export default function CreateAvulsaSuperPage() {
             total +
             participant.payments.reduce(
               (sum, payment) => sum + Number(payment.value || 0),
-              0
+              0,
             )
           );
         }, 0),
@@ -55,7 +54,7 @@ export default function CreateAvulsaSuperPage() {
         setErrorMessage(message);
       }
     },
-    [createAvulsaMutation, eventId, router]
+    [createAvulsaMutation, eventId, router],
   );
 
   if (!eventId) return null;

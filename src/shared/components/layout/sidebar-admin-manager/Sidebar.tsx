@@ -40,14 +40,9 @@ import { cn } from "@/shared/lib/utils";
 import {
   BanknoteArrowDown,
   CalendarDays,
-  Captions,
-  CardSim,
   ChevronRight,
   ChevronsUpDown,
-  DollarSign,
   House,
-  IdCard,
-  ListOrdered,
   LogOut,
   Map,
   ScrollText,
@@ -151,8 +146,15 @@ export default function AppSidebarAdminManager({
                               href="/admin/inscriptions/analysis"
                               className="gap-1"
                             >
-                              <Captions className="size-4" />
                               <span>Analizar Inscrições</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/inscriptions/list-inscriptions"
+                              className="gap-1"
+                            >
+                              <span>Lista de Inscrições</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
@@ -160,7 +162,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/inscriptions/avulsa"
                               className="gap-1"
                             >
-                              <IdCard className="size-4" />
                               <span>Inscrição Avulsas</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -194,7 +195,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/payments/analysis"
                               className="gap-1"
                             >
-                              <DollarSign className="size-4" />
                               <span>Analizar Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -203,7 +203,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/payments/list-payments"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Lista de Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -257,7 +256,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/events/manager"
                               className="gap-1"
                             >
-                              <CardSim className="size-4" />
                               <span>Gerenciamento</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -266,7 +264,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/participants/list-participants"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Lista de Participantes</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -275,7 +272,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/participants/list-guest-participants"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Participantes Não Vinculados</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -284,7 +280,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/events/check-in"
                               className="gap-1"
                             >
-                              <IdCard className="size-4" />
                               <span>Check-in</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -319,7 +314,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/tickets/manager"
                               className="gap-1"
                             >
-                              <CardSim className="size-4" />
                               <span>Gerenciamento</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -328,7 +322,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/tickets/analisy-sales"
                               className="gap-1"
                             >
-                              <DollarSign className="size-4" />
                               <span>Analise de Vendas</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -337,7 +330,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/tickets/list-sales"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Lista de Vendas</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -346,7 +338,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/tickets/register-sale"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Registrar Venda</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -388,7 +379,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/report/geral"
                               className="gap-1"
                             >
-                              <CardSim className="size-4" />
                               <span>Relatorio Geral</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -397,7 +387,6 @@ export default function AppSidebarAdminManager({
                               href="/admin/report/financial"
                               className="gap-1"
                             >
-                              <CardSim className="size-4" />
                               <span>Relatorio Financeiro</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>

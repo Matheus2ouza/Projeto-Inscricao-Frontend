@@ -7,7 +7,7 @@ import { avulsaKeys } from "../../types/avulsa/avulsaTypes";
 export function useAvulsaRegistrations(
   eventId: string,
   page: number,
-  pageSize: number
+  pageSize: number,
 ) {
   const query = useQuery({
     queryKey: avulsaKeys.list(eventId, page, pageSize),

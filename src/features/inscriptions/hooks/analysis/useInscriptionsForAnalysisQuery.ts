@@ -1,12 +1,12 @@
+import { getEventInscriptions } from "@/features/inscriptions/api/analysis/getEventInscriptions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getEventInscriptions } from "../../api/analysis/getEventInscriptions";
 
 // Chaves de cache para análise de inscrições
-export const analysisInscriptionsKeys = {
-  all: ["analysis-inscriptions"] as const,
+export const inscriptionsForAnalysisKeys = {
+  all: ["inscriptions-for-analysis"] as const,
   eventInscriptions: (eventId: string, page: number, pageSize: number) =>
     [
-      ...analysisInscriptionsKeys.all,
+      ...inscriptionsForAnalysisKeys.all,
       "eventInscriptions",
       eventId,
       { page, pageSize },
@@ -14,27 +14,27 @@ export const analysisInscriptionsKeys = {
   // Base key for all pages of a specific inscription's details
   inscriptionDetailsBase: (inscriptionId: string) =>
     [
-      ...analysisInscriptionsKeys.all,
+      ...inscriptionsForAnalysisKeys.all,
       "inscriptionDetails",
       inscriptionId,
     ] as const,
   inscriptionDetails: (inscriptionId: string, page: number, pageSize: number) =>
     [
-      ...analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+      ...inscriptionsForAnalysisKeys.inscriptionDetailsBase(inscriptionId),
       { page, pageSize },
     ] as const,
   // Chave para eventos de análise
   events: (page: number, pageSize: number) =>
-    [...analysisInscriptionsKeys.all, "events", { page, pageSize }] as const,
+    [...inscriptionsForAnalysisKeys.all, "events", { page, pageSize }] as const,
 };
 
-export function useAnalysisInscriptionsQuery(
+export function useInscriptionsForAnalysisQuery(
   eventId: string,
   page: number = 1,
   pageSize: number = 15,
 ) {
   return useQuery({
-    queryKey: analysisInscriptionsKeys.eventInscriptions(
+    queryKey: inscriptionsForAnalysisKeys.eventInscriptions(
       eventId,
       page,
       pageSize,
@@ -55,33 +55,35 @@ export function useInvalidateAnalysisInscriptions() {
 
   return {
     invalidateAll: () =>
-      queryClient.invalidateQueries({ queryKey: analysisInscriptionsKeys.all }),
+      queryClient.invalidateQueries({
+        queryKey: inscriptionsForAnalysisKeys.all,
+      }),
     invalidateEventInscriptions: (eventId: string) =>
       queryClient.invalidateQueries({
-        queryKey: analysisInscriptionsKeys.eventInscriptions(eventId, 1, 15),
+        queryKey: inscriptionsForAnalysisKeys.eventInscriptions(eventId, 1, 15),
       }),
     // Invalidate all pages of inscription details using the base key
     invalidateInscriptionDetails: (inscriptionId: string) =>
       queryClient.invalidateQueries({
         queryKey:
-          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+          inscriptionsForAnalysisKeys.inscriptionDetailsBase(inscriptionId),
       }),
     // Remove all pages of inscription details from cache (e.g., after delete)
     removeInscriptionDetails: (inscriptionId: string) =>
       queryClient.removeQueries({
         queryKey:
-          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+          inscriptionsForAnalysisKeys.inscriptionDetailsBase(inscriptionId),
       }),
     // Cancel any in-flight requests for this inscription's details
     cancelInscriptionDetails: (inscriptionId: string) =>
       queryClient.cancelQueries({
         queryKey:
-          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+          inscriptionsForAnalysisKeys.inscriptionDetailsBase(inscriptionId),
       }),
     // Invalidate events cache
     invalidateEvents: () =>
       queryClient.invalidateQueries({
-        queryKey: analysisInscriptionsKeys.all,
+        queryKey: inscriptionsForAnalysisKeys.all,
         predicate: (query) =>
           query.queryKey.includes("events") ||
           query.queryKey.includes("eventInscriptions"),
@@ -91,16 +93,16 @@ export function useInvalidateAnalysisInscriptions() {
       // Remove inscription details
       queryClient.removeQueries({
         queryKey:
-          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+          inscriptionsForAnalysisKeys.inscriptionDetailsBase(inscriptionId),
       });
       // Cancel any ongoing requests for this inscription
       queryClient.cancelQueries({
         queryKey:
-          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+          inscriptionsForAnalysisKeys.inscriptionDetailsBase(inscriptionId),
       });
       // Invalidate event inscriptions to refresh lists
       queryClient.invalidateQueries({
-        queryKey: analysisInscriptionsKeys.all,
+        queryKey: inscriptionsForAnalysisKeys.all,
         predicate: (query) => query.queryKey.includes("eventInscriptions"),
       });
     },
@@ -118,7 +120,7 @@ export function usePrefetchAnalysisInscriptions() {
       pageSize: number,
     ) => {
       queryClient.prefetchQuery({
-        queryKey: analysisInscriptionsKeys.eventInscriptions(
+        queryKey: inscriptionsForAnalysisKeys.eventInscriptions(
           eventId,
           currentPage + 1,
           pageSize,

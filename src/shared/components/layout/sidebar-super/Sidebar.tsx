@@ -30,11 +30,7 @@ import {
   CalendarDays,
   ChevronRight,
   ChevronsUpDown,
-  DollarSign,
-  FileText,
   House,
-  IdCard,
-  ListOrdered,
   LogOut,
   Map,
   ScrollText,
@@ -156,6 +152,14 @@ export default function AppSidebarSuper({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
+                              href="/super/inscriptions/list-inscriptions"
+                              className="gap-1"
+                            >
+                              <span>Lista de Inscrições</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
                               href="/super/inscriptions/avulsa"
                               className="gap-1"
                             >
@@ -252,7 +256,6 @@ export default function AppSidebarSuper({
                               href="/super/events/manager"
                               className="gap-1"
                             >
-                              <FileText className="size-4" />
                               <span>Gerenciamento</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -261,7 +264,6 @@ export default function AppSidebarSuper({
                               href="/super/participants/list-participants"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Lista de Participantes</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -270,7 +272,6 @@ export default function AppSidebarSuper({
                               href="/super/participants/list-guest-participants"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Participantes Não Vinculados</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -279,7 +280,6 @@ export default function AppSidebarSuper({
                               href="/super/events/check-in"
                               className="gap-1"
                             >
-                              <IdCard className="size-4" />
                               <span>Check-in</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -314,7 +314,6 @@ export default function AppSidebarSuper({
                               href="/super/tickets/manager"
                               className="gap-1"
                             >
-                              <FileText className="size-4" />
                               <span>Gerenciamento</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -323,7 +322,6 @@ export default function AppSidebarSuper({
                               href="/super/tickets/analisy-sales"
                               className="gap-1"
                             >
-                              <DollarSign className="size-4" />
                               <span>Analise de Vendas</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -332,7 +330,6 @@ export default function AppSidebarSuper({
                               href="/super/tickets/list-sales"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Lista de Vendas</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
@@ -341,7 +338,6 @@ export default function AppSidebarSuper({
                               href="/super/tickets/register-sale"
                               className="gap-1"
                             >
-                              <ListOrdered className="size-4" />
                               <span>Registrar Venda</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>

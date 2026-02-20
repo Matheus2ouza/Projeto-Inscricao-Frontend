@@ -3,16 +3,9 @@
 import {
   Event,
   Inscription,
-} from "@/features/inscriptions/types/MyInscriptions/myInscriptionsTypes";
-import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
+} from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import {
   Pagination,
   PaginationContent,
@@ -33,19 +26,12 @@ import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
-import {
-  Calendar,
-  Eye,
-  Image as ImageIcon,
-  Trash2,
-  User,
-  Users,
-} from "lucide-react";
+import { Calendar, Eye, Image as ImageIcon, User, Users } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { useMyInscriptionActions } from "../../hooks/myInscriptions/useMyInscriptionActions";
 
-type MyInscriptionsProps = {
+interface listInscriptionsTableProps {
+  pageSize: number;
   event: Event | null;
   inscriptions: Inscription[];
   total: number;
@@ -53,11 +39,10 @@ type MyInscriptionsProps = {
   pageCount: number;
   onPageChange: (page: number) => void;
   onSelectInscription: (id: string) => void;
-  pageSize?: number;
-  onInscriptionDeleted?: () => void;
-};
+}
 
-export default function MyInscriptionsTable({
+export default function ListInscriptionsTable({
+  pageSize,
   event,
   inscriptions,
   total,
@@ -65,53 +50,11 @@ export default function MyInscriptionsTable({
   pageCount,
   onPageChange,
   onSelectInscription,
-  pageSize = 10,
-  onInscriptionDeleted,
-}: MyInscriptionsProps) {
+}: listInscriptionsTableProps) {
   const [imageError, setImageError] = useState(false);
-  const [inscriptionToDelete, setInscriptionToDelete] =
-    useState<Inscription | null>(null);
-  const [selectedInscription, setSelectedInscription] =
-    useState<Inscription | null>(null);
 
-  const { handleDeleteInscription, isDeleting } = useMyInscriptionActions();
-
-  // Função para calcular o índice global
   const calculateGlobalIndex = (localIndex: number): number => {
     return (page - 1) * pageSize + localIndex + 1;
-  };
-
-  // Função para deletar a inscrição
-  const handleDelete = async () => {
-    if (!inscriptionToDelete) return;
-
-    try {
-      await handleDeleteInscription(inscriptionToDelete.id);
-      setInscriptionToDelete(null);
-
-      // Chama o callback para atualizar a lista
-      if (onInscriptionDeleted) {
-        onInscriptionDeleted();
-      }
-    } catch (error) {
-      console.error("Erro ao deletar inscrição:", error);
-      // O erro já é tratado no hook useMyInscriptionActions
-    }
-  };
-
-  // Função para visualizar detalhes da inscrição (mobile)
-  const handleViewDetails = (inscription: Inscription) => {
-    setSelectedInscription(inscription);
-  };
-
-  // Função para redirecionar para a página de detalhes da inscrição (desktop)
-  const handleViewInscription = (inscriptionId: string) => {
-    onSelectInscription(inscriptionId);
-  };
-
-  // Função para abrir dialog de exclusão
-  const handleOpenDeleteDialog = (inscription: Inscription) => {
-    setInscriptionToDelete(inscription);
   };
 
   if (!event) {
@@ -130,11 +73,9 @@ export default function MyInscriptionsTable({
 
   return (
     <div className="space-y-6">
-      {/* Card do Evento com layout melhorado */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col sm:flex-row gap-6">
-            {/* Imagem do Evento à esquerda */}
             <div className="relative w-full sm:w-70 h-48 rounded-lg overflow-hidden bg-muted flex-shrink-0">
               {event.image && !imageError ? (
                 <Image
@@ -152,14 +93,12 @@ export default function MyInscriptionsTable({
               )}
             </div>
 
-            {/* Informações do Evento à direita */}
             <div className="flex-1 space-y-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white uppercase">
                   {event.name}
                 </h1>
 
-                {/* Detalhes do Evento */}
                 <div className="flex flex-wrap gap-4 mt-3">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
@@ -170,7 +109,6 @@ export default function MyInscriptionsTable({
                   </div>
                 </div>
 
-                {/* Data de criação (se disponível) */}
                 {(event as any).createdAt && (
                   <div className="mt-2 text-xs text-muted-foreground">
                     Criado em: {formatDateTime((event as any).createdAt)}
@@ -178,12 +116,11 @@ export default function MyInscriptionsTable({
                 )}
               </div>
 
-              {/* Estatísticas do Evento */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="flex flex-col space-y-1">
                     <span className="text-sm text-muted-foreground">
-                      Minhas Inscrições
+                      Total de Inscrições
                     </span>
                     <span className="text-2xl font-bold">
                       {event.totalInscription}
@@ -194,10 +131,21 @@ export default function MyInscriptionsTable({
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="flex flex-col space-y-1">
                     <span className="text-sm text-muted-foreground">
-                      Total de Participantes
+                      Participantes
                     </span>
                     <span className="text-2xl font-bold">
                       {event.totalParticipants}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <div className="flex flex-col space-y-1">
+                    <span className="text-sm text-muted-foreground">
+                      Participantes Não Alocados
+                    </span>
+                    <span className="text-2xl font-bold">
+                      {event.totalGuestInscription || 0}
                     </span>
                   </div>
                 </div>
@@ -229,14 +177,12 @@ export default function MyInscriptionsTable({
         </div>
       </div>
 
-      {/* Título das Inscrições */}
       <div className="pt-4">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Minhas Inscrições
+          Lista de Inscrições
         </h2>
       </div>
 
-      {/* Tabela - Versão Mobile com Cards */}
       <div className="block sm:hidden">
         {inscriptions.length === 0 ? (
           <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
@@ -249,7 +195,6 @@ export default function MyInscriptionsTable({
                 key={inscription.id}
                 className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
               >
-                {/* Primeira linha: Número, Status e Ações */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-muted-foreground">
@@ -261,27 +206,17 @@ export default function MyInscriptionsTable({
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                      onClick={() => handleViewDetails(inscription)}
-                      title="Visualizar Detalhes"
+                      variant="link"
+                      size="sm"
+                      className="h-10 w-10 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
+                      onClick={() => onSelectInscription(inscription.id)}
+                      aria-label="Detalhes"
                     >
                       <Eye className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                      onClick={() => handleOpenDeleteDialog(inscription)}
-                      title="Excluir Inscrição"
-                    >
-                      <Trash2 className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
 
-                {/* Status */}
                 <div className="mb-3">
                   <span
                     className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
@@ -292,13 +227,22 @@ export default function MyInscriptionsTable({
                   </span>
                 </div>
 
-                {/* Segunda linha: Responsável e ID */}
                 <div className="grid grid-cols-1 gap-3 mb-3">
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Responsável</p>
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      <p className="font-medium">{inscription.responsible}</p>
+                      <p className="font-medium">
+                        {inscription.responsible || "-"}
+                      </p>
+                      {inscription.isGuest && (
+                        <Badge
+                          variant="secondary"
+                          className="h-5 px-2 text-[10px]"
+                        >
+                          N/ Alocado
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <div className="space-y-1">
@@ -309,7 +253,6 @@ export default function MyInscriptionsTable({
                   </div>
                 </div>
 
-                {/* Terceira linha: Participantes */}
                 <div className="pt-3 border-t">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -327,7 +270,6 @@ export default function MyInscriptionsTable({
         )}
       </div>
 
-      {/* Tabela - Versão Desktop */}
       <div className="hidden sm:block rounded-md border">
         {inscriptions.length === 0 ? (
           <div className="px-6 py-12 text-center text-muted-foreground">
@@ -359,7 +301,15 @@ export default function MyInscriptionsTable({
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      {inscription.responsible}
+                      {inscription.responsible || "-"}
+                      {inscription.isGuest && (
+                        <Badge
+                          variant="secondary"
+                          className="h-5 px-2 text-[10px]"
+                        >
+                          N/ Alocado
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -382,22 +332,13 @@ export default function MyInscriptionsTable({
                   <TableCell className="text-center">
                     <div className="flex justify-center gap-1">
                       <Button
-                        variant="ghost"
+                        variant="link"
                         size="sm"
-                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                        onClick={() => handleViewInscription(inscription.id)}
-                        title="Visualizar Detalhes"
+                        className="h-6 w-6 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
+                        onClick={() => onSelectInscription(inscription.id)}
+                        aria-label="Detalhes"
                       >
                         <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                        onClick={() => handleOpenDeleteDialog(inscription)}
-                        title="Excluir Inscrição"
-                      >
-                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -408,7 +349,6 @@ export default function MyInscriptionsTable({
         )}
       </div>
 
-      {/* Paginação - Exatamente igual ao exemplo */}
       {pageCount > 1 && (
         <div className="py-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -428,7 +368,6 @@ export default function MyInscriptionsTable({
                   />
                 </PaginationItem>
 
-                {/* Versão mobile - apenas página atual */}
                 <div className="sm:hidden">
                   <PaginationItem>
                     <PaginationLink
@@ -441,7 +380,6 @@ export default function MyInscriptionsTable({
                   </PaginationItem>
                 </div>
 
-                {/* Versão desktop - todas as páginas */}
                 <div className="hidden sm:flex">
                   {Array.from({ length: pageCount }, (_, i) => (
                     <PaginationItem key={i}>
@@ -470,157 +408,6 @@ export default function MyInscriptionsTable({
           </div>
         </div>
       )}
-
-      {/* Dialog de Confirmação para Excluir */}
-      <ConfirmationDialog
-        open={!!inscriptionToDelete}
-        onOpenChange={(open) => {
-          if (!open) {
-            setInscriptionToDelete(null);
-          }
-        }}
-        onConfirm={handleDelete}
-        title="Excluir inscrição"
-        message="Tem certeza que deseja excluir esta inscrição? Esta ação não pode ser desfeita e todos os participantes serão removidos."
-        confirmText="Excluir"
-        cancelText="Cancelar"
-        isLoading={isDeleting}
-        variant="destructive"
-      />
-
-      {/* Dialog de Detalhes da Inscrição (apenas para mobile) */}
-      <Dialog
-        open={!!selectedInscription}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedInscription(null);
-          }
-        }}
-      >
-        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          {selectedInscription && (
-            <>
-              <DialogHeader>
-                <DialogTitle>Detalhes da Inscrição</DialogTitle>
-                <DialogDescription className="break-all">
-                  ID: {selectedInscription.id.substring(0, 16)}...
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4 mt-4">
-                {/* Informações principais */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <span className="text-xs text-muted-foreground">
-                      Responsável
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-base font-semibold">
-                        {selectedInscription.responsible}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-xs text-muted-foreground">
-                      Status
-                    </span>
-                    <div className="mt-1">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                          selectedInscription.status,
-                        )}`}
-                      >
-                        {getConvertStatusInscription(
-                          selectedInscription.status,
-                        )}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-xs text-muted-foreground">
-                      Total de Participantes
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-base font-semibold">
-                        {selectedInscription.totalParticipant}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-xs text-muted-foreground">
-                      ID da Inscrição
-                    </span>
-                    <code className="font-mono text-sm bg-muted px-2 py-1 rounded block">
-                      {selectedInscription.id}
-                    </code>
-                  </div>
-                </div>
-
-                {/* Informações do Evento */}
-                <div className="space-y-1">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Evento
-                  </span>
-                  <div className="border rounded-md overflow-hidden bg-muted p-3 sm:p-4">
-                    <div className="flex items-center gap-3">
-                      {event.image && (
-                        <div className="relative w-16 h-16 rounded overflow-hidden flex-shrink-0">
-                          <Image
-                            src={event.image}
-                            alt={event.name}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        </div>
-                      )}
-                      <div>
-                        <h4 className="font-semibold">{event.name}</h4>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(event.startDate)} -{" "}
-                          {formatDate(event.endDate)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Informações Adicionais (se disponíveis) */}
-                {(selectedInscription as any).createdAt && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium text-muted-foreground">
-                      Data de Criação
-                    </span>
-                    <div className="border rounded-md bg-muted/30 px-4 py-3">
-                      <p className="text-sm">
-                        {formatDateTime((selectedInscription as any).createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Botão para ver mais detalhes */}
-                <div className="pt-4 border-t">
-                  <Button
-                    onClick={() => {
-                      setSelectedInscription(null);
-                      handleViewInscription(selectedInscription.id);
-                    }}
-                    className="w-full"
-                  >
-                    Ver mais detalhes
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

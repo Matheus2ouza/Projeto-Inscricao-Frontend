@@ -1,8 +1,8 @@
 "use client";
 
+import type { InscriptionAnalysisResponse } from "@/features/inscriptions/types/analysis/analysisTypes";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import {
@@ -15,32 +15,20 @@ import {
   Menu,
   Users,
 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
-import type { InscriptionAnalysisResponse } from "../../types/analysis/analysisTypes";
 
 interface InscriptionsAnalysisTableProps {
   analysisData: InscriptionAnalysisResponse | null;
-  loading: boolean;
-  error: string | null;
   page: number;
   pageCount: number;
   total: number;
   onPageChange: (page: number) => void;
   onViewInscription: (inscriptionId: string) => void;
-  listPath: string;
 }
 
 export default function InscriptionsAnalysisTable({
   analysisData,
-  loading,
-  error,
-  page,
-  pageCount,
-  total,
-  onPageChange,
   onViewInscription,
-  listPath,
 }: InscriptionsAnalysisTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<{
@@ -48,7 +36,7 @@ export default function InscriptionsAnalysisTable({
     direction: "asc" | "desc" | "default";
   }>({ field: "", direction: "default" });
   const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   const handleInscriptionClick = (inscriptionId: string) => {
@@ -79,7 +67,7 @@ export default function InscriptionsAnalysisTable({
           inscription.responsible
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          inscription.phone.toLowerCase().includes(searchTerm.toLowerCase())
+          inscription.phone.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }) || [];
 
@@ -159,29 +147,8 @@ export default function InscriptionsAnalysisTable({
   // Contar total de inscrições filtradas
   const totalFilteredInscriptions = sortedAccounts.reduce(
     (total, account) => total + account.inscriptions.length,
-    0
+    0,
   );
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <Card className="w-full max-w-md border-0 shadow-lg">
-          <CardContent className="p-6 text-center">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-6 h-6 text-red-600 dark:text-red-400" />
-            </div>
-            <h2 className="text-xl font-semibold text-red-600 mb-2">
-              Erro ao carregar inscrições
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-            <Button asChild className="w-full">
-              <Link href={listPath}>Voltar para Análise</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen">
@@ -217,7 +184,7 @@ export default function InscriptionsAnalysisTable({
                     <p className="text-xl font-bold">
                       {analysisData.account.reduce(
                         (total, account) => total + account.inscriptions.length,
-                        0
+                        0,
                       )}
                     </p>
                   </div>
@@ -244,9 +211,9 @@ export default function InscriptionsAnalysisTable({
                             account.inscriptions.reduce(
                               (acc, inscription) =>
                                 acc + inscription.totalValue,
-                              0
+                              0,
                             ),
-                          0
+                          0,
                         )
                         .toFixed(2)}
                     </p>
@@ -276,9 +243,9 @@ export default function InscriptionsAnalysisTable({
                   (total, account) =>
                     total +
                     account.inscriptions.filter(
-                      (i) => i.status.toLowerCase() === "under_review"
+                      (i) => i.status.toLowerCase() === "under_review",
                     ).length,
-                  0
+                  0,
                 )}
               </span>
             </div>
@@ -290,9 +257,9 @@ export default function InscriptionsAnalysisTable({
                   (total, account) =>
                     total +
                     account.inscriptions.filter(
-                      (i) => i.status.toLowerCase() === "pending"
+                      (i) => i.status.toLowerCase() === "pending",
                     ).length,
-                  0
+                  0,
                 )}
               </span>
             </div>
@@ -300,27 +267,13 @@ export default function InscriptionsAnalysisTable({
         )}
 
         {/* Cards de Contas */}
-        {loading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <Card key={index} className="border-0 shadow-sm">
-                <CardContent className="">
-                  <div className="space-y-4">
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-8 w-full" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : analysisData && sortedAccounts.length > 0 ? (
+        {analysisData && sortedAccounts.length > 0 ? (
           <div className="space-y-4">
             {sortedAccounts.map((account) => {
               const isExpanded = expandedAccounts.has(account.id);
               const totalDebt = account.inscriptions.reduce(
                 (total, inscription) => total + inscription.totalValue,
-                0
+                0,
               );
 
               return (
@@ -361,7 +314,7 @@ export default function InscriptionsAnalysisTable({
                         <p className="text-lg font-bold text-green-600">
                           {
                             account.inscriptions.filter(
-                              (i) => i.status.toLowerCase() === "paid"
+                              (i) => i.status.toLowerCase() === "paid",
                             ).length
                           }
                         </p>
@@ -373,7 +326,7 @@ export default function InscriptionsAnalysisTable({
                         <p className="text-lg font-bold text-yellow-600">
                           {
                             account.inscriptions.filter(
-                              (i) => i.status.toLowerCase() === "pending"
+                              (i) => i.status.toLowerCase() === "pending",
                             ).length
                           }
                         </p>
@@ -385,7 +338,7 @@ export default function InscriptionsAnalysisTable({
                         <p className="text-lg font-bold text-blue-600">
                           {
                             account.inscriptions.filter(
-                              (i) => i.status.toLowerCase() === "under_review"
+                              (i) => i.status.toLowerCase() === "under_review",
                             ).length
                           }
                         </p>
@@ -607,16 +560,16 @@ export default function InscriptionsAnalysisTable({
                                       <td className="px-3 py-3 text-center">
                                         <span
                                           className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                                            inscription.status
+                                            inscription.status,
                                           )}`}
                                         >
                                           {getConvertStatusInscription(
-                                            inscription.status
+                                            inscription.status,
                                           )}
                                         </span>
                                       </td>
                                     </tr>
-                                  )
+                                  ),
                                 )}
                               </tbody>
                             </table>

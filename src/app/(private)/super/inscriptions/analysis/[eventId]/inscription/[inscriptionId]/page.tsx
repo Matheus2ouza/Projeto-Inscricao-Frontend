@@ -1,15 +1,15 @@
 "use client";
 
 import InscriptionDetailAnalysis from "@/features/inscriptions/components/analysis/inscription/InscriptionDetailAnalysis";
-import { useInscriptionActions } from "@/features/inscriptions/hooks/analysis/inscription/actions/useInscriptionActions";
 import { useInscriptionDetails } from "@/features/inscriptions/hooks/analysis/inscription/useInscriptionDetails";
+import { useInscriptionActions } from "@/features/inscriptions/hooks/analysis/useInscriptionActions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
 
-export default function InscriptionDetailInsideAnalysisAdminPage() {
+export default function InscriptionDetailInsideAnalysisSuperPage() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;
@@ -18,9 +18,6 @@ export default function InscriptionDetailInsideAnalysisAdminPage() {
   const inscriptionId = Array.isArray(rawInscriptionId)
     ? rawInscriptionId[0]
     : rawInscriptionId;
-
-  console.log("inscriptionId", inscriptionId);
-  console.log("eventId", eventId);
 
   if (!eventId || !inscriptionId) {
     return null;
