@@ -1,6 +1,12 @@
 "use client";
 
+import { downloadParticipantsPdf } from "@/features/inscriptions/api/analysis/inscription/downloadParticipantsPdf";
+import { inscriptionsForAnalysisKeys } from "@/features/inscriptions/hooks/analysis/useInscriptionsForAnalysisQuery";
 import { useUpdateInscription } from "@/features/inscriptions/hooks/useEditInscription";
+import {
+  AnalysisInscriptionResponse,
+  Participants,
+} from "@/features/inscriptions/types/analysis/analysisTypes";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import {
@@ -28,7 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+import { getCalculateAge } from "@/shared/utils/getCalculateAge";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
 import { useQueryClient } from "@tanstack/react-query";
@@ -49,16 +55,12 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { downloadParticipantsPdf } from "../../api/analysis/downloadParticipantsPdf";
-import { analysisInscriptionsKeys } from "../../hooks/analysis/useAnalysisInscriptionsQuery";
-import { AnalysisInscriptionResponse } from "../../types/analysis/analysisTypes";
 import { ConfirmationModal } from "./ConfirmationModal";
 
 interface InscriptionDetailAnalysisProps {
   inscriptionId: string;
-  inscriptionData: AnalysisInscriptionResponse | null;
-  loading: boolean;
-  error: string | null;
+  inscriptionDetails: AnalysisInscriptionResponse | null;
+  participants: Participants | null;
   page: number;
   pageCount: number;
   total: number;
@@ -66,7 +68,7 @@ interface InscriptionDetailAnalysisProps {
   approveInscription: (inscriptionId: string) => Promise<void>;
   cancelInscription: (
     inscriptionId: string,
-    currentStatus: string
+    currentStatus: string,
   ) => Promise<void>;
   deleteInscription: (inscriptionId: string) => Promise<void>;
   isApproving: boolean;
@@ -76,9 +78,8 @@ interface InscriptionDetailAnalysisProps {
 
 export default function InscriptionDetailAnalysis({
   inscriptionId,
-  inscriptionData,
-  loading,
-  error,
+  inscriptionDetails,
+  participants,
   page,
   pageCount,
   total,
@@ -120,36 +121,36 @@ export default function InscriptionDetailAnalysis({
     handleSubmit: handleUpdateSubmit,
     isUpdating,
   } = useUpdateInscription({
-    inscriptionId: inscriptionData?.id,
+    inscriptionId: inscriptionDetails?.id ?? inscriptionId,
     initialValues: {
-      responsible: inscriptionData?.responsible,
-      phone: inscriptionData?.phone,
-      email: inscriptionData?.email,
+      responsible: inscriptionDetails?.responsible,
+      phone: inscriptionDetails?.phone,
+      email: inscriptionDetails?.email,
     },
     onSuccess: async () => {
       setIsEditDialogOpen(false);
       // Invalidar queries de análise também
       await queryClient.invalidateQueries({
         queryKey:
-          analysisInscriptionsKeys.inscriptionDetailsBase(inscriptionId),
+          inscriptionsForAnalysisKeys.inscriptionDetailsBase(inscriptionId),
       });
       await queryClient.invalidateQueries({
-        queryKey: analysisInscriptionsKeys.all,
+        queryKey: inscriptionsForAnalysisKeys.all,
       });
     },
   });
 
   const handleDownloadParticipants = async () => {
-    if (!inscriptionData?.id) {
+    const targetInscriptionId = inscriptionDetails?.id ?? inscriptionId;
+    if (!targetInscriptionId) {
       toast.error("Inscrição não encontrada para gerar a lista.");
       return;
     }
 
     try {
       setParticipantsDownloadLoading(true);
-      const { pdfBase64, filename } = await downloadParticipantsPdf(
-        inscriptionData.id
-      );
+      const { pdfBase64, filename } =
+        await downloadParticipantsPdf(targetInscriptionId);
       const byteCharacters = atob(pdfBase64);
       const byteNumbers = new Array(byteCharacters.length);
 
@@ -197,7 +198,7 @@ export default function InscriptionDetailAnalysis({
 
   const handleCancelInscription = () => {
     const isCurrentlyCancelled =
-      inscriptionData?.status.toLowerCase() === "cancelled";
+      inscriptionDetails?.status.toLowerCase() === "cancelled";
 
     setModalConfig({
       title: isCurrentlyCancelled ? "Reativar Inscrição" : "Cancelar Inscrição",
@@ -207,7 +208,10 @@ export default function InscriptionDetailAnalysis({
       confirmText: isCurrentlyCancelled ? "Reativar" : "Cancelar",
       variant: isCurrentlyCancelled ? "success" : "default",
       action: async () => {
-        await cancelInscription(inscriptionId, inscriptionData?.status || "");
+        await cancelInscription(
+          inscriptionId,
+          inscriptionDetails?.status || "",
+        );
         setShowConfirmModal(false);
       },
     });
@@ -229,41 +233,6 @@ export default function InscriptionDetailAnalysis({
     setShowConfirmModal(true);
   };
 
-  const getStatusText = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
-        return "PENDENTE";
-      case "paid":
-        return "APROVADA";
-      case "cancelled":
-        return "REJEITADA";
-      case "under_review":
-        return "EM ANÁLISE";
-      default:
-        return status.toUpperCase();
-    }
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("pt-BR");
-  };
-
-  const calculateAge = (birthDate: string) => {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birth.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
-  };
-
   const getGenderText = (gender: string) => {
     switch (gender.toLowerCase()) {
       case "male":
@@ -275,6 +244,12 @@ export default function InscriptionDetailAnalysis({
       default:
         return gender;
     }
+  };
+
+  const formatDate = (date: string | Date) => {
+    const parsedDate = typeof date === "string" ? new Date(date) : date;
+    if (Number.isNaN(parsedDate.getTime())) return "";
+    return parsedDate.toLocaleDateString("pt-BR");
   };
 
   // Função para ordenar os participantes
@@ -322,9 +297,9 @@ export default function InscriptionDetailAnalysis({
   return (
     <div className="space-y-6">
       {/* Botões de Ação */}
-      {inscriptionData && (
+      {inscriptionDetails && (
         <div className="flex items-center justify-end gap-3">
-          {inscriptionData.status.toLowerCase() === "under_review" && (
+          {inscriptionDetails.status.toLowerCase() === "under_review" && (
             <Button
               variant="default"
               onClick={handleApproveInscription}
@@ -336,7 +311,7 @@ export default function InscriptionDetailAnalysis({
             </Button>
           )}
 
-          {inscriptionData.status.toLowerCase() !== "paid" && (
+          {inscriptionDetails.status.toLowerCase() !== "paid" && (
             <div className="flex items-center gap-2">
               <Dialog
                 open={isEditDialogOpen}
@@ -430,21 +405,21 @@ export default function InscriptionDetailAnalysis({
                 onClick={handleCancelInscription}
                 disabled={isCancelling}
                 className={`flex items-center gap-2 ${
-                  inscriptionData.status.toLowerCase() === "cancelled"
+                  inscriptionDetails.status.toLowerCase() === "cancelled"
                     ? "border-green-500 text-green-600 hover:bg-green-50 hover:border-green-600 hover:text-green-700"
                     : "border-orange-500 text-orange-600 hover:bg-orange-50 hover:border-orange-600 hover:text-orange-700"
                 }`}
               >
-                {inscriptionData.status.toLowerCase() === "cancelled" ? (
+                {inscriptionDetails.status.toLowerCase() === "cancelled" ? (
                   <CheckCircle className="h-4 w-4" />
                 ) : (
                   <X className="h-4 w-4" />
                 )}
                 {isCancelling
-                  ? inscriptionData.status.toLowerCase() === "cancelled"
+                  ? inscriptionDetails.status.toLowerCase() === "cancelled"
                     ? "Reativando..."
                     : "Cancelando..."
-                  : inscriptionData.status.toLowerCase() === "cancelled"
+                  : inscriptionDetails.status.toLowerCase() === "cancelled"
                     ? "Reativar Inscrição"
                     : "Cancelar Inscrição"}
               </Button>
@@ -464,14 +439,14 @@ export default function InscriptionDetailAnalysis({
       )}
 
       {/* Informações da Inscrição */}
-      {inscriptionData && (
+      {inscriptionDetails && (
         <Card className="border-0 shadow-md mb-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-4">
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    {inscriptionData.responsible}
+                    {inscriptionDetails.responsible}
                   </h2>
                   <p className="text-sm text-muted-foreground">
                     Responsável pela inscrição
@@ -480,10 +455,10 @@ export default function InscriptionDetailAnalysis({
               </div>
               <span
                 className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
-                  inscriptionData.status
+                  inscriptionDetails.status,
                 )}`}
               >
-                {getConvertStatusInscription(inscriptionData.status)}
+                {getConvertStatusInscription(inscriptionDetails.status)}
               </span>
             </div>
 
@@ -497,12 +472,12 @@ export default function InscriptionDetailAnalysis({
                     Telefone
                   </p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white">
-                    {inscriptionData.phone}
+                    {inscriptionDetails.phone}
                   </p>
                 </div>
               </div>
 
-              {inscriptionData.email && (
+              {inscriptionDetails.email && (
                 <div className="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
                   <div className="p-3 bg-orange-500 rounded-lg shadow-md">
                     <Mail className="h-6 w-6 text-white" />
@@ -512,7 +487,7 @@ export default function InscriptionDetailAnalysis({
                       Email
                     </p>
                     <p className="text-lg font-bold text-gray-900 dark:text-white break-all">
-                      {inscriptionData.email}
+                      {inscriptionDetails.email}
                     </p>
                   </div>
                 </div>
@@ -523,7 +498,7 @@ export default function InscriptionDetailAnalysis({
       )}
 
       {/* Botão Baixar Lista */}
-      {inscriptionData && (
+      {inscriptionDetails && (
         <div className="flex justify-end mb-6">
           <Button
             variant="outline"
@@ -538,7 +513,7 @@ export default function InscriptionDetailAnalysis({
       )}
 
       {/* Informações da Lista de Participantes - Fora da Tabela */}
-      {inscriptionData && (
+      {inscriptionDetails && (
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Lista de Participantes
@@ -553,22 +528,7 @@ export default function InscriptionDetailAnalysis({
       {/* Tabela de Participantes */}
       <Card className="border-0 shadow-sm">
         <CardContent className="p-0">
-          {loading ? (
-            <div className="p-6">
-              <div className="space-y-4">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <div key={index} className="flex items-center space-x-4">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <div className="space-y-2 flex-1">
-                      <Skeleton className="h-4 w-1/4" />
-                      <Skeleton className="h-4 w-1/3" />
-                    </div>
-                    <Skeleton className="h-6 w-20" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : inscriptionData && inscriptionData.participants.length > 0 ? (
+          {participants && participants.length > 0 ? (
             <>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
@@ -718,50 +678,48 @@ export default function InscriptionDetailAnalysis({
                     </tr>
                   </thead>
                   <tbody>
-                    {sortParticipants(inscriptionData.participants).map(
-                      (participant) => (
-                        <tr
-                          key={participant.id}
-                          className="border-t hover:bg-muted/50 transition-colors"
-                        >
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                                <User className="w-4 h-4 text-white dark:text-white" />
-                              </div>
-                              <span className="font-medium">
-                                {participant.name}
-                              </span>
+                    {sortParticipants(participants).map((participant) => (
+                      <tr
+                        key={participant.id}
+                        className="border-t hover:bg-muted/50 transition-colors"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                              <User className="w-4 h-4 text-white dark:text-white" />
                             </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-muted-foreground">
-                                {formatDate(participant.birthDate)}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span
-                              className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(participant.typeInscription)}`}
-                            >
-                              {participant.typeInscription}
+                            <span className="font-medium">
+                              {participant.name}
                             </span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className="text-muted-foreground font-medium">
-                              {calculateAge(participant.birthDate)} anos
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-muted-foreground" />
                             <span className="text-muted-foreground">
-                              {getGenderText(participant.gender)}
+                              {formatDate(participant.birthDate)}
                             </span>
-                          </td>
-                        </tr>
-                      )
-                    )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(participant.typeInscription)}`}
+                          >
+                            {participant.typeInscription}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="text-muted-foreground font-medium">
+                            {getCalculateAge(participant.birthDate)} anos
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="text-muted-foreground">
+                            {getGenderText(participant.gender)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

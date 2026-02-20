@@ -21,7 +21,7 @@ export default function AvulsaByEventSuperPage() {
   const { data, isLoading, error } = useAvulsaRegistrations(
     eventId,
     page,
-    PAGE_SIZE
+    PAGE_SIZE,
   );
 
   const errorMessage =
@@ -36,12 +36,12 @@ export default function AvulsaByEventSuperPage() {
   };
 
   const handleCreate = () => {
-    router.push(`/super/inscriptions/avulsa/create/${eventId}`);
+    router.push(`/super/inscriptions/avulsa/${eventId}/create`);
   };
 
   const handleViewDetails = (registrationId: string) => {
     router.push(
-      `/super/inscriptions/avulsa/${eventId}/details/${registrationId}`
+      `/super/inscriptions/avulsa/${eventId}/details/${registrationId}`,
     );
   };
 

@@ -1,9 +1,11 @@
 "use client";
 
-import { StatusEvent } from "@/features/inscriptions/types/selectEvent";
 import ListEventsForParticipants from "@/features/participants/components/ListEventsForParticipants";
 import { useListEventsForParticipants } from "@/features/participants/hooks/useListEventsForParticipants";
-import type { Event } from "@/features/participants/types/listEventsForParticipants";
+import type {
+  Event,
+  StatusEvent,
+} from "@/features/participants/types/listEventsForParticipants";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";

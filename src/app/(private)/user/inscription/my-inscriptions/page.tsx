@@ -12,8 +12,11 @@ import { useState } from "react";
 
 export default function SelectedEventMyInscriptionPage() {
   const router = useRouter();
-  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
-  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
+  const defaultStatusFilter: StatusEvent[] = ["OPEN"];
+  const [pendingFilter, setPendingFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
     useEventsForInscription({
       initialPage: 1,

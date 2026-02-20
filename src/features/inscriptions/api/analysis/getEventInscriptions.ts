@@ -6,7 +6,7 @@ import {
 
 export async function getEventInscriptions(
   eventId: string,
-  params: InscriptionAnalysisRequest
+  params: InscriptionAnalysisRequest,
 ): Promise<InscriptionAnalysisResponse> {
   try {
     const { data } = await axiosInstance.get<InscriptionAnalysisResponse>(
@@ -16,7 +16,7 @@ export async function getEventInscriptions(
           page: params.page,
           pageSize: params.pageSize,
         },
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -27,7 +27,7 @@ export async function getEventInscriptions(
     };
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao carregar análise de inscrições do evento"
+        "Falha ao carregar análise de inscrições do evento",
     );
   }
 }

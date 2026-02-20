@@ -1,7 +1,6 @@
 "use client";
 
-import { useGlobalLoading } from "@/components/GlobalLoading";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import type {
   UseEventsForInscriptionParams,
   UseEventsForInscriptionResult,
@@ -14,7 +13,6 @@ export function useEventsForInscription({
   status,
 }: UseEventsForInscriptionParams = {}): UseEventsForInscriptionResult {
   const [page, setPage] = useState(initialPage);
-  const { setLoading: setGlobalLoading } = useGlobalLoading();
   const {
     data,
     isLoading,
@@ -23,31 +21,13 @@ export function useEventsForInscription({
     refetch: queryRefetch,
   } = useEventsForInscriptionQuery(page, pageSize, status);
 
-  useEffect(() => {
-    setGlobalLoading(isFetching);
-
-    return () => {
-      setGlobalLoading(false);
-    };
-  }, [isFetching, setGlobalLoading]);
-
-  const errorMessage = useMemo(() => {
-    if (!error) {
-      return null;
-    }
-
-    return error instanceof Error
-      ? error.message
-      : "Não foi possível carregar os eventos.";
-  }, [error]);
-
   return {
     events: data?.events ?? [],
     total: data?.total ?? 0,
     page,
     pageCount: data?.pageCount ?? 0,
     loading: isLoading || isFetching,
-    error: errorMessage,
+    error: error?.message || null,
     setPage,
     refetch: async () => {
       await queryRefetch();

@@ -1,3 +1,11 @@
+import { EventStatusOption } from "@/shared/components/EventStatusFilter";
+
+export const EVENT_STATUS_OPTIONS: EventStatusOption[] = [
+  { value: "OPEN", label: "Inscrições Abertas" },
+  { value: "CLOSE", label: "Inscrições Fechadas" },
+  { value: "FINALIZED", label: "Finalizados" },
+];
+
 export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
 export const STATUS_EVENT_VALUES: StatusEvent[] = [
   "OPEN",
@@ -8,28 +16,16 @@ export const STATUS_EVENT_VALUES: StatusEvent[] = [
 export type Event = {
   id: string;
   name: string;
+  imageUrl: string;
+  status: StatusEvent;
   startDate: string;
   endDate: string;
-  quantityParticipants: number;
-  amountCollected: number;
-  imageUrl?: string;
-  logoUrl?: string;
   location?: string;
-  latitude?: number;
-  longitude?: number;
-  status: string;
-  active?: boolean;
-  paymentEnebled: boolean;
-  ticketEnabled: boolean;
-  regionId: string;
-  regionName?: string;
-  createdAt: string;
-  updatedAt: string;
-  countTypeInscriptions?: number;
-  description?: string;
-  maxParticipants?: number;
-  ticketPrice?: number;
-  address?: string;
+  countInscriptions: number;
+  countGuestInscriptions: number;
+  countInscriptionsAnalysis: number;
+  countSingleInscriptions: number;
+  countSingleDebit: number;
 };
 
 export type EventsListQueryParams = {

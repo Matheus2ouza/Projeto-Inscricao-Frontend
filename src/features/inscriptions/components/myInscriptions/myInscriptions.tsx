@@ -54,7 +54,7 @@ type MyInscriptionsProps = {
   onPageChange: (page: number) => void;
   onSelectInscription: (id: string) => void;
   pageSize?: number;
-  onInscriptionDeleted?: () => void; // Nova prop para atualizar a lista após exclusão
+  onInscriptionDeleted?: () => void;
 };
 
 export default function MyInscriptionsTable({
@@ -135,7 +135,7 @@ export default function MyInscriptionsTable({
         <div className="p-6">
           <div className="flex flex-col sm:flex-row gap-6">
             {/* Imagem do Evento à esquerda */}
-            <div className="relative w-full sm:w-48 h-48 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+            <div className="relative w-full sm:w-70 h-48 rounded-lg overflow-hidden bg-muted flex-shrink-0">
               {event.image && !imageError ? (
                 <Image
                   src={event.image}
@@ -183,10 +183,21 @@ export default function MyInscriptionsTable({
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="flex flex-col space-y-1">
                     <span className="text-sm text-muted-foreground">
-                      Total de Inscrições
+                      Minhas Inscrições
                     </span>
                     <span className="text-2xl font-bold">
                       {event.totalInscription}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <div className="flex flex-col space-y-1">
+                    <span className="text-sm text-muted-foreground">
+                      Total de Participantes
+                    </span>
+                    <span className="text-2xl font-bold">
+                      {event.totalParticipants}
                     </span>
                   </div>
                 </div>
@@ -209,17 +220,6 @@ export default function MyInscriptionsTable({
                     </span>
                     <span className="text-2xl font-bold text-red-600 dark:text-red-400">
                       {getFormatCurrency(event.totalDue)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="bg-muted/30 p-4 rounded-lg">
-                  <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-muted-foreground">
-                      Minhas Inscrições
-                    </span>
-                    <span className="text-2xl font-bold">
-                      {inscriptions.length}
                     </span>
                   </div>
                 </div>

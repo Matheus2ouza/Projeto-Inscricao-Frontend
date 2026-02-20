@@ -1,33 +1,29 @@
 "use client";
 
-import type { Event } from "@/features/events/types/selectEvent";
-import SelectedEvent from "@/features/inscriptions/components/SelectedEvent";
-import { useEventsForAnalysis } from "@/features/inscriptions/hooks/useSelectEvent";
-import { StatusEvent } from "@/features/inscriptions/types/selectEvent";
+import ListEventsForInscription from "@/features/inscriptions/components/ListEventsForInscription";
+import { useEventsForInscription } from "@/features/inscriptions/hooks/useEventsForInscription";
+import type { Event } from "@/features/inscriptions/types/listEventsTypes";
+import { StatusEvent } from "@/features/inscriptions/types/listEventsTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
-import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
-import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
+import { Button } from "@/shared/components/ui/button";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { Card, CardBody, CardFooter } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SelectedEventSuperPage() {
+export default function SelectedEventForInscriptionAvulsaSuperPage() {
   const router = useRouter();
-  const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
-  const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
-  const { events, loading, error, page, pageCount, setPage } =
-    useEventsForAnalysis({
+  const defaultStatusFilter: StatusEvent[] = ["OPEN"];
+  const [pendingFilter, setPendingFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<StatusEvent[]>(defaultStatusFilter);
+  const { events, total, page, pageCount, loading, error, setPage, refetch } =
+    useEventsForInscription({
       initialPage: 1,
       pageSize: 8,
       status: appliedFilter.length > 0 ? appliedFilter : undefined,
     });
-
-  const handleBack = () => {
-    router.push("/super/home");
-  };
-
-  const handleViewEvent = (eventId: string) => {
-    router.push(`/super/inscriptions/avulsa${eventId}`);
-  };
 
   const handleStatusChange = (value: StatusEvent[]) => {
     setPendingFilter(value);
@@ -38,7 +34,7 @@ export default function SelectedEventSuperPage() {
     setPage(1);
   };
 
-  const getInfoRows = (event: Event) => [
+  const infoRows = (event: Event) => [
     {
       label: "Inscrições avulsas",
       value: event.countSingleInscriptions,
@@ -49,48 +45,33 @@ export default function SelectedEventSuperPage() {
     },
   ];
 
-  const renderSkeletonGrid = () => {
-    const skeletonCards = Array.from({ length: 6 });
-
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-2">
-            <Skeleton className="h-10 w-full sm:w-[220px] rounded-full" />
-            <Skeleton className="h-10 w-28 rounded-full" />
-          </div>
-          <Skeleton className="h-10 w-28 rounded-full" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {skeletonCards.map((_, index) => (
-            <Card
-              key={index}
-              className="w-full border border-transparent shadow-md rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800"
-            >
-              <CardBody className="p-0">
-                <AspectRatio ratio={16 / 9} className="w-full">
-                  <Skeleton className="w-full h-full rounded-t-xl" />
-                </AspectRatio>
-              </CardBody>
-              <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl space-y-3">
-                <Skeleton className="h-6 w-3/4" />
-                <div className="flex w-full justify-between gap-4">
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-4 w-14" />
-                </div>
-                <div className="flex w-full justify-between gap-4">
-                  <Skeleton className="h-4 w-1/4" />
-                  <Skeleton className="h-4 w-10" />
-                </div>
-                <Skeleton className="h-10 w-full rounded-full" />
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+  const handleBack = () => {
+    router.push("/super/home");
   };
+
+  const handleSelectEvent = (eventId: string) => {
+    router.push(`/super/inscriptions/avulsa/${eventId}`);
+  };
+
+  const renderSkeletonGrid = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {Array.from({ length: 8 }).map((_, index) => (
+        <Card
+          key={index}
+          className="w-full border border-transparent shadow-md rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800"
+        >
+          <CardBody className="p-0">
+            <Skeleton className="w-full h-48 rounded-t-xl" />
+          </CardBody>
+          <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
 
   const renderContent = () => {
     if (loading) {
@@ -99,28 +80,36 @@ export default function SelectedEventSuperPage() {
 
     if (error) {
       return (
-        <div className="flex justify-center items-center min-h-96">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-red-600 mb-2">
-              Erro ao carregar eventos
-            </h2>
-            <p className="text-gray-600">{error}</p>
+        <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
+          <div>
+            <p className="text-red-600 dark:text-red-400 font-semibold">
+              Não foi possível carregar os eventos.
+            </p>
+            <p className="text-muted-foreground mt-1 max-w-md">
+              {error || "Tente novamente em instantes."}
+            </p>
           </div>
+          <Button onClick={() => refetch()} variant="outline">
+            Tentar novamente
+          </Button>
         </div>
       );
     }
 
     return (
-      <SelectedEvent
+      <ListEventsForInscription
+        buttonLabel="Ver Inscrições"
         events={events}
+        total={total}
         page={page}
         pageCount={pageCount}
-        onPageChange={setPage}
-        onViewEvent={handleViewEvent}
         statusFilter={pendingFilter}
+        showDateLocation={false}
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
-        getInfoRows={getInfoRows}
+        setPage={setPage}
+        onSelectEvent={handleSelectEvent}
+        getInfoRows={infoRows}
       />
     );
   };
@@ -128,8 +117,8 @@ export default function SelectedEventSuperPage() {
   return (
     <PageContainer
       title="Inscrições Avulsas"
-      description="Visualize eventos e seus status para cadastrar inscrições avulsas."
-      showBackButton
+      description="Escolha um evento para ver todas as inscrições avulsas."
+      showBackButton={true}
       backButtonAction={handleBack}
     >
       {renderContent()}

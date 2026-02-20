@@ -5,6 +5,7 @@ export type Event = {
   startDate: string;
   endDate: string;
   totalInscription: number;
+  totalParticipants: number;
   totalPaid: number;
   totalDue: number;
   inscriptions: Inscription[];

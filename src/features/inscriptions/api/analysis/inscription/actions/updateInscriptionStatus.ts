@@ -2,14 +2,18 @@ import axiosInstance from "@/shared/lib/apiClient";
 
 export async function updateInscriptionStatus(
   inscriptionId: string,
-  status: "PENDING" | "CANCELLED"
+  status: "PENDING" | "CANCELLED",
 ): Promise<void> {
   try {
-    await axiosInstance.patch(`/inscriptions/${inscriptionId}/update`, {}, {
-      params: {
-        status: status
-      }
-    });
+    await axiosInstance.patch(
+      `/inscriptions/${inscriptionId}/update`,
+      {},
+      {
+        params: {
+          status: status,
+        },
+      },
+    );
   } catch (error) {
     console.error("Error updating inscription status:", error);
     const axiosError = error as {
@@ -23,7 +27,7 @@ export async function updateInscriptionStatus(
 
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao atualizar status da inscrição"
+        "Falha ao atualizar status da inscrição",
     );
   }
 }

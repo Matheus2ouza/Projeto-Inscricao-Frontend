@@ -75,7 +75,8 @@ export type UseInscriptionDetailParams = {
 };
 
 export type UseInscriptionDetailResult = {
-  inscriptionData: InscriptionDetailResponse | null;
+  inscriptionDetails: InscriptionDetailResponse | null;
+  participants: Participants | null;
   loading: boolean;
   error: string | null;
   page: number;

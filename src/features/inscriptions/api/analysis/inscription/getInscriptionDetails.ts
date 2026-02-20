@@ -1,12 +1,12 @@
-import axiosInstance from "@/shared/lib/apiClient";
 import {
   AnalysisInscriptionResponse,
   InscriptionDetailRequest,
-} from "../../types/analysis/analysisTypes";
+} from "@/features/inscriptions/types/analysis/analysisTypes";
+import axiosInstance from "@/shared/lib/apiClient";
 
 export async function getInscriptionDetails(
   inscriptionId: string,
-  params: InscriptionDetailRequest
+  params: InscriptionDetailRequest,
 ): Promise<AnalysisInscriptionResponse> {
   try {
     const { data } = await axiosInstance.get<AnalysisInscriptionResponse>(
@@ -16,9 +16,9 @@ export async function getInscriptionDetails(
           page: params.page,
           pageSize: params.pageSize,
         },
-      }
+      },
     );
-    console.log(data)
+    console.log(data);
     return data;
   } catch (error) {
     const axiosError = error as {
@@ -27,7 +27,7 @@ export async function getInscriptionDetails(
     };
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao carregar detalhes da inscrição"
+        "Falha ao carregar detalhes da inscrição",
     );
   }
 }

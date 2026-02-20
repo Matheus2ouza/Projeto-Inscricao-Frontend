@@ -9,7 +9,7 @@ export type GetEventsForInscriptionParams = {
 };
 
 export async function getEventsForInscription(
-  params: GetEventsForInscriptionParams
+  params: GetEventsForInscriptionParams,
 ): Promise<EventsListResponse> {
   const { data } = await axiosInstance.get<EventsListResponse>(
     "/events/inscriptions",
@@ -20,7 +20,7 @@ export async function getEventsForInscription(
         status: params.status,
       },
       paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
-    }
+    },
   );
 
   return data;

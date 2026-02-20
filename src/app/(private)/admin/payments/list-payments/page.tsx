@@ -58,6 +58,7 @@ export default function SelectEventForListPaymentSuperPage() {
       value: getFormatCurrency(event?.amountCollected || 0),
     },
   ];
+
   const handleSelectEvent = (eventId: string) => {
     router.push(`/admin/payments/list-payments/${eventId}`);
   };

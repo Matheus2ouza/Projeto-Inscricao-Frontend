@@ -68,7 +68,9 @@ export function ConfirmationModal({
               {styles.icon}
             </div>
             <div>
-              <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
+              <DialogTitle className="text-xl font-semibold">
+                {title}
+              </DialogTitle>
               <DialogDescription className="text-muted-foreground mt-1">
                 {description}
               </DialogDescription>

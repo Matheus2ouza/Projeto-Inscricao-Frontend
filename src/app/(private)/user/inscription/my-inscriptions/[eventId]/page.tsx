@@ -25,8 +25,6 @@ export default function MyInscriptionsPage() {
     page,
     pageCount,
     loading,
-    fetching,
-    fetched,
     error,
     setPage,
     refresh,
