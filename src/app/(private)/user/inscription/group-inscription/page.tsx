@@ -2,7 +2,7 @@
 
 import ListEventsForInscription from "@/features/inscriptions/components/ListEventsForInscription";
 import { useEventsForInscription } from "@/features/inscriptions/hooks/useEventsForInscription";
-import { StatusEvent } from "@/features/inscriptions/types/selectEvent";
+import { StatusEvent } from "@/features/inscriptions/types/listEventsTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
