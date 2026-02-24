@@ -1,7 +1,7 @@
 "use client";
 
 import type { GetDashboardUserResponse } from "@/features/home/api/user/dashboard";
-import { useEventDates } from "@/features/home/hook/admin/useDates";
+import { useDates } from "@/features/home/hook/admin/useDates";
 import type { DashboardUserMetric } from "@/features/home/hook/user/useUserDashboard";
 import DismissibleAlert from "@/shared/components/DismissibleAlert";
 import { Badge } from "@/shared/components/ui/badge";
@@ -56,7 +56,7 @@ export default function UserHomeDashboard({
   const [infoOpen, setInfoOpen] = useState<DashboardUserMetric | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const eventDates = useEventDates();
+  const eventDates = useDates();
 
   const statusColors: Record<string, string> = {
     OPEN: "bg-emerald-500",
