@@ -6,7 +6,7 @@ export async function updateInscriptionStatus(
 ): Promise<void> {
   try {
     await axiosInstance.patch(
-      `/inscriptions/${inscriptionId}/update`,
+      `/inscriptions/${inscriptionId}/status`,
       {},
       {
         params: {

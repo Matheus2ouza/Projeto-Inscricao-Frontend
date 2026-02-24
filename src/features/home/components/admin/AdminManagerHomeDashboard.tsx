@@ -2,7 +2,7 @@
 
 import type { DashboardAdminResponse } from "@/features/home/api/admin/dashboard";
 import type { DashboardMetric } from "@/features/home/hook/admin/useAdminDashboard";
-import { useEventDates } from "@/features/home/hook/admin/useEventDates";
+import { useDates } from "@/features/home/hook/admin/useDates";
 import { Badge } from "@/shared/components/ui/badge";
 import {
   Popover,
@@ -34,6 +34,7 @@ type AdminManagerHomeDashboardProps = {
   isFetching?: boolean;
   refreshingMetric?: DashboardMetric | null;
   onRefreshMetric?: (metric: DashboardMetric) => void;
+  onViewPayment?: (eventId: string, paymentId: string) => void;
 };
 
 export default function AdminManagerHomeDashboard({
@@ -42,11 +43,12 @@ export default function AdminManagerHomeDashboard({
   isFetching = false,
   refreshingMetric = null,
   onRefreshMetric,
+  onViewPayment,
 }: AdminManagerHomeDashboardProps) {
   const [infoOpen, setInfoOpen] = useState<DashboardMetric | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const eventDates = useEventDates();
+  const dates = useDates();
   const statusColors: Record<string, string> = {
     OPEN: "bg-emerald-500",
     CLOSE: "bg-amber-500",
@@ -131,7 +133,7 @@ export default function AdminManagerHomeDashboard({
   ];
 
   const eventsByDay = useMemo(() => {
-    const events = eventDates.events ?? [];
+    const events = dates.events ?? [];
     const map = new Map<
       string,
       { id: string; name: string; status: string; displayStatus: string }[]
@@ -163,7 +165,75 @@ export default function AdminManagerHomeDashboard({
     });
 
     return map;
-  }, [eventDates.events]);
+  }, [dates.events]);
+
+  const paymentsByDay = useMemo(() => {
+    const payments = dates.payments ?? [];
+    const map = new Map<
+      string,
+      {
+        eventId: string;
+        paymentId: string;
+        installmentNumber: number;
+        received: boolean;
+        value: number;
+        netValue: number;
+      }[]
+    >();
+
+    const resolveEstimatedDayKey = (value: unknown) => {
+      if (value instanceof Date) {
+        const iso = value.toISOString();
+        const key = iso.slice(0, 10);
+        return /^\d{4}-\d{2}-\d{2}$/.test(key) ? key : null;
+      }
+
+      if (typeof value === "string") {
+        const trimmed = value.trim();
+        const match = /^(\d{4}-\d{2}-\d{2})/.exec(trimmed);
+        if (match) return match[1];
+        const parsed = new Date(trimmed);
+        if (!Number.isNaN(parsed.getTime())) {
+          const iso = parsed.toISOString();
+          const key = iso.slice(0, 10);
+          return /^\d{4}-\d{2}-\d{2}$/.test(key) ? key : null;
+        }
+      }
+
+      return null;
+    };
+
+    payments.forEach((p) => {
+      const key = resolveEstimatedDayKey(p.estimatedAt);
+      if (!key) {
+        return;
+      }
+      const list = map.get(key) ?? [];
+      list.push({
+        eventId: p.eventId,
+        paymentId: p.paymentId,
+        installmentNumber: p.installmentNumber,
+        received: p.received,
+        value: p.value,
+        netValue: p.netValue,
+      });
+      map.set(key, list);
+    });
+
+    map.forEach((list, key) => {
+      map.set(
+        key,
+        [...list].sort((a, b) => {
+          if (a.eventId !== b.eventId) {
+            return a.eventId.localeCompare(b.eventId);
+          }
+          return a.installmentNumber - b.installmentNumber;
+        }),
+      );
+    });
+
+    return map;
+  }, [dates.payments]);
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 0 });
@@ -180,6 +250,18 @@ export default function AdminManagerHomeDashboard({
 
   const eventsSelectedDay =
     eventsByDay.get(format(selectedDate, "yyyy-MM-dd")) ?? [];
+  const paymentsSelectedDay =
+    paymentsByDay.get(format(selectedDate, "yyyy-MM-dd")) ?? [];
+  const paymentsSelectedDayTotals = useMemo(() => {
+    return paymentsSelectedDay.reduce(
+      (acc, p) => {
+        acc.value += p.value ?? 0;
+        acc.netValue += p.netValue ?? 0;
+        return acc;
+      },
+      { value: 0, netValue: 0 },
+    );
+  }, [paymentsSelectedDay]);
 
   return (
     <>
@@ -308,17 +390,24 @@ export default function AdminManagerHomeDashboard({
                   <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
                   Período
                 </Badge>
+                <Badge
+                  variant="outline"
+                  className="gap-2 border-sky-300 bg-sky-50 text-sky-700"
+                >
+                  <span className="inline-block h-2 w-2 rounded-full bg-sky-600" />
+                  Pagamentos
+                </Badge>
               </div>
             </div>
             <button
               type="button"
               className="p-2 rounded-full hover:bg-muted transition-colors"
-              onClick={() => eventDates.refetch()}
+              onClick={() => dates.refetch()}
               aria-label="Atualizar calendário"
             >
               <RefreshCcw
                 className={`w-4 h-4 ${
-                  eventDates.loading || eventDates.isFetching
+                  dates.loading || dates.isFetching
                     ? "animate-spin text-primary"
                     : "text-gray-500"
                 }`}
@@ -373,10 +462,13 @@ export default function AdminManagerHomeDashboard({
 
             <div className="grid grid-cols-7 gap-1 text-sm">
               {calendarDays.map((day) => {
-                const eventsDay =
-                  eventsByDay.get(format(day, "yyyy-MM-dd")) ?? [];
+                const key = format(day, "yyyy-MM-dd");
+                const eventsDay = eventsByDay.get(key) ?? [];
+                const paymentsDay = paymentsByDay.get(key) ?? [];
                 const isCurrentMonth = isSameMonth(day, currentMonth);
                 const isSelected = isSameDay(day, selectedDate);
+                const hasMarkers =
+                  eventsDay.length > 0 || paymentsDay.length > 0;
                 return (
                   <button
                     key={day.toISOString()}
@@ -392,14 +484,17 @@ export default function AdminManagerHomeDashboard({
                     onClick={() => setSelectedDate(day)}
                   >
                     <span>{format(day, "d")}</span>
-                    {eventsDay.length > 0 && (
+                    {hasMarkers && (
                       <div className="flex items-center justify-center gap-0.5 mt-1">
-                        {eventsDay.slice(0, 3).map((evt) => (
+                        {eventsDay.slice(0, 2).map((evt) => (
                           <span
                             key={evt.id}
                             className={`h-1.5 w-1.5 rounded-full ${statusColors[evt.displayStatus] ?? "bg-emerald-500"}`}
                           />
                         ))}
+                        {paymentsDay.length > 0 && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-sky-600" />
+                        )}
                       </div>
                     )}
                   </button>
@@ -414,11 +509,12 @@ export default function AdminManagerHomeDashboard({
               {format(selectedDate, "dd/MM/yyyy")}
             </div>
             <div className="mt-2 space-y-2">
-              {eventsSelectedDay.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  Nenhum evento agendado para esta data.
-                </p>
-              )}
+              {eventsSelectedDay.length === 0 &&
+                paymentsSelectedDay.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum evento ou pagamento agendado para esta data.
+                  </p>
+                )}
               {eventsSelectedDay.map((evt) => (
                 <div
                   key={evt.id}
@@ -441,6 +537,88 @@ export default function AdminManagerHomeDashboard({
                   </Badge>
                 </div>
               ))}
+
+              {paymentsSelectedDay.length > 0 && (
+                <div className="pt-2">
+                  <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 bg-sky-50 dark:bg-sky-950/30">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-sky-600" />
+                          <span className="text-sm font-semibold text-foreground">
+                            Pagamentos
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            • {paymentsSelectedDay.length} parcela(s)
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-8 text-right">
+                        <div className="text-sm">
+                          <span className="text-xs text-muted-foreground">
+                            Bruto{" "}
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            {getFormatCurrency(paymentsSelectedDayTotals.value)}
+                          </span>
+                        </div>
+                        <div className="text-sm">
+                          <span className="text-xs text-muted-foreground">
+                            Líquido{" "}
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            {getFormatCurrency(
+                              paymentsSelectedDayTotals.netValue,
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="divide-y divide-gray-200 dark:divide-gray-800">
+                      {paymentsSelectedDay.map((p) => (
+                        <button
+                          key={`${p.paymentId}-${p.installmentNumber}`}
+                          type="button"
+                          className={`w-full text-left px-4 py-3 text-sm flex items-center justify-between transition-colors ${
+                            onViewPayment ? "hover:bg-muted cursor-pointer" : ""
+                          }`}
+                          onClick={() =>
+                            onViewPayment?.(p.eventId, p.paymentId)
+                          }
+                        >
+                          <div className="min-w-0 flex items-center gap-3">
+                            <span className="h-2 w-2 rounded-full bg-sky-600" />
+                            <span className="font-semibold text-foreground truncate">
+                              Parcela {p.installmentNumber}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              • {p.received ? "Liberada" : "Prevista"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-8">
+                            <div className="text-sm">
+                              <span className="text-xs text-muted-foreground">
+                                Bruto{" "}
+                              </span>
+                              <span className="font-semibold text-foreground">
+                                {getFormatCurrency(p.value)}
+                              </span>
+                            </div>
+                            <div className="text-sm">
+                              <span className="text-xs text-muted-foreground">
+                                Líquido{" "}
+                              </span>
+                              <span className="font-semibold text-foreground">
+                                {getFormatCurrency(p.netValue)}
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

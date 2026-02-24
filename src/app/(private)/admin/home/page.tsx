@@ -60,6 +60,10 @@ export default function AdminManagerHome() {
     }
   }, [dashboard.isFetching, dashboard.loading, selectedEventId]);
 
+  const handleViewPayment = (eventId: string, paymentId: string) => {
+    router.push(`payments/list-payments/${eventId}/details/${paymentId}`);
+  };
+
   return (
     <PageContainer
       title={user?.username ? `Olá, ${user.username}` : "Bem-vindo!"}
@@ -98,6 +102,7 @@ export default function AdminManagerHome() {
         isFetching={dashboard.isFetching}
         refreshingMetric={dashboard.refreshingMetric}
         onRefreshMetric={dashboard.refreshMetric}
+        onViewPayment={handleViewPayment}
       />
     </PageContainer>
   );

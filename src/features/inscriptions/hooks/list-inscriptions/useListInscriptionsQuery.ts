@@ -1,10 +1,6 @@
 import { getListInscriptions } from "@/features/inscriptions/api/list-inscriptions/getListInscriptions";
 import { ListInscriptionsResponse } from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
-import {
-  keepPreviousData,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const listInscriptionsKeys = {
   all: ["list-inscriptions"] as const,
@@ -45,7 +41,6 @@ export function useListInscritionsQuery(
       getListInscriptions(eventId, page, pageSize, isGuest, orderBy),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 }
