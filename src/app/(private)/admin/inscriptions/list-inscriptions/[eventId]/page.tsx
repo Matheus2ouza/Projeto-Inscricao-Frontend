@@ -1,6 +1,6 @@
 "use client";
 
-import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptions";
+import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable";
 import useDownloadPdf from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadPdf";
 import { useListInscriptions } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptions";
 import PageContainer from "@/shared/components/layout/PageContainer";
