@@ -9,11 +9,17 @@ import { Button } from "@/shared/components/ui/button";
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/components/ui/popover";
 import {
   Table,
   TableBody,
@@ -26,9 +32,21 @@ import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
-import { Calendar, Eye, Image as ImageIcon, User, Users } from "lucide-react";
+import {
+  Calendar,
+  ChevronDown,
+  Download,
+  Eye,
+  FileText,
+  Filter,
+  Image as ImageIcon,
+  User,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { DownloadListInscriptionsPdfInput } from "../../types/list-inscriptions/pdf/listInscriptionsPdfTypes";
+import SheetListInscriptions from "./pdf/SheetListInscriptions";
 
 interface listInscriptionsTableProps {
   pageSize: number;
@@ -39,19 +57,30 @@ interface listInscriptionsTableProps {
   pageCount: number;
   onPageChange: (page: number) => void;
   onSelectInscription: (id: string) => void;
+
+  //pdf
+  onDownloadPdf: ({
+    eventId,
+    isGuest,
+    details,
+    participants,
+  }: DownloadListInscriptionsPdfInput) => void;
 }
 
 export default function ListInscriptionsTable({
   pageSize,
   event,
   inscriptions,
-  total,
   page,
   pageCount,
   onPageChange,
   onSelectInscription,
+  onDownloadPdf,
 }: listInscriptionsTableProps) {
   const [imageError, setImageError] = useState(false);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [pdfSheetOpen, setPdfSheetOpen] = useState(false);
 
   const calculateGlobalIndex = (localIndex: number): number => {
     return (page - 1) * pageSize + localIndex + 1;
@@ -177,237 +206,373 @@ export default function ListInscriptionsTable({
         </div>
       </div>
 
-      <div className="pt-4">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Lista de Inscrições
-        </h2>
-      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+        <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Lista de Inscrições
+          </h2>
 
-      <div className="block sm:hidden">
-        {inscriptions.length === 0 ? (
-          <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
-            Nenhuma inscrição encontrada
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {inscriptions.map((inscription, idx) => (
-              <div
-                key={inscription.id}
-                className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      #
-                    </span>
-                    <span className="font-semibold">
-                      {calculateGlobalIndex(idx)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="h-10 w-10 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
-                      onClick={() => onSelectInscription(inscription.id)}
-                      aria-label="Detalhes"
-                    >
-                      <Eye className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="mb-3">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                      inscription.status,
-                    )}`}
+          <div className="flex items-center gap-2">
+            <Popover
+              open={pdfOpen}
+              onOpenChange={(open) => {
+                setPdfOpen(open);
+                if (open) setFiltersOpen(false);
+              }}
+            >
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Gerar PDF
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0">
+                <div className="py-2">
+                  <button
+                    type="button"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setPdfOpen(false);
+                      setPdfSheetOpen(true);
+                    }}
                   >
-                    {getConvertStatusInscription(inscription.status)}
-                  </span>
+                    <FileText className="w-4 h-4" />
+                    Lista de Inscritos
+                  </button>
                 </div>
+              </PopoverContent>
+            </Popover>
 
-                <div className="grid grid-cols-1 gap-3 mb-3">
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Responsável</p>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <p className="font-medium">
-                        {inscription.responsible || "-"}
-                      </p>
-                      {inscription.isGuest && (
-                        <Badge
-                          variant="secondary"
-                          className="h-5 px-2 text-[10px]"
-                        >
-                          N/ Alocado
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">ID</p>
-                    <code className="font-mono text-xs bg-muted px-2 py-1 rounded">
-                      {inscription.id.substring(0, 12)}...
-                    </code>
-                  </div>
-                </div>
-
-                <div className="pt-3 border-t">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Participantes</span>
-                    </div>
-                    <span className="text-lg font-bold">
-                      {inscription.totalParticipant}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="hidden sm:block rounded-md border">
-        {inscriptions.length === 0 ? (
-          <div className="px-6 py-12 text-center text-muted-foreground">
-            Nenhuma inscrição encontrada
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">#</TableHead>
-                <TableHead className="w-[200px]">ID</TableHead>
-                <TableHead>Responsável</TableHead>
-                <TableHead className="w-[140px]">Status</TableHead>
-                <TableHead className="w-[140px] text-right">
-                  Participantes
-                </TableHead>
-                <TableHead className="w-[100px] text-center">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {inscriptions.map((inscription, idx) => (
-                <TableRow key={inscription.id} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">
-                    {calculateGlobalIndex(idx)}
-                  </TableCell>
-                  <TableCell className="font-mono text-sm">
-                    {inscription.id.substring(0, 8)}...
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      {inscription.responsible || "-"}
-                      {inscription.isGuest && (
-                        <Badge
-                          variant="secondary"
-                          className="h-5 px-2 text-[10px]"
-                        >
-                          N/ Alocado
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                        inscription.status,
-                      )}`}
-                    >
-                      {getConvertStatusInscription(inscription.status)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-semibold">
-                        {inscription.totalParticipant}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex justify-center gap-1">
-                      <Button
-                        variant="link"
-                        size="sm"
-                        className="h-6 w-6 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
-                        onClick={() => onSelectInscription(inscription.id)}
-                        aria-label="Detalhes"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
-
-      {pageCount > 1 && (
-        <div className="py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-muted-foreground">
-              Página {page} de {pageCount} • Total: {total} inscrições
-            </div>
-
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => page > 1 && onPageChange(page - 1)}
-                    href={page > 1 ? "#" : undefined}
-                    className={
-                      page === 1 ? "pointer-events-none opacity-50" : ""
-                    }
-                  />
-                </PaginationItem>
-
-                <div className="sm:hidden">
-                  <PaginationItem>
-                    <PaginationLink
-                      isActive={true}
-                      href="#"
-                      className="pointer-events-none"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                </div>
-
-                <div className="hidden sm:flex">
-                  {Array.from({ length: pageCount }, (_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink
-                        isActive={page === i + 1}
-                        href="#"
-                        onClick={() => onPageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                </div>
-
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => page < pageCount && onPageChange(page + 1)}
-                    href={page < pageCount ? "#" : undefined}
-                    className={
-                      page === pageCount ? "pointer-events-none opacity-50" : ""
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <Popover
+              open={filtersOpen}
+              onOpenChange={(open) => {
+                setFiltersOpen(open);
+                if (open) setPdfOpen(false);
+              }}
+            >
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
+                >
+                  <Filter className="w-4 h-4" />
+                  Filtros
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-4">
+                <div className="text-sm text-muted-foreground">Em breve</div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
-      )}
+
+        <SheetListInscriptions
+          open={pdfSheetOpen}
+          onOpenChange={setPdfSheetOpen}
+          eventId={event.id}
+          onDownloadPdf={onDownloadPdf}
+        />
+
+        <div className="px-6 pb-6">
+          <div className="block sm:hidden">
+            {inscriptions.length === 0 ? (
+              <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
+                Nenhuma inscrição encontrada
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {inscriptions.map((inscription, idx) => (
+                  <div
+                    key={inscription.id}
+                    className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          #
+                        </span>
+                        <span className="font-semibold">
+                          {calculateGlobalIndex(idx)}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="h-10 w-10 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
+                          onClick={() => onSelectInscription(inscription.id)}
+                          aria-label="Detalhes"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="mb-3">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                          inscription.status,
+                        )}`}
+                      >
+                        {getConvertStatusInscription(inscription.status)}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 mb-3">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">
+                          Responsável
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <p className="font-medium">
+                            {inscription.responsible || "-"}
+                          </p>
+                          {inscription.isGuest && (
+                            <Badge
+                              variant="secondary"
+                              className="h-5 px-2 text-[10px]"
+                            >
+                              N/ Alocado
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">ID</p>
+                        <code className="font-mono text-xs bg-muted px-2 py-1 rounded">
+                          {inscription.id.substring(0, 12)}...
+                        </code>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">
+                            Participantes
+                          </span>
+                        </div>
+                        <span className="text-lg font-bold">
+                          {inscription.totalParticipant}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="hidden sm:block rounded-md border">
+            {inscriptions.length === 0 ? (
+              <div className="px-6 py-12 text-center text-muted-foreground">
+                Nenhuma inscrição encontrada
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-16">#</TableHead>
+                    <TableHead className="w-[200px]">ID</TableHead>
+                    <TableHead>Responsável</TableHead>
+                    <TableHead className="w-[140px]">Status</TableHead>
+                    <TableHead className="w-[140px] text-right">
+                      Participantes
+                    </TableHead>
+                    <TableHead className="w-[100px] text-center">
+                      Ações
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {inscriptions.map((inscription, idx) => (
+                    <TableRow
+                      key={inscription.id}
+                      className="hover:bg-muted/50"
+                    >
+                      <TableCell className="font-medium">
+                        {calculateGlobalIndex(idx)}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {inscription.id.substring(0, 8)}...
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          {inscription.responsible || "-"}
+                          {inscription.isGuest && (
+                            <Badge
+                              variant="secondary"
+                              className="h-5 px-2 text-[10px]"
+                            >
+                              N/ Alocado
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                            inscription.status,
+                          )}`}
+                        >
+                          {getConvertStatusInscription(inscription.status)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-semibold">
+                            {inscription.totalParticipant}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="flex justify-center gap-1">
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="h-6 w-6 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
+                            onClick={() => onSelectInscription(inscription.id)}
+                            aria-label="Detalhes"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+
+          {pageCount > 1 && (
+            <div className="py-4">
+              <div className="flex flex-col items-center gap-3">
+                <Pagination>
+                  <PaginationContent>
+                    {page > 1 && (
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => onPageChange(page - 1)}
+                          href="#"
+                        />
+                      </PaginationItem>
+                    )}
+
+                    <div className="sm:hidden">
+                      <PaginationItem>
+                        <PaginationLink
+                          isActive={true}
+                          href="#"
+                          className="pointer-events-none"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    </div>
+
+                    <div className="hidden sm:flex">
+                      {(() => {
+                        const windowSize = 3;
+
+                        if (pageCount <= windowSize) {
+                          return Array.from(
+                            { length: pageCount },
+                            (_, index) => (
+                              <PaginationItem key={index}>
+                                <PaginationLink
+                                  href="#"
+                                  isActive={page === index + 1}
+                                  onClick={() => onPageChange(index + 1)}
+                                >
+                                  {index + 1}
+                                </PaginationLink>
+                              </PaginationItem>
+                            ),
+                          );
+                        }
+
+                        const maxStart = pageCount - windowSize + 1;
+                        const startPage =
+                          page <= 2
+                            ? 1
+                            : page >= pageCount - 2
+                              ? maxStart
+                              : page - 1;
+                        const endPage = Math.min(
+                          startPage + windowSize - 1,
+                          pageCount,
+                        );
+
+                        const items = Array.from(
+                          { length: endPage - startPage + 1 },
+                          (_, index) => {
+                            const pageNumber = startPage + index;
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <PaginationLink
+                                  href="#"
+                                  isActive={page === pageNumber}
+                                  onClick={() => onPageChange(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </PaginationLink>
+                              </PaginationItem>
+                            );
+                          },
+                        );
+
+                        if (endPage < pageCount) {
+                          items.push(
+                            <PaginationItem key="ellipsis">
+                              <PaginationEllipsis />
+                            </PaginationItem>,
+                          );
+                          items.push(
+                            <PaginationItem key={pageCount}>
+                              <PaginationLink
+                                href="#"
+                                isActive={page === pageCount}
+                                onClick={() => onPageChange(pageCount)}
+                              >
+                                {pageCount}
+                              </PaginationLink>
+                            </PaginationItem>,
+                          );
+                        }
+
+                        return items;
+                      })()}
+                    </div>
+
+                    {page < pageCount && (
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => onPageChange(page + 1)}
+                          href="#"
+                        />
+                      </PaginationItem>
+                    )}
+                  </PaginationContent>
+                </Pagination>
+                <div className="text-sm font-semibold text-foreground">
+                  Página <span className="font-bold">{page}</span> de{" "}
+                  <span className="font-bold">{pageCount}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

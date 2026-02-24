@@ -1,6 +1,7 @@
 "use client";
 
-import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/listInscriptions";
+import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptions";
+import useDownloadPdf from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadPdf";
 import { useListInscriptions } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
@@ -39,6 +40,8 @@ export default function ListInscriptionsSuperPage() {
     isGuest: undefined,
     orderBy: "asc",
   });
+
+  const { downloadListInscriptionsPdf } = useDownloadPdf();
 
   const renderSkeletonGrid = () => {
     return (
@@ -127,6 +130,7 @@ export default function ListInscriptionsSuperPage() {
         pageCount={pageCount}
         onPageChange={setPage}
         onSelectInscription={handleViewInscription}
+        onDownloadPdf={downloadListInscriptionsPdf}
       />
     );
   };

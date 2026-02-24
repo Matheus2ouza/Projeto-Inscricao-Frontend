@@ -105,9 +105,6 @@ export default function DetailsInscriptionTable({
     );
   }
 
-  // Calcular total pago
-  const totalPaid = payments.reduce((sum, payment) => sum + payment.value, 0);
-
   // Função para calcular a idade a partir da data de nascimento
   const calculateAge = (birthDate: Date) => {
     const today = new Date();

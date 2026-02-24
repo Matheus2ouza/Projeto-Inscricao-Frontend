@@ -64,10 +64,10 @@ export default function AppSidebarSuper({
   const { user } = useCurrentUser();
   const { logout } = useLogout();
   const router = useRouter();
-  const [inscriptionsOpen, setInscriptionsOpen] = React.useState(true);
-  const [paymentsOpen, setPaymentsOpen] = React.useState(true);
-  const [eventsOpen, setEventsOpen] = React.useState(true);
-  const [ticketsOpen, setTicketsOpen] = React.useState(true);
+  const [inscriptionsOpen, setInscriptionsOpen] = React.useState(false);
+  const [paymentsOpen, setPaymentsOpen] = React.useState(false);
+  const [eventsOpen, setEventsOpen] = React.useState(false);
+  const [ticketsOpen, setTicketsOpen] = React.useState(false);
 
   const isMobile = useIsMobile();
 

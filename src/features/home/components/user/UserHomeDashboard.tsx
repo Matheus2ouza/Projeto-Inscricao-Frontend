@@ -1,7 +1,7 @@
 "use client";
 
 import type { GetDashboardUserResponse } from "@/features/home/api/user/dashboard";
-import { useEventDates } from "@/features/home/hook/admin/useEventDates";
+import { useEventDates } from "@/features/home/hook/admin/useDates";
 import type { DashboardUserMetric } from "@/features/home/hook/user/useUserDashboard";
 import DismissibleAlert from "@/shared/components/DismissibleAlert";
 import { Badge } from "@/shared/components/ui/badge";

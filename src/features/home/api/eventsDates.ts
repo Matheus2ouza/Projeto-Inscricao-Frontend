@@ -1,4 +1,4 @@
-import apiClient from "@/shared/lib/apiClient";
+import axiosInstance from "@/shared/lib/apiClient";
 
 export type FindEventDateResponse = {
   events: {
@@ -11,28 +11,21 @@ export type FindEventDateResponse = {
 };
 
 export async function getEventsDates(): Promise<FindEventDateResponse> {
-  const { data } = await apiClient.get("/events/dates");
+  try {
+    const { data } =
+      await axiosInstance.get<FindEventDateResponse>(`events/dates`);
 
-  const events =
-    Array.isArray(data?.events) && data.events.length > 0
-      ? data.events
-      : [];
+    return data;
+  } catch (error) {
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
 
-  type EventFromApi = {
-    id?: unknown;
-    name?: unknown;
-    status?: unknown;
-    startDate: string | Date;
-    endDate: string | Date;
-  };
-
-  return {
-    events: events.map((evt: EventFromApi) => ({
-      id: String(evt.id),
-      name: String(evt.name ?? ""),
-      status: String(evt.status ?? "OPEN"),
-      startDate: evt.startDate,
-      endDate: evt.endDate,
-    })),
-  };
+    throw new Error(
+      axiosError.response?.data?.message ??
+        axiosError.message ??
+        "Não foi possível carregar as datas dos eventos.",
+    );
+  }
 }

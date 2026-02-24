@@ -12,10 +12,10 @@ import { useState } from "react";
 export default function SelectEventAdminPage() {
   const router = useRouter();
   const [pendingStatusFilter, setPendingStatusFilter] = useState<StatusEvent[]>(
-    []
+    [],
   );
   const [appliedStatusFilter, setAppliedStatusFilter] = useState<StatusEvent[]>(
-    []
+    [],
   );
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
     useEventsAll({
