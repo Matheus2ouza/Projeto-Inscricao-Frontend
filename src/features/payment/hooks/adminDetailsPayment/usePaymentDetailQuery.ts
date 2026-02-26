@@ -42,5 +42,23 @@ export function useInvalidatePaymentDetailQuery() {
         queryKey: paymentDetailKeys.detail(id),
       });
     },
+
+    removeAll: () => {
+      queryClient.removeQueries({
+        queryKey: paymentDetailKeys.all,
+      });
+    },
+
+    removeDetails: () => {
+      queryClient.removeQueries({
+        queryKey: paymentDetailKeys.details(),
+      });
+    },
+
+    removeDetail: (id: string) => {
+      queryClient.removeQueries({
+        queryKey: paymentDetailKeys.detail(id),
+      });
+    },
   };
 }

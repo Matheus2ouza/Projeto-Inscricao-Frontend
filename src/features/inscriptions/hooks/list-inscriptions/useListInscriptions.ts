@@ -9,8 +9,10 @@ export function useListInscriptions({
   eventId,
   initialPage,
   pageSize,
+  status,
   isGuest,
   orderBy,
+  limitTime,
 }: ListInscriptionsParams): ListInscriptionsResult {
   const [page, setPage] = useState(initialPage);
 
@@ -18,8 +20,10 @@ export function useListInscriptions({
     eventId,
     page,
     pageSize,
+    status,
     isGuest,
     orderBy,
+    limitTime,
   );
 
   return {

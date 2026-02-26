@@ -11,6 +11,7 @@ import {
   StatusPayment,
 } from "@/features/guest/types/detailsInscription/detailsInscriptionType";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
+import ImageUpdateDialog from "@/shared/components/ImageUpdateDialog";
 import ImageViewerDialog, {
   ImageViewerDownloadExtension,
 } from "@/shared/components/ImageViewerDialog";
@@ -65,8 +66,12 @@ import {
   Search,
   User,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
+import type {
+  ModifyReceiptPaymentInput,
+  ModifyReceiptPaymentResponse,
+} from "../../types/detailsInscription/actions/modifyReceiptPaymentTypes";
 
 interface DetailsInscriptionProps {
   confirmationCode: string | null;
@@ -93,6 +98,10 @@ interface DetailsInscriptionProps {
   onRegisterPaymentCard: () => void;
   onRegisterPaymentPix: () => void;
   onDeletePayment: (paymentId: string) => void;
+  onModifyReceipt: (
+    input: ModifyReceiptPaymentInput,
+  ) => Promise<ModifyReceiptPaymentResponse>;
+  isModifingReceipt: boolean;
 }
 
 export function DetailsInscription({
@@ -108,6 +117,8 @@ export function DetailsInscription({
   onRegisterPaymentCard,
   onRegisterPaymentPix,
   onDeletePayment,
+  onModifyReceipt,
+  isModifingReceipt,
 }: DetailsInscriptionProps) {
   const [searchCode, setSearchCode] = useState(confirmationCode || "");
   const [receiptViewerOpen, setReceiptViewerOpen] = useState(false);
@@ -119,6 +130,11 @@ export function DetailsInscription({
   const [paymentIdToDelete, setPaymentIdToDelete] = useState<string | null>(
     null,
   );
+  const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
+  const [paymentIdToModify, setPaymentIdToModify] = useState<string | null>(
+    null,
+  );
+  const modifyDialogScrollRef = useRef(0);
   const [openGenderParticipant, setOpenGenderParticipant] = useState(false);
   const [openShirtSizeParticipant, setOpenShirtSizeParticipant] =
     useState(false);
@@ -998,6 +1014,23 @@ export function DetailsInscription({
           </div>
 
           <div className="space-y-4">
+            <ImageUpdateDialog
+              open={modifyDialogOpen}
+              onOpenChange={(open) => {
+                setModifyDialogOpen(open);
+                if (!open) setPaymentIdToModify(null);
+              }}
+              title="Modificar comprovante"
+              description="Selecione ou arraste uma imagem para atualizar o comprovante."
+              onSubmit={async (imageDataUrl) => {
+                if (!paymentIdToModify) return;
+                await onModifyReceipt({
+                  paymentId: paymentIdToModify,
+                  image: imageDataUrl,
+                });
+              }}
+              isSubmitting={isModifingReceipt}
+            />
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -1024,7 +1057,6 @@ export function DetailsInscription({
                     p.paymentInstallment ?? [];
                   const isApproved =
                     String(p.status).toUpperCase() === "APPROVED";
-                  const debt = Math.max(p.totalValue - p.totalPaid, 0);
                   const installmentsTotal = Math.max(
                     Number(p.installments) || 0,
                     1,
@@ -1046,17 +1078,34 @@ export function DetailsInscription({
                             {p.id.slice(0, 12)}...
                           </h3>
                         </div>
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => {
-                            setPaymentIdToDelete(p.id);
-                            setDeleteDialogOpen(true);
-                          }}
-                        >
-                          Deletar pagamento
-                        </Button>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                          {p.status === StatusPayment.REFUSED && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                modifyDialogScrollRef.current = window.scrollY;
+                                setPaymentIdToModify(p.id);
+                                setModifyDialogOpen(true);
+                              }}
+                            >
+                              Modificar comprovante
+                            </Button>
+                          )}
+
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => {
+                              setPaymentIdToDelete(p.id);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            Deletar pagamento
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

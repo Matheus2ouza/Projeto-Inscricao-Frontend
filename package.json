@@ -36,6 +36,7 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
+    "antd": "^6.3.1",
     "axios": "^1.12.2",
     "bootstrap-icons": "^1.13.1",
     "class-variance-authority": "^0.7.1",

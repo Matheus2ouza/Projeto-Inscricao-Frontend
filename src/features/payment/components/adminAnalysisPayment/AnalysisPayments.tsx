@@ -30,8 +30,8 @@ import {
   AlertCircle,
   Calendar,
   DollarSign,
-  Eye,
   ImageIcon,
+  Info,
   User,
   Users,
 } from "lucide-react";
@@ -247,13 +247,13 @@ export default function AnalysisPayments({
                       </code>
                     </div>
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-10 w-10 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                      title="Analisar Pagamento"
+                      variant="link"
+                      size="sm"
+                      className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center"
+                      aria-label="Detalhes"
                       onClick={() => onViewDetail(payment.id)}
                     >
-                      <Eye className="h-5 w-5" />
+                      <Info className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -330,13 +330,13 @@ export default function AnalysisPayments({
                   <TableCell className="text-center">
                     <div className="flex justify-center gap-1">
                       <Button
-                        variant="ghost"
+                        variant="link"
                         size="sm"
-                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                        title="Analisar Pagamento"
+                        className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center"
+                        aria-label="Detalhes"
                         onClick={() => onViewDetail(payment.id)}
                       >
-                        <Eye className="h-4 w-4" />
+                        <Info className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>

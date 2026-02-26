@@ -1,7 +1,7 @@
 "use client";
 
 import PaymentDetailsContent from "@/features/payment/components/adminDetailsPayment/PaymentDetailsContent";
-import { useDeletePayment } from "@/features/payment/hooks/adminDetailsPayment/actions/useDeletePayment";
+import { useActionsPayment } from "@/features/payment/hooks/adminDetailsPayment/actions/useActionsPayment";
 import { usePaymentDetail } from "@/features/payment/hooks/adminDetailsPayment/usePaymentdetail";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
@@ -34,7 +34,12 @@ export default function PaymentDetailsSuperPage() {
       paymentId,
     });
 
-  const { deletePaymentMutation } = useDeletePayment(eventId, user.role);
+  const {
+    handleDeletePayment,
+    isDeletingPayment,
+    handleModifyReceiptPayment,
+    isModifingReceiptPayment,
+  } = useActionsPayment();
 
   const handleBack = () => {
     router.push(`/super/payments/list-payments/${eventId}`);
@@ -80,7 +85,10 @@ export default function PaymentDetailsSuperPage() {
         allocations={allocations}
         installments={installments}
         onValidPayment={handleValidPayment}
-        onDeletePayment={deletePaymentMutation.mutate}
+        onDeletePayment={handleDeletePayment}
+        idDeletingPayment={isDeletingPayment}
+        onModifyReceiptPayment={handleModifyReceiptPayment}
+        isModifingReceiptPayment={isModifingReceiptPayment}
       />
     );
   };

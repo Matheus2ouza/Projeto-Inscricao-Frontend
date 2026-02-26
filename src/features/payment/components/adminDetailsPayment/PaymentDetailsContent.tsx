@@ -1,12 +1,17 @@
 "use client";
 
 import {
+  ModifyReceiptPaymentInput,
+  ModifyReceiptPaymentResponse,
+} from "@/features/payment/types/adminDetailsPayment/actions/modifyReceiptPaymentTypes";
+import {
   PaymentAllocation,
   PaymentInstallment,
   PaymentMethod,
   PaymentsDetails,
   StatusPayment,
 } from "@/features/payment/types/adminDetailsPayment/paymentsDetailsTypes";
+import ImageUpdateDialog from "@/shared/components/ImageUpdateDialog";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -35,18 +40,25 @@ import {
   DollarSign,
   FileImage,
   ImageIcon,
+  ImagePlus,
   Link,
   Receipt,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { DeletePaymentInput } from "../../types/adminDetailsPayment/actions/deletePaymentTypes";
 
 interface PaymentDetailsContentProps {
   payment: PaymentsDetails | null;
   allocations?: PaymentAllocation[];
   installments?: PaymentInstallment[];
   onValidPayment: (paymentId: string) => void;
-  onDeletePayment: (paymentId: string) => void;
+  onDeletePayment: (input: DeletePaymentInput) => void;
+  idDeletingPayment: boolean;
+  onModifyReceiptPayment?: (
+    input: ModifyReceiptPaymentInput,
+  ) => Promise<ModifyReceiptPaymentResponse>;
+  isModifingReceiptPayment?: boolean;
 }
 
 export default function PaymentDetailsContent({
@@ -55,12 +67,16 @@ export default function PaymentDetailsContent({
   installments = [],
   onValidPayment,
   onDeletePayment,
+  idDeletingPayment,
+  onModifyReceiptPayment,
+  isModifingReceiptPayment,
 }: PaymentDetailsContentProps) {
   if (!payment) {
     return null;
   }
 
   const [imageError, setImageError] = useState(false);
+  const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
 
   const getPaymentMethodIcon = (method: PaymentMethod) => {
     const iconMap: Record<PaymentMethod, React.ReactNode> = {
@@ -157,7 +173,7 @@ export default function PaymentDetailsContent({
               )}
               <Button
                 className="w-full lg:w-auto"
-                onClick={() => onDeletePayment(payment.id)}
+                onClick={() => onDeletePayment({ paymentId: payment.id })}
                 variant="destructive"
               >
                 Deletar pagamento
@@ -400,6 +416,31 @@ export default function PaymentDetailsContent({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" asChild className="w-full sm:w-auto">
+                  <a
+                    href={payment.imageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2"
+                  >
+                    <Link className="h-4 w-4" />
+                    Abrir em nova aba
+                  </a>
+                </Button>
+                {onModifyReceiptPayment && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={() => setModifyDialogOpen(true)}
+                    disabled={!!isModifingReceiptPayment}
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                    Modificar comprovante
+                  </Button>
+                )}
+              </div>
               <div className="max-w-lg">
                 <div className="relative h-64 sm:h-80 w-full bg-muted rounded-lg overflow-hidden border">
                   {!imageError ? (
@@ -420,21 +461,25 @@ export default function PaymentDetailsContent({
                   )}
                 </div>
               </div>
-              <Button variant="outline" asChild className="w-full sm:w-auto">
-                <a
-                  href={payment.imageUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
-                >
-                  <Link className="h-4 w-4" />
-                  Abrir em nova aba
-                </a>
-              </Button>
             </div>
           </CardContent>
         </Card>
       )}
+
+      <ImageUpdateDialog
+        open={modifyDialogOpen}
+        onOpenChange={setModifyDialogOpen}
+        title="Modificar comprovante"
+        description="Selecione ou arraste uma imagem para atualizar o comprovante."
+        onSubmit={async (imageDataUrl) => {
+          if (!onModifyReceiptPayment) return;
+          await onModifyReceiptPayment({
+            paymentId: payment.id,
+            image: imageDataUrl,
+          });
+        }}
+        isSubmitting={!!isModifingReceiptPayment}
+      />
     </div>
   );
 }

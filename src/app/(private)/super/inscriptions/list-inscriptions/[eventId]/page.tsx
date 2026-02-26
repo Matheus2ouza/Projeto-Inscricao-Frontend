@@ -1,25 +1,58 @@
 "use client";
 
 import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable";
+import type { InscriptionsFiltersValue } from "@/features/inscriptions/components/list-inscriptions/filters/InscriptionsFilters";
 import useDownloadPdf from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadPdf";
 import { useListInscriptions } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptions";
+import { listInscriptionsKeys } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 
 const PAGE_SIZE = 10;
 
 export default function ListInscriptionsSuperPage() {
   const params = useParams();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
   if (!eventId) {
     return null;
   }
+
+  const [filters, setFilters] = useState<InscriptionsFiltersValue>({
+    status: [],
+    hideNotAllocated: false,
+    orderBy: "asc",
+    limitTime: "all",
+  });
+
+  const convertedLimitTime = useMemo(() => {
+    if (filters.limitTime === "all" || !filters.limitTime) {
+      return undefined;
+    }
+
+    const now = new Date();
+    let limitDate: Date;
+
+    if (filters.limitTime.endsWith("h")) {
+      const hours = parseInt(filters.limitTime.replace("h", ""), 10);
+      limitDate = new Date(now.getTime() - hours * 60 * 60 * 1000);
+    } else if (filters.limitTime.endsWith("d")) {
+      const days = parseInt(filters.limitTime.replace("d", ""), 10);
+      limitDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    } else {
+      return undefined;
+    }
+
+    return limitDate.toISOString();
+  }, [filters.limitTime]);
 
   const {
     event,
@@ -37,8 +70,10 @@ export default function ListInscriptionsSuperPage() {
     eventId,
     initialPage: 1,
     pageSize: PAGE_SIZE,
-    isGuest: undefined,
-    orderBy: "asc",
+    status: filters.status.length > 0 ? filters.status : undefined,
+    isGuest: filters.hideNotAllocated ? false : true,
+    orderBy: filters.orderBy,
+    limitTime: convertedLimitTime,
   });
 
   const { downloadListInscriptionsPdf } = useDownloadPdf();
@@ -130,6 +165,26 @@ export default function ListInscriptionsSuperPage() {
         pageCount={pageCount}
         onPageChange={setPage}
         onSelectInscription={handleViewInscription}
+        filters={filters}
+        onApplyFilters={(next) => {
+          setFilters(next);
+          setPage(1);
+          queryClient.invalidateQueries({
+            queryKey: listInscriptionsKeys.lists(),
+          });
+        }}
+        onClearFilters={() => {
+          setFilters({
+            status: [],
+            hideNotAllocated: false,
+            orderBy: "asc",
+            limitTime: "all",
+          });
+          setPage(1);
+          queryClient.invalidateQueries({
+            queryKey: listInscriptionsKeys.lists(),
+          });
+        }}
         onDownloadPdf={downloadListInscriptionsPdf}
       />
     );

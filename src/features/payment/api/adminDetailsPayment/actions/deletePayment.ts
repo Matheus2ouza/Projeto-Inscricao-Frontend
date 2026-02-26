@@ -1,6 +1,7 @@
+import { DeletePaymentInput } from "@/features/payment/types/adminDetailsPayment/actions/deletePaymentTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 
-export async function deletePayment(paymentId: string) {
+export async function deletePayment({ paymentId }: DeletePaymentInput) {
   try {
     const { data } = await axiosInstance.delete(`/payments/${paymentId}`);
     return data;

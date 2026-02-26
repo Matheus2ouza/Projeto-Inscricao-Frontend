@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
+import { Modal } from "antd";
 import { Download, Loader2, ZoomIn, ZoomOut } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -188,11 +182,33 @@ export default function ImageViewerDialog({
   const imageAreaMinHeight = Math.min(300, imageAreaMaxHeight ?? 300);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent
-        className="flex flex-col p-4 sm:p-6"
+    <Modal
+      open={isOpen}
+      onCancel={handleClose}
+      footer={null}
+      destroyOnHidden
+      mask={{ closable: true }}
+      keyboard={true}
+      closable={true}
+      centered
+      width={dialogWidth}
+      styles={{ body: { padding: 0 } }}
+      title={
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6 space-y-1">
+          <div className="text-lg sm:text-xl font-semibold leading-none">
+            {title}
+          </div>
+          {description && (
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              {description}
+            </div>
+          )}
+        </div>
+      }
+    >
+      <div
+        className="flex flex-col px-4 sm:px-6 pb-4 sm:pb-6"
         style={{
-          width: dialogWidth,
           maxWidth: viewportSize.width
             ? viewportSize.width * (viewportSize.width < 640 ? 0.98 : 0.95)
             : undefined,
@@ -200,15 +216,6 @@ export default function ImageViewerDialog({
           minWidth: viewportSize.width < 640 ? 280 : 450,
         }}
       >
-        <DialogHeader className="px-0 sm:px-2">
-          <DialogTitle className="text-lg sm:text-xl">{title}</DialogTitle>
-          {description && (
-            <DialogDescription className="text-xs sm:text-sm">
-              {description}
-            </DialogDescription>
-          )}
-        </DialogHeader>
-
         {/* Controles de Zoom e Download */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 border-b pb-3">
           <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -309,7 +316,7 @@ export default function ImageViewerDialog({
           {viewportSize.width < 640 &&
             " • Arraste para mover a imagem ampliada"}
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </Modal>
   );
 }
