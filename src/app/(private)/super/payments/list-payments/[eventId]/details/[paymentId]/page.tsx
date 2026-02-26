@@ -34,7 +34,12 @@ export default function PaymentDetailsSuperPage() {
       paymentId,
     });
 
-  const { deletePaymentMutation } = useActionsPayment(eventId, user.role);
+  const {
+    handleDeletePayment,
+    isDeletingPayment,
+    handleModifyReceiptPayment,
+    isModifingReceiptPayment,
+  } = useActionsPayment();
 
   const handleBack = () => {
     router.push(`/super/payments/list-payments/${eventId}`);
@@ -80,7 +85,10 @@ export default function PaymentDetailsSuperPage() {
         allocations={allocations}
         installments={installments}
         onValidPayment={handleValidPayment}
-        onDeletePayment={deletePaymentMutation.mutate}
+        onDeletePayment={handleDeletePayment}
+        idDeletingPayment={isDeletingPayment}
+        onModifyReceiptPayment={handleModifyReceiptPayment}
+        isModifingReceiptPayment={isModifingReceiptPayment}
       />
     );
   };
