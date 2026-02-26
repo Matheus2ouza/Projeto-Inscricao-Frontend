@@ -1,11 +1,16 @@
 "use client";
 
 import {
+  ModifyReceiptPaymentInput,
+  ModifyReceiptPaymentResponse,
+} from "@/features/payment/types/analysisPayment/actions/modifyReceiptPaymentTypes";
+import {
   Payment,
   PaymentMethod,
   StatusPayment,
 } from "@/features/payment/types/analysisPayment/analysisPaymentDetails";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
+import ImageUpdateDialog from "@/shared/components/ImageUpdateDialog";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -14,14 +19,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import { Label } from "@/shared/components/ui/label";
 import {
   Table,
@@ -37,6 +34,7 @@ import { formatDateTime } from "@/shared/utils/formatDate";
 import { getConvertStatusPayment } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
+import { Modal } from "antd";
 import {
   AlertCircle,
   Calendar,
@@ -45,6 +43,7 @@ import {
   Eye,
   FileImage,
   ImageIcon,
+  ImagePlus,
   Link,
   Receipt,
   Undo2,
@@ -52,78 +51,63 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import {
+  ApprovePaymentInput,
+  ApprovePaymentResponse,
+} from "../../types/analysisPayment/actions/approvePaymentTypes";
+import {
+  RejectedPaymentInput,
+  RejectedPaymentResponse,
+} from "../../types/analysisPayment/actions/rejectedPaymentTypes";
+import {
+  ReversePaymentInput,
+  ReversePaymentResponse,
+} from "../../types/analysisPayment/actions/reversePaymentTypes";
 
 export interface DetailsPaymentTableProps {
   payment?: Payment;
-  onApprovePayment?: () => Promise<void>;
-  onRejectPayment?: (reason: string) => Promise<void>;
-  onRevertPayment?: () => Promise<void>;
+  onApprovePayment?: ({
+    paymentId,
+  }: ApprovePaymentInput) => Promise<ApprovePaymentResponse>;
   isApproving?: boolean;
+  onRejectPayment?: ({
+    paymentId,
+    rejectionReason,
+  }: RejectedPaymentInput) => Promise<RejectedPaymentResponse>;
   isRejecting?: boolean;
+  onRevertPayment?: ({
+    paymentId,
+  }: ReversePaymentInput) => Promise<ReversePaymentResponse>;
   isReversing?: boolean;
+  onModifyReceiptPayment?: (
+    input: ModifyReceiptPaymentInput,
+  ) => Promise<ModifyReceiptPaymentResponse>;
+  isModifingReceiptPayment?: boolean;
 }
 
 export default function DetailsPaymentTable({
   payment,
   onApprovePayment,
-  onRejectPayment,
-  onRevertPayment,
   isApproving,
+  onRejectPayment,
   isRejecting,
+  onRevertPayment,
   isReversing,
+  onModifyReceiptPayment,
+  isModifingReceiptPayment,
 }: DetailsPaymentTableProps) {
   const [imageError, setImageError] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [revertDialogOpen, setRevertDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
 
   const handleApproveClick = () => setApproveDialogOpen(true);
   const handleRevertClick = () => setRevertDialogOpen(true);
   const handleRejectClick = () => {
     setRejectionReason("");
     setRejectDialogOpen(true);
-  };
-
-  const handleConfirmApprove = async () => {
-    if (onApprovePayment) {
-      await onApprovePayment();
-      setApproveDialogOpen(false);
-    }
-  };
-
-  const handleConfirmRevert = async () => {
-    if (onRevertPayment) {
-      await onRevertPayment();
-      setRevertDialogOpen(false);
-    }
-  };
-
-  const handleConfirmReject = async () => {
-    if (onRejectPayment && rejectionReason.trim()) {
-      await onRejectPayment(rejectionReason);
-      setRejectDialogOpen(false);
-    }
-  };
-
-  // Função para converter método de pagamento em texto legível
-  const getPaymentMethodText = (method: PaymentMethod) => {
-    const methodMap: Record<PaymentMethod, string> = {
-      [PaymentMethod.DINHEIRO]: "Dinheiro",
-      [PaymentMethod.PIX]: "PIX",
-      [PaymentMethod.CARTAO]: "Cartão",
-    };
-    return methodMap[method] || method;
-  };
-
-  // Função para obter ícone do método de pagamento
-  const getPaymentMethodIcon = (method: PaymentMethod) => {
-    const iconMap: Record<PaymentMethod, React.ReactNode> = {
-      [PaymentMethod.DINHEIRO]: <DollarSign className="h-4 w-4" />,
-      [PaymentMethod.PIX]: <Receipt className="h-4 w-4" />,
-      [PaymentMethod.CARTAO]: <CreditCard className="h-4 w-4" />,
-    };
-    return iconMap[method] || <DollarSign className="h-4 w-4" />;
   };
 
   if (!payment) {
@@ -140,13 +124,42 @@ export default function DetailsPaymentTable({
     );
   }
 
-  // Verificar se pode mostrar botão de reverter
-  const canRevert =
-    String(payment.status) === "APPROVED" ||
-    String(payment.status) === "REFUSED";
+  const handleConfirmApprove = async () => {
+    if (onApprovePayment) {
+      await onApprovePayment({ paymentId: payment.id });
+      setApproveDialogOpen(false);
+    }
+  };
 
-  // Para verificar o status de análise, vamos usar a string direta
-  const isUnderReview = String(payment.status) === "UNDER_REVIEW";
+  const handleConfirmRevert = async () => {
+    if (onRevertPayment) {
+      await onRevertPayment({ paymentId: payment.id });
+      setRevertDialogOpen(false);
+    }
+  };
+
+  const handleConfirmReject = async () => {
+    if (onRejectPayment && rejectionReason.trim()) {
+      await onRejectPayment({
+        paymentId: payment.id,
+        rejectionReason,
+      });
+      setRejectDialogOpen(false);
+    }
+  };
+
+  // Função para obter ícone do método de pagamento
+  const getPaymentMethodIcon = (method: PaymentMethod) => {
+    const iconMap: Record<PaymentMethod, React.ReactNode> = {
+      [PaymentMethod.DINHEIRO]: <DollarSign className="h-4 w-4" />,
+      [PaymentMethod.PIX]: <Receipt className="h-4 w-4" />,
+      [PaymentMethod.CARTAO]: <CreditCard className="h-4 w-4" />,
+    };
+    return iconMap[method] || <DollarSign className="h-4 w-4" />;
+  };
+
+  // Verificar se pode mostrar botão de reverter
+  const statusUpper = String(payment.status).toUpperCase();
 
   return (
     <div className="space-y-6">
@@ -207,7 +220,7 @@ export default function DetailsPaymentTable({
                     <span className="text-sm font-medium">Método</span>
                   </div>
                   <p className="text-lg font-semibold">
-                    {getPaymentMethodText(payment.methodPayment)}
+                    {payment.methodPayment}
                   </p>
                 </div>
               </div>
@@ -218,7 +231,7 @@ export default function DetailsPaymentTable({
               <div className="flex flex-col sm:flex-row lg:flex-col gap-2">
                 {/* Aprovar (só mostra se estiver em análise) */}
 
-                {isUnderReview && (
+                {payment.status === StatusPayment.UNDER_REVIEW && (
                   <Button className="gap-2" onClick={handleApproveClick}>
                     <DollarSign className="h-4 w-4" />
                     Aprovar Pagamento
@@ -226,7 +239,7 @@ export default function DetailsPaymentTable({
                 )}
                 {/* Rejeitar (só mostra se estiver em análise) */}
 
-                {isUnderReview && (
+                {payment.status === StatusPayment.UNDER_REVIEW && (
                   <Button
                     variant="destructive"
                     className="gap-2"
@@ -238,7 +251,7 @@ export default function DetailsPaymentTable({
                 )}
 
                 {/* Reverter (só mostra se estiver aprovado ou rejeitado) */}
-                {canRevert && (
+                {payment.status !== StatusPayment.UNDER_REVIEW && (
                   <Button
                     variant="outline"
                     className="gap-2 border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800 dark:border-amber-700 dark:text-amber-300 dark:hover:bg-amber-900/20"
@@ -416,9 +429,7 @@ export default function DetailsPaymentTable({
                 <div className="mt-2">
                   <div className="flex items-center gap-2">
                     {getPaymentMethodIcon(payment.methodPayment)}
-                    <span className="font-medium">
-                      {getPaymentMethodText(payment.methodPayment)}
-                    </span>
+                    <span className="font-medium">{payment.methodPayment}</span>
                   </div>
                 </div>
               </div>
@@ -516,6 +527,22 @@ export default function DetailsPaymentTable({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              <Button variant="outline" className="w-full sm:w-auto mr-2">
+                <Link className="h-4 w-4" />
+                Abrir em nova aba
+              </Button>
+              {onModifyReceiptPayment && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => setModifyDialogOpen(true)}
+                  disabled={!!isModifingReceiptPayment}
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  Modificar comprovante
+                </Button>
+              )}
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden border">
                 {!imageError ? (
                   <Image
@@ -534,21 +561,25 @@ export default function DetailsPaymentTable({
                   </div>
                 )}
               </div>
-              <Button variant="outline" asChild className="w-full sm:w-auto">
-                <a
-                  href={payment.imageUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
-                >
-                  <Link className="h-4 w-4" />
-                  Abrir em nova aba
-                </a>
-              </Button>
             </div>
           </CardContent>
         </Card>
       )}
+
+      <ImageUpdateDialog
+        open={modifyDialogOpen}
+        onOpenChange={setModifyDialogOpen}
+        title="Modificar comprovante"
+        description="Selecione ou arraste uma imagem para atualizar o comprovante."
+        onSubmit={async (imageDataUrl) => {
+          if (!onModifyReceiptPayment) return;
+          await onModifyReceiptPayment({
+            paymentId: payment.id,
+            image: imageDataUrl,
+          });
+        }}
+        isSubmitting={!!isModifingReceiptPayment}
+      />
 
       <ConfirmationDialog
         open={approveDialogOpen}
@@ -571,43 +602,52 @@ export default function DetailsPaymentTable({
         variant="destructive"
       />
 
-      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Rejeitar Pagamento</DialogTitle>
-            <DialogDescription>
-              Informe o motivo da rejeição deste pagamento. Esta ação notificará
-              o usuário.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="reason">Motivo</Label>
-              <Textarea
-                id="reason"
-                placeholder="Digite o motivo da rejeição..."
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-              />
-            </div>
+      <Modal
+        title="Rejeitar Pagamento"
+        open={rejectDialogOpen}
+        onCancel={() => setRejectDialogOpen(false)}
+        footer={null}
+        destroyOnHidden
+        mask={{ closable: !isRejecting }}
+        closable={!isRejecting}
+        keyboard={!isRejecting}
+      >
+        <div className="space-y-4">
+          <div className="text-sm text-muted-foreground">
+            Informe o motivo da rejeição deste pagamento. Esta ação notificará o
+            usuário.
           </div>
-          <DialogFooter>
+
+          <div className="grid gap-2">
+            <Label htmlFor="reason">Motivo</Label>
+            <Textarea
+              id="reason"
+              placeholder="Digite o motivo da rejeição..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3 pt-2">
             <Button
+              type="button"
               variant="outline"
               onClick={() => setRejectDialogOpen(false)}
+              disabled={isRejecting}
             >
               Cancelar
             </Button>
             <Button
+              type="button"
               variant="destructive"
               onClick={handleConfirmReject}
               disabled={!rejectionReason.trim() || isRejecting}
             >
               {isRejecting ? "Rejeitando..." : "Confirmar Rejeição"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

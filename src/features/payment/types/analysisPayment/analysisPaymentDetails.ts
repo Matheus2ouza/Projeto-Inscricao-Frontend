@@ -13,9 +13,9 @@ export type Payment = {
 };
 
 export enum StatusPayment {
-  APPROVED = "APROVADO",
-  UNDER_REVIEW = "EM_ANALISE",
-  REFUSED = "RECUSADO",
+  APPROVED = "APPROVED",
+  UNDER_REVIEW = "UNDER_REVIEW",
+  REFUSED = "REFUSED",
 }
 
 export enum PaymentMethod {

@@ -1,12 +1,14 @@
+import {
+  RejectedPaymentInput,
+  RejectedPaymentResponse,
+} from "@/features/payment/types/analysisPayment/actions/rejectedPaymentTypes";
 import axiosInstance from "@/shared/lib/apiClient";
-import { PaymentActionsResponse } from "../../types/analysisPayment/analysisPaymentDetails";
-
-export async function rejectPayment(
-  paymentId: string,
-  rejectionReason: string,
-): Promise<PaymentActionsResponse> {
+export async function rejectPayment({
+  paymentId,
+  rejectionReason,
+}: RejectedPaymentInput): Promise<RejectedPaymentResponse> {
   try {
-    const { data } = await axiosInstance.post<PaymentActionsResponse>(
+    const { data } = await axiosInstance.post<RejectedPaymentResponse>(
       `payments/${paymentId}/analysis/rejected`,
       {
         rejectionReason,

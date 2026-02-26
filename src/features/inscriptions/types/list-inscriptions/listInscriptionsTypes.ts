@@ -1,7 +1,15 @@
+export enum InscriptionStatus {
+  PENDING = "PENDING",
+  UNDER_REVIEW = "UNDER_REVIEW",
+  PAID = "PAID",
+  EXPIRED = "EXPIRED",
+  CANCELLED = "CANCELLED",
+}
+
 export type Inscription = {
   id: string;
   responsible: string;
-  status: string;
+  status: InscriptionStatus;
   isGuest: boolean;
   totalParticipant: number;
 };
@@ -31,8 +39,10 @@ export type ListInscriptionsParams = {
   eventId: string;
   initialPage: number;
   pageSize: number;
+  status?: InscriptionStatus[];
   isGuest?: boolean;
   orderBy?: "asc" | "desc";
+  limitTime?: string;
 };
 
 export type ListInscriptionsResult = {

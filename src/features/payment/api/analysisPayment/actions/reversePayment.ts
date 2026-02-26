@@ -1,12 +1,15 @@
+import {
+  RejectedPaymentResponse,
+  ReversePaymentInput,
+} from "@/features/payment/types/analysisPayment/actions/reversePaymentTypes";
 import axiosInstance from "@/shared/lib/apiClient";
-import { PaymentActionsResponse } from "../../types/analysisPayment/analysisPaymentDetails";
 
-export async function approvePayment(
-  paymentId: string,
-): Promise<PaymentActionsResponse> {
+export async function reversePayment({
+  paymentId,
+}: ReversePaymentInput): Promise<RejectedPaymentResponse> {
   try {
-    const { data } = await axiosInstance.post<PaymentActionsResponse>(
-      `payments/${paymentId}/analysis/approve`,
+    const { data } = await axiosInstance.post<RejectedPaymentResponse>(
+      `payments/${paymentId}/analysis/reverse`,
     );
 
     return data;

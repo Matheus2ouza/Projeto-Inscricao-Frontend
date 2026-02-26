@@ -33,9 +33,19 @@ export function useInvalidateDetailsInscriptionQuery() {
         queryKey: DetailsInscriptionKey.all,
       });
     },
-    invalidateDetail: (inscriptionId: string) => {
+    invalidateDetails: (inscriptionId: string) => {
       queryClient.invalidateQueries({
-        queryKey: DetailsInscriptionKey.detail(inscriptionId),
+        queryKey: DetailsInscriptionKey.details(inscriptionId),
+      });
+    },
+    removeAll: () => {
+      queryClient.removeQueries({
+        queryKey: DetailsInscriptionKey.all,
+      });
+    },
+    removeDetails: (inscriptionId: string) => {
+      queryClient.removeQueries({
+        queryKey: DetailsInscriptionKey.details(inscriptionId),
       });
     },
   };

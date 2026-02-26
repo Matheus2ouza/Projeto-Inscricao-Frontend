@@ -2,6 +2,7 @@
 
 import { DetailsInscription } from "@/features/guest/components/detailsInscription/detailsInscription";
 import { useDeletePayment } from "@/features/guest/hook/detailsInscription/actions/useDeletePayment";
+import { useModifyReceiptPayment } from "@/features/guest/hook/detailsInscription/actions/useModifyReceiptPayment";
 import { useUpdateGuestInscription } from "@/features/guest/hook/detailsInscription/actions/useUpdateInscription";
 import { useUpdateGuestParticipant } from "@/features/guest/hook/detailsInscription/actions/useUpdateParticipant";
 import { useDetailsInscription } from "@/features/guest/hook/detailsInscription/useDetailsInscription";
@@ -206,6 +207,9 @@ export default function GuestInscriptionPage() {
     router.push(`/guest/${eventId}/payment/pix?${search.toString()}`);
   };
 
+  const { handleModifyReceiptPayment, isModifingReceiptPayment } =
+    useModifyReceiptPayment();
+
   const renderContent = () => {
     return (
       <div className="space-y-6">
@@ -234,6 +238,8 @@ export default function GuestInscriptionPage() {
           onRegisterPaymentCard={handleRegisterPaymentCard}
           onRegisterPaymentPix={handleRegisterPaymentPix}
           onDeletePayment={deletePaymentMutation.mutate}
+          onModifyReceipt={handleModifyReceiptPayment}
+          isModifingReceipt={isModifingReceiptPayment}
         />
         {error && (
           <div className="min-h-[160px] flex items-center justify-center">

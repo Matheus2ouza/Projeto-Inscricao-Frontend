@@ -1,16 +1,7 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/shared/components/ui/alert-dialog";
 import { Button } from "@/shared/components/ui/button";
+import { Modal } from "antd";
 import { AlertTriangle } from "lucide-react";
 
 interface ConfirmationDialogProps {
@@ -43,58 +34,60 @@ export function ConfirmationDialog({
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center gap-2">
-            <AlertTriangle
-              className={`h-5 w-5 ${
-                variant === "destructive"
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-amber-600 dark:text-amber-400"
-              }`}
-            />
-            {title}
-          </AlertDialogTitle>
-          <AlertDialogDescription>{message}</AlertDialogDescription>
-        </AlertDialogHeader>
+    <Modal
+      open={open}
+      onCancel={() => onOpenChange(false)}
+      footer={null}
+      destroyOnHidden
+      mask={{ closable: !isLoading }}
+      closable={!isLoading}
+      keyboard={!isLoading}
+    >
+      <div className="space-y-5">
+        <div className="flex items-start gap-2">
+          <AlertTriangle
+            className={`h-5 w-5 ${
+              variant === "destructive"
+                ? "text-red-600 dark:text-red-400"
+                : "text-amber-600 dark:text-amber-400"
+            }`}
+          />
+          <div className="min-w-0">
+            <div className="text-base font-semibold text-foreground">
+              {title}
+            </div>
+            <div className="text-sm text-muted-foreground mt-1">{message}</div>
+          </div>
+        </div>
 
-        <AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
-          <AlertDialogCancel asChild>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-              className="flex-1 sm:flex-initial"
-            >
-              {cancelText}
-            </Button>
-          </AlertDialogCancel>
-
-          <AlertDialogAction asChild>
-            <Button
-              type="button"
-              variant={variant === "destructive" ? "destructive" : "default"}
-              onClick={handleConfirm}
-              disabled={isLoading}
-              className="flex-1 sm:flex-initial"
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Processando...
-                </span>
-              ) : (
-                confirmText
-              )}
-            </Button>
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+            className="flex-1 sm:flex-initial"
+          >
+            {cancelText}
+          </Button>
+          <Button
+            type="button"
+            variant={variant === "destructive" ? "destructive" : "default"}
+            onClick={handleConfirm}
+            disabled={isLoading}
+            className="flex-1 sm:flex-initial"
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Processando...
+              </span>
+            ) : (
+              confirmText
+            )}
+          </Button>
+        </div>
+      </div>
+    </Modal>
   );
 }

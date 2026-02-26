@@ -37,6 +37,8 @@ export default function InscriptionDetailListAdminPage() {
     isUpdatingExpired,
     handleCreatePaymentLink,
     isCreatingPaymentLink,
+    handleDeleteInscription,
+    isDeletingInscription,
   } = useActionsInscription();
 
   const renderSkeletonGrid = () => {
@@ -81,6 +83,10 @@ export default function InscriptionDetailListAdminPage() {
         isUpdatingExpired={isUpdatingExpired}
         onCreatePaymentLink={handleCreatePaymentLink}
         isCreatingPaymentLink={isCreatingPaymentLink}
+        onDeleteInscription={(id) =>
+          handleDeleteInscription({ eventId, inscriptionId: id })
+        }
+        isDeletingInscription={isDeletingInscription}
       />
     );
   };

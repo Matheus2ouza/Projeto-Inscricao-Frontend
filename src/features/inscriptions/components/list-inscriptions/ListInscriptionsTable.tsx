@@ -36,16 +36,19 @@ import {
   Calendar,
   ChevronDown,
   Download,
-  Eye,
   FileText,
   Filter,
   Image as ImageIcon,
+  Info,
   User,
   Users,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { DownloadListInscriptionsPdfInput } from "../../types/list-inscriptions/pdf/listInscriptionsPdfTypes";
+import InscriptionsFilters, {
+  InscriptionsFiltersValue,
+} from "./filters/InscriptionsFilters";
 import SheetListInscriptions from "./pdf/SheetListInscriptions";
 
 interface listInscriptionsTableProps {
@@ -57,6 +60,9 @@ interface listInscriptionsTableProps {
   pageCount: number;
   onPageChange: (page: number) => void;
   onSelectInscription: (id: string) => void;
+  filters: InscriptionsFiltersValue;
+  onApplyFilters: (filters: InscriptionsFiltersValue) => void;
+  onClearFilters: () => void;
 
   //pdf
   onDownloadPdf: ({
@@ -75,6 +81,9 @@ export default function ListInscriptionsTable({
   pageCount,
   onPageChange,
   onSelectInscription,
+  filters,
+  onApplyFilters,
+  onClearFilters,
   onDownloadPdf,
 }: listInscriptionsTableProps) {
   const [imageError, setImageError] = useState(false);
@@ -264,8 +273,21 @@ export default function ListInscriptionsTable({
                   <ChevronDown className="w-4 h-4" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-72 rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-4">
-                <div className="text-sm text-muted-foreground">Em breve</div>
+              <PopoverContent
+                align="end"
+                className="w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0"
+              >
+                <InscriptionsFilters
+                  value={filters}
+                  onApply={(next) => {
+                    onApplyFilters(next);
+                    setFiltersOpen(false);
+                  }}
+                  onClear={() => {
+                    onClearFilters();
+                    setFiltersOpen(false);
+                  }}
+                />
               </PopoverContent>
             </Popover>
           </div>
@@ -304,11 +326,11 @@ export default function ListInscriptionsTable({
                         <Button
                           variant="link"
                           size="sm"
-                          className="h-10 w-10 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
+                          className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center"
                           onClick={() => onSelectInscription(inscription.id)}
                           aria-label="Detalhes"
                         >
-                          <Eye className="h-5 w-5" />
+                          <Info className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -439,11 +461,11 @@ export default function ListInscriptionsTable({
                           <Button
                             variant="link"
                             size="sm"
-                            className="h-6 w-6 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center"
+                            className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center"
                             onClick={() => onSelectInscription(inscription.id)}
                             aria-label="Detalhes"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Info className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>

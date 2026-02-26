@@ -15,6 +15,7 @@ import {
   Payment,
   PaymentLink,
 } from "@/features/inscriptions/types/list-inscriptions/inscription/detailsInscriptionTypes";
+import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { Button } from "@/shared/components/ui/button";
 import { Calendar } from "@/shared/components/ui/calendar";
 import { Input } from "@/shared/components/ui/input";
@@ -65,6 +66,8 @@ interface DetailsInscriptionProps {
     input: CreatePaymentLinkInput,
   ) => Promise<CreatePaymentLinkResponse>;
   isCreatingPaymentLink?: boolean;
+  onDeleteInscription?: (inscriptionId: string) => Promise<void>;
+  isDeletingInscription?: boolean;
 }
 
 export default function DetailsInscriptionTable({
@@ -77,6 +80,8 @@ export default function DetailsInscriptionTable({
   isUpdatingExpired = false,
   onCreatePaymentLink,
   isCreatingPaymentLink = false,
+  onDeleteInscription,
+  isDeletingInscription,
 }: DetailsInscriptionProps) {
   if (!inscription) {
     return (
@@ -113,6 +118,7 @@ export default function DetailsInscriptionTable({
   const [paymentLinkCreated, setPaymentLinkCreated] =
     useState<CreatePaymentLinkResponse | null>(null);
   const [paymentLinkCopied, setPaymentLinkCopied] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const activePaymentLink = useMemo(() => {
     if (paymentLinkCreated) {
@@ -204,13 +210,37 @@ export default function DetailsInscriptionTable({
 
   return (
     <div className="space-y-8">
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={async () => {
+          await onDeleteInscription?.(inscription.id);
+        }}
+        title="Deletar inscrição"
+        message="Tem certeza que deseja deletar esta inscrição? Essa ação não pode ser desfeita."
+        confirmText="Deletar"
+        cancelText="Cancelar"
+        isLoading={!!isDeletingInscription}
+        variant="destructive"
+      />
       <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
         <div className="p-6">
           <div className="space-y-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Detalhes da Inscrição
-              </h1>
+              <div className="flex items-center justify-between gap-3">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Detalhes da Inscrição
+                </h1>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setDeleteDialogOpen(true)}
+                  disabled={!onDeleteInscription || !!isDeletingInscription}
+                >
+                  {isDeletingInscription ? "Deletando..." : "Deletar Inscrição"}
+                </Button>
+              </div>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 mt-2">
                 <code className="font-mono bg-muted px-2 py-1 rounded">
@@ -274,146 +304,147 @@ export default function DetailsInscriptionTable({
         </div>
       </div>
 
-      {inscription.status !== InscriptionStatus.PAID && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-muted-foreground" />
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Expiração
-                  </h2>
-                </div>
+      {inscription.status !== InscriptionStatus.PAID ||
+        (inscription.expiresAt && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-muted-foreground" />
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Expiração
+                    </h2>
+                  </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full lg:w-auto">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={!onUpdateExpired || isUpdatingExpired}
-                    onClick={() => {
-                      const next = new Date(
-                        expiresAt.getTime() + 60 * 60 * 1000,
-                      );
-                      onUpdateExpired?.({
-                        inscriptionId: inscription.id,
-                        expiresAt: next,
-                      });
-                    }}
-                  >
-                    + 1 hora
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={!onUpdateExpired || isUpdatingExpired}
-                    onClick={() => {
-                      const next = new Date(
-                        expiresAt.getTime() + 24 * 60 * 60 * 1000,
-                      );
-                      onUpdateExpired?.({
-                        inscriptionId: inscription.id,
-                        expiresAt: next,
-                      });
-                    }}
-                  >
-                    + 24h
-                  </Button>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full lg:w-auto">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!onUpdateExpired || isUpdatingExpired}
+                      onClick={() => {
+                        const next = new Date(
+                          expiresAt.getTime() + 60 * 60 * 1000,
+                        );
+                        onUpdateExpired?.({
+                          inscriptionId: inscription.id,
+                          expiresAt: next,
+                        });
+                      }}
+                    >
+                      + 1 hora
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!onUpdateExpired || isUpdatingExpired}
+                      onClick={() => {
+                        const next = new Date(
+                          expiresAt.getTime() + 24 * 60 * 60 * 1000,
+                        );
+                        onUpdateExpired?.({
+                          inscriptionId: inscription.id,
+                          expiresAt: next,
+                        });
+                      }}
+                    >
+                      + 24h
+                    </Button>
 
-                  <Popover open={customOpen} onOpenChange={setCustomOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        type="button"
-                        disabled={!onUpdateExpired || isUpdatingExpired}
-                      >
-                        Personalizado
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 p-4" align="end">
-                      <div className="space-y-3">
-                        <div className="space-y-2">
-                          <div className="text-sm font-semibold text-foreground">
-                            Data e hora
-                          </div>
-                          <div className="rounded-md border">
-                            <Calendar
-                              mode="single"
-                              selected={customDate}
-                              onSelect={(date) => {
-                                if (!date) return;
-                                setCustomDate(date);
-                              }}
-                              initialFocus
-                            />
-                          </div>
-                          <Input
-                            type="time"
-                            value={customTime}
-                            onChange={(e) => setCustomTime(e.target.value)}
-                          />
-                        </div>
-
+                    <Popover open={customOpen} onOpenChange={setCustomOpen}>
+                      <PopoverTrigger asChild>
                         <Button
                           type="button"
-                          className="w-full"
                           disabled={!onUpdateExpired || isUpdatingExpired}
-                          onClick={() => {
-                            const [hh, mm] = customTime.split(":");
-                            const hours = Number(hh);
-                            const minutes = Number(mm);
-
-                            const next = new Date(customDate);
-                            next.setHours(Number.isFinite(hours) ? hours : 0);
-                            next.setMinutes(
-                              Number.isFinite(minutes) ? minutes : 0,
-                            );
-                            next.setSeconds(0);
-                            next.setMilliseconds(0);
-
-                            onUpdateExpired?.({
-                              inscriptionId: inscription.id,
-                              expiresAt: next,
-                            });
-                            setCustomOpen(false);
-                          }}
                         >
-                          Aplicar
+                          Personalizado
                         </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-4" align="end">
+                        <div className="space-y-3">
+                          <div className="space-y-2">
+                            <div className="text-sm font-semibold text-foreground">
+                              Data e hora
+                            </div>
+                            <div className="rounded-md border">
+                              <Calendar
+                                mode="single"
+                                selected={customDate}
+                                onSelect={(date) => {
+                                  if (!date) return;
+                                  setCustomDate(date);
+                                }}
+                                initialFocus
+                              />
+                            </div>
+                            <Input
+                              type="time"
+                              value={customTime}
+                              onChange={(e) => setCustomTime(e.target.value)}
+                            />
+                          </div>
+
+                          <Button
+                            type="button"
+                            className="w-full"
+                            disabled={!onUpdateExpired || isUpdatingExpired}
+                            onClick={() => {
+                              const [hh, mm] = customTime.split(":");
+                              const hours = Number(hh);
+                              const minutes = Number(mm);
+
+                              const next = new Date(customDate);
+                              next.setHours(Number.isFinite(hours) ? hours : 0);
+                              next.setMinutes(
+                                Number.isFinite(minutes) ? minutes : 0,
+                              );
+                              next.setSeconds(0);
+                              next.setMilliseconds(0);
+
+                              onUpdateExpired?.({
+                                inscriptionId: inscription.id,
+                                expiresAt: next,
+                              });
+                              setCustomOpen(false);
+                            }}
+                          >
+                            Aplicar
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
-              </div>
 
-              <div
-                className={`px-3 py-1 rounded-full border text-sm font-semibold whitespace-nowrap w-fit ${
-                  remainingMs >= 0
-                    ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-300"
-                    : "bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-900 dark:text-red-300"
-                }`}
-              >
-                {remainingLabel}
-              </div>
+                <div
+                  className={`px-3 py-1 rounded-full border text-sm font-semibold whitespace-nowrap w-fit ${
+                    remainingMs >= 0
+                      ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/30 dark:border-blue-900 dark:text-blue-300"
+                      : "bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-900 dark:text-red-300"
+                  }`}
+                >
+                  {remainingLabel}
+                </div>
 
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>
-                  Expira em{" "}
-                  <span className="font-semibold text-foreground">
-                    {formatDateTime(expiresAt)}
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>
+                    Expira em{" "}
+                    <span className="font-semibold text-foreground">
+                      {formatDateTime(expiresAt)}
+                    </span>
                   </span>
-                </span>
-                <span className="font-medium">
-                  {Math.round(remainingPercent)}%
-                </span>
+                  <span className="font-medium">
+                    {Math.round(remainingPercent)}%
+                  </span>
+                </div>
+                <Progress
+                  value={remainingPercent}
+                  className="h-2.5 bg-gray-200 dark:bg-gray-700 [&_[data-slot=progress-indicator]]:bg-blue-500"
+                />
               </div>
-              <Progress
-                value={remainingPercent}
-                className="h-2.5 bg-gray-200 dark:bg-gray-700 [&_[data-slot=progress-indicator]]:bg-blue-500"
-              />
             </div>
           </div>
-        </div>
-      )}
+        ))}
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -632,10 +663,6 @@ export default function DetailsInscriptionTable({
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Histórico de Pagamentos
             </h2>
-            <p className="text-muted-foreground">
-              {payments.length} pagamento{payments.length !== 1 ? "s" : ""}{" "}
-              registrado{payments.length !== 1 ? "s" : ""}
-            </p>
           </div>
         </div>
 

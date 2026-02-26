@@ -1,7 +1,7 @@
 "use client";
 
 import PaymentDetailsContent from "@/features/payment/components/adminDetailsPayment/PaymentDetailsContent";
-import { useDeletePayment } from "@/features/payment/hooks/adminDetailsPayment/actions/useDeletePayment";
+import { useActionsPayment } from "@/features/payment/hooks/adminDetailsPayment/actions/useActionsPayment";
 import { usePaymentDetail } from "@/features/payment/hooks/adminDetailsPayment/usePaymentdetail";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
@@ -34,7 +34,7 @@ export default function PaymentDetailsSuperPage() {
       paymentId,
     });
 
-  const { deletePaymentMutation } = useDeletePayment(eventId, user.role);
+  const { deletePaymentMutation } = useActionsPayment(eventId, user.role);
 
   const handleBack = () => {
     router.push(`/super/payments/list-payments/${eventId}`);

@@ -1,7 +1,7 @@
 "use client";
 import DetailsPaymentTable from "@/features/payment/components/adminAnalysisPayment/DetailsPayment";
+import { useActionsPayment } from "@/features/payment/hooks/analysisPayment/actions/useActionsPayment";
 import { useAnalysisPaymentDetails } from "@/features/payment/hooks/analysisPayment/analysisPaymentDetails";
-import { usePaymentActions } from "@/features/payment/hooks/analysisPayment/usePaymentActions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -27,13 +27,15 @@ export default function PaymentDetailsAdminPage() {
     });
 
   const {
-    approvePayment,
-    rejectPayment,
-    reversePayment,
-    isApproving,
-    isRejecting,
-    isReversing,
-  } = usePaymentActions();
+    handleModifyReceiptPayment,
+    isModifingReceiptPayment,
+    handleApprovePayment,
+    isApprovingPayment,
+    handleRejectPayment,
+    isRejectingPayment,
+    handleReversePayment,
+    isReversingPayment,
+  } = useActionsPayment();
 
   const renderSkeletonGrid = () => {
     return (
@@ -71,26 +73,16 @@ export default function PaymentDetailsAdminPage() {
     return (
       <DetailsPaymentTable
         payment={payment}
-        onApprovePayment={() => handleApprovePayment(paymentId)}
-        onRejectPayment={(reason) => handleRejectPayment(paymentId, reason)}
-        onRevertPayment={() => handleRevertPayment(paymentId)}
-        isApproving={isApproving}
-        isRejecting={isRejecting}
-        isReversing={isReversing}
+        onApprovePayment={handleApprovePayment}
+        isApproving={isApprovingPayment}
+        onRejectPayment={handleRejectPayment}
+        isRejecting={isRejectingPayment}
+        onRevertPayment={handleReversePayment}
+        isReversing={isReversingPayment}
+        onModifyReceiptPayment={handleModifyReceiptPayment}
+        isModifingReceiptPayment={isModifingReceiptPayment}
       />
     );
-  };
-
-  const handleApprovePayment = async (paymentId: string) => {
-    await approvePayment(paymentId);
-  };
-
-  const handleRejectPayment = async (paymentId: string, reason: string) => {
-    await rejectPayment({ paymentId, reason });
-  };
-
-  const handleRevertPayment = async (paymentId: string) => {
-    await reversePayment(paymentId);
   };
 
   const handleBack = () => {
