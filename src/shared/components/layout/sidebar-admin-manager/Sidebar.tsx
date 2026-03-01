@@ -50,6 +50,7 @@ import {
   Tickets,
   TrendingUp,
   Users,
+  Wallet,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -353,6 +354,17 @@ export default function AppSidebarAdminManager({
                       >
                         <BanknoteArrowDown className="size-4" />
                         Gastos
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href="/admin/cash-register"
+                        className="flex items-center gap-1"
+                      >
+                        <Wallet className="size-4" />
+                        Caixa
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
