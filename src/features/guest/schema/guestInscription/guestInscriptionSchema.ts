@@ -14,6 +14,9 @@ export const guestInscriptionSchema = z
         /^\(\d{2}\)\s9\d{4}-?\d{4}$/,
         "Informe um telefone válido no formato (DDD) 9XXXX-XXXX",
       ),
+    cpf: z
+      .string()
+      .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "Informe um CPF válido"),
     locality: z.string().trim().min(1, "Localidade é obrigatória"),
     participantName: z.string().trim().optional(),
     birthDate: z.string().trim().min(1, "Data de nascimento é obrigatória"),

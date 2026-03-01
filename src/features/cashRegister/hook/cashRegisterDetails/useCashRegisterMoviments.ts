@@ -20,13 +20,13 @@ export function useCashRegisterMoviments({
 
   const { data, isLoading, isFetching, error, refetch } =
     useCashRegisterMovimentsQuery(
-    cashRegisterId,
-    page,
-    pageSize,
-    type,
-    limitTime,
-    orderBy,
-  );
+      cashRegisterId,
+      page,
+      pageSize,
+      type,
+      limitTime,
+      orderBy,
+    );
 
   const { prefetchNextPage } = usePrefetchCashRegisterMovimentsQuery();
 
@@ -37,8 +37,6 @@ export function useCashRegisterMoviments({
   return {
     moviments: data?.moviments || null,
     totalMoviments: data?.totalMoviments || 0,
-    totalIncome: data?.totalIncome || 0,
-    totalExpense: data?.totalExpense || 0,
     page: data?.page || 0,
     pageCount: data?.pageCount || 0,
     loading: isLoading,
