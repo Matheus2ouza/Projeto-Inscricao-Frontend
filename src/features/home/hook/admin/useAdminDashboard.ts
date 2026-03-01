@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  getDashboardActiveEvents,
   getDashboardActiveParticipants,
   getDashboardAdmin,
   getDashboardTotalCollected,
   getDashboardTotalDebt,
+  getDashboardTotalExpense,
   type DashboardAdminResponse,
 } from "@/features/home/api/admin/dashboard";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -38,8 +38,8 @@ export function useAdminDashboard(eventId?: string) {
       try {
         let value = 0;
         switch (metric) {
-          case "activeEvents":
-            value = await getDashboardActiveEvents();
+          case "totalExpense":
+            value = await getDashboardTotalExpense(eventId);
             break;
           case "totalCollected":
             value = await getDashboardTotalCollected(eventId);
@@ -57,7 +57,7 @@ export function useAdminDashboard(eventId?: string) {
         queryClient.setQueryData<DashboardAdminResponse | undefined>(
           dashboardAdminKeys.summary(eventId),
           (old) => ({
-            activeEvents: old?.activeEvents ?? 0,
+            totalExpense: old?.totalExpense ?? 0,
             totalCollected: old?.totalCollected ?? 0,
             totalDebt: old?.totalDebt ?? 0,
             activeParticipants: old?.activeParticipants ?? 0,

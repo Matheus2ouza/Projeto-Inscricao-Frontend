@@ -62,8 +62,7 @@ export default function AdminManagerHomeDashboard({
     totalDebt:
       "Soma de todos os valores pendentes das inscrições ainda não pagas no evento mais próximo.",
 
-    activeEvents:
-      "Quantidade de eventos ativos e publicados atualmente na região.",
+    totalExpense: "Valor total de gastos do evento mais próximo.",
 
     activeParticipants:
       "Número total de participantes confirmados no evento mais próximo (inclui apenas inscrições pagas).",
@@ -105,27 +104,27 @@ export default function AdminManagerHomeDashboard({
       detailLabel: "Em aberto",
     },
     {
-      title: "Eventos ativos",
-      subtitle: "Eventos publicados",
+      title: "Total gasto",
+      subtitle: "Gastos do evento",
       stripe: {
-        color: "rgba(59, 130, 246, 0.5)",
-        bg: "rgba(59, 130, 246, 0.15)",
-        border: "border-blue-200",
+        color: "rgba(245, 158, 11, 0.6)",
+        bg: "rgba(245, 158, 11, 0.18)",
+        border: "border-amber-200",
       },
-      textColor: "text-blue-700",
-      metric: "activeEvents",
-      value: `${data?.activeEvents ?? 0} evento(s)`,
-      detailLabel: "Eventos",
+      textColor: "text-amber-700",
+      metric: "totalExpense",
+      value: getFormatCurrency(data?.totalExpense ?? 0),
+      detailLabel: "Gastos",
     },
     {
       title: "Participantes",
       subtitle: "Participantes inscritos",
       stripe: {
-        color: "rgba(245, 158, 11, 0.55)",
-        bg: "rgba(245, 158, 11, 0.16)",
-        border: "border-amber-200",
+        color: "rgba(139, 92, 246, 0.55)",
+        bg: "rgba(139, 92, 246, 0.16)",
+        border: "border-violet-200",
       },
-      textColor: "text-amber-700",
+      textColor: "text-violet-700",
       metric: "activeParticipants",
       value: `${data?.activeParticipants ?? 0} participante(s)`,
       detailLabel: "Participantes",
@@ -277,87 +276,96 @@ export default function AdminManagerHomeDashboard({
             return (
               <div
                 key={card.metric}
-                className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-xs flex flex-col gap-3"
+                className={`relative bg-white dark:bg-gray-950 border rounded-xl p-4 shadow-xs overflow-hidden ${card.stripe.border}`}
               >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
-                      {card.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {card.subtitle}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      aria-label="Atualizar card"
-                      className="p-1.5 rounded-full hover:bg-muted transition-colors"
-                      onClick={() => onRefreshMetric?.(card.metric)}
-                      disabled={isRefreshing}
-                    >
-                      <RefreshCcw
-                        className={`w-4 h-4 ${
-                          isRefreshing
-                            ? "animate-spin text-primary"
-                            : "text-gray-500"
-                        }`}
-                      />
-                    </button>
-                    <Popover
-                      open={infoOpen === card.metric}
-                      onOpenChange={(open) =>
-                        setInfoOpen(open ? card.metric : null)
-                      }
-                    >
-                      <PopoverTrigger asChild>
-                        <button
-                          type="button"
-                          aria-label="Abrir detalhes do card"
-                          className="p-1.5 rounded-full hover:bg-muted transition-colors"
-                        >
-                          <Info className="w-4 h-4 text-blue-500" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-64 rounded-2xl shadow-lg border bg-white dark:bg-gray-900">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-semibold text-foreground">
-                              {card.title}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {infoTexts[card.metric]}
-                            </p>
-                          </div>
+                <div
+                  className="absolute inset-0 dark:hidden"
+                  style={{ backgroundColor: card.stripe.bg }}
+                />
+                <div
+                  className="absolute top-0 left-0 h-1 w-full"
+                  style={{ backgroundColor: card.stripe.color }}
+                />
+
+                <div className="relative flex flex-col gap-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
+                        {card.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {card.subtitle}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        aria-label="Atualizar card"
+                        className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                        onClick={() => onRefreshMetric?.(card.metric)}
+                        disabled={isRefreshing}
+                      >
+                        <RefreshCcw
+                          className={`w-4 h-4 ${
+                            isRefreshing
+                              ? "animate-spin text-primary"
+                              : card.textColor
+                          }`}
+                        />
+                      </button>
+                      <Popover
+                        open={infoOpen === card.metric}
+                        onOpenChange={(open) =>
+                          setInfoOpen(open ? card.metric : null)
+                        }
+                      >
+                        <PopoverTrigger asChild>
                           <button
                             type="button"
-                            aria-label="Fechar"
-                            className="p-1 rounded-full hover:bg-muted transition-colors"
-                            onClick={() => setInfoOpen(null)}
+                            aria-label="Abrir detalhes do card"
+                            className="p-1.5 rounded-full hover:bg-muted transition-colors"
                           >
-                            <X className="w-3.5 h-3.5" />
+                            <Info className={`w-4 h-4 ${card.textColor}`} />
                           </button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-64 rounded-2xl shadow-lg border bg-white dark:bg-gray-900">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-foreground">
+                                {card.title}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {infoTexts[card.metric]}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              aria-label="Fechar"
+                              className="p-1 rounded-full hover:bg-muted transition-colors"
+                              onClick={() => setInfoOpen(null)}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <p className={`text-2xl font-bold ${card.textColor}`}>
-                    {isRefreshing ? "..." : card.value}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {card.detailLabel}
-                  </p>
-                </div>
-                <div
-                  className={`h-3 w-full rounded-full overflow-hidden border ${card.stripe.border}`}
-                  style={{
-                    backgroundImage: `repeating-linear-gradient(45deg, ${card.stripe.color}, ${card.stripe.color} 10px, ${card.stripe.bg} 10px, ${card.stripe.bg} 20px)`,
-                  }}
-                />
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex items-center justify-between"></div>
+
+                  <div>
+                    <p className={`text-2xl font-bold ${card.textColor}`}>
+                      {isRefreshing ? "..." : card.value}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {card.detailLabel}
+                    </p>
+                  </div>
+                  <div
+                    className={`h-3 w-full rounded-full overflow-hidden border ${card.stripe.border}`}
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(45deg, ${card.stripe.color}, ${card.stripe.color} 10px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 0) 20px)`,
+                    }}
+                  />
                 </div>
               </div>
             );

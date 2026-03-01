@@ -19,7 +19,7 @@ import { StatusEvent } from "../../types/eventTypes";
 export type useFormCreateEvent = {
   form: ReturnType<typeof useForm<CreateEventFormType>>;
   onSubmit: (
-    event?: React.BaseSyntheticEvent
+    event?: React.BaseSyntheticEvent,
   ) => Promise<{ success: boolean; id?: string }>;
   dateRange: DateRange | undefined;
   setDateRange: (dateRange: DateRange | undefined) => void;
@@ -51,7 +51,7 @@ export default function useFormCreateEvent(): useFormCreateEvent {
     from: new Date(),
     to: new Date(new Date().setDate(new Date().getDate() + 3)),
   });
-  const { invalidateList } = useInvalidateEventsQuery();
+  const { invalidateAll } = useInvalidateEventsQuery();
 
   const form = useForm<CreateEventFormType>({
     resolver: zodResolver(CreateEventSchema),
@@ -65,7 +65,7 @@ export default function useFormCreateEvent(): useFormCreateEvent {
   });
 
   async function onCreateForm(
-    input: CreateEventFormType
+    input: CreateEventFormType,
   ): Promise<{ success: boolean; id?: string }> {
     try {
       setLoading(true);
@@ -121,7 +121,7 @@ export default function useFormCreateEvent(): useFormCreateEvent {
       const { id } = await registerEvent(eventData);
 
       // Invalidar cache da lista assim que um novo evento é criado
-      invalidateList();
+      invalidateAll();
 
       form.reset();
       setDateRange({

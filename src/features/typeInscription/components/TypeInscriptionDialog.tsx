@@ -1,17 +1,6 @@
 "use client";
 
-import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { Switch } from "@/shared/components/ui/switch";
+import { Button, Input, InputNumber, Modal, Switch, Typography } from "antd";
 import React, { useEffect } from "react";
 import { TypeInscriptions } from "../types/typesInscriptionsTypes";
 
@@ -39,9 +28,9 @@ export default function TypeInscriptionDialog({
   loading,
 }: TypeInscriptionDialogProps) {
   const [description, setDescription] = React.useState("");
-  const [value, setValue] = React.useState<number | string>("");
+  const [value, setValue] = React.useState<number | null>(null);
   const [specialType, setSpecialType] = React.useState(false);
-  const [maxAge, setMaxAge] = React.useState<number | string>("");
+  const [maxAge, setMaxAge] = React.useState<number | null>(null);
 
   const baseDate = React.useMemo(() => {
     if (!eventStartDate) return new Date();
@@ -54,9 +43,9 @@ export default function TypeInscriptionDialog({
 
   const getAgeFromRuleDate = React.useCallback(
     (ruleDate: Date | string | null) => {
-      if (!ruleDate) return "";
+      if (!ruleDate) return null;
       const rule = ruleDate instanceof Date ? ruleDate : new Date(ruleDate);
-      if (isNaN(rule.getTime())) return "";
+      if (isNaN(rule.getTime())) return null;
       let age = baseDate.getFullYear() - rule.getFullYear();
       const monthDiff = baseDate.getMonth() - rule.getMonth();
       if (
@@ -65,7 +54,7 @@ export default function TypeInscriptionDialog({
       ) {
         age--;
       }
-      return age >= 0 ? age : "";
+      return age >= 0 ? age : null;
     },
     [baseDate],
   );
@@ -78,29 +67,29 @@ export default function TypeInscriptionDialog({
       setMaxAge(getAgeFromRuleDate(typeInscription.rule));
     } else {
       setDescription("");
-      setValue("");
+      setValue(null);
       setSpecialType(false);
-      setMaxAge("");
+      setMaxAge(null);
     }
   }, [typeInscription, open, getAgeFromRuleDate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedMaxAge =
-      typeof maxAge === "string" ? maxAge.trim() : String(maxAge);
-    const parsedMaxAge =
-      trimmedMaxAge.length > 0 ? Number(trimmedMaxAge) : null;
+    if (!description.trim()) return;
+    if (value === null || Number.isNaN(value)) return;
+
     const rule =
-      parsedMaxAge === null || Number.isNaN(parsedMaxAge)
+      maxAge === null || Number.isNaN(maxAge)
         ? null
         : (() => {
             const rule = new Date(baseDate);
-            rule.setFullYear(rule.getFullYear() - parsedMaxAge);
+            rule.setFullYear(rule.getFullYear() - maxAge);
             return rule;
           })();
+
     await onSubmit({
-      description,
-      value: Number(value),
+      description: description.trim(),
+      value,
       specialType,
       rule,
     });
@@ -108,92 +97,106 @@ export default function TypeInscriptionDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>
-              {typeInscription
-                ? "Editar Tipo de Inscrição"
-                : "Novo Tipo de Inscrição"}
-            </DialogTitle>
-            <DialogDescription>
-              {typeInscription
-                ? "Altere os dados do tipo de inscrição abaixo."
-                : "Preencha os dados para criar um novo tipo de inscrição."}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="descriptions">Descrição</Label>
-              <Input
-                id="descriptions"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ex: Ingresso Inteiro, Meia Entrada, etc."
-                required
-              />
-            </div>
+    <Modal
+      title={
+        typeInscription ? "Editar Tipo de Inscrição" : "Novo Tipo de Inscrição"
+      }
+      open={open}
+      onCancel={() => onOpenChange(false)}
+      footer={null}
+      destroyOnHidden
+      mask={{ closable: !loading }}
+      closable={!loading}
+      keyboard={!loading}
+    >
+      <div className="space-y-1">
+        <Typography.Text type="secondary">
+          {typeInscription
+            ? "Altere os dados do tipo de inscrição abaixo."
+            : "Preencha os dados para criar um novo tipo de inscrição."}
+        </Typography.Text>
+      </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="value">Valor (R$)</Label>
-              <Input
-                id="value"
-                type="number"
-                step="0.01"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="0,00"
-                required
-              />
-            </div>
+      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="descriptions" className="text-sm font-medium">
+            Descrição
+          </label>
+          <Input
+            id="descriptions"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Ex: Ingresso Inteiro, Meia Entrada, etc."
+            required
+            disabled={loading}
+          />
+        </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="maxAge">Idade Máxima (anos) - Opcional</Label>
-              <Input
-                id="maxAge"
-                type="number"
-                min="0"
-                step="1"
-                value={maxAge}
-                onChange={(e) => setMaxAge(e.target.value)}
-                placeholder="Ex: 12"
-              />
-              <p className="text-xs text-muted-foreground">
-                Deixe em branco para permitir qualquer idade.
-              </p>
-            </div>
+        <div className="space-y-2">
+          <label htmlFor="value" className="text-sm font-medium">
+            Valor (R$)
+          </label>
+          <InputNumber
+            id="value"
+            min={0}
+            step={0.01}
+            value={value}
+            onChange={(v) => setValue(typeof v === "number" ? v : null)}
+            placeholder="0,00"
+            required
+            disabled={loading}
+            style={{ width: "100%" }}
+          />
+        </div>
 
-            <div className="flex items-center justify-between rounded-md border p-3">
-              <div>
-                <Label htmlFor="specialType" className="font-medium">
-                  Tipo de inscrição especial
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Define se este tipo possui validação especial para inscrição.
-                </p>
-              </div>
-              <Switch
-                id="specialType"
-                checked={specialType}
-                onCheckedChange={setSpecialType}
-              />
+        <div className="space-y-2">
+          <label htmlFor="maxAge" className="text-sm font-medium">
+            Idade Máxima (anos) - Opcional
+          </label>
+          <InputNumber
+            id="maxAge"
+            min={0}
+            step={1}
+            value={maxAge}
+            onChange={(v) => setMaxAge(typeof v === "number" ? v : null)}
+            placeholder="Ex: 12"
+            disabled={loading}
+            style={{ width: "100%" }}
+          />
+          <div className="text-xs text-muted-foreground">
+            Deixe em branco para permitir qualquer idade.
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between rounded-md border p-3">
+          <div className="space-y-1">
+            <div className="text-sm font-medium">
+              Tipo de inscrição especial
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Define se este tipo possui validação especial para inscrição.
             </div>
           </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Salvando..." : typeInscription ? "Salvar" : "Criar"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <Switch
+            checked={specialType}
+            onChange={(checked) => setSpecialType(checked)}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3 pt-2">
+          <Button
+            type="default"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          <Button type="primary" htmlType="submit" loading={loading}>
+            {typeInscription ? "Salvar" : "Criar"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

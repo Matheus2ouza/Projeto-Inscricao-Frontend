@@ -46,6 +46,7 @@ import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { formatDate } from "@/shared/utils/formatDate";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+import { getInitial } from "@/shared/utils/getInitials";
 import { getWithExpiry, setWithExpiry } from "@/shared/utils/storageWithExpiry";
 import {
   AlertCircle,
@@ -243,7 +244,7 @@ export function RegisterGuest({
                   <div className="h-full w-full bg-muted flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-5xl font-semibold text-muted-foreground mb-2">
-                        {event.name.charAt(0)}
+                        {getInitial(event.name)}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Sem imagem

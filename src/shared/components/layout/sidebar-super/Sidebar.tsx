@@ -38,6 +38,7 @@ import {
   SquareChartGantt,
   Tickets,
   Users,
+  Wallet,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -353,6 +354,17 @@ export default function AppSidebarSuper({
                       >
                         <BanknoteArrowDown className="size-4" />
                         Gastos
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href="/super/cash-register"
+                        className="flex items-center gap-1"
+                      >
+                        <Wallet className="size-4" />
+                        Caixa
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

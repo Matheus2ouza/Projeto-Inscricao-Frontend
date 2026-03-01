@@ -184,7 +184,7 @@ export default function RegisterFormEvent({
         duration: 3000,
       });
     },
-    [form]
+    [form],
   );
 
   // Função para lidar com o drag leave
@@ -218,7 +218,7 @@ export default function RegisterFormEvent({
         handleFileSelect(file);
       }
     },
-    [handleFileSelect]
+    [handleFileSelect],
   );
 
   // Função para lidar com o clique na área de upload
@@ -429,7 +429,7 @@ export default function RegisterFormEvent({
                                       "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300",
                                       isDragging
                                         ? "border-primary bg-primary/5"
-                                        : "border-border bg-background hover:bg-accent/50"
+                                        : "border-border bg-background hover:bg-accent/50",
                                     )}
                                     onClick={handleAreaClick}
                                     onDragOver={handleDragOver}

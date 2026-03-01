@@ -731,9 +731,6 @@ export default function ReportDetails({
                           <p className="text-lg font-bold text-slate-800 mb-1">
                             {getFormatCurrency(method.totalValue)}
                           </p>
-                          <p className="text-xs text-slate-500">
-                            {method.countParticipants} participante(s)
-                          </p>
                         </div>
                       );
                     })}
