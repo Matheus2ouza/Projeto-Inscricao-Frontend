@@ -20,6 +20,7 @@ import {
   CashRegisterStatus,
   Moviment,
 } from "../../types/cashRegisterDetails/cashRegisterDetailsType";
+import type { generatePdfResponse } from "../../types/cashRegisterDetails/generatePdfTypes";
 
 interface CashRegisterDetailsProps {
   cashRegister: CashRegister | null;
@@ -27,10 +28,10 @@ interface CashRegisterDetailsProps {
   cashRegisterFetching: boolean;
   cashRegisterError: string | null;
   onRefetchCashRegister: () => void;
+  onGenerateReport: () => Promise<generatePdfResponse>;
+  generatingReport: boolean;
   moviments: Moviment[] | null;
   totalMoviments: number;
-  totalIncome: number;
-  totalExpense: number;
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
@@ -46,10 +47,10 @@ export default function CashRegisterDetails({
   cashRegisterFetching,
   cashRegisterError,
   onRefetchCashRegister,
+  onGenerateReport,
+  generatingReport,
   moviments,
   totalMoviments,
-  totalIncome,
-  totalExpense,
   page,
   pageCount,
   onPageChange,
@@ -128,13 +129,24 @@ export default function CashRegisterDetails({
             )}
           </div>
 
-          <Button
-            onClick={onRefetchCashRegister}
-            icon={<SyncOutlined />}
-            loading={cashRegisterFetching && { icon: <SyncOutlined spin /> }}
-          >
-            Recarregar caixa
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={onRefetchCashRegister}
+              icon={<SyncOutlined />}
+              loading={cashRegisterFetching && { icon: <SyncOutlined spin /> }}
+            >
+              Recarregar caixa
+            </Button>
+            <Button
+              type="primary"
+              onClick={onGenerateReport}
+              icon={<SyncOutlined />}
+              loading={generatingReport && { icon: <SyncOutlined spin /> }}
+              disabled={!cashRegister}
+            >
+              Gerar relatório
+            </Button>
+          </div>
         </div>
 
         <div className="mt-6 space-y-4">
@@ -183,10 +195,10 @@ export default function CashRegisterDetails({
                 Entradas
               </div>
               <div className="mt-2 text-lg font-semibold">
-                {movimentsLoading ? (
+                {cashRegisterLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  String(totalIncome)
+                  getFormatCurrency(cashRegister?.totalIncome ?? 0)
                 )}
               </div>
             </div>
@@ -195,10 +207,49 @@ export default function CashRegisterDetails({
                 Saídas
               </div>
               <div className="mt-2 text-lg font-semibold">
-                {movimentsLoading ? (
+                {cashRegisterLoading ? (
                   <Skeleton className="h-6 w-24" />
                 ) : (
-                  String(totalExpense)
+                  getFormatCurrency(cashRegister?.totalExpense ?? 0)
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="rounded-xl border p-4">
+              <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                Pix
+              </div>
+              <div className="mt-2 text-lg font-semibold">
+                {cashRegisterLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  getFormatCurrency(cashRegister?.totalPix ?? 0)
+                )}
+              </div>
+            </div>
+            <div className="rounded-xl border p-4">
+              <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                Cartão
+              </div>
+              <div className="mt-2 text-lg font-semibold">
+                {cashRegisterLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  getFormatCurrency(cashRegister?.totalCard ?? 0)
+                )}
+              </div>
+            </div>
+            <div className="rounded-xl border p-4">
+              <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                Dinheiro
+              </div>
+              <div className="mt-2 text-lg font-semibold">
+                {cashRegisterLoading ? (
+                  <Skeleton className="h-6 w-24" />
+                ) : (
+                  getFormatCurrency(cashRegister?.totalCash ?? 0)
                 )}
               </div>
             </div>

@@ -550,6 +550,27 @@ export function RegisterGuest({
                 )}
               />
 
+              {!formData.isResponsibleParticipant && (
+                <FormField
+                  control={control}
+                  name="cpf"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CPF do Participante</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="000.000.000-00"
+                          {...field}
+                          onChange={handleInputChange}
+                          maxLength={14}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               {/* Se for inscrição para outra pessoa, mostra campos do participante */}
               {formData.isResponsibleParticipant && (
                 <div className="space-y-4 pt-4 border-t mt-4 animate-in fade-in slide-in-from-top-4">
@@ -568,6 +589,25 @@ export function RegisterGuest({
                           <Input
                             placeholder="Nome do participante"
                             {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={control}
+                    name="cpf"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>CPF do Participante</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="000.000.000-00"
+                            {...field}
+                            onChange={handleInputChange}
+                            maxLength={14}
                           />
                         </FormControl>
                         <FormMessage />
@@ -836,94 +876,100 @@ export function RegisterGuest({
 
               {/* Se for inscrição para si mesmo (não é para outra pessoa), mostra nascimento e genero aqui */}
               {!formData.isResponsibleParticipant && (
-                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-4">
-                  <FormField
-                    control={control}
-                    name="birthDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nascimento</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="DD/MM/AAAA"
-                            {...field}
-                            onChange={handleInputChange}
-                            maxLength={10}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={control}
+                      name="birthDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nascimento</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="DD/MM/AAAA"
+                              {...field}
+                              onChange={handleInputChange}
+                              maxLength={10}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={control}
-                    name="gender"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Gênero</FormLabel>
-                        <Popover open={openGender} onOpenChange={setOpenGender}>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={openGender}
-                                type="button"
-                                className={cn(
-                                  "w-full justify-between",
-                                  !field.value && "text-muted-foreground",
-                                )}
-                              >
-                                {field.value
-                                  ? genderOptions.find(
-                                      (gender) => gender.value === field.value,
-                                    )?.label
-                                  : "Selecione"}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-[var(--radix-popover-trigger-width)] p-0"
-                            align="start"
-                            onOpenAutoFocus={(e) => e.preventDefault()}
+                    <FormField
+                      control={control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Gênero</FormLabel>
+                          <Popover
+                            open={openGender}
+                            onOpenChange={setOpenGender}
                           >
-                            <Command>
-                              <CommandList>
-                                <CommandEmpty>
-                                  Nenhum gênero encontrado.
-                                </CommandEmpty>
-                                <CommandGroup>
-                                  {genderOptions.map((gender) => (
-                                    <CommandItem
-                                      value={gender.label}
-                                      key={gender.value}
-                                      onSelect={() => {
-                                        field.onChange(gender.value);
-                                        setOpenGender(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          gender.value === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0",
-                                        )}
-                                      />
-                                      {gender.label}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  aria-expanded={openGender}
+                                  type="button"
+                                  className={cn(
+                                    "w-full justify-between",
+                                    !field.value && "text-muted-foreground",
+                                  )}
+                                >
+                                  {field.value
+                                    ? genderOptions.find(
+                                        (gender) =>
+                                          gender.value === field.value,
+                                      )?.label
+                                    : "Selecione"}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-[var(--radix-popover-trigger-width)] p-0"
+                              align="start"
+                              onOpenAutoFocus={(e) => e.preventDefault()}
+                            >
+                              <Command>
+                                <CommandList>
+                                  <CommandEmpty>
+                                    Nenhum gênero encontrado.
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {genderOptions.map((gender) => (
+                                      <CommandItem
+                                        value={gender.label}
+                                        key={gender.value}
+                                        onSelect={() => {
+                                          field.onChange(gender.value);
+                                          setOpenGender(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            gender.value === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0",
+                                          )}
+                                        />
+                                        {gender.label}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               )}
 

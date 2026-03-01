@@ -36,6 +36,11 @@ export type GetCashRegisterResponse = {
   status: CashRegisterStatus;
   balance: number;
   allocationEvents: AllocationEvent[];
+  totalIncome: number;
+  totalExpense: number;
+  totalPix: number;
+  totalCard: number;
+  totalCash: number;
   openedAt: Date;
   closedAt?: Date;
 };
@@ -46,6 +51,11 @@ export type CashRegister = {
   status: CashRegisterStatus;
   balance: number;
   allocationEvents: AllocationEvent[];
+  totalIncome: number;
+  totalExpense: number;
+  totalPix: number;
+  totalCard: number;
+  totalCash: number;
   openedAt: Date;
   closedAt?: Date;
 };
@@ -82,8 +92,6 @@ export type Moviment = {
 export type GetCashRegisterMovimentsResponse = {
   moviments: Moviment[];
   totalMoviments: number;
-  totalIncome: number;
-  totalExpense: number;
   page: number;
   pageCount: number;
 };
@@ -100,8 +108,6 @@ export type CashRegisterMovimentsParam = {
 export type CashRegisterMovimentsResult = {
   moviments: Moviment[] | null;
   totalMoviments: number;
-  totalIncome: number;
-  totalExpense: number;
   page: number;
   pageCount: number;
   loading: boolean;

@@ -1,6 +1,7 @@
 "use client";
 
 import CashRegisterDetails from "@/features/cashRegister/components/cashRegisterDetails/CashRegisterDetetails";
+import { useActionsCashRegister } from "@/features/cashRegister/hook/cashRegisterDetails/useActionsCashRegister";
 import { useCashRegisterDetails } from "@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterDetails";
 import { useCashRegisterMoviments } from "@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterMoviments";
 import PageContainer from "@/shared/components/layout/PageContainer";
@@ -31,11 +32,11 @@ export default function CashRegisterDetailsAdminPage() {
     cashRegisterId,
   });
 
+  const { handleGenerateReport, isGeneratingReport } = useActionsCashRegister();
+
   const {
     moviments,
     totalMoviments,
-    totalIncome,
-    totalExpense,
     page,
     pageCount,
     setPage,
@@ -71,10 +72,12 @@ export default function CashRegisterDetailsAdminPage() {
         cashRegisterFetching={cashRegisterFetching}
         cashRegisterError={cashRegisterError}
         onRefetchCashRegister={refetchCashRegister}
+        onGenerateReport={() =>
+          handleGenerateReport({ cashRegisetrId: cashRegisterId })
+        }
+        generatingReport={isGeneratingReport}
         moviments={moviments}
         totalMoviments={totalMoviments}
-        totalIncome={totalIncome}
-        totalExpense={totalExpense}
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}

@@ -34,6 +34,15 @@ const formatDate = (value: string): string => {
   return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
 };
 
+const formatCpf = (value: string): string => {
+  const numbers = value.replace(/\D/g, "").slice(0, 11);
+  if (numbers.length <= 3) return numbers;
+  if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
+  if (numbers.length <= 9)
+    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
+  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
+};
+
 export function useFormCreateGuestInscription({
   eventId,
   onSuccess,
@@ -51,6 +60,7 @@ export function useFormCreateGuestInscription({
       preferredName: "",
       email: "",
       phone: "",
+      cpf: "",
       locality: "",
       participantName: "",
       birthDate: "",
@@ -77,6 +87,8 @@ export function useFormCreateGuestInscription({
 
     if (name === "phone") {
       setValue(fieldName, formatPhone(value));
+    } else if (name === "cpf") {
+      setValue(fieldName, formatCpf(value));
     } else if (name === "birthDate") {
       setValue(fieldName, formatDate(value));
     } else {
@@ -133,6 +145,7 @@ export function useFormCreateGuestInscription({
           name: data.isResponsibleParticipant
             ? data.participantName || ""
             : data.name,
+          cpf: data.cpf.replace(/\D/g, ""),
           preferredName: data.preferredName,
           birthDate: birthDate,
           gender: data.gender,

@@ -7,11 +7,11 @@ export function getConvertCashEntryOrigin(origin: CashEntryOrigin): string {
     case CashEntryOrigin.INTERNAL:
       return "Interno";
     case CashEntryOrigin.ONSITE:
-      return "Presencial";
+      return "Inscrição Avulsa";
     case CashEntryOrigin.EXPENSE:
       return "Despesa";
     case CashEntryOrigin.TICKET:
-      return "Ingresso";
+      return "Alimentação";
     case CashEntryOrigin.TRANSFER:
       return "Transferência";
     case CashEntryOrigin.MANUAL:

@@ -60,6 +60,7 @@ export type ShirtType = "TRADICIONAL" | "BABYLOOK";
 
 export type ParticipantGuest = {
   name: string;
+  cpf: string;
   preferredName: string;
   birthDate: Date;
   gender: GenderType;
