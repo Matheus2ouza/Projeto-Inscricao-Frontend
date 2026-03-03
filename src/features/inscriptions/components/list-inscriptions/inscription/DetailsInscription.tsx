@@ -44,6 +44,7 @@ import {
   Clock,
   Copy,
   CreditCard,
+  Download,
   Eye,
   FileText,
   Mail,
@@ -66,6 +67,8 @@ interface DetailsInscriptionProps {
     input: CreatePaymentLinkInput,
   ) => Promise<CreatePaymentLinkResponse>;
   isCreatingPaymentLink?: boolean;
+  onDownloadInscriptionDetailsPdf?: (inscriptionId: string) => Promise<boolean>;
+  isDownloadingInscriptionDetailsPdf?: boolean;
   onDeleteInscription?: (inscriptionId: string) => Promise<void>;
   isDeletingInscription?: boolean;
 }
@@ -80,6 +83,8 @@ export default function DetailsInscriptionTable({
   isUpdatingExpired = false,
   onCreatePaymentLink,
   isCreatingPaymentLink = false,
+  onDownloadInscriptionDetailsPdf,
+  isDownloadingInscriptionDetailsPdf = false,
   onDeleteInscription,
   isDeletingInscription,
 }: DetailsInscriptionProps) {
@@ -231,15 +236,37 @@ export default function DetailsInscriptionTable({
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Detalhes da Inscrição
                 </h1>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setDeleteDialogOpen(true)}
-                  disabled={!onDeleteInscription || !!isDeletingInscription}
-                >
-                  {isDeletingInscription ? "Deletando..." : "Deletar Inscrição"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      await onDownloadInscriptionDetailsPdf?.(inscription.id);
+                    }}
+                    disabled={
+                      !onDownloadInscriptionDetailsPdf ||
+                      isDownloadingInscriptionDetailsPdf
+                    }
+                    className="flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    {isDownloadingInscriptionDetailsPdf
+                      ? "Baixando..."
+                      : "Baixar PDF"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    disabled={!onDeleteInscription || !!isDeletingInscription}
+                  >
+                    {isDeletingInscription
+                      ? "Deletando..."
+                      : "Deletar Inscrição"}
+                  </Button>
+                </div>
               </div>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 mt-2">

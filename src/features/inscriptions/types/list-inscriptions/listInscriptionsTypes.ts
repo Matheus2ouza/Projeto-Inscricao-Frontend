@@ -28,6 +28,17 @@ export type Event = {
   inscriptions: Inscription[];
 };
 
+export type getListInscriptionsParams = {
+  eventId: string;
+  status?: InscriptionStatus[];
+  isGuest?: boolean;
+  orderBy?: "asc" | "desc";
+  limitTime?: string;
+  responsible?: string;
+  page: number;
+  pageSize: number;
+};
+
 export type ListInscriptionsResponse = {
   event: Event;
   total: number;
@@ -43,6 +54,7 @@ export type ListInscriptionsParams = {
   isGuest?: boolean;
   orderBy?: "asc" | "desc";
   limitTime?: string;
+  responsible?: string;
 };
 
 export type ListInscriptionsResult = {

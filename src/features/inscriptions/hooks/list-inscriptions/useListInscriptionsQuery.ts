@@ -16,6 +16,7 @@ export const listInscriptionsKeys = {
     isGuest?: boolean,
     orderBy?: "asc" | "desc",
     limitTime?: string,
+    responsible?: string,
   ) =>
     [
       ...listInscriptionsKeys.lists(),
@@ -26,6 +27,7 @@ export const listInscriptionsKeys = {
       isGuest,
       orderBy,
       limitTime,
+      responsible,
     ] as const,
 };
 
@@ -37,6 +39,7 @@ export function useListInscritionsQuery(
   isGuest?: boolean,
   orderBy?: "asc" | "desc",
   limitTime?: string,
+  responsible?: string,
 ) {
   return useQuery<ListInscriptionsResponse>({
     queryKey: listInscriptionsKeys.list(
@@ -47,6 +50,7 @@ export function useListInscritionsQuery(
       isGuest,
       orderBy,
       limitTime,
+      responsible,
     ),
     queryFn: () =>
       getListInscriptions({
@@ -55,6 +59,7 @@ export function useListInscritionsQuery(
         isGuest,
         orderBy,
         limitTime,
+        responsible,
         page,
         pageSize,
       }),
@@ -81,6 +86,7 @@ export function useInvalidateListInscriptionsQuery() {
       isGuest?: boolean,
       orderBy?: "asc" | "desc",
       limitTime?: string,
+      responsible?: string,
     ) => {
       queryClient.invalidateQueries({
         queryKey: listInscriptionsKeys.list(
@@ -91,6 +97,7 @@ export function useInvalidateListInscriptionsQuery() {
           isGuest,
           orderBy,
           limitTime,
+          responsible,
         ),
       });
     },

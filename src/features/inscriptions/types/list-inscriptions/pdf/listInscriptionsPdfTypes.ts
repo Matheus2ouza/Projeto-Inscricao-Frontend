@@ -1,11 +1,9 @@
-export type PdfFileResponse = {
+export type ListInscriptionsPdfResponse = {
   pdfBase64: string;
   filename: string;
 };
 
-export type ListInscriptionsPdfResponse = PdfFileResponse;
-
-export type ProcessPdfDownloadOptions = {
+export type ProcessListInscriptionsPdfDownloadOptions = {
   successMessage?: string;
   defaultFilename?: string;
 };

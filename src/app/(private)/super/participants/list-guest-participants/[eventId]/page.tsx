@@ -1,6 +1,7 @@
 "use client";
 
 import ListGuestParticipants from "@/features/participants/components/list-guest-participants/listGuestParticipants";
+import { useActionsGuestParticipants } from "@/features/participants/hooks/list-guest-participants/actions/useActionsGuestParticipants";
 import { useListGuestParticipants } from "@/features/participants/hooks/list-guest-participants/useListGuestParticipants";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -32,6 +33,9 @@ export default function ListGuestParticipantsSuperPage() {
     initialPage: 1,
     pageSize: 10,
   });
+
+  const { handleGenerateReport, isGeneratingPdf } =
+    useActionsGuestParticipants();
 
   const renderSkeletonGrid = () => {
     return (
@@ -102,6 +106,8 @@ export default function ListGuestParticipantsSuperPage() {
         pageSize={10}
         pageCount={pageCount}
         onPageChange={setPage}
+        onGenerateReport={() => handleGenerateReport({ eventId })}
+        generatingReport={isGeneratingPdf}
       />
     );
   };
