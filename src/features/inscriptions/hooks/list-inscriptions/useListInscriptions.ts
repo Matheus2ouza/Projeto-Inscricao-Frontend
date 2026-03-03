@@ -13,6 +13,7 @@ export function useListInscriptions({
   isGuest,
   orderBy,
   limitTime,
+  responsible,
 }: ListInscriptionsParams): ListInscriptionsResult {
   const [page, setPage] = useState(initialPage);
 
@@ -24,6 +25,7 @@ export function useListInscriptions({
     isGuest,
     orderBy,
     limitTime,
+    responsible,
   );
 
   return {

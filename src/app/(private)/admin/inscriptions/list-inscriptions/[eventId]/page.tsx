@@ -2,7 +2,7 @@
 
 import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable";
 import type { InscriptionsFiltersValue } from "@/features/inscriptions/components/list-inscriptions/filters/InscriptionsFilters";
-import useDownloadPdf from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadPdf";
+import useDownloadPdf from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadListInscriptionsPdf";
 import { useListInscriptions } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptions";
 import { listInscriptionsKeys } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery";
 import PageContainer from "@/shared/components/layout/PageContainer";
@@ -32,6 +32,7 @@ export default function ListInscriptionsAdminPage() {
     orderBy: "asc",
     limitTime: "all",
   });
+  const [responsible, setResponsible] = useState<string>("");
 
   const convertedLimitTime = useMemo(() => {
     if (filters.limitTime === "all" || !filters.limitTime) {
@@ -74,6 +75,7 @@ export default function ListInscriptionsAdminPage() {
     isGuest: filters.hideNotAllocated ? false : true,
     orderBy: filters.orderBy,
     limitTime: convertedLimitTime,
+    responsible: responsible.trim() ? responsible.trim() : undefined,
   });
 
   const { downloadListInscriptionsPdf } = useDownloadPdf();
@@ -180,6 +182,14 @@ export default function ListInscriptionsAdminPage() {
             orderBy: "asc",
             limitTime: "all",
           });
+          setResponsible("");
+          setPage(1);
+          queryClient.invalidateQueries({
+            queryKey: listInscriptionsKeys.lists(),
+          });
+        }}
+        onSearchResponsible={(next) => {
+          setResponsible(next || "");
           setPage(1);
           queryClient.invalidateQueries({
             queryKey: listInscriptionsKeys.lists(),

@@ -1,19 +1,9 @@
 import {
-  InscriptionStatus,
+  getListInscriptionsParams,
   ListInscriptionsResponse,
 } from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 import qs from "qs";
-
-export type getListInscriptionsParams = {
-  eventId: string;
-  status?: InscriptionStatus[];
-  isGuest?: boolean;
-  orderBy?: "asc" | "desc";
-  limitTime?: string;
-  page: number;
-  pageSize: number;
-};
 
 export async function getListInscriptions({
   eventId,
@@ -23,6 +13,7 @@ export async function getListInscriptions({
   limitTime,
   page,
   pageSize,
+  responsible,
 }: getListInscriptionsParams): Promise<ListInscriptionsResponse> {
   try {
     const { data } = await axiosInstance.get<ListInscriptionsResponse>(
@@ -33,6 +24,7 @@ export async function getListInscriptions({
           isGuest,
           orderBy,
           limitTime,
+          responsible,
           page,
           pageSize,
         },

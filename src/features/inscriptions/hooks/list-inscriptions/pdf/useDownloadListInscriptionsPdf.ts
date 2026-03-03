@@ -4,8 +4,8 @@ import { useGlobalLoading } from "@/components/GlobalLoading";
 import { listInscriptionsPdf } from "@/features/inscriptions/api/list-inscriptions/pdf/listInscriptionsPdf";
 import {
   DownloadListInscriptionsPdfInput,
-  PdfFileResponse,
-  ProcessPdfDownloadOptions,
+  ListInscriptionsPdfResponse,
+  ProcessListInscriptionsPdfDownloadOptions,
 } from "@/features/inscriptions/types/list-inscriptions/pdf/listInscriptionsPdfTypes";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -33,13 +33,13 @@ function downloadPdf(pdfBase64: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export default function useDownloadPdf() {
+export default function useDownloadListInscriptionsPdf() {
   const { setLoading } = useGlobalLoading();
 
   const processDownload = useCallback(
     async (
-      fetchPdf: () => Promise<PdfFileResponse>,
-      options?: ProcessPdfDownloadOptions,
+      fetchPdf: () => Promise<ListInscriptionsPdfResponse>,
+      options?: ProcessListInscriptionsPdfDownloadOptions,
     ) => {
       setLoading(true);
 

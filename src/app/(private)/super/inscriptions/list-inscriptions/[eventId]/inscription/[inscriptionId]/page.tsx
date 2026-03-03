@@ -3,10 +3,12 @@
 import DetailsInscriptionTable from "@/features/inscriptions/components/list-inscriptions/inscription/DetailsInscription";
 import { useActionsInscription } from "@/features/inscriptions/hooks/list-inscriptions/actions/useActionsInscription";
 import { useDetailsInscription } from "@/features/inscriptions/hooks/list-inscriptions/inscription/useDetailsInscription";
+import { useDownloadInscriptionDetailsPdf } from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadInscriptionDetailsPdf";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function InscriptionDetailListSuperPage() {
   const params = useParams();
@@ -39,6 +41,10 @@ export default function InscriptionDetailListSuperPage() {
     handleDeleteInscription,
     isDeletingInscription,
   } = useActionsInscription();
+
+  const { downloadInscriptionDetailsPdf } = useDownloadInscriptionDetailsPdf();
+  const [isDownloadingInscriptionPdf, setIsDownloadingInscriptionPdf] =
+    useState(false);
 
   const renderSkeletonGrid = () => {
     return (
@@ -82,6 +88,15 @@ export default function InscriptionDetailListSuperPage() {
         isUpdatingExpired={isUpdatingExpired}
         onCreatePaymentLink={handleCreatePaymentLink}
         isCreatingPaymentLink={isCreatingPaymentLink}
+        onDownloadInscriptionDetailsPdf={async (id) => {
+          setIsDownloadingInscriptionPdf(true);
+          try {
+            return await downloadInscriptionDetailsPdf({ inscriptionId: id });
+          } finally {
+            setIsDownloadingInscriptionPdf(false);
+          }
+        }}
+        isDownloadingInscriptionDetailsPdf={isDownloadingInscriptionPdf}
         onDeleteInscription={(id) =>
           handleDeleteInscription({ eventId, inscriptionId: id })
         }

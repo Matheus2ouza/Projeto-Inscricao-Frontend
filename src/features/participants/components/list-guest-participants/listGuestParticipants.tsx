@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/shared/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,7 +15,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
-import { Users } from "lucide-react";
+import { Download, Users } from "lucide-react";
+import { GeneratePdfLocalityResponse } from "../../api/list-guest-participants/generatePdf";
 import { GuestParticipant } from "../../types/list-guest-participants/guestParticipantsTypes";
 
 interface ListGuestParticipantsProps {
@@ -27,6 +29,8 @@ interface ListGuestParticipantsProps {
   pageSize: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  onGenerateReport: () => Promise<GeneratePdfLocalityResponse>;
+  generatingReport: boolean;
 }
 
 const calculateAge = (birthDate: Date | string) => {
@@ -91,6 +95,8 @@ export default function ListGuestParticipants({
   pageSize,
   pageCount,
   onPageChange,
+  onGenerateReport,
+  generatingReport,
 }: ListGuestParticipantsProps) {
   if (!guestParticipants.length) {
     return (
@@ -184,11 +190,24 @@ export default function ListGuestParticipants({
             <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
               Participantes convidados
             </CardTitle>
-            {total > 0 && (
-              <div className="text-sm text-muted-foreground">
-                Mostrando {startItem}-{endItem} de {total}
-              </div>
-            )}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              {total > 0 && (
+                <div className="text-sm text-muted-foreground">
+                  Mostrando {startItem}-{endItem} de {total}
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onGenerateReport}
+                disabled={generatingReport}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {generatingReport ? "Baixando..." : "Gerar PDF"}
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">

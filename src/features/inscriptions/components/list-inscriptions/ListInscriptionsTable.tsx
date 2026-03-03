@@ -49,6 +49,7 @@ import { DownloadListInscriptionsPdfInput } from "../../types/list-inscriptions/
 import InscriptionsFilters, {
   InscriptionsFiltersValue,
 } from "./filters/InscriptionsFilters";
+import InscriptionsNameSearch from "./filters/InscriptionsNameSearch";
 import SheetListInscriptions from "./pdf/SheetListInscriptions";
 
 interface listInscriptionsTableProps {
@@ -63,6 +64,7 @@ interface listInscriptionsTableProps {
   filters: InscriptionsFiltersValue;
   onApplyFilters: (filters: InscriptionsFiltersValue) => void;
   onClearFilters: () => void;
+  onSearchResponsible?: (responsible: string | undefined) => void;
 
   //pdf
   onDownloadPdf: ({
@@ -84,6 +86,7 @@ export default function ListInscriptionsTable({
   filters,
   onApplyFilters,
   onClearFilters,
+  onSearchResponsible,
   onDownloadPdf,
 }: listInscriptionsTableProps) {
   const [imageError, setImageError] = useState(false);
@@ -216,80 +219,86 @@ export default function ListInscriptionsTable({
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-        <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="p-6 space-y-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Lista de Inscrições
           </h2>
 
-          <div className="flex items-center gap-2">
-            <Popover
-              open={pdfOpen}
-              onOpenChange={(open) => {
-                setPdfOpen(open);
-                if (open) setFiltersOpen(false);
-              }}
-            >
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  Gerar PDF
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72 rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0">
-                <div className="py-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <InscriptionsNameSearch
+              eventId={event.id}
+              onSearch={onSearchResponsible}
+            />
+            <div className="flex items-center gap-2">
+              <Popover
+                open={pdfOpen}
+                onOpenChange={(open) => {
+                  setPdfOpen(open);
+                  if (open) setFiltersOpen(false);
+                }}
+              >
+                <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setPdfOpen(false);
-                      setPdfSheetOpen(true);
-                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
                   >
-                    <FileText className="w-4 h-4" />
-                    Lista de Inscritos
+                    <Download className="w-4 h-4" />
+                    Gerar PDF
+                    <ChevronDown className="w-4 h-4" />
                   </button>
-                </div>
-              </PopoverContent>
-            </Popover>
+                </PopoverTrigger>
+                <PopoverContent className="w-72 rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0">
+                  <div className="py-2">
+                    <button
+                      type="button"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
+                      onClick={() => {
+                        setPdfOpen(false);
+                        setPdfSheetOpen(true);
+                      }}
+                    >
+                      <FileText className="w-4 h-4" />
+                      Lista de Inscritos
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
 
-            <Popover
-              open={filtersOpen}
-              onOpenChange={(open) => {
-                setFiltersOpen(open);
-                if (open) setPdfOpen(false);
-              }}
-            >
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
-                >
-                  <Filter className="w-4 h-4" />
-                  Filtros
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                align="end"
-                className="w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0"
+              <Popover
+                open={filtersOpen}
+                onOpenChange={(open) => {
+                  setFiltersOpen(open);
+                  if (open) setPdfOpen(false);
+                }}
               >
-                <InscriptionsFilters
-                  value={filters}
-                  onApply={(next) => {
-                    onApplyFilters(next);
-                    setFiltersOpen(false);
-                  }}
-                  onClear={() => {
-                    onClearFilters();
-                    setFiltersOpen(false);
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
+                  >
+                    <Filter className="w-4 h-4" />
+                    Filtros
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="end"
+                  className="w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0"
+                >
+                  <InscriptionsFilters
+                    value={filters}
+                    onApply={(next) => {
+                      onApplyFilters(next);
+                      setFiltersOpen(false);
+                    }}
+                    onClear={() => {
+                      onClearFilters();
+                      setFiltersOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         </div>
 
