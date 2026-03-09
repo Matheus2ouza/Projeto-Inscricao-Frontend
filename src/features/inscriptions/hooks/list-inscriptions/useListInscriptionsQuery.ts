@@ -3,7 +3,11 @@ import {
   InscriptionStatus,
   ListInscriptionsResponse,
 } from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export const listInscriptionsKeys = {
   all: ["list-inscriptions"] as const,
@@ -14,7 +18,8 @@ export const listInscriptionsKeys = {
     pageSize: number,
     status?: InscriptionStatus[],
     isGuest?: boolean,
-    orderBy?: "asc" | "desc",
+    orderByCreatedAt?: "asc" | "desc",
+    orderByResponsible?: "asc" | "desc",
     limitTime?: string,
     responsible?: string,
   ) =>
@@ -25,7 +30,8 @@ export const listInscriptionsKeys = {
       pageSize,
       status,
       isGuest,
-      orderBy,
+      orderByCreatedAt,
+      orderByResponsible,
       limitTime,
       responsible,
     ] as const,
@@ -37,7 +43,8 @@ export function useListInscritionsQuery(
   pageSize: number,
   status?: InscriptionStatus[],
   isGuest?: boolean,
-  orderBy?: "asc" | "desc",
+  orderByCreatedAt?: "asc" | "desc",
+  orderByResponsible?: "asc" | "desc",
   limitTime?: string,
   responsible?: string,
 ) {
@@ -48,7 +55,8 @@ export function useListInscritionsQuery(
       pageSize,
       status,
       isGuest,
-      orderBy,
+      orderByCreatedAt,
+      orderByResponsible,
       limitTime,
       responsible,
     ),
@@ -57,7 +65,8 @@ export function useListInscritionsQuery(
         eventId,
         status,
         isGuest,
-        orderBy,
+        orderByCreatedAt,
+        orderByResponsible,
         limitTime,
         responsible,
         page,
@@ -65,6 +74,7 @@ export function useListInscritionsQuery(
       }),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 }
@@ -84,7 +94,8 @@ export function useInvalidateListInscriptionsQuery() {
       pageSize: number,
       status?: InscriptionStatus[],
       isGuest?: boolean,
-      orderBy?: "asc" | "desc",
+      orderByCreatedAt?: "asc" | "desc",
+      orderByResponsible?: "asc" | "desc",
       limitTime?: string,
       responsible?: string,
     ) => {
@@ -95,7 +106,8 @@ export function useInvalidateListInscriptionsQuery() {
           pageSize,
           status,
           isGuest,
-          orderBy,
+          orderByCreatedAt,
+          orderByResponsible,
           limitTime,
           responsible,
         ),

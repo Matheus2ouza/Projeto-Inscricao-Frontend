@@ -7,19 +7,11 @@ import {
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/shared/components/ui/pagination";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -32,6 +24,7 @@ import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
+import { Pagination } from "antd";
 import {
   Calendar,
   ChevronDown,
@@ -59,6 +52,7 @@ interface listInscriptionsTableProps {
   total: number;
   page: number;
   pageCount: number;
+  loadingInscriptions?: boolean;
   onPageChange: (page: number) => void;
   onSelectInscription: (id: string) => void;
   filters: InscriptionsFiltersValue;
@@ -79,8 +73,10 @@ export default function ListInscriptionsTable({
   pageSize,
   event,
   inscriptions,
+  total,
   page,
   pageCount,
+  loadingInscriptions = false,
   onPageChange,
   onSelectInscription,
   filters,
@@ -311,7 +307,28 @@ export default function ListInscriptionsTable({
 
         <div className="px-6 pb-6">
           <div className="block sm:hidden">
-            {inscriptions.length === 0 ? (
+            {loadingInscriptions ? (
+              <div className="space-y-3">
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <div key={idx} className="p-4 border rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-6 w-6 rounded-lg" />
+                    </div>
+                    <Skeleton className="h-5 w-28 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                    <div className="pt-3 border-t flex items-center justify-between">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-6 w-10" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : inscriptions.length === 0 ? (
               <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
                 Nenhuma inscrição encontrada
               </div>
@@ -402,7 +419,20 @@ export default function ListInscriptionsTable({
           </div>
 
           <div className="hidden sm:block rounded-md border">
-            {inscriptions.length === 0 ? (
+            {loadingInscriptions ? (
+              <div className="p-6 space-y-4">
+                {Array.from({ length: 8 }).map((_, idx) => (
+                  <div key={idx} className="flex items-center gap-4">
+                    <Skeleton className="h-5 w-10" />
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-5 flex-1" />
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-8 w-10" />
+                  </div>
+                ))}
+              </div>
+            ) : inscriptions.length === 0 ? (
               <div className="px-6 py-12 text-center text-muted-foreground">
                 Nenhuma inscrição encontrada
               </div>
@@ -488,113 +518,15 @@ export default function ListInscriptionsTable({
           {pageCount > 1 && (
             <div className="py-4">
               <div className="flex flex-col items-center gap-3">
-                <Pagination>
-                  <PaginationContent>
-                    {page > 1 && (
-                      <PaginationItem>
-                        <PaginationPrevious
-                          onClick={() => onPageChange(page - 1)}
-                          href="#"
-                        />
-                      </PaginationItem>
-                    )}
-
-                    <div className="sm:hidden">
-                      <PaginationItem>
-                        <PaginationLink
-                          isActive={true}
-                          href="#"
-                          className="pointer-events-none"
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    </div>
-
-                    <div className="hidden sm:flex">
-                      {(() => {
-                        const windowSize = 3;
-
-                        if (pageCount <= windowSize) {
-                          return Array.from(
-                            { length: pageCount },
-                            (_, index) => (
-                              <PaginationItem key={index}>
-                                <PaginationLink
-                                  href="#"
-                                  isActive={page === index + 1}
-                                  onClick={() => onPageChange(index + 1)}
-                                >
-                                  {index + 1}
-                                </PaginationLink>
-                              </PaginationItem>
-                            ),
-                          );
-                        }
-
-                        const maxStart = pageCount - windowSize + 1;
-                        const startPage =
-                          page <= 2
-                            ? 1
-                            : page >= pageCount - 2
-                              ? maxStart
-                              : page - 1;
-                        const endPage = Math.min(
-                          startPage + windowSize - 1,
-                          pageCount,
-                        );
-
-                        const items = Array.from(
-                          { length: endPage - startPage + 1 },
-                          (_, index) => {
-                            const pageNumber = startPage + index;
-                            return (
-                              <PaginationItem key={pageNumber}>
-                                <PaginationLink
-                                  href="#"
-                                  isActive={page === pageNumber}
-                                  onClick={() => onPageChange(pageNumber)}
-                                >
-                                  {pageNumber}
-                                </PaginationLink>
-                              </PaginationItem>
-                            );
-                          },
-                        );
-
-                        if (endPage < pageCount) {
-                          items.push(
-                            <PaginationItem key="ellipsis">
-                              <PaginationEllipsis />
-                            </PaginationItem>,
-                          );
-                          items.push(
-                            <PaginationItem key={pageCount}>
-                              <PaginationLink
-                                href="#"
-                                isActive={page === pageCount}
-                                onClick={() => onPageChange(pageCount)}
-                              >
-                                {pageCount}
-                              </PaginationLink>
-                            </PaginationItem>,
-                          );
-                        }
-
-                        return items;
-                      })()}
-                    </div>
-
-                    {page < pageCount && (
-                      <PaginationItem>
-                        <PaginationNext
-                          onClick={() => onPageChange(page + 1)}
-                          href="#"
-                        />
-                      </PaginationItem>
-                    )}
-                  </PaginationContent>
-                </Pagination>
+                <Pagination
+                  current={page}
+                  total={total}
+                  pageSize={pageSize}
+                  showSizeChanger={false}
+                  onChange={(next) => onPageChange(next)}
+                  responsive
+                  size="small"
+                />
                 <div className="text-sm font-semibold text-foreground">
                   Página <span className="font-bold">{page}</span> de{" "}
                   <span className="font-bold">{pageCount}</span>

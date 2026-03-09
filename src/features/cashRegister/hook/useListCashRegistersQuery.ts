@@ -1,18 +1,32 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { getListCashRegisters } from "../api/getListCashRegisters";
-import { listCashRegistersResponse } from "../types/listCashRegisters";
+import {
+  CashRegisterStatus,
+  ListCashRegistersResponse,
+} from "../types/listCashRegisters";
 
 export const listCashRegistersKeys = {
   all: ["list-cash-registers"] as const,
   lists: () => [...listCashRegistersKeys.all, "list"] as const,
+  list: (page?: number, pageSize?: number, status?: CashRegisterStatus[]) =>
+    [...listCashRegistersKeys.lists(), { page, pageSize, status }] as const,
 };
 
-export function useListCashRegistersQuery() {
-  return useQuery<listCashRegistersResponse>({
-    queryKey: listCashRegistersKeys.lists(),
-    queryFn: () => getListCashRegisters(),
+export function useListCashRegistersQuery(
+  status?: CashRegisterStatus[],
+  page?: number,
+  pageSize?: number,
+) {
+  return useQuery<ListCashRegistersResponse>({
+    queryKey: listCashRegistersKeys.list(page, pageSize, status),
+    queryFn: () => getListCashRegisters(status, page, pageSize),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 }

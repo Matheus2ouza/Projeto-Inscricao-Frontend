@@ -12,7 +12,8 @@ import { useEffect, useMemo, useState } from "react";
 export type InscriptionsFiltersValue = {
   status: InscriptionStatus[];
   hideNotAllocated: boolean;
-  orderBy: "asc" | "desc";
+  orderByCreatedAt: "asc" | "desc";
+  orderByResponsible: "asc" | "desc";
   limitTime: "all" | "1h" | "24h" | "7d" | "30d";
 };
 
@@ -25,7 +26,8 @@ type InscriptionsFiltersProps = {
 const DEFAULT_FILTERS: InscriptionsFiltersValue = {
   status: [],
   hideNotAllocated: false,
-  orderBy: "asc",
+  orderByCreatedAt: "asc",
+  orderByResponsible: "asc",
   limitTime: "all",
 };
 
@@ -146,14 +148,15 @@ export default function InscriptionsFilters({
           <div className="space-y-6">
             <div className="space-y-3">
               <div className="text-sm font-semibold text-foreground">
-                Ordernar por
+                Ordenar por data
               </div>
               <RadioGroup
-                value={draft.orderBy}
+                value={draft.orderByCreatedAt}
                 onValueChange={(next) =>
                   setDraft((prev) => ({
                     ...prev,
-                    orderBy: next as InscriptionsFiltersValue["orderBy"],
+                    orderByCreatedAt:
+                      next as InscriptionsFiltersValue["orderByCreatedAt"],
                   }))
                 }
               >
@@ -167,6 +170,40 @@ export default function InscriptionsFilters({
                       id={`order-${opt.value}`}
                     />
                     <Label htmlFor={`order-${opt.value}`} className="text-sm">
+                      {opt.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3">
+              <div className="text-sm font-semibold text-foreground">
+                Ordenar responsável
+              </div>
+              <RadioGroup
+                value={draft.orderByResponsible}
+                onValueChange={(next) =>
+                  setDraft((prev) => ({
+                    ...prev,
+                    orderByResponsible:
+                      next as InscriptionsFiltersValue["orderByResponsible"],
+                  }))
+                }
+              >
+                {[
+                  { value: "asc", label: "A-Z" },
+                  { value: "desc", label: "Z-A" },
+                ].map((opt) => (
+                  <div key={opt.value} className="flex items-center gap-3">
+                    <RadioGroupItem
+                      value={opt.value}
+                      id={`responsible-${opt.value}`}
+                    />
+                    <Label
+                      htmlFor={`responsible-${opt.value}`}
+                      className="text-sm"
+                    >
                       {opt.label}
                     </Label>
                   </div>

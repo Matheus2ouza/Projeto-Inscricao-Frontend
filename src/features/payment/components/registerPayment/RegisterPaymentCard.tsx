@@ -1,17 +1,10 @@
 import type { RegisterPaymentCardSchema } from "@/features/payment/schema/registerPaymendCarcSchema";
 import { Button } from "@/shared/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { Separator } from "@/shared/components/ui/separator";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+import { Modal } from "antd";
 import { useEffect, useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Controller, useWatch } from "react-hook-form";
@@ -47,6 +40,7 @@ export default function RegisterPaymentCard({
   const [currentStep, setCurrentStep] = useState<Step>("dados-titular");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isCepLoading, setIsCepLoading] = useState(false);
+  const [isCepResolved, setIsCepResolved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passCustomerDialogOpen, setPassCustomerDialogOpen] = useState(false);
 
@@ -62,6 +56,10 @@ export default function RegisterPaymentCard({
   const postalCode = useWatch({
     control: form.control,
     name: "postalCode",
+  });
+  const provinceValue = useWatch({
+    control: form.control,
+    name: "province",
   });
 
   const formatCep = (value: string): string => {
@@ -105,12 +103,17 @@ export default function RegisterPaymentCard({
       lastCepFetchedRef.current = null;
       inFlightCepRef.current = null;
       setIsCepLoading(false);
+      setIsCepResolved(false);
       return;
     }
 
     if (lastCepFetchedRef.current === cleanCep) return;
     if (inFlightCepRef.current === cleanCep) return;
     inFlightCepRef.current = cleanCep;
+
+    setIsCepResolved(false);
+    form.setValue("city", "", { shouldValidate: false });
+    setExtraAddressDetails({ bairro: "", localidade: "" });
 
     const abortController = new AbortController();
     const fetchId = ++cepFetchIdRef.current;
@@ -123,9 +126,7 @@ export default function RegisterPaymentCard({
           { signal: abortController.signal },
         );
 
-        if (!response.ok) {
-          throw new Error("CEP inválido");
-        }
+        if (!response.ok) return;
 
         const data = (await response.json()) as {
           erro?: boolean;
@@ -137,9 +138,8 @@ export default function RegisterPaymentCard({
           bairro?: string;
         };
 
-        if (data.erro) {
-          throw new Error("CEP não encontrado");
-        }
+        if (data.erro) return;
+        if (!data.logradouro && !data.ibge && !data.uf) return;
 
         lastCepFetchedRef.current = cleanCep;
         if (data.logradouro) {
@@ -156,20 +156,10 @@ export default function RegisterPaymentCard({
           bairro: data.bairro || "",
           localidade: data.localidade || "",
         });
+        setIsCepResolved(Boolean(data.ibge));
       } catch (error) {
         if (abortController.signal.aborted) return;
-
-        toast.error("Não foi possível buscar o CEP", {
-          description:
-            error instanceof Error
-              ? error.message
-              : "Verifique o CEP e tente novamente.",
-        });
-
-        form.setValue("address", "", { shouldValidate: true });
-        form.setValue("city", "", { shouldValidate: true });
-        form.setValue("province", "", { shouldValidate: true });
-        setExtraAddressDetails({ bairro: "", localidade: "" });
+        setIsCepResolved(false);
       } finally {
         if (cepFetchIdRef.current === fetchId) {
           setIsCepLoading(false);
@@ -187,6 +177,67 @@ export default function RegisterPaymentCard({
       }
     };
   }, [postalCode, form]);
+
+  useEffect(() => {
+    if (isCepResolved) return;
+
+    const uf = (provinceValue ?? "").trim().toUpperCase();
+    const cityName = (extraAddressDetails.localidade ?? "").trim();
+
+    if (!uf || uf.length !== 2) {
+      form.setValue("city", "", { shouldValidate: false });
+      return;
+    }
+    if (!cityName) {
+      form.setValue("city", "", { shouldValidate: false });
+      return;
+    }
+
+    const normalize = (value: string) =>
+      value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    const normalizedCityName = normalize(cityName);
+    const abortController = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`,
+          { signal: abortController.signal },
+        );
+        if (!response.ok) return;
+
+        const municipios = (await response.json()) as Array<{
+          id: number;
+          nome: string;
+        }>;
+
+        const exact = municipios.find(
+          (m) => normalize(m.nome) === normalizedCityName,
+        );
+
+        const fallback =
+          exact ??
+          municipios.find((m) =>
+            normalize(m.nome).startsWith(normalizedCityName),
+          );
+
+        if (!fallback) return;
+
+        form.setValue("city", String(fallback.id), { shouldValidate: true });
+      } catch {
+        return;
+      }
+    }, 450);
+
+    return () => {
+      abortController.abort();
+      window.clearTimeout(timeoutId);
+    };
+  }, [extraAddressDetails.localidade, form, isCepResolved, provinceValue]);
 
   const handleNextStep = async () => {
     const fieldsToValidate = ["name", "email", "telefone", "cpfCnpj"] as const;
@@ -585,8 +636,14 @@ export default function RegisterPaymentCard({
                     <Input
                       id="card-bairro"
                       value={extraAddressDetails.bairro}
-                      readOnly
-                      className="bg-muted text-muted-foreground md:text-base"
+                      onChange={(event) =>
+                        setExtraAddressDetails((current) => ({
+                          ...current,
+                          bairro: event.target.value,
+                        }))
+                      }
+                      readOnly={isCepResolved}
+                      className={`md:text-base ${isCepResolved ? "bg-muted text-muted-foreground" : ""}`}
                     />
                   </div>
 
@@ -595,8 +652,16 @@ export default function RegisterPaymentCard({
                     <Input
                       id="card-city-display"
                       value={extraAddressDetails.localidade}
-                      readOnly
-                      className="bg-muted text-muted-foreground md:text-base"
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setExtraAddressDetails((current) => ({
+                          ...current,
+                          localidade: value,
+                        }));
+                        form.setValue("city", "", { shouldValidate: false });
+                      }}
+                      readOnly={isCepResolved}
+                      className={`md:text-base ${isCepResolved ? "bg-muted text-muted-foreground" : ""}`}
                     />
                   </div>
 
@@ -653,39 +718,38 @@ export default function RegisterPaymentCard({
           </div>
         </form>
 
-        <Dialog
+        <Modal
           open={passCustomerDialogOpen}
-          onOpenChange={(open) => {
+          onCancel={() => {
             if (isSubmitting) return;
-            setPassCustomerDialogOpen(open);
+            setPassCustomerDialogOpen(false);
           }}
+          title="Usar os dados?"
+          footer={[
+            <Button
+              key="no"
+              type="button"
+              variant="outline"
+              className="mr-3"
+              disabled={isSubmitting}
+              onClick={() => handleSubmitPayment(false)}
+            >
+              Não
+            </Button>,
+            <Button
+              key="yes"
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => handleSubmitPayment(true)}
+            >
+              Sim
+            </Button>,
+          ]}
         >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Usar os dados?</DialogTitle>
-              <DialogDescription>
-                Deseja utilizar os dados informados também como dados do cartão?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isSubmitting}
-                onClick={() => handleSubmitPayment(false)}
-              >
-                Não
-              </Button>
-              <Button
-                type="button"
-                disabled={isSubmitting}
-                onClick={() => handleSubmitPayment(true)}
-              >
-                Sim
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          <p className="text-sm text-muted-foreground">
+            Deseja utilizar os dados informados também como dados do cartão?
+          </p>
+        </Modal>
       </div>
     </div>
   );

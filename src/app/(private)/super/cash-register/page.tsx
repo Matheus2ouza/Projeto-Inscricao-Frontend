@@ -3,16 +3,37 @@
 import { LisCashRegisters } from "@/features/cashRegister/components/ListCashRegisters";
 import { useCreateCashRegister } from "@/features/cashRegister/hook/createCashRegister/useCreateCashRegister";
 import { useListCashRegisters } from "@/features/cashRegister/hook/useListCashRegisters";
+import { CashRegisterStatus } from "@/features/cashRegister/types/listCashRegisters";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Card, CardBody, CardFooter } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function listCashRegistersSuperPage() {
   const router = useRouter();
+  const defaultStatusFilter: CashRegisterStatus[] = [CashRegisterStatus.OPEN];
+  const [pendingFilter, setPendingFilter] =
+    useState<CashRegisterStatus[]>(defaultStatusFilter);
+  const [appliedFilter, setAppliedFilter] =
+    useState<CashRegisterStatus[]>(defaultStatusFilter);
 
-  const { cashRegisters, loading, error, refetch } = useListCashRegisters();
+  const { cashRegisters, loading, error, refetch, setPage } =
+    useListCashRegisters({
+      status: appliedFilter.length > 0 ? appliedFilter : undefined,
+      initialPage: 1,
+      pageSize: 10,
+    });
+
+  const handleStatusChange = (value: CashRegisterStatus[]) => {
+    setPendingFilter(value);
+  };
+
+  const handleApplyStatusFilter = () => {
+    setAppliedFilter(pendingFilter);
+    setPage(1);
+  };
   const { handleCreateCashRegister, isCreatingCashRegister } =
     useCreateCashRegister();
 
@@ -46,7 +67,7 @@ export default function listCashRegistersSuperPage() {
         <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
           <div>
             <p className="text-red-600 dark:text-red-400 font-semibold">
-              Não foi possível carregar os eventos.
+              Não foi possível carregar os caixas.
             </p>
             <p className="text-muted-foreground mt-1 max-w-md">
               {error || "Tente novamente em instantes."}
@@ -65,6 +86,9 @@ export default function listCashRegistersSuperPage() {
         onCreateCashRegister={handleCreateCashRegister}
         isCreatingCashRegister={isCreatingCashRegister}
         onSelectCashRegister={handleSelectCashRegister}
+        statusFilter={pendingFilter}
+        onStatusFilterChange={handleStatusChange}
+        onApplyStatusFilter={handleApplyStatusFilter}
       />
     );
   };

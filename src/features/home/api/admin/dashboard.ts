@@ -3,6 +3,7 @@ import apiClient from "@/shared/lib/apiClient";
 export type DashboardAdminResponse = {
   totalExpense: number;
   totalCollected: number;
+  totalNetValueCollected: number;
   totalDebt: number;
   activeParticipants: number;
 };
@@ -38,6 +39,15 @@ const normalizeSummary = (data: unknown): DashboardAdminResponse => {
       totalCollected: toNumber(
         obj.totalCollected ?? obj.collected ?? obj.total_collected ?? 0,
       ),
+      totalNetValueCollected: toNumber(
+        obj.totalNetValueCollected ??
+          obj.total_net_value_collected ??
+          obj.totalNetCollected ??
+          obj.netCollected ??
+          obj.net_collected ??
+          obj.total_net_collected ??
+          0,
+      ),
       totalDebt: toNumber(obj.totalDebt ?? obj.debt ?? obj.total_debt ?? 0),
       activeParticipants: toNumber(
         obj.activeParticipants ??
@@ -50,6 +60,7 @@ const normalizeSummary = (data: unknown): DashboardAdminResponse => {
   return {
     totalExpense: 0,
     totalCollected: 0,
+    totalNetValueCollected: 0,
     totalDebt: 0,
     activeParticipants: 0,
   };
@@ -96,6 +107,56 @@ export async function getDashboardTotalCollected(
     params: eventId ? { eventId } : undefined,
   });
   return pickNumber(data, ["totalCollected", "collected", "total", "value"]);
+}
+
+export async function getDashboardCollectedTotals(eventId?: string): Promise<{
+  totalCollected: number;
+  totalNetValueCollected: number;
+}> {
+  const { data } = await apiClient.get("/dashboard/admin/collected", {
+    params: eventId ? { eventId } : undefined,
+  });
+
+  return {
+    totalCollected: pickNumber(data, ["totalCollected", "collected", "total", "value"]),
+    totalNetValueCollected: pickNumber(data, [
+      "totalNetValueCollected",
+      "total_net_value_collected",
+      "totalNetCollected",
+      "netCollected",
+      "net_collected",
+      "totalNetValue",
+      "netValue",
+      "net_value",
+      "total",
+      "value",
+    ]),
+  };
+}
+
+export async function getDashboardTotalNetValueCollected(
+  eventId?: string,
+): Promise<number> {
+  try {
+    const { data } = await apiClient.get("/dashboard/admin/collected", {
+      params: eventId ? { eventId } : undefined,
+    });
+    return pickNumber(data, [
+      "totalNetValueCollected",
+      "total_net_value_collected",
+      "totalNetCollected",
+      "netCollected",
+      "net_collected",
+      "totalNetValue",
+      "netValue",
+      "net_value",
+      "total",
+      "value",
+    ]);
+  } catch {
+    const summary = await getDashboardAdmin(eventId);
+    return summary.totalNetValueCollected;
+  }
 }
 
 export async function getDashboardTotalDebt(eventId?: string): Promise<number> {

@@ -16,7 +16,7 @@ export function useTicketsEvents({
   const { setLoading: setGlobalLoading } = useGlobalLoading();
   const { data, isLoading, isFetching, error, refetch } = useTicketsEventsQuery(
     page,
-    pageSize
+    pageSize,
   );
 
   useEffect(() => {

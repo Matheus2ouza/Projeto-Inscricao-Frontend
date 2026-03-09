@@ -1,10 +1,27 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { listCashRegistersResponse } from "../types/listCashRegisters";
+import qs from "qs";
+import {
+  CashRegisterStatus,
+  ListCashRegistersResponse,
+} from "../types/listCashRegisters";
 
-export async function getListCashRegisters(): Promise<listCashRegistersResponse> {
+export async function getListCashRegisters(
+  status?: CashRegisterStatus[],
+  page?: number,
+  pageSize?: number,
+): Promise<ListCashRegistersResponse> {
   try {
-    const { data } =
-      await axiosInstance.get<listCashRegistersResponse>(`cash-register`);
+    const { data } = await axiosInstance.get<ListCashRegistersResponse>(
+      `cash-register`,
+      {
+        params: {
+          status,
+          page,
+          pageSize,
+        },
+        paramsSerializer: (params) => qs.stringify(params, { indices: false }),
+      },
+    );
     return data;
   } catch (error) {
     const axiosError = error as {

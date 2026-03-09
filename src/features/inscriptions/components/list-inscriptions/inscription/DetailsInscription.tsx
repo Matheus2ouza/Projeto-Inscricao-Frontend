@@ -331,8 +331,8 @@ export default function DetailsInscriptionTable({
         </div>
       </div>
 
-      {inscription.status !== InscriptionStatus.PAID ||
-        (inscription.expiresAt && (
+      {inscription.status !== InscriptionStatus.PAID &&
+        inscription.status !== InscriptionStatus.CANCELLED && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
             <div className="p-6">
               <div className="space-y-4">
@@ -471,7 +471,7 @@ export default function DetailsInscriptionTable({
               </div>
             </div>
           </div>
-        ))}
+        )}
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
