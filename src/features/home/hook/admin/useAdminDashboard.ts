@@ -3,7 +3,7 @@
 import {
   getDashboardActiveParticipants,
   getDashboardAdmin,
-  getDashboardTotalCollected,
+  getDashboardCollectedTotals,
   getDashboardTotalDebt,
   getDashboardTotalExpense,
   type DashboardAdminResponse,
@@ -36,13 +36,28 @@ export function useAdminDashboard(eventId?: string) {
     async (metric: DashboardMetric) => {
       setRefreshingMetric(metric);
       try {
+        if (
+          metric === "totalCollected" ||
+          metric === "totalNetValueCollected"
+        ) {
+          const totals = await getDashboardCollectedTotals(eventId);
+          queryClient.setQueryData<DashboardAdminResponse | undefined>(
+            dashboardAdminKeys.summary(eventId),
+            (old) => ({
+              totalExpense: old?.totalExpense ?? 0,
+              totalCollected: totals.totalCollected,
+              totalNetValueCollected: totals.totalNetValueCollected,
+              totalDebt: old?.totalDebt ?? 0,
+              activeParticipants: old?.activeParticipants ?? 0,
+            }),
+          );
+          return;
+        }
+
         let value = 0;
         switch (metric) {
           case "totalExpense":
             value = await getDashboardTotalExpense(eventId);
-            break;
-          case "totalCollected":
-            value = await getDashboardTotalCollected(eventId);
             break;
           case "totalDebt":
             value = await getDashboardTotalDebt(eventId);
@@ -59,6 +74,7 @@ export function useAdminDashboard(eventId?: string) {
           (old) => ({
             totalExpense: old?.totalExpense ?? 0,
             totalCollected: old?.totalCollected ?? 0,
+            totalNetValueCollected: old?.totalNetValueCollected ?? 0,
             totalDebt: old?.totalDebt ?? 0,
             activeParticipants: old?.activeParticipants ?? 0,
             [metric]: value,

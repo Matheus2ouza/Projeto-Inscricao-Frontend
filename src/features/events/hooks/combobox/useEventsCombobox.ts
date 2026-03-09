@@ -1,8 +1,11 @@
 "use client";
 
-import { getEventsCombobox } from "@/features/events/api/combobox/getEventsCombobox";
-import { Event } from "@/features/events/types/combobox/comboboxEventTypes";
-import { useEffect, useState } from "react";
+import {
+  Event,
+  StatusEvent,
+} from "@/features/events/types/combobox/comboboxEventTypes";
+import { useCallback } from "react";
+import { useEventsComboboxQuery } from "./useEventsComboboxQuery";
 
 type UseEventsResult = {
   events: Event[];
@@ -11,30 +14,19 @@ type UseEventsResult = {
   refetch: () => Promise<void>;
 };
 
-export function useEventsCombobox(): UseEventsResult {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+export function useEventsCombobox(
+  status: StatusEvent = StatusEvent.OPEN,
+): UseEventsResult {
+  const { data, isLoading, error, refetch } = useEventsComboboxQuery(status);
 
-  const fetchEvents = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getEventsCombobox();
-      console.log(data);
-      setEvents(data.event);
-    } catch (e: unknown) {
-      const errorMessage =
-        e instanceof Error ? e.message : "Falha ao carregar os eventos";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+  const handleRefetch = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  return {
+    events: data ?? [],
+    loading: isLoading,
+    error: (error as Error | null)?.message ?? null,
+    refetch: handleRefetch,
   };
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  return { events, loading, error, refetch: fetchEvents };
 }

@@ -13,17 +13,24 @@ export enum CashRegisterStatus {
  * @returns.badgeClass Classes Tailwind CSS para estilização do badge de acordo com o tema claro/escuro
  */
 export function getListCashRegistersStatusInfo(status: CashRegisterStatus) {
-  if (status === CashRegisterStatus.OPEN) {
-    return {
-      label: "Aberto",
-      badgeClass:
-        "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-    };
+  switch (status) {
+    case CashRegisterStatus.OPEN:
+      return {
+        label: "Caixa Aberto",
+        badgeClass: "bg-green-500 text-white",
+        disabled: false,
+      };
+    case CashRegisterStatus.CLOSED:
+      return {
+        label: "Caixa Fechado",
+        badgeClass: "bg-red-500 text-white",
+        disabled: true,
+      };
+    default:
+      return {
+        label: "Status Desconhecido",
+        badgeClass: "bg-gray-500 text-white",
+        disabled: true,
+      };
   }
-
-  return {
-    label: "Fechado",
-    badgeClass:
-      "bg-zinc-200/70 text-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200",
-  };
 }

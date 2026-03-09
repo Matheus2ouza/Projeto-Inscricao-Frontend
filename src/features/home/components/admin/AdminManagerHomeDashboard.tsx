@@ -57,15 +57,18 @@ export default function AdminManagerHomeDashboard({
   };
   const infoTexts: Record<DashboardMetric, string> = {
     totalCollected:
-      "Valor total arrecadado pelas inscrições do evento mais próximo (inclui somente pagamentos aprovados).",
+      "Valor total arrecadado pelas inscrições (inclui somente pagamentos aprovados).",
+
+    totalNetValueCollected:
+      "Valor líquido arrecadado pelas inscrições (após descontos/taxas, inclui somente pagamentos aprovados).",
 
     totalDebt:
-      "Soma de todos os valores pendentes das inscrições ainda não pagas no evento mais próximo.",
+      "Soma de todos os valores pendentes das inscrições ainda não pagas.",
 
-    totalExpense: "Valor total de gastos do evento mais próximo.",
+    totalExpense: "Valor total de gastos registrados.",
 
     activeParticipants:
-      "Número total de participantes confirmados no evento mais próximo (inclui apenas inscrições pagas).",
+      "Número total de participantes confirmados (inclui apenas inscrições pagas).",
   };
 
   const cards: {
@@ -88,7 +91,9 @@ export default function AdminManagerHomeDashboard({
       textColor: "text-emerald-600",
       metric: "totalCollected",
       value: getFormatCurrency(data?.totalCollected ?? 0),
-      detailLabel: "Recebido",
+      detailLabel: `${getFormatCurrency(
+        data?.totalNetValueCollected ?? 0,
+      )} líquido`,
     },
     {
       title: "A receber",

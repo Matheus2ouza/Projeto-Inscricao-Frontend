@@ -1,15 +1,13 @@
 import axiosInstance from "@/shared/lib/apiClient";
 import {
-  generatePdfParams,
-  generatePdfResponse,
-} from "../../types/cashRegisterDetails/generatePdfTypes";
+  MovimentDetailsInput,
+  MovimentDetailsResponse,
+} from "../../types/movimentDetails/movimentDetailsTypes";
 
-export async function generatePdf({
-  cashRegisetrId,
-}: generatePdfParams): Promise<generatePdfResponse> {
+export async function getMovimentDetails({ movimentId }: MovimentDetailsInput) {
   try {
-    const { data } = await axiosInstance.get<generatePdfResponse>(
-      `cash-register/${cashRegisetrId}/pdf`,
+    const { data } = await axiosInstance.get<MovimentDetailsResponse>(
+      `cash-register/moviment/${movimentId}`,
     );
     return data;
   } catch (error) {

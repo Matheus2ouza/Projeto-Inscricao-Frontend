@@ -29,7 +29,8 @@ export default function ListInscriptionsSuperPage() {
   const [filters, setFilters] = useState<InscriptionsFiltersValue>({
     status: [],
     hideNotAllocated: false,
-    orderBy: "asc",
+    orderByCreatedAt: "asc",
+    orderByResponsible: "asc",
     limitTime: "all",
   });
   const [responsible, setResponsible] = useState<string>("");
@@ -73,7 +74,8 @@ export default function ListInscriptionsSuperPage() {
     pageSize: PAGE_SIZE,
     status: filters.status.length > 0 ? filters.status : undefined,
     isGuest: filters.hideNotAllocated ? false : true,
-    orderBy: filters.orderBy,
+    orderByCreatedAt: filters.orderByCreatedAt,
+    orderByResponsible: filters.orderByResponsible,
     limitTime: convertedLimitTime,
     responsible: responsible.trim() ? responsible.trim() : undefined,
   });
@@ -165,6 +167,7 @@ export default function ListInscriptionsSuperPage() {
         total={total}
         page={page}
         pageCount={pageCount}
+        loadingInscriptions={fetching}
         onPageChange={setPage}
         onSelectInscription={handleViewInscription}
         filters={filters}
@@ -179,7 +182,8 @@ export default function ListInscriptionsSuperPage() {
           setFilters({
             status: [],
             hideNotAllocated: false,
-            orderBy: "asc",
+            orderByCreatedAt: "asc",
+            orderByResponsible: "asc",
             limitTime: "all",
           });
           setResponsible("");

@@ -32,7 +32,8 @@ export type getListInscriptionsParams = {
   eventId: string;
   status?: InscriptionStatus[];
   isGuest?: boolean;
-  orderBy?: "asc" | "desc";
+  orderByCreatedAt?: "asc" | "desc";
+  orderByResponsible?: "asc" | "desc";
   limitTime?: string;
   responsible?: string;
   page: number;
@@ -52,7 +53,8 @@ export type ListInscriptionsParams = {
   pageSize: number;
   status?: InscriptionStatus[];
   isGuest?: boolean;
-  orderBy?: "asc" | "desc";
+  orderByCreatedAt?: "asc" | "desc";
+  orderByResponsible?: "asc" | "desc";
   limitTime?: string;
   responsible?: string;
 };

@@ -40,7 +40,13 @@ export type EventsListResponse = {
   pageCount: number;
 };
 
-type UseEventsListResult = {
+export type UseEventsForInscriptionParams = {
+  initialPage?: number;
+  pageSize?: number;
+  status?: StatusEvent[];
+};
+
+export type UseEventsForInscriptionResult = {
   events: Event[];
   total: number;
   page: number;
@@ -51,17 +57,18 @@ type UseEventsListResult = {
   refetch: () => Promise<void>;
 };
 
-export type UseEventsForInscriptionParams = {
-  initialPage?: number;
-  pageSize?: number;
-  status?: StatusEvent[];
-};
-
-export type UseEventsForInscriptionResult = UseEventsListResult;
-
 export type UseTicketsEventsParams = {
   initialPage?: number;
   pageSize?: number;
 };
 
-export type UseTicketsEventsResult = UseEventsListResult;
+export type UseTicketsEventsResult = {
+  events: Event[];
+  total: number;
+  page: number;
+  pageCount: number;
+  loading: boolean;
+  error: string | null;
+  setPage: (page: number) => void;
+  refetch: () => Promise<void>;
+};

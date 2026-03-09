@@ -11,22 +11,28 @@ export function useListInscriptions({
   pageSize,
   status,
   isGuest,
-  orderBy,
+  orderByCreatedAt,
+  orderByResponsible,
   limitTime,
   responsible,
 }: ListInscriptionsParams): ListInscriptionsResult {
   const [page, setPage] = useState(initialPage);
 
-  const { data, isLoading, error, refetch } = useListInscritionsQuery(
-    eventId,
-    page,
-    pageSize,
-    status,
-    isGuest,
-    orderBy,
-    limitTime,
-    responsible,
-  );
+  const { data, isLoading, isFetching, isFetched, error, refetch } =
+    useListInscritionsQuery(
+      eventId,
+      page,
+      pageSize,
+      status,
+      isGuest,
+      orderByCreatedAt,
+      orderByResponsible,
+      limitTime,
+      responsible,
+    );
+
+  const hasData = Boolean(data?.event);
+  const loading = isLoading && !hasData;
 
   return {
     event: data?.event || null,
@@ -34,9 +40,9 @@ export function useListInscriptions({
     total: data?.total || 0,
     page: data?.page || initialPage,
     pageCount: data?.pageCount || 0,
-    loading: isLoading,
-    fetching: isLoading,
-    fetched: !isLoading,
+    loading,
+    fetching: isFetching,
+    fetched: isFetched,
     error: error || null,
     setPage,
     refresh: async () => await refetch(),

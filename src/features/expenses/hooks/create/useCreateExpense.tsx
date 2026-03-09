@@ -17,7 +17,7 @@ const createExpenseSchema = z.object({
   responsible: z.string().min(1, "Responsável é obrigatório"),
 });
 
-type CreateExpenseFormData = z.infer<typeof createExpenseSchema>;
+export type CreateExpenseFormData = z.infer<typeof createExpenseSchema>;
 
 export function useCreateExpense(eventId: string) {
   const queryClient = useQueryClient();
@@ -56,8 +56,13 @@ export function useCreateExpense(eventId: string) {
     },
   });
 
-  const onSubmit = form.handleSubmit((data) => {
-    mutation.mutate(data);
+  const onSubmit = form.handleSubmit(async (data) => {
+    try {
+      await mutation.mutateAsync(data);
+      return true;
+    } catch {
+      return false;
+    }
   });
 
   return {
