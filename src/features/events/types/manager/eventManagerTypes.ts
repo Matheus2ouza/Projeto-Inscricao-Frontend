@@ -66,7 +66,8 @@ export type getEventResponse = {
   location?: string;
   latitude?: number;
   longitude?: number;
-  status: string;
+  status: EventStatus;
+  allowedInscriptionModes: InscriptionMode[];
   active?: boolean;
   paymentEnebled: boolean;
   ticketEnabled: boolean;
