@@ -1,5 +1,6 @@
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { zodResolver } from "@hookform/resolvers/zod";
+import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import { createMember } from "../api/createMember";
 import { membersSchema, MembersSchemaType } from "../schema/membersSchema";
@@ -17,12 +18,19 @@ export default function useFormCreateMembers(): UseFormCreateMembers {
   const { setLoading } = useGlobalLoading();
   const { invalidateLists } = useInvalidateMembersQuery();
 
+  // Data de hoje no formato YYYY-MM-DD
+  const today = dayjs().format("YYYY-MM-DD");
+
   const form = useForm<MembersSchemaType>({
     resolver: zodResolver(membersSchema),
     defaultValues: {
       name: "",
-      birthDate: "",
+      birthDate: today, // Data de hoje como padrão
       gender: "MASCULINO",
+      cpf: "",
+      preferredName: "",
+      shirtSize: "M",
+      shirtType: "TRADICIONAL",
     },
   });
 

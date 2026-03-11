@@ -2,7 +2,7 @@ import { useState } from "react";
 import { UseMembersParams, UseMembersResult } from "../types/membersType";
 import { useMembersQuery, usePrefetchMembersQuery } from "./useMembersQuery";
 
-export function UseMembers({
+export function useMembers({
   initialPage = 1,
   pageSize = 20,
 }: UseMembersParams): UseMembersResult {

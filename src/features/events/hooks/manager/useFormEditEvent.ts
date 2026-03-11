@@ -1,5 +1,6 @@
 import {
   Event,
+  InscriptionMode,
   UpdateEventInput,
 } from "@/features/events/types/manager/eventManagerTypes";
 import { useCurrentUser } from "@/shared/context/user-context";
@@ -29,6 +30,9 @@ export function useFormEditEvent(event: Event) {
   // IDs dos responsáveis originais do evento
   const originalResponsibleIds = event.responsibles?.map((r) => r.id) || [];
 
+  // Modos de inscrição originais do evento
+  const originalInscriptionModes = event.allowedInscriptionModes || [];
+
   const [formData, setFormData] = useState({
     name: event.name,
     description: event.description || "",
@@ -48,6 +52,7 @@ export function useFormEditEvent(event: Event) {
     status: event.status || "CLOSE",
     active: event.active || false,
     responsibleIds: originalResponsibleIds,
+    allowedInscriptionModes: originalInscriptionModes,
   });
 
   const handleInputChange = (
@@ -84,6 +89,7 @@ export function useFormEditEvent(event: Event) {
           newResponsibleIds && newResponsibleIds.length > 0
             ? newResponsibleIds
             : undefined,
+        allowedInscriptionModes: formData.allowedInscriptionModes,
       };
 
       await updateEvent(event.id, updateData);
@@ -172,6 +178,7 @@ export function useFormEditEvent(event: Event) {
       status: event.status || "CLOSE",
       active: event.active || false,
       responsibleIds: originalResponsibleIds,
+      allowedInscriptionModes: originalInscriptionModes,
     });
     setIsEditing(false);
   };
@@ -183,10 +190,24 @@ export function useFormEditEvent(event: Event) {
     );
   };
 
+  // Função para obter apenas os novos modos de inscrição adicionados
+  const getNewInscriptionModes = (): InscriptionMode[] => {
+    return formData.allowedInscriptionModes.filter(
+      (mode) => !originalInscriptionModes.includes(mode),
+    );
+  };
+
   const handleResponsiblesChange = (responsibleIds: string[]) => {
     setFormData((prev) => ({
       ...prev,
       responsibleIds,
+    }));
+  };
+
+  const handleInscriptionModesChange = (modes: InscriptionMode[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      allowedInscriptionModes: modes,
     }));
   };
 
@@ -196,6 +217,7 @@ export function useFormEditEvent(event: Event) {
     loading: loading || paymentLoading || inscriptionsLoading,
     formData,
     originalResponsibleIds,
+    originalInscriptionModes,
     handleInputChange,
     handleSave,
     handleDelete,
@@ -204,6 +226,8 @@ export function useFormEditEvent(event: Event) {
     handleUpdateAllowCard,
     handleUpdateInscription,
     handleResponsiblesChange,
+    handleInscriptionModesChange,
     getNewResponsibleIds,
+    getNewInscriptionModes,
   };
 }

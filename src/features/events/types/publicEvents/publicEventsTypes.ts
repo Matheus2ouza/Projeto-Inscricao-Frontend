@@ -1,3 +1,14 @@
+export enum InscriptionMode {
+  NORMAL = "NORMAL",
+  GUEST = "GUEST",
+}
+
+export enum EventStatus {
+  OPEN = "OPEN",
+  CLOSE = "CLOSE",
+  FINALIZED = "FINALIZED",
+}
+
 export type Event = {
   id: string;
   name: string;
@@ -8,8 +19,8 @@ export type Event = {
   location: string;
   latitude: number;
   longitude: number;
-  status: "OPEN" | "CLOSE" | "FINALIZED";
-  allowGuest: boolean;
+  status: EventStatus;
+  allowedInscriptionModes: InscriptionMode[];
   createdAt: string;
 };
 

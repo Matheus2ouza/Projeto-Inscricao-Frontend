@@ -1,9 +1,15 @@
+export type ShirtSize = "PP" | "P" | "M" | "G" | "GG" | "XG";
+
+export type ShirtType = "TRADICIONAL" | "BABYLOOK";
+export type genderType = "MASCULINO" | "FEMININO";
+
 export type Member = {
   id: string;
   name: string;
-  birthDate: string;
-  gender: string;
-  createdAt: string;
+  cpf?: string;
+  birthDate: Date;
+  gender: genderType;
+  createdAt: Date;
 };
 
 export type FindAllToMembersResponse = {

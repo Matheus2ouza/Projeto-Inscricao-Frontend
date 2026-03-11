@@ -4,7 +4,6 @@ import { useGlobalLoading } from "@/components/GlobalLoading";
 import { ComboboxAccount } from "@/features/accounts/components/ComboboxAccount";
 import { ComboboxRegion } from "@/features/regions/components/ComboboxRegion";
 import { useRegions } from "@/features/regions/hooks/useRegions";
-import { CalendarRanger } from "@/shared/components/calendar-ranger";
 import { Button } from "@/shared/components/ui/button";
 import {
   FormControl,
@@ -16,6 +15,9 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { useCurrentUser } from "@/shared/context/user-context";
 import { cn } from "@/shared/lib/utils";
+import type { SelectProps } from "antd";
+import { DatePicker, Select, Space } from "antd";
+import dayjs from "dayjs";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -29,6 +31,9 @@ import React, {
 import { FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import useFormCreateEvent from "../../hooks/create/useFormCreateEvent";
+import { InscriptionMode } from "../../types/create/createEvent";
+
+const { RangePicker } = DatePicker;
 
 interface RegisterFormEventProps {
   onSubmitSuccess?: () => void;
@@ -65,6 +70,18 @@ export default function RegisterFormEvent({
     | "SUPER"
     | "ADMIN"
     | "MANAGER";
+
+  // Opções para o select de modos de inscrição
+  const inscriptionModeOptions: SelectProps["options"] = [
+    {
+      label: "Com alocação",
+      value: InscriptionMode.NORMAL,
+    },
+    {
+      label: "Sem alocação",
+      value: InscriptionMode.GUEST,
+    },
+  ];
 
   useEffect(() => {
     // Usuários não-super já possuem região definida no contexto
@@ -283,6 +300,27 @@ export default function RegisterFormEvent({
     router.push(`/${resolvedRole}/events/manager`);
   };
 
+  // Função para lidar com a mudança no RangePicker
+  const handleDateRangeChange = (dates: any, dateStrings: [string, string]) => {
+    if (dates && dates[0] && dates[1]) {
+      setDateRange({
+        from: dates[0].toDate(),
+        to: dates[1].toDate(),
+      });
+    } else {
+      setDateRange({
+        from: undefined,
+        to: undefined,
+      });
+    }
+  };
+
+  // Converter DateRange para valores do Ant Design - corrigido o tipo
+  const rangePickerValue: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null =
+    dateRange?.from && dateRange?.to
+      ? [dayjs(dateRange.from), dayjs(dateRange.to)]
+      : null;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10">
@@ -492,9 +530,12 @@ export default function RegisterFormEvent({
                   {/* Campo: Período do Evento */}
                   <div className="space-y-3">
                     <div className="w-full">
-                      <CalendarRanger
-                        dateRange={dateRange}
-                        onDateRangeChange={setDateRange}
+                      <RangePicker
+                        value={rangePickerValue}
+                        onChange={handleDateRangeChange}
+                        format="DD/MM/YYYY"
+                        placeholder={["Data inicial", "Data final"]}
+                        style={{ width: "100%" }}
                       />
                     </div>
                   </div>
@@ -530,6 +571,53 @@ export default function RegisterFormEvent({
                           />
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Seção: Configurações de Inscrição */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Configurações de Inscrição
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Selecione os modos de inscrição disponíveis para este evento.
+                </p>
+
+                {/* Campo: Modos de Inscrição */}
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="allowedInscriptionModes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-medium">
+                          Modos de Inscrição *
+                        </FormLabel>
+                        <FormControl>
+                          <Space
+                            style={{ width: "100%" }}
+                            orientation="vertical"
+                          >
+                            <Select
+                              mode="multiple"
+                              allowClear
+                              style={{ width: "100%" }}
+                              placeholder="Selecione os modos de inscrição"
+                              value={field.value}
+                              onChange={(value) => field.onChange(value)}
+                              options={inscriptionModeOptions}
+                              className="w-full"
+                            />
+                          </Space>
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Escolha se o evento aceitará inscrições normais,
+                          convidados, ou ambos.
+                        </p>
                       </FormItem>
                     )}
                   />

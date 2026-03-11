@@ -1,6 +1,9 @@
 "use client";
 
-import { Event } from "@/features/events/types/publicEvents/publicEventsTypes";
+import {
+  Event,
+  InscriptionMode,
+} from "@/features/events/types/publicEvents/publicEventsTypes";
 import EventMap from "@/shared/components/EventMap";
 import { GuestInscriptionAlready } from "@/shared/components/GuestInscriptionAlready";
 import { Button } from "@/shared/components/ui/button";
@@ -345,7 +348,9 @@ export default function PublicEventDetails({
           {subscriptionStatus.status === "open" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Card de inscrição direta - só mostra se allowGuest for true */}
-              {event.allowGuest && (
+              {event.allowedInscriptionModes.includes(
+                InscriptionMode.GUEST,
+              ) && (
                 <div className="border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-4 mb-6">
                     <div className="p-3 bg-primary/10 rounded-lg">
@@ -412,12 +417,16 @@ export default function PublicEventDetails({
                   </div>
                   <div>
                     <h3 className="font-semibold text-card-foreground text-lg">
-                      {event.allowGuest
+                      {event.allowedInscriptionModes.includes(
+                        InscriptionMode.GUEST,
+                      )
                         ? "Já tem uma conta?"
                         : "Faça login para se inscrever"}
                     </h3>
                     <p className="text-muted-foreground text-sm mt-1">
-                      {event.allowGuest
+                      {event.allowedInscriptionModes.includes(
+                        InscriptionMode.GUEST,
+                      )
                         ? "Acesse para gerenciar suas inscrições e histórico"
                         : "Entre com sua conta para realizar a inscrição"}
                     </p>
@@ -427,16 +436,26 @@ export default function PublicEventDetails({
                 <div className="space-y-4">
                   <Button
                     onClick={onLogin}
-                    variant={event.allowGuest ? "outline" : "default"}
+                    variant={
+                      event.allowedInscriptionModes.includes(
+                        InscriptionMode.GUEST,
+                      )
+                        ? "outline"
+                        : "default"
+                    }
                     size="lg"
                     className="w-full h-12 text-base font-semibold"
                   >
-                    {event.allowGuest
+                    {event.allowedInscriptionModes.includes(
+                      InscriptionMode.GUEST,
+                    )
                       ? "Fazer Login"
                       : "Inscrever-se com Login"}
                   </Button>
 
-                  {!event.allowGuest && (
+                  {!event.allowedInscriptionModes.includes(
+                    InscriptionMode.GUEST,
+                  ) && (
                     <p className="text-xs text-muted-foreground text-center mt-3">
                       É necessário ter uma conta para se inscrever neste evento
                     </p>

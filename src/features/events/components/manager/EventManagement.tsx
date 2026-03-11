@@ -5,10 +5,13 @@ import { deleteImageEvent } from "@/features/events/api/manager/eventActions/del
 import { deleteLogoEvent } from "@/features/events/api/manager/eventActions/deleteLogoEvent";
 import { updateEventImage } from "@/features/events/api/manager/eventActions/updateEventImage";
 import { updateEventLogo } from "@/features/events/api/manager/eventActions/updateEventLogo";
-import ResponsiblesDialog from "@/features/events/components/ResponsiblesDialog";
+import ResponsiblesDialog from "@/features/events/components/manager/ResponsiblesDialog";
 import { useFormEditEvent } from "@/features/events/hooks/manager/useFormEditEvent";
 import { useEventResponsible } from "@/features/events/hooks/useEventResponsible";
-import { Event } from "@/features/events/types/manager/eventManagerTypes";
+import {
+  Event,
+  InscriptionMode,
+} from "@/features/events/types/manager/eventManagerTypes";
 import TypeInscriptionDialog from "@/features/typeInscription/components/TypeInscriptionDialog";
 import { useTypeInscriptionsActions } from "@/features/typeInscription/hook/useTypeInscriptionsActions";
 import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
@@ -39,6 +42,7 @@ import {
   Save,
   Tag,
   Trash2,
+  User,
   UserCheck,
   Users,
 } from "lucide-react";
@@ -46,6 +50,7 @@ import Image from "next/image";
 import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useInvalidateDetailsEventQuery } from "../../hooks/manager/useEventManagerQuery";
+import InscriptionModesDialog from "./InscriptionModesDialog";
 
 interface EventManagementProps {
   event: Event | null;
@@ -92,6 +97,7 @@ export default function EventManagement({
     handleUpdateAllowCard,
     handleUpdateInscription,
     handleResponsiblesChange,
+    handleInscriptionModesChange,
     getNewResponsibleIds,
   } = useFormEditEvent(event);
   const { invalidateDetail } = useInvalidateDetailsEventQuery();
@@ -110,6 +116,8 @@ export default function EventManagement({
     useEventResponsible();
 
   const [responsiblesDialogOpen, setResponsiblesDialogOpen] = useState(false);
+  const [inscriptionModesDialogOpen, setInscriptionModesDialogOpen] =
+    useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -128,6 +136,12 @@ export default function EventManagement({
     responsibleId: null,
     responsibleName: null,
   });
+
+  // Opções para os modos de inscrição
+  const inscriptionModeOptions = [
+    { value: InscriptionMode.NORMAL, label: "Normal" },
+    { value: InscriptionMode.GUEST, label: "Não Alocados" },
+  ];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR");
@@ -460,6 +474,88 @@ export default function EventManagement({
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Card de Modos de Inscrição */}
+            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Modos de Inscrição
+                </h2>
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <User className="h-3 w-3" />
+                  {event.allowedInscriptionModes?.length || 0} modos
+                </Badge>
+              </div>
+
+              <div className="space-y-4">
+                {!event.allowedInscriptionModes?.length ? (
+                  <div className="text-center flex flex-col items-center justify-center py-8">
+                    <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      Nenhum modo de inscrição configurado
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      Selecione os modos de inscrição disponíveis para este
+                      evento.
+                    </p>
+                    {isEditing && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex items-center gap-2"
+                        onClick={() => setInscriptionModesDialogOpen(true)}
+                      >
+                        <Plus className="h-4 w-4" />
+                        Adicionar Modos
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      {(() => {
+                        // Durante edição, mostrar todos os modos selecionados
+                        // No modo visualização, mostrar apenas os modos do evento
+                        const displayModes = isEditing
+                          ? formData.allowedInscriptionModes || []
+                          : event.allowedInscriptionModes || [];
+
+                        return displayModes.map((mode) => {
+                          const modeOption = inscriptionModeOptions.find(
+                            (opt) => opt.value === mode,
+                          );
+                          return (
+                            <div
+                              key={mode}
+                              className="flex items-center justify-between p-3 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
+                            >
+                              <div className="flex items-center gap-2 flex-1">
+                                <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {modeOption?.label || mode}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+
+                    {isEditing && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full flex items-center gap-2"
+                        onClick={() => setInscriptionModesDialogOpen(true)}
+                      >
+                        <Plus className="h-4 w-4" />
+                        Gerenciar Modos de Inscrição
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
@@ -971,6 +1067,21 @@ export default function EventManagement({
                   ...formData.responsibleIds,
                   responsibleId,
                 ]);
+              }
+            }}
+          />
+        )}
+
+        {/* Diálogo para gerenciar modos de inscrição */}
+        {isEditing && (
+          <InscriptionModesDialog
+            open={inscriptionModesDialogOpen}
+            onOpenChange={setInscriptionModesDialogOpen}
+            selectedModes={formData.allowedInscriptionModes || []}
+            onAddMode={(mode) => {
+              const currentModes = formData.allowedInscriptionModes || [];
+              if (!currentModes.includes(mode)) {
+                handleInscriptionModesChange([...currentModes, mode]);
               }
             }}
           />

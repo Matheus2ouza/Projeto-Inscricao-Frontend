@@ -1,5 +1,8 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { Event, UpdateEventInput } from "../../../types/eventTypes";
+import {
+  Event,
+  UpdateEventInput,
+} from "../../../types/manager/eventManagerTypes";
 
 export async function updateEvent(
   eventId: string,

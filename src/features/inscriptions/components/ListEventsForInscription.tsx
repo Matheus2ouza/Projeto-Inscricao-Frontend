@@ -21,7 +21,11 @@ import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { Calendar, Frown, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { EVENT_STATUS_OPTIONS, StatusEvent } from "../types/listEventsTypes";
+import {
+  EVENT_STATUS_OPTIONS,
+  InscriptionMode,
+  StatusEvent,
+} from "../types/listEventsTypes";
 
 type InfoRow = {
   label: string;
@@ -103,6 +107,8 @@ export default function ListEventsForInscription({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {events.map((event) => {
+          const isInscriptionNotAllowed =
+            !event.allowedInscriptionModes.includes(InscriptionMode.NORMAL);
           const statusInfo = getEventStatusInfo(event.status);
           const gradientClass = getGradientClass(event.name);
           const isImageLoading = event.imageUrl
@@ -220,7 +226,7 @@ export default function ListEventsForInscription({
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
                     onClick={() => onSelectEvent(event.id)}
-                    disabled={statusInfo.disabled}
+                    disabled={statusInfo.disabled || isInscriptionNotAllowed}
                   >
                     {buttonLabel}
                   </Button>

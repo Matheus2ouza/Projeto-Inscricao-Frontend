@@ -73,7 +73,7 @@ export default function ListInscriptionsSuperPage() {
     initialPage: 1,
     pageSize: PAGE_SIZE,
     status: filters.status.length > 0 ? filters.status : undefined,
-    isGuest: filters.hideNotAllocated ? false : true,
+    isGuest: filters.hideNotAllocated ? false : undefined,
     orderByCreatedAt: filters.orderByCreatedAt,
     orderByResponsible: filters.orderByResponsible,
     limitTime: convertedLimitTime,

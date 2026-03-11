@@ -1,3 +1,14 @@
+export enum InscriptionMode {
+  NORMAL = "NORMAL",
+  GUEST = "GUEST",
+}
+
+export enum EventStatus {
+  OPEN = "OPEN",
+  CLOSE = "CLOSE",
+  FINALIZED = "FINALIZED",
+}
+
 export type Event = {
   id: string;
   name: string;
@@ -10,7 +21,8 @@ export type Event = {
   location?: string;
   latitude?: number;
   longitude?: number;
-  status: string;
+  status: EventStatus;
+  allowedInscriptionModes: InscriptionMode[];
   active?: boolean;
   paymentEnebled: boolean;
   ticketEnabled: boolean;
@@ -107,7 +119,8 @@ export type UpdateEventInput = {
   maxParticipants?: number;
   ticketPrice?: number;
   address?: string;
-  status?: string;
+  status?: EventStatus;
+  allowedInscriptionModes?: InscriptionMode[];
   active?: boolean;
   responsibles?: string[];
 };
