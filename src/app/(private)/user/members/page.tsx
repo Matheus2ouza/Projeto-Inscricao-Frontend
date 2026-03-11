@@ -1,7 +1,7 @@
 "use client";
 
 import MembersTable from "@/features/members/components/MembersTable";
-import { UseMembers } from "@/features/members/hook/useMembers";
+import { useMembers } from "@/features/members/hook/useMembers";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -11,7 +11,7 @@ const PAGE_SIZE = 20;
 export default function MembersPage() {
   const router = useRouter();
   const { members, total, page, pageCount, loading, error, setPage, refresh } =
-    UseMembers({ initialPage: 1, pageSize: PAGE_SIZE });
+    useMembers({ initialPage: 1, pageSize: PAGE_SIZE });
 
   const renderSkeletonGrid = () => {
     return (

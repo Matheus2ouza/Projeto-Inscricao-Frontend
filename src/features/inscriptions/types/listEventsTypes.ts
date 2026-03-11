@@ -13,11 +13,17 @@ export const STATUS_EVENT_VALUES: StatusEvent[] = [
   "FINALIZED",
 ];
 
+export enum InscriptionMode {
+  NORMAL = "NORMAL",
+  GUEST = "GUEST",
+}
+
 export type Event = {
   id: string;
   name: string;
   imageUrl: string;
   status: StatusEvent;
+  allowedInscriptionModes: InscriptionMode[];
   startDate: string;
   endDate: string;
   location?: string;

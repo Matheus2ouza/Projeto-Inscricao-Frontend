@@ -63,9 +63,14 @@ interface listInscriptionsTableProps {
   //pdf
   onDownloadPdf: ({
     eventId,
-    isGuest,
-    details,
     participants,
+    payment,
+    status,
+    statusPayment,
+    methodPayment,
+    isGuest,
+    startDate,
+    endDate,
   }: DownloadListInscriptionsPdfInput) => void;
 }
 

@@ -1,4 +1,5 @@
 import z from "zod";
+import { InscriptionMode } from "../../types/create/createEvent";
 
 export const CreateEventSchema = z.object({
   name: z
@@ -10,7 +11,7 @@ export const CreateEventSchema = z.object({
       (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
       {
         message: "A imagem deve ser JPEG, PNG ou WebP",
-      }
+      },
     )
     .refine((file) => file.size <= 5 * 1024 * 1024, {
       message: "A imagem deve ter no máximo 5MB",
@@ -23,6 +24,9 @@ export const CreateEventSchema = z.object({
     .min(2, { message: "Localização muito curta ou inválida" })
     .optional(),
   openImmediately: z.boolean(),
+  allowedInscriptionModes: z.array(z.nativeEnum(InscriptionMode)).min(1, {
+    message: "Selecione pelo menos um modo de inscrição",
+  }),
 });
 
 export type CreateEventFormType = z.infer<typeof CreateEventSchema>;

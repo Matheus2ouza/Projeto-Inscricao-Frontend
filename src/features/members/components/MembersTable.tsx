@@ -2,22 +2,6 @@
 
 import { Button } from "@/shared/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/components/ui/dialog";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/shared/components/ui/form";
-import { Input } from "@/shared/components/ui/input";
-import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -25,15 +9,25 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
-import { useCurrentUser } from "@/shared/context/user-context";
 import { formatDateTime } from "@/shared/utils/formatDate";
+import type { SelectProps } from "antd";
+import {
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Radio,
+  Select,
+  Space,
+  Tag,
+} from "antd";
+import dayjs from "dayjs";
 import { AlertCircle, ThumbsUp } from "lucide-react";
 import React, { useState } from "react";
-import { FormProvider } from "react-hook-form";
+import { Controller, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 import useFormCreateMembers from "../hook/useFormCreateMembers";
-import { Member } from "../types/membersType";
+import { Member, genderType } from "../types/membersType";
 
 type MembersTableProps = {
   members: Member[];
@@ -58,15 +52,53 @@ const formatDateOnly = (dateString: string | Date): string => {
   return `${day}/${month}/${year}`;
 };
 
+// Função para formatar CPF
+const formatCPF = (cpf?: string): string => {
+  if (!cpf) return "-";
+  // Formata CPF: XXX.XXX.XXX-XX
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+};
+
+// Função para formatar gênero
+const formatGender = (gender: genderType): string => {
+  return gender === "MASCULINO" ? "Masculino" : "Feminino";
+};
+
+// Função para obter cor do badge de gênero
+const getGenderColor = (gender: genderType): string => {
+  return gender === "MASCULINO" ? "blue" : "pink";
+};
+
+// Opções para tamanho de camiseta
+const shirtSizeOptions: SelectProps["options"] = [
+  { label: "PP", value: "PP" },
+  { label: "P", value: "P" },
+  { label: "M", value: "M" },
+  { label: "G", value: "G" },
+  { label: "GG", value: "GG" },
+  { label: "XG", value: "XG" },
+];
+
+// Opções para tipo de camiseta
+const shirtTypeOptions: SelectProps["options"] = [
+  { label: "Tradicional", value: "TRADICIONAL" },
+  { label: "Baby Look", value: "BABYLOOK" },
+];
+
+// Opções para gênero
+const genderOptions = [
+  { label: "Masculino", value: "MASCULINO" },
+  { label: "Feminino", value: "FEMININO" },
+];
+
 export default function MembersTable({
   members,
   total,
   page,
   pageCount,
   onPageChange,
-  pageSize = 10, // Valor padrão de 10 itens por página
+  pageSize = 10,
 }: MembersTableProps) {
-  const { user } = useCurrentUser();
   const [open, setOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -120,7 +152,7 @@ export default function MembersTable({
             className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80"
             onClick={() => {
               setOpen(true);
-              setSubmitError(null); // Limpar erro ao abrir o modal
+              setSubmitError(null);
             }}
           >
             Criar Membro
@@ -133,9 +165,8 @@ export default function MembersTable({
               <tr>
                 <th className="w-12 px-4 py-2 text-center font-semibold">#</th>
                 <th className="px-4 py-2 text-left font-semibold">Nome</th>
-                <th className="px-4 py-2 text-center font-semibold">
-                  Data Nasc.
-                </th>
+                <th className="px-4 py-2 text-left font-semibold">CPF</th>
+                <th className="px-4 py-2 text-center font-semibold">Gênero</th>
                 <th className="px-4 py-2 text-center font-semibold">
                   Criado em
                 </th>
@@ -145,7 +176,7 @@ export default function MembersTable({
               {members.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
                     Nenhum membro encontrado
@@ -160,9 +191,12 @@ export default function MembersTable({
                     <td className="w-12 px-4 py-2 text-center font-medium">
                       {calculateGlobalIndex(idx)}
                     </td>
-                    <td className="px-4 py-2 uppercase">{member.name}</td>
+                    <td className="px-4 py-2 ">{member.name}</td>
+                    <td className="px-4 py-2 ">{formatCPF(member.cpf)}</td>
                     <td className="px-4 py-2 text-center">
-                      {formatDateOnly(member.birthDate)}
+                      <Tag color={getGenderColor(member.gender)}>
+                        {formatGender(member.gender)}
+                      </Tag>
                     </td>
                     <td className="px-4 py-2 text-center">
                       {formatDateTime(member.createdAt)}
@@ -214,161 +248,214 @@ export default function MembersTable({
           Página {page} de {pageCount} • {pageSize} itens por página
         </div>
 
-        {/* Modal de criação */}
-        <Dialog
+        {/* Modal de criação com Ant Design */}
+        <Modal
           open={open}
-          onOpenChange={(isOpen) => {
-            setOpen(isOpen);
-            if (!isOpen) {
-              setSubmitError(null); // Limpar erro ao fechar
-            }
+          onCancel={() => {
+            setOpen(false);
+            setSubmitError(null);
+            form.reset();
           }}
+          title="Criar Membro"
+          width="600px"
+          footer={null}
+          className="dark:bg-white/5"
         >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="text-primary">Criar Membro</DialogTitle>
-            </DialogHeader>
-            <FormProvider {...form}>
-              <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-                {/* Nome */}
-                <div>
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel
-                          htmlFor="name"
-                          className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
-                        >
-                          Nome
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            id="name"
-                            type="text"
-                            placeholder="Digite o nome"
-                            className="w-full rounded-xl border-gray-300 bg-white/50 dark:bg-gray-800/50 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 focus:ring-opacity-60 focus:shadow-md dark:border-gray-600 dark:text-white backdrop-blur-sm transition-all duration-300 pl-4 pr-4 py-3"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+          <FormProvider {...form}>
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+              {/* Nome */}
+              <Controller
+                control={form.control}
+                name="name"
+                render={({ field, fieldState }) => (
+                  <Form.Item
+                    label="Nome"
+                    validateStatus={fieldState.error ? "error" : ""}
+                    help={fieldState.error?.message}
+                    required
+                  >
+                    <Input
+                      {...field}
+                      placeholder="Digite o nome"
+                      className="w-full"
+                    />
+                  </Form.Item>
+                )}
+              />
 
-                {/* Data de Nascimento */}
-                <div className="space-y-2">
-                  <FormField
-                    control={form.control}
-                    name="birthDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel
-                          htmlFor="birthDate"
-                          className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
-                        >
-                          Data de Nascimento
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            id="birthDate"
-                            type="date"
-                            className="w-60 rounded-xl border-gray-300 bg-white/50 dark:bg-gray-800/50 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300 focus:ring-opacity-60 focus:shadow-md dark:border-gray-600 dark:text-white backdrop-blur-sm transition-all duration-300 pl-4 pr-4 py-3"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              {/* Nome Preferido */}
+              <Controller
+                control={form.control}
+                name="preferredName"
+                render={({ field }) => (
+                  <Form.Item label="Nome Preferido (opcional)">
+                    <Input
+                      {...field}
+                      placeholder="Digite o nome preferido"
+                      className="w-full"
+                    />
+                  </Form.Item>
+                )}
+              />
 
-                {/* Gênero - CORREÇÃO: valor correto é "MASCULINO" */}
-                <div className="space-y-2">
-                  <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Gênero
-                        </FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            value={field.value}
-                            className="flex space-x-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem
-                                value="MASCULINO"
-                                id="masculino"
-                              />
-                              <label
-                                htmlFor="masculino"
-                                className="text-sm text-gray-700 dark:text-gray-300"
-                              >
-                                Masculino
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="FEMININO" id="feminino" />
-                              <label
-                                htmlFor="feminino"
-                                className="text-sm text-gray-700 dark:text-gray-300"
-                              >
-                                Feminino
-                              </label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              {/* CPF */}
+              <Controller
+                control={form.control}
+                name="cpf"
+                render={({ field, fieldState }) => (
+                  <Form.Item
+                    label="CPF (opcional)"
+                    validateStatus={fieldState.error ? "error" : ""}
+                    help={fieldState.error?.message}
+                  >
+                    <Input
+                      {...field}
+                      placeholder="Digite o CPF (apenas números)"
+                      className="w-full"
+                      maxLength={11}
+                    />
+                  </Form.Item>
+                )}
+              />
 
-                {/* Mensagem de erro do submit - MODIFICADO para exibir cada erro em uma linha */}
-                {submitError && (
-                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <div className="flex items-start gap-2 text-red-600 dark:text-red-400">
-                      <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      <div className="flex flex-col gap-1">
-                        {parseErrorMessages(submitError).map(
-                          (errorLine, index) => (
-                            <span key={index} className="text-sm font-medium">
-                              • {errorLine}
-                            </span>
-                          )
-                        )}
-                      </div>
+              {/* Data de Nascimento com DatePicker do Ant Design */}
+              <Controller
+                control={form.control}
+                name="birthDate"
+                render={({ field, fieldState }) => (
+                  <Form.Item
+                    label="Data de Nascimento"
+                    validateStatus={fieldState.error ? "error" : ""}
+                    help={fieldState.error?.message}
+                    required
+                  >
+                    <DatePicker
+                      {...field}
+                      style={{ width: "100%" }}
+                      placeholder="Selecione a data de nascimento"
+                      format="DD/MM/YYYY"
+                      value={field.value ? dayjs(field.value) : null}
+                      onChange={(date) => {
+                        field.onChange(date ? date.format("YYYY-MM-DD") : "");
+                      }}
+                      className="w-full"
+                    />
+                  </Form.Item>
+                )}
+              />
+
+              {/* Gênero */}
+              <Controller
+                control={form.control}
+                name="gender"
+                render={({ field, fieldState }) => (
+                  <Form.Item
+                    label="Gênero"
+                    validateStatus={fieldState.error ? "error" : ""}
+                    help={fieldState.error?.message}
+                    required
+                  >
+                    <Radio.Group
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      value={field.value}
+                    >
+                      <Space>
+                        <Radio value="MASCULINO">Masculino</Radio>
+                        <Radio value="FEMININO">Feminino</Radio>
+                      </Space>
+                    </Radio.Group>
+                  </Form.Item>
+                )}
+              />
+
+              {/* Tamanho da Camiseta */}
+              <Controller
+                control={form.control}
+                name="shirtSize"
+                render={({ field, fieldState }) => (
+                  <Form.Item
+                    label="Tamanho da Camiseta (opcional)"
+                    validateStatus={fieldState.error ? "error" : ""}
+                    help={fieldState.error?.message}
+                  >
+                    <Select
+                      {...field}
+                      style={{ width: "100%" }}
+                      placeholder="Selecione o tamanho"
+                      options={shirtSizeOptions}
+                      value={field.value || undefined}
+                      onChange={(value) => field.onChange(value)}
+                      allowClear
+                    />
+                  </Form.Item>
+                )}
+              />
+
+              {/* Tipo da Camiseta */}
+              <Controller
+                control={form.control}
+                name="shirtType"
+                render={({ field, fieldState }) => (
+                  <Form.Item
+                    label="Tipo da Camiseta (opcional)"
+                    validateStatus={fieldState.error ? "error" : ""}
+                    help={fieldState.error?.message}
+                  >
+                    <Select
+                      {...field}
+                      style={{ width: "100%" }}
+                      placeholder="Selecione o tipo"
+                      options={shirtTypeOptions}
+                      value={field.value || undefined}
+                      onChange={(value) => field.onChange(value)}
+                      allowClear
+                    />
+                  </Form.Item>
+                )}
+              />
+
+              {/* Mensagem de erro do submit */}
+              {submitError && (
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <div className="flex items-start gap-2 text-red-600 dark:text-red-400">
+                    <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <div className="flex flex-col gap-1">
+                      {parseErrorMessages(submitError).map(
+                        (errorLine, index) => (
+                          <span key={index} className="text-sm font-medium">
+                            • {errorLine}
+                          </span>
+                        ),
+                      )}
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                <DialogFooter>
-                  <Button
-                    type="submit"
-                    className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80"
-                  >
-                    Salvar
-                  </Button>
-                  <DialogClose asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setSubmitError(null)}
-                    >
-                      Cancelar
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </form>
-            </FormProvider>
-          </DialogContent>
-        </Dialog>
+              {/* Footer com botões */}
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false);
+                    setSubmitError(null);
+                    form.reset();
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80"
+                >
+                  Salvar
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
+        </Modal>
       </div>
     </div>
   );

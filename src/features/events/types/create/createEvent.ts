@@ -1,5 +1,13 @@
-export type { CreateEventFormType } from "../../schema/create/CreateEventSchema";
-export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
+export enum InscriptionMode {
+  NORMAL = "NORMAL",
+  GUEST = "GUEST",
+}
+
+export enum EventStatus {
+  OPEN = "OPEN",
+  CLOSE = "CLOSE",
+  FINALIZED = "FINALIZED",
+}
 
 export type CreateEventResponsible = {
   accountId: string;
@@ -12,7 +20,8 @@ export type CreateEventRequest = {
   regionId: string;
   image?: string;
   location?: string;
-  status: StatusEvent;
+  status: EventStatus;
+  allowedInscriptionModes: InscriptionMode[];
   paymentEnabled: boolean;
   responsibles?: CreateEventResponsible[];
 };

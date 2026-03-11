@@ -13,8 +13,11 @@ import {
   CreateEventSchema,
   type CreateEventFormType,
 } from "../../schema/create/CreateEventSchema";
-import { CreateEventRequest } from "../../types/create/createEvent";
-import { StatusEvent } from "../../types/eventTypes";
+import {
+  CreateEventRequest,
+  EventStatus,
+  InscriptionMode,
+} from "../../types/create/createEvent";
 
 export type useFormCreateEvent = {
   form: ReturnType<typeof useForm<CreateEventFormType>>;
@@ -61,6 +64,7 @@ export default function useFormCreateEvent(): useFormCreateEvent {
       accountIds: [],
       location: "",
       openImmediately: false,
+      allowedInscriptionModes: [InscriptionMode.NORMAL],
     },
   });
 
@@ -98,9 +102,9 @@ export default function useFormCreateEvent(): useFormCreateEvent {
       const startDateISO = convertToISOString(dateRange.from);
       const endDateISO = convertToISOString(dateRange.to);
 
-      const registrationStatus: StatusEvent = input.openImmediately
-        ? "OPEN"
-        : "CLOSE";
+      const registrationStatus: EventStatus = input.openImmediately
+        ? EventStatus.OPEN
+        : EventStatus.CLOSE;
 
       const responsibles = input.accountIds?.map((accountId) => ({
         accountId,
@@ -114,6 +118,7 @@ export default function useFormCreateEvent(): useFormCreateEvent {
         image: imageBase64,
         location: input.location,
         status: registrationStatus,
+        allowedInscriptionModes: input.allowedInscriptionModes,
         paymentEnabled: false,
         responsibles,
       };
@@ -124,10 +129,12 @@ export default function useFormCreateEvent(): useFormCreateEvent {
       invalidateAll();
 
       form.reset();
+
       setDateRange({
         from: new Date(),
         to: new Date(new Date().setDate(new Date().getDate() + 3)),
       });
+
       return { success: true, id };
     } catch (error) {
       const err = error as Error;

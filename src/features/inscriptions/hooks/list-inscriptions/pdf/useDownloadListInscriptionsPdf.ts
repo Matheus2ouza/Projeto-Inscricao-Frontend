@@ -70,18 +70,35 @@ export default function useDownloadListInscriptionsPdf() {
   const downloadListInscriptionsPdf = useCallback(
     async ({
       eventId,
-      isGuest,
-      details,
       participants,
+      payment,
+      status,
+      statusPayment,
+      methodPayment,
+      isGuest,
+      startDate,
+      endDate,
     }: DownloadListInscriptionsPdfInput) => {
       if (!eventId) {
         toast.error("Evento não encontrado.");
         return false;
       }
 
+      const normalizedIsGuest = isGuest === false ? false : undefined;
+
       return processDownload(
         async () =>
-          await listInscriptionsPdf(eventId, details, participants, isGuest),
+          await listInscriptionsPdf(
+            eventId,
+            participants,
+            payment,
+            status,
+            statusPayment,
+            methodPayment,
+            normalizedIsGuest,
+            startDate,
+            endDate,
+          ),
         {
           successMessage: "PDF gerado com sucesso.",
         },

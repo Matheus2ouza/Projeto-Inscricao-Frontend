@@ -67,7 +67,7 @@ export default function ResponsiblesDialog({
                 <TableBody>
                   {accounts.map((account) => {
                     const isAlreadyAdded = selectedResponsibleIds.includes(
-                      account.id
+                      account.id,
                     );
 
                     return (
