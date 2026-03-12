@@ -2,9 +2,9 @@ import { useGlobalLoading } from "@/components/GlobalLoading";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
-import { createMember } from "../api/createMember";
-import { membersSchema, MembersSchemaType } from "../schema/membersSchema";
-import { useInvalidateMembersQuery } from "./useMembersQuery";
+import { createMember } from "../../api/createMember";
+import { membersSchema, MembersSchemaType } from "../../schema/membersSchema";
+import { useInvalidateMembersQuery } from "../useMembersQuery";
 
 export type UseFormCreateMembers = {
   form: ReturnType<typeof useForm<MembersSchemaType>>;
@@ -14,7 +14,7 @@ export type UseFormCreateMembers = {
   }>;
 };
 
-export default function useFormCreateMembers(): UseFormCreateMembers {
+export default function useFormCreateMember(): UseFormCreateMembers {
   const { setLoading } = useGlobalLoading();
   const { invalidateLists } = useInvalidateMembersQuery();
 

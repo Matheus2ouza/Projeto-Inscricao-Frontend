@@ -12,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
@@ -61,6 +62,7 @@ export default function ListEventsForInscription({
   onSelectEvent,
   getInfoRows,
 }: ListEventsForInscriptionProps) {
+  const { user } = useCurrentUser();
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
@@ -226,7 +228,10 @@ export default function ListEventsForInscription({
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
                     onClick={() => onSelectEvent(event.id)}
-                    disabled={statusInfo.disabled || isInscriptionNotAllowed}
+                    disabled={
+                      statusInfo.disabled ||
+                      (isInscriptionNotAllowed && user.role === "USER")
+                    }
                   >
                     {buttonLabel}
                   </Button>

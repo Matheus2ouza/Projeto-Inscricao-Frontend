@@ -1084,6 +1084,12 @@ export default function EventManagement({
                 handleInscriptionModesChange([...currentModes, mode]);
               }
             }}
+            onRemoveMode={(mode) => {
+              const currentModes = formData.allowedInscriptionModes || [];
+              handleInscriptionModesChange(
+                currentModes.filter((m) => m !== mode),
+              );
+            }}
           />
         )}
 

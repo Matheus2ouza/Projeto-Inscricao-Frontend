@@ -1,14 +1,6 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/shared/components/ui/pagination";
 import { formatDateTime } from "@/shared/utils/formatDate";
 import type { SelectProps } from "antd";
 import {
@@ -19,14 +11,16 @@ import {
   Radio,
   Select,
   Space,
+  Table,
   Tag,
 } from "antd";
+import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { AlertCircle, ThumbsUp } from "lucide-react";
+import { AlertCircle, Eye, ThumbsUp } from "lucide-react";
 import React, { useState } from "react";
 import { Controller, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
-import useFormCreateMembers from "../hook/useFormCreateMembers";
+import useFormCreateMember from "../hook/createMember/useFormCreateMember";
 import { Member, genderType } from "../types/membersType";
 
 type MembersTableProps = {
@@ -35,21 +29,8 @@ type MembersTableProps = {
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
+  onViewDetailsMember: (memberId: string) => void;
   pageSize?: number;
-};
-
-// Função para formatar apenas data (para birthDate)
-const formatDateOnly = (dateString: string | Date): string => {
-  if (!dateString) return "-";
-
-  const date = new Date(dateString);
-
-  // Formata data: DD/MM/YYYY
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-
-  return `${day}/${month}/${year}`;
 };
 
 // Função para formatar CPF
@@ -85,28 +66,23 @@ const shirtTypeOptions: SelectProps["options"] = [
   { label: "Baby Look", value: "BABYLOOK" },
 ];
 
-// Opções para gênero
-const genderOptions = [
-  { label: "Masculino", value: "MASCULINO" },
-  { label: "Feminino", value: "FEMININO" },
-];
-
 export default function MembersTable({
   members,
   total,
   page,
   pageCount,
   onPageChange,
+  onViewDetailsMember,
   pageSize = 10,
 }: MembersTableProps) {
   const [open, setOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { form, onSubmit } = useFormCreateMembers();
+  const { form, onSubmit } = useFormCreateMember();
 
   // Função para calcular o índice global
-  const calculateGlobalIndex = (localIndex: number): number => {
-    return (page - 1) * pageSize + localIndex + 1;
+  const calculateGlobalIndex = (index: number): number => {
+    return (page - 1) * pageSize + index + 1;
   };
 
   // Função para dividir os erros por vírgula e criar um array
@@ -143,6 +119,68 @@ export default function MembersTable({
     }
   };
 
+  // Colunas da tabela
+  const columns: ColumnsType<Member> = [
+    {
+      title: "#",
+      key: "index",
+      width: 60,
+      align: "center",
+      render: (_, __, index) => calculateGlobalIndex(index),
+    },
+    {
+      title: "Nome",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: "CPF",
+      key: "cpf",
+      render: (_, record) => formatCPF(record.cpf),
+    },
+    {
+      title: "Gênero",
+      key: "gender",
+      align: "center",
+      render: (_, record) => (
+        <Tag color={getGenderColor(record.gender)}>
+          {formatGender(record.gender)}
+        </Tag>
+      ),
+      filters: [
+        { text: "Masculino", value: "MASCULINO" },
+        { text: "Feminino", value: "FEMININO" },
+      ],
+      onFilter: (value, record) => record.gender === value,
+    },
+    {
+      title: "Criado em",
+      key: "createdAt",
+      align: "center",
+      render: (_, record) => formatDateTime(record.createdAt),
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    },
+    {
+      title: "Ações",
+      key: "actions",
+      width: 100,
+      align: "center",
+      render: (_, record) => (
+        <Button
+          variant="link"
+          size="sm"
+          className="h-6 w-6 rounded-lg bg-blue-500 text-white p-0 flex items-center justify-center border-0 hover:bg-blue-600"
+          onClick={() => onViewDetailsMember(record.id)}
+          aria-label="Detalhes"
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-6">
@@ -160,92 +198,22 @@ export default function MembersTable({
         </div>
 
         <div className="overflow-x-auto rounded-lg border">
-          <table className="min-w-full text-sm">
-            <thead className="bg-muted text-muted-foreground">
-              <tr>
-                <th className="w-12 px-4 py-2 text-center font-semibold">#</th>
-                <th className="px-4 py-2 text-left font-semibold">Nome</th>
-                <th className="px-4 py-2 text-left font-semibold">CPF</th>
-                <th className="px-4 py-2 text-center font-semibold">Gênero</th>
-                <th className="px-4 py-2 text-center font-semibold">
-                  Criado em
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-8 text-center text-muted-foreground"
-                  >
-                    Nenhum membro encontrado
-                  </td>
-                </tr>
-              ) : (
-                members.map((member, idx) => (
-                  <tr
-                    key={member.id}
-                    className="border-t hover:bg-muted/50 transition-colors"
-                  >
-                    <td className="w-12 px-4 py-2 text-center font-medium">
-                      {calculateGlobalIndex(idx)}
-                    </td>
-                    <td className="px-4 py-2 ">{member.name}</td>
-                    <td className="px-4 py-2 ">{formatCPF(member.cpf)}</td>
-                    <td className="px-4 py-2 text-center">
-                      <Tag color={getGenderColor(member.gender)}>
-                        {formatGender(member.gender)}
-                      </Tag>
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      {formatDateTime(member.createdAt)}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Paginação */}
-        <div className="flex justify-between items-center mt-4">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => page > 1 && onPageChange(page - 1)}
-                  href={page > 1 ? "#" : undefined}
-                  className={page === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
-              {Array.from({ length: pageCount }, (_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
-                    isActive={page === i + 1}
-                    href="#"
-                    onClick={() => onPageChange(i + 1)}
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => page < pageCount && onPageChange(page + 1)}
-                  href={page < pageCount ? "#" : undefined}
-                  className={
-                    page === pageCount ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-
-        {/* Informações de paginação */}
-        <div className="text-center text-sm text-muted-foreground mt-2">
-          Página {page} de {pageCount} • {pageSize} itens por página
+          <Table
+            columns={columns}
+            dataSource={members}
+            rowKey="id"
+            pagination={{
+              current: page,
+              pageSize: pageSize,
+              total: total,
+              onChange: onPageChange,
+              showSizeChanger: false,
+              showTotal: (total) => `Total de ${total} membros`,
+            }}
+            size="middle"
+            className="w-full"
+            scroll={{ x: "max-content" }}
+          />
         </div>
 
         {/* Modal de criação com Ant Design */}
