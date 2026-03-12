@@ -1,17 +1,26 @@
 "use client";
 
-import MembersTable from "@/features/members/components/MembersTable";
-import { useMembers } from "@/features/members/hook/useMembers";
+import DetailsMember from "@/features/members/components/detailsMember/DetailsMember";
+import { useDetailsMember } from "@/features/members/hook/detailsMember/useDetailsMember";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-const PAGE_SIZE = 20;
-export default function MembersPage() {
+export default function DetailsMemberPage() {
+  const params = useParams();
   const router = useRouter();
-  const { members, total, page, pageCount, loading, error, setPage, refresh } =
-    useMembers({ initialPage: 1, pageSize: PAGE_SIZE });
+  const rawMemberId = params.memberId;
+  const memberId = Array.isArray(rawMemberId) ? rawMemberId[0] : rawMemberId;
+
+  if (!memberId) {
+    return null;
+  }
+
+  const { member, loading, fetching, fetched, error, refresh } =
+    useDetailsMember({
+      memberId,
+    });
 
   const renderSkeletonGrid = () => {
     return (
@@ -33,38 +42,26 @@ export default function MembersPage() {
       return (
         <div className="p-6 flex items-center justify-center min-h-96">
           <div className="text-center text-destructive">
-            <p className="mb-4">Erro ao carregar membros: {error.message}</p>
+            <p className="mb-4">
+              Erro ao carregar detalhes do membro: {error.message}
+            </p>
             <Button onClick={refresh}>Tentar Novamente</Button>
           </div>
         </div>
       );
     }
 
-    return (
-      <MembersTable
-        members={members}
-        total={total}
-        page={page}
-        pageCount={pageCount}
-        onPageChange={setPage}
-        onViewDetailsMember={handleViewDetailsMember}
-        pageSize={PAGE_SIZE}
-      />
-    );
+    return <DetailsMember member={member} />;
   };
 
   const handleBack = () => {
-    router.replace(`/user/home`);
-  };
-
-  const handleViewDetailsMember = (memberId: string) => {
-    router.push(`/user/members/${memberId}`);
+    router.replace(`/user/members`);
   };
 
   return (
     <PageContainer
-      title="Membros"
-      description="Gerencie seus membros e registre novos membros."
+      title="Detalhes do Membro"
+      description="Visualize os detalhes do membro."
       showBackButton={true}
       backButtonAction={handleBack}
     >
