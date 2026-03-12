@@ -25,6 +25,7 @@ import {
 import type { SelectProps } from "antd";
 import {
   Card,
+  DatePicker,
   Descriptions,
   Divider,
   Form,
@@ -145,7 +146,6 @@ export default function CreateInscriptionAdmin() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { form, onSubmit } = useFormCreateInscriptionAdmin();
@@ -158,7 +158,7 @@ export default function CreateInscriptionAdmin() {
 
   const isGuest = watch("isGuest");
   const eventId = watch("eventId");
-  const accountId = watch("accountId"); // Observar o accountId selecionado
+  const accountId = watch("accountId");
 
   // Observar os participantes para recalcular total quando mudarem
   const participants = useWatch({
@@ -626,7 +626,7 @@ export default function CreateInscriptionAdmin() {
                     <ComboboxMemberSingle
                       key={refreshKey}
                       eventId={eventId}
-                      accountId={accountId} // Passando o accountId selecionado
+                      accountId={accountId}
                       value=""
                       onChange={handleMemberSelected}
                       placeholder="Buscar membro..."
@@ -838,7 +838,7 @@ export default function CreateInscriptionAdmin() {
                           )}
                         />
 
-                        {/* Data de nascimento */}
+                        {/* Data de nascimento - Agora usando DatePicker do Ant Design */}
                         <Controller
                           control={control}
                           name={`participants.${index}.birthDate`}
@@ -848,9 +848,17 @@ export default function CreateInscriptionAdmin() {
                               validateStatus={fieldState.error ? "error" : ""}
                               help={fieldState.error?.message}
                             >
-                              <Input
+                              <DatePicker
                                 {...field}
-                                placeholder="YYYY-MM-DD"
+                                style={{ width: "100%" }}
+                                placeholder="Selecione a data de nascimento"
+                                format="DD/MM/YYYY"
+                                value={field.value ? dayjs(field.value) : null}
+                                onChange={(date) => {
+                                  field.onChange(
+                                    date ? date.format("YYYY-MM-DD") : "",
+                                  );
+                                }}
                                 className="w-full"
                               />
                             </Form.Item>
@@ -1082,7 +1090,7 @@ export default function CreateInscriptionAdmin() {
                 <div className="w-full">
                   <Form.Item
                     label="Comprovante de Pagamento"
-                    required
+                    required={watch("payment.methodPayment") === "PIX"}
                     className="w-full"
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
@@ -1275,45 +1283,6 @@ export default function CreateInscriptionAdmin() {
                       )}
                     </div>
                   </Form.Item>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Campos condicionais conforme isGuest */}
-                  {isGuest && (
-                    <>
-                      <Controller
-                        control={control}
-                        name="payment.guestName"
-                        render={({ field }) => (
-                          <Form.Item label="Nome do convidado (pagamento)">
-                            <Input
-                              {...field}
-                              placeholder="Nome"
-                              className="w-full"
-                            />
-                          </Form.Item>
-                        )}
-                      />
-                      <Controller
-                        control={control}
-                        name="payment.guestEmail"
-                        render={({ field, fieldState }) => (
-                          <Form.Item
-                            label="Email do convidado (pagamento)"
-                            validateStatus={fieldState.error ? "error" : ""}
-                            help={fieldState.error?.message}
-                          >
-                            <Input
-                              {...field}
-                              type="email"
-                              placeholder="email@exemplo.com"
-                              className="w-full"
-                            />
-                          </Form.Item>
-                        )}
-                      />
-                    </>
-                  )}
                 </div>
               </Space>
             )}
