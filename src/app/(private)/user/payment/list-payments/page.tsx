@@ -103,6 +103,7 @@ export default function SelectEventForListPayments() {
         events={events}
         total={total}
         page={page}
+        disableWhenPaymentDisabled={false}
         statusFilter={pendingFilter}
         pageCount={pageCount}
         setPage={setPage}

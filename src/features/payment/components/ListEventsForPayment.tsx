@@ -12,6 +12,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/shared/components/ui/pagination";
+import { useCurrentUser } from "@/shared/context/user-context";
 import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
@@ -50,7 +51,7 @@ export default function ListEventsForPayment({
   total,
   page,
   pageCount,
-  disableWhenPaymentDisabled = false,
+  disableWhenPaymentDisabled,
   statusFilter,
   onStatusFilterChange,
   onApplyStatusFilter,
@@ -60,6 +61,7 @@ export default function ListEventsForPayment({
   onSelectEvent,
   getInfoRows,
 }: ListEventsForPaymentProps) {
+  const { user } = useCurrentUser();
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
@@ -156,6 +158,10 @@ export default function ListEventsForPayment({
           const isImageLoading = hasImage
             ? imageLoadingStates[event.id] !== false
             : false;
+          const isDisabled =
+            disableWhenPaymentDisabled !== undefined
+              ? disableWhenPaymentDisabled
+              : !event.paymentEnabled;
 
           return (
             <Card
@@ -256,9 +262,7 @@ export default function ListEventsForPayment({
                     size="sm"
                     className="w-full dark:text-white rounded-lg"
                     onClick={() => onSelectEvent(event.id)}
-                    disabled={
-                      disableWhenPaymentDisabled && !event.paymentEnabled
-                    }
+                    disabled={isDisabled}
                   >
                     {buttonLabel}
                   </Button>

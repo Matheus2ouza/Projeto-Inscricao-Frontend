@@ -105,7 +105,6 @@ export default function SelectedEventForRegisterPayment() {
         page={page}
         pageCount={pageCount}
         statusFilter={pendingFilter}
-        disableWhenPaymentDisabled={true}
         setPage={setPage}
         onSelectEvent={handleSelectEvent}
         onStatusFilterChange={handleStatusChange}

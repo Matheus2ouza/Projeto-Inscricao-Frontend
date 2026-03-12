@@ -144,6 +144,14 @@ export default function AppSidebarAdminManager({
                         <SidebarMenuSub className="mt-1 border-0 pl-6">
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
+                              href="/admin/inscriptions/register"
+                              className="gap-1"
+                            >
+                              <span>Registar Inscrição</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
                               href="/admin/inscriptions/analysis"
                               className="gap-1"
                             >

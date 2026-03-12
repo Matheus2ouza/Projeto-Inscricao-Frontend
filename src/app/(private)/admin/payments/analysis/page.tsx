@@ -116,6 +116,7 @@ export default function AnalysisPaymentAdminPage() {
         events={events}
         total={total}
         page={page}
+        disableWhenPaymentDisabled={false}
         pageCount={pageCount}
         statusFilter={pendingFilter}
         showDateLocation={false}

@@ -1,20 +1,22 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMembersCombobox } from "../../api/combobox/getUsersCombobox";
-import { MemberResponse } from "../../types/combobox/membertsComboboxType";
+import { GetMembersResponse } from "../../types/combobox/membersComboboxType";
 
 export const membersKeys = {
   all: ["members"] as const,
-  lists: () => [...membersKeys.all, "list"] as const,
-  combobox: () => [...membersKeys.lists(), "combobox"] as const,
-  details: () => [...membersKeys.all, "detail"] as const,
-  detail: (id: string) => [...membersKeys.details(), id] as const,
+  combobox: (eventId: string, accountId?: string) =>
+    [...membersKeys.all, "combobox", eventId, accountId] as const,
 };
 
-export function useMembersQuery(eventId: string, enabled: boolean = true) {
-  return useQuery<MemberResponse[]>({
-    queryKey: [...membersKeys.combobox()],
-    queryFn: () => getMembersCombobox(eventId),
-    enabled,
+export function useMembersQuery(
+  eventId: string,
+  accountId?: string,
+  enabled: boolean = true,
+) {
+  return useQuery<GetMembersResponse>({
+    queryKey: membersKeys.combobox(eventId),
+    queryFn: () => getMembersCombobox(eventId, accountId),
+    enabled: enabled && !!eventId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
@@ -26,8 +28,10 @@ export function useInvalidateMembersQuery() {
   const queryClient = useQueryClient();
 
   return {
-    invalidateCombobox: () =>
-      queryClient.invalidateQueries({ queryKey: membersKeys.combobox() }),
+    invalidateCombobox: (eventId: string, accountId?: string) =>
+      queryClient.invalidateQueries({
+        queryKey: membersKeys.combobox(eventId, accountId),
+      }),
     invalidateAll: () =>
       queryClient.invalidateQueries({ queryKey: membersKeys.all }),
   };

@@ -1,27 +1,26 @@
 "use client";
 
-import { MemberResponse } from "@/features/members/types/combobox/membertsComboboxType";
+import {
+  useMembersParms,
+  useMembersResult,
+} from "@/features/members/types/combobox/membersComboboxType";
 import { useMembersQuery } from "./useMembersQuery";
 
-type UseMemberResult = {
-  members: MemberResponse[];
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-};
-
-export function useMember(
-  eventId: string,
-  autoFetch: boolean = true,
-): UseMemberResult {
+export function useMember({
+  eventId,
+  accountId,
+  autoFetch = true,
+}: useMembersParms): useMembersResult {
   const { data, isLoading, isFetching, error, refetch } = useMembersQuery(
     eventId,
+    accountId,
     autoFetch,
   );
 
   return {
     members: data ?? [],
-    loading: isLoading || isFetching,
+    loading: isLoading,
+    fetching: isFetching,
     error: error
       ? error instanceof Error
         ? error.message
