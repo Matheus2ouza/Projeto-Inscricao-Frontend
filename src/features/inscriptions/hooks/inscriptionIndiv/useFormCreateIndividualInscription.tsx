@@ -112,15 +112,15 @@ export function useFormCreateIndividualInscription({
       // Preenche os campos do formulário com os dados do membro
       setValue("participantName", member.label);
 
-      if (member.birthDate) {
+      if (member.member?.birthDate) {
         // Formata a data de nascimento para DD/MM/AAAA
-        const birthDate = new Date(member.birthDate);
+        const birthDate = new Date(member.member?.birthDate);
         const formattedDate = birthDate.toLocaleDateString("pt-BR");
         setValue("birthDate", formattedDate);
       }
 
-      if (member.gender) {
-        setValue("gender", member.gender.toLowerCase());
+      if (member.member?.gender) {
+        setValue("gender", member.member?.gender.toLowerCase());
       }
 
       // Valida os campos preenchidos

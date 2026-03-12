@@ -1,20 +1,7 @@
 "use client";
 
-import { Button } from "@/shared/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/shared/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { cn } from "@/shared/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+import type { SelectProps } from "antd";
+import { Select, Space, Spin, Tag } from "antd";
 import * as React from "react";
 import { useTypeInscriptionsQuery } from "../hook/useTypeInscriptionsQuery";
 
@@ -28,11 +15,11 @@ export type TypeInscriptionOption = {
 export type ComboboxTypeInscriptionProps = {
   eventId: string;
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, option?: TypeInscriptionOption) => void; // Modificado para retornar o option completo
   options?: TypeInscriptionOption[];
   loading?: boolean;
   disabled?: boolean;
-  modal?: boolean;
+  placeholder?: string;
 };
 
 export function ComboboxTypeInscription({
@@ -42,9 +29,8 @@ export function ComboboxTypeInscription({
   options,
   loading: loadingProp,
   disabled = false,
-  modal = true,
+  placeholder = "Selecione o tipo de inscrição",
 }: ComboboxTypeInscriptionProps) {
-  const [open, setOpen] = React.useState(false);
   const {
     data: fetched,
     isLoading: internalLoading,
@@ -65,99 +51,75 @@ export function ComboboxTypeInscription({
     return [];
   }, [options, fetched]);
 
-  const selectedTypeInscription = React.useMemo(() => {
-    return typeInscriptions.find((t) => t.value === value);
-  }, [typeInscriptions, value]);
+  // Configuração das opções para o Select
+  const selectOptions: SelectProps["options"] = typeInscriptions.map(
+    (type) => ({
+      label: type.label,
+      value: type.value,
+      disabled: disabled,
+    }),
+  );
 
-  const buttonLabel = React.useMemo(() => {
-    if (disabled) return "Selecione um membro primeiro";
+  // Função para renderizar cada opção personalizada
+  const renderOption = (option: any) => {
+    const type = typeInscriptions.find((t) => t.value === option.value);
+    if (!type) return option.label;
+
+    return (
+      <Space className="w-full justify-between">
+        <span>{type.label}</span>
+        {value === type.value && (
+          <Tag color="blue" className="ml-2">
+            Selecionado
+          </Tag>
+        )}
+      </Space>
+    );
+  };
+
+  // Placeholder baseado no estado
+  const getPlaceholder = () => {
+    if (disabled) return "Selecione um evento primeiro";
     if (loading) return "Carregando tipos...";
     if (typeInscriptions.length === 0) return "Nenhum tipo encontrado";
-    if (selectedTypeInscription) {
-      return selectedTypeInscription.label;
-    }
-    return "Selecione o tipo de inscrição";
-  }, [selectedTypeInscription, loading, typeInscriptions.length, disabled]);
+    return placeholder;
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal={modal}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          disabled={disabled} // Aplicado aqui
-          className={cn(
-            "w-full justify-between relative overflow-hidden",
-            disabled &&
-              "opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800",
-          )}
-        >
-          <span
-            className={cn(
-              value
-                ? "relative z-10 text-blue-700 dark:text-blue-300 font-semibold px-2 py-1"
-                : "text-gray-700 dark:text-gray-200",
-              disabled && "text-gray-500 dark:text-gray-400",
-            )}
-          >
-            {buttonLabel}
-          </span>
-          <ChevronsUpDown
-            className={cn(
-              value ? "relative z-10 text-blue-700 opacity-80" : "opacity-50",
-              disabled && "opacity-30",
-            )}
-          />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[260px] p-0">
-        <Command>
-          <CommandList>
-            <CommandEmpty>
-              {loading
-                ? "Carregando..."
-                : error
-                  ? "Falha ao carregar tipos de inscrição."
-                  : "Nenhum tipo encontrado."}
-            </CommandEmpty>
-            {typeInscriptions.length > 0 && (
-              <CommandGroup>
-                {typeInscriptions.map((type) => (
-                  <CommandItem
-                    key={type.value}
-                    value={type.value}
-                    onSelect={(currentValue) => {
-                      if (!disabled) {
-                        onChange(currentValue === value ? "" : currentValue);
-                        setOpen(false);
-                      }
-                    }}
-                    className={cn(disabled && "opacity-50 cursor-not-allowed")}
-                  >
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded text-xs font-semibold uppercase",
-                        value === type.value ? "ring-2 ring-blue-400" : "",
-                        disabled && "text-gray-400",
-                      )}
-                    >
-                      {type.label}
-                    </span>
-                    <Check
-                      className={cn(
-                        "ml-auto",
-                        value === type.value ? "opacity-100" : "opacity-0",
-                        disabled && "text-gray-400",
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <Select
+      showSearch
+      allowClear
+      placeholder={getPlaceholder()}
+      value={value || undefined}
+      onChange={(selectedValue, option) => {
+        const selectedOption = Array.isArray(option) ? option[0] : option;
+        const type = typeInscriptions.find((t) => t.value === selectedValue);
+        onChange(selectedValue || "", type);
+      }}
+      loading={loading}
+      options={selectOptions}
+      optionRender={(option) => renderOption(option.data)}
+      filterOption={(input, option) =>
+        String(option?.label ?? "")
+          .toLowerCase()
+          .includes(input.toLowerCase())
+      }
+      disabled={disabled || typeInscriptions.length === 0}
+      notFoundContent={
+        error ? (
+          <div className="text-center py-2">
+            <p className="text-red-500 text-sm">Falha ao carregar tipos</p>
+          </div>
+        ) : loading ? (
+          <Spin size="small" />
+        ) : (
+          "Nenhum tipo encontrado"
+        )
+      }
+      className="w-full"
+      style={{ width: "100%" }}
+      virtual={false}
+      listHeight={250}
+    />
   );
 }

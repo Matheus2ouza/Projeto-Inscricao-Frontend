@@ -1,7 +1,6 @@
 "use client";
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
-import { ComboboxAccount } from "@/features/accounts/components/ComboboxAccount";
 import { ComboboxRegion } from "@/features/regions/components/ComboboxRegion";
 import { useRegions } from "@/features/regions/hooks/useRegions";
 import { Button } from "@/shared/components/ui/button";
@@ -408,17 +407,6 @@ export default function RegisterFormEvent({
                               Escolha um ou mais usuários que ficarão
                               responsáveis pelo evento.
                             </p>
-                            <FormControl>
-                              <ComboboxAccount
-                                value={
-                                  Array.isArray(field.value) ? field.value : []
-                                }
-                                onChange={(selected) => {
-                                  field.onChange(selected);
-                                }}
-                                showRole
-                              />
-                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}

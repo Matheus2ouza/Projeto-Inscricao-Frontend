@@ -19,6 +19,8 @@ export function getConvertStatusInscription(status: string): string {
       return "EM ANÁLISE";
     case "paid":
       return "APROVADA";
+    case "expired":
+      return "EXPIRADA";
     case "cancelled":
       return "CANCELADA";
     default:
