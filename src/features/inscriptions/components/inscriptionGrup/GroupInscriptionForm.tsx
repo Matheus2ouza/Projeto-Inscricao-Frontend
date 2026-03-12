@@ -1,5 +1,6 @@
 "use client";
 
+import { ComboboxAccountSingle } from "@/features/accounts/components/ComboboxAccount";
 import { useTypeInscriptionsQuery } from "@/features/inscriptions/hooks/inscriptionIndiv/useTypeInscriptionsQuery";
 import {
   MemberDisplayData,
@@ -64,6 +65,9 @@ export function GroupInscriptionForm({
     register,
   } = hookData;
 
+  // Estado para a conta selecionada
+  const [accountId, setAccountId] = useState<string>("");
+
   // Busca os tipos de inscrição para obter o nome quando selecionado
   const { data: typeInscriptions } = useTypeInscriptionsQuery(eventId);
 
@@ -104,8 +108,8 @@ export function GroupInscriptionForm({
         accountParticipantId: tempMemberId,
         typeInscriptionId: tempTypeId,
         name: tempMemberData.label,
-        birthDate: tempMemberData.birthDate,
-        gender: tempMemberData.gender,
+        birthDate: tempMemberData.member?.birthDate,
+        gender: tempMemberData.member?.gender,
         typeInscriptionName: tempTypeName,
       };
 
@@ -286,6 +290,39 @@ export function GroupInscriptionForm({
           </CardContent>
         </Card>
 
+        {/* Card da Conta */}
+        <Card className="w-full">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <CardTitle className="text-xl sm:text-2xl flex items-center gap-2">
+                  <User className="h-5 w-5 sm:h-6 sm:w-6" />
+                  Conta
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base mt-1">
+                  Selecione a conta para buscar os membros
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-3">
+                <Label htmlFor="account" className="text-base font-medium">
+                  Conta *
+                </Label>
+                <ComboboxAccountSingle
+                  id="account"
+                  value={accountId}
+                  onChange={setAccountId}
+                  placeholder="Selecione uma conta..."
+                  showRole={true}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Card dos Membros */}
         <Card className="w-full">
           <CardHeader className="pb-4">
@@ -338,6 +375,7 @@ export function GroupInscriptionForm({
                 type="button"
                 className="flex items-center gap-2 w-full sm:w-auto h-10 sm:h-auto"
                 onClick={handleOpenSheet}
+                disabled={!accountId}
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="text-sm sm:text-base">Adicionar Membro</span>
@@ -371,11 +409,21 @@ export function GroupInscriptionForm({
                         </Label>
                         <ComboboxMemberSingle
                           eventId={eventId}
+                          accountId={accountId}
                           id="memberSelect"
                           value={tempMemberId}
                           onChange={(id, member) => {
                             setTempMemberId(id);
-                            setTempMemberData(member);
+                            if (member && id) {
+                              setTempMemberData({
+                                label: member.name,
+                                value: id,
+                                registered: member.registered || false,
+                                member,
+                              });
+                            } else {
+                              setTempMemberData(undefined);
+                            }
                           }}
                           disabledValues={addedMemberIds}
                         />
@@ -397,7 +445,9 @@ export function GroupInscriptionForm({
                                 Nascimento
                               </Label>
                               <p className="text-sm font-medium">
-                                {formatBirthDate(tempMemberData.birthDate)}
+                                {formatBirthDate(
+                                  tempMemberData.member?.birthDate,
+                                )}
                               </p>
                             </div>
                             <div className="space-y-1 sm:col-span-2">
@@ -405,7 +455,7 @@ export function GroupInscriptionForm({
                                 Gênero
                               </Label>
                               <p className="text-sm font-medium capitalize">
-                                {tempMemberData.gender || "-"}
+                                {tempMemberData.member?.gender || "-"}
                               </p>
                             </div>
                           </div>
@@ -475,7 +525,8 @@ export function GroupInscriptionForm({
                   Nenhum membro adicionado
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 mb-3 sm:mb-4 px-4">
-                  Clique no botão "Adicionar Membro" para começar.
+                  Selecione uma conta e clique no botão "Adicionar Membro" para
+                  começar.
                 </p>
                 <Button
                   variant="outline"
@@ -483,6 +534,7 @@ export function GroupInscriptionForm({
                   type="button"
                   size="sm"
                   className="h-9 sm:h-10"
+                  disabled={!accountId}
                 >
                   Adicionar Membro
                 </Button>
@@ -608,7 +660,8 @@ export function GroupInscriptionForm({
                     isSubmitting ||
                     members.length === 0 ||
                     !!formErrors.responsible ||
-                    !!formErrors.phone
+                    !!formErrors.phone ||
+                    !accountId
                   }
                 >
                   {isSubmitting ? (

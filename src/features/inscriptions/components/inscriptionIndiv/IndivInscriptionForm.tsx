@@ -223,7 +223,6 @@ export default function IndividualInscriptionForm({
                   formErrors.participantName &&
                     "[&_button]:border-red-500 [&_button]:focus:border-red-500",
                 )}
-                modal={false}
               />
               {!isMemberSelected && (
                 <p className="text-muted-foreground text-xs sm:text-sm flex items-center gap-1.5 mt-2">
@@ -303,7 +302,6 @@ export default function IndividualInscriptionForm({
                     handleInputChange(event);
                   }}
                   disabled={!isMemberSelected}
-                  modal={false}
                 />
               </div>
               {formErrors.typeInscriptionId && (
