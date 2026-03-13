@@ -17,6 +17,7 @@ export type MemberSingleOption = {
 export type ComboboxMemberSingleProps = {
   eventId: string;
   accountId?: string;
+  requireAccountId?: boolean;
   id?: string;
   label?: string;
   value: string;
@@ -33,6 +34,7 @@ export type ComboboxMemberSingleProps = {
 export function ComboboxMemberSingle({
   eventId,
   accountId,
+  requireAccountId = false,
   id,
   label,
   value,
@@ -51,7 +53,9 @@ export function ComboboxMemberSingle({
   const toastShownRef = useRef(false);
 
   // Verificar se pode buscar membros (precisa de eventId e accountId)
-  const canFetchMembers = Boolean(eventId && accountId);
+  const canFetchMembers = requireAccountId
+    ? Boolean(eventId && accountId) // CreateInscriptionAdmin: precisa dos dois
+    : Boolean(eventId);
 
   const {
     members: fetched,
@@ -84,22 +88,23 @@ export function ComboboxMemberSingle({
     }
   }, [eventId]);
 
-  // Mostrar toast quando tem evento mas não tem conta
   useEffect(() => {
-    if (eventId && !accountId && !toastShownRef.current) {
+    if (requireAccountId && eventId && !accountId && !toastShownRef.current) {
+      // 👈 guard
       toastShownRef.current = true;
       toast.warning("Selecione uma conta primeiro", {
         description: "Escolha a conta antes de buscar membros",
       });
     }
-  }, [eventId, accountId]);
+  }, [eventId, accountId, requireAccountId]);
 
   // Resetar o controle de toast quando ambos estão presentes
   useEffect(() => {
-    if (eventId && accountId) {
-      toastShownRef.current = false;
-    }
-  }, [eventId, accountId]);
+    const shouldReset = requireAccountId
+      ? Boolean(eventId && accountId)
+      : Boolean(eventId);
+    if (shouldReset) toastShownRef.current = false;
+  }, [eventId, accountId, requireAccountId]);
 
   // Busca sempre da API e monta dados normalizados
   const normalizedMembers = useMemo(() => {
@@ -175,7 +180,7 @@ export function ComboboxMemberSingle({
         toast.warning("Selecione um evento primeiro", {
           description: "Escolha o evento antes de buscar membros",
         });
-      } else if (!accountId) {
+      } else if (requireAccountId && !accountId) {
         toast.warning("Selecione uma conta primeiro", {
           description: "Escolha a conta antes de buscar membros",
         });
@@ -217,9 +222,11 @@ export function ComboboxMemberSingle({
       className={className}
       style={{ width: "100%" }}
       notFoundContent={
-        error ? (
-          <div className="text-center py-4">
-            <p className="text-red-500">Falha ao carregar membros.</p>
+        !canFetchMembers ? (
+          <div className="text-center py-4 text-gray-500">
+            {!eventId
+              ? "Selecione um evento para buscar membros"
+              : "Selecione uma conta para buscar membros"}
           </div>
         ) : loading ? (
           <Spin size="small" />

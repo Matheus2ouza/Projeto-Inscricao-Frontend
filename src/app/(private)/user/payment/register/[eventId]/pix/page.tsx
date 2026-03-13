@@ -65,13 +65,13 @@ export default function RegisterPaymentPixPage() {
           </div>
         </div>
       ) : (
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-6xl">
           <RegisterPaymentPix
             selectedInscriptions={inscriptionsIds.map((id) => ({ id }))}
             eventId={eventId}
             totalValue={resolvedTotalValue}
             allowCard={allowCard}
-            allowCustomValue={false}
+            allowCustomValue={true}
             onSubmitPayment={({ value, image }) =>
               registerPayment.mutateAsync({
                 eventId,

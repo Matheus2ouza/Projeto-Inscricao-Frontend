@@ -627,6 +627,7 @@ export default function CreateInscriptionAdmin() {
                       key={refreshKey}
                       eventId={eventId}
                       accountId={accountId}
+                      requireAccountId={true}
                       value=""
                       onChange={handleMemberSelected}
                       placeholder="Buscar membro..."
