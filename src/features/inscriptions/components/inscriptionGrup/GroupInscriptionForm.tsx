@@ -1,6 +1,5 @@
 "use client";
 
-import { ComboboxAccountSingle } from "@/features/accounts/components/ComboboxAccount";
 import { useTypeInscriptionsQuery } from "@/features/inscriptions/hooks/inscriptionIndiv/useTypeInscriptionsQuery";
 import {
   MemberDisplayData,
@@ -24,14 +23,6 @@ import {
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/shared/components/ui/sheet";
-import {
   Table,
   TableBody,
   TableCell,
@@ -40,6 +31,7 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
+import { Drawer } from "antd";
 import { HelpCircle, Phone, Plus, Trash2, User, Users } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -65,30 +57,27 @@ export function GroupInscriptionForm({
     register,
   } = hookData;
 
-  // Estado para a conta selecionada
-  const [accountId, setAccountId] = useState<string>("");
-
   // Busca os tipos de inscrição para obter o nome quando selecionado
   const { data: typeInscriptions } = useTypeInscriptionsQuery(eventId);
 
   // IDs dos membros já adicionados à lista (para desabilitar no combobox)
   const addedMemberIds = members.map((m) => m.accountParticipantId);
 
-  // Estado local para o sheet de adição de membro
+  // Estado local para o drawer de adição de membro
   const [tempMemberId, setTempMemberId] = useState("");
   const [tempMemberData, setTempMemberData] = useState<
     MemberSingleOption | undefined
   >(undefined);
   const [tempTypeId, setTempTypeId] = useState("");
   const [tempTypeName, setTempTypeName] = useState("");
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const handleOpenSheet = () => {
+  const handleOpenDrawer = () => {
     setTempMemberId("");
     setTempMemberData(undefined);
     setTempTypeId("");
     setTempTypeName("");
-    setIsSheetOpen(true);
+    setIsDrawerOpen(true);
   };
 
   // Calcular valor total das inscrições
@@ -114,8 +103,8 @@ export function GroupInscriptionForm({
       };
 
       addMember(newMember);
-      // Fechar o sheet após adicionar
-      setIsSheetOpen(false);
+      // Fechar o drawer após adicionar
+      setIsDrawerOpen(false);
       // Limpar os campos temporários
       setTempMemberId("");
       setTempMemberData(undefined);
@@ -290,39 +279,6 @@ export function GroupInscriptionForm({
           </CardContent>
         </Card>
 
-        {/* Card da Conta */}
-        <Card className="w-full">
-          <CardHeader className="pb-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <CardTitle className="text-xl sm:text-2xl flex items-center gap-2">
-                  <User className="h-5 w-5 sm:h-6 sm:w-6" />
-                  Conta
-                </CardTitle>
-                <CardDescription className="text-sm sm:text-base mt-1">
-                  Selecione a conta para buscar os membros
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4">
-              <div className="space-y-3">
-                <Label htmlFor="account" className="text-base font-medium">
-                  Conta *
-                </Label>
-                <ComboboxAccountSingle
-                  id="account"
-                  value={accountId}
-                  onChange={setAccountId}
-                  placeholder="Selecione uma conta..."
-                  showRole={true}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Card dos Membros */}
         <Card className="w-full">
           <CardHeader className="pb-4">
@@ -374,8 +330,7 @@ export function GroupInscriptionForm({
               <Button
                 type="button"
                 className="flex items-center gap-2 w-full sm:w-auto h-10 sm:h-auto"
-                onClick={handleOpenSheet}
-                disabled={!accountId}
+                onClick={handleOpenDrawer}
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="text-sm sm:text-base">Adicionar Membro</span>
@@ -383,140 +338,132 @@ export function GroupInscriptionForm({
             </div>
           </CardHeader>
           <CardContent>
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetContent
-                className="sm:max-w-[500px] w-full overflow-y-auto"
-                onOpenAutoFocus={(e) => e.preventDefault()}
-              >
-                <div className="flex flex-col h-full">
-                  <SheetHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
-                    <SheetTitle className="text-lg sm:text-xl">
-                      Adicionar Membro
-                    </SheetTitle>
-                    <SheetDescription className="text-xs sm:text-sm">
-                      Busque um membro e selecione o tipo de inscrição.
-                    </SheetDescription>
-                  </SheetHeader>
+            <Drawer
+              title="Adicionar Membro"
+              placement="right"
+              size={500}
+              onClose={() => setIsDrawerOpen(false)}
+              open={isDrawerOpen}
+              styles={{
+                body: {
+                  padding: "16px 24px",
+                  overflowY: "auto",
+                },
+                header: {
+                  padding: "16px 24px",
+                  borderBottom: "1px solid #e5e7eb",
+                },
+                footer: {
+                  padding: "12px 24px",
+                  borderTop: "1px solid #e5e7eb",
+                },
+              }}
+              footer={
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="w-full sm:w-1/2 h-10 sm:h-auto"
+                    type="button"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleAddMember}
+                    disabled={!tempMemberId || !tempTypeId}
+                    className="w-full sm:w-1/2 h-10 sm:h-auto"
+                    type="button"
+                  >
+                    Adicionar
+                  </Button>
+                </div>
+              }
+            >
+              <div className="space-y-4 sm:space-y-6 py-2">
+                <div className="space-y-3">
+                  <Label htmlFor="memberSelect" className="text-sm font-medium">
+                    Buscar Membro
+                  </Label>
+                  <ComboboxMemberSingle
+                    eventId={eventId}
+                    id="memberSelect"
+                    value={tempMemberId}
+                    onChange={(id, member) => {
+                      setTempMemberId(id);
+                      if (member && id) {
+                        setTempMemberData({
+                          label: member.name,
+                          value: id,
+                          registered: member.registered || false,
+                          member,
+                        });
+                      } else {
+                        setTempMemberData(undefined);
+                      }
+                    }}
+                    disabledValues={addedMemberIds}
+                  />
+                </div>
 
-                  <div className="flex-1 overflow-y-auto px-4 sm:px-6">
-                    <div className="space-y-4 sm:space-y-6 py-2">
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="memberSelect"
-                          className="text-sm font-medium"
-                        >
-                          Buscar Membro
+                {tempMemberData && (
+                  <div className="space-y-3 p-3 sm:p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">
+                          Nome
                         </Label>
-                        <ComboboxMemberSingle
-                          eventId={eventId}
-                          accountId={accountId}
-                          id="memberSelect"
-                          value={tempMemberId}
-                          onChange={(id, member) => {
-                            setTempMemberId(id);
-                            if (member && id) {
-                              setTempMemberData({
-                                label: member.name,
-                                value: id,
-                                registered: member.registered || false,
-                                member,
-                              });
-                            } else {
-                              setTempMemberData(undefined);
-                            }
-                          }}
-                          disabledValues={addedMemberIds}
-                        />
+                        <p className="text-sm font-medium break-words">
+                          {tempMemberData.label}
+                        </p>
                       </div>
-
-                      {tempMemberData && (
-                        <div className="space-y-3 p-3 sm:p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                            <div className="space-y-1">
-                              <Label className="text-xs text-muted-foreground">
-                                Nome
-                              </Label>
-                              <p className="text-sm font-medium break-words">
-                                {tempMemberData.label}
-                              </p>
-                            </div>
-                            <div className="space-y-1">
-                              <Label className="text-xs text-muted-foreground">
-                                Nascimento
-                              </Label>
-                              <p className="text-sm font-medium">
-                                {formatBirthDate(
-                                  tempMemberData.member?.birthDate,
-                                )}
-                              </p>
-                            </div>
-                            <div className="space-y-1 sm:col-span-2">
-                              <Label className="text-xs text-muted-foreground">
-                                Gênero
-                              </Label>
-                              <p className="text-sm font-medium capitalize">
-                                {tempMemberData.member?.gender || "-"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="space-y-3">
-                        <Label
-                          htmlFor="typeSelect"
-                          className="text-sm font-medium"
-                        >
-                          Tipo de Inscrição
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">
+                          Nascimento
                         </Label>
-                        <ComboboxTypeInscription
-                          eventId={eventId}
-                          value={tempTypeId}
-                          onChange={(selectedValue) => {
-                            setTempTypeId(selectedValue);
-                            // Encontrar o nome do tipo selecionado para exibição na tabela
-                            if (Array.isArray(typeInscriptions)) {
-                              const selectedType = typeInscriptions.find(
-                                (t: TypeInscription) => t.id === selectedValue,
-                              );
-                              if (selectedType) {
-                                setTempTypeName(
-                                  `${selectedType.description} - R$ ${selectedType.value.toFixed(
-                                    2,
-                                  )}`,
-                                );
-                              }
-                            }
-                          }}
-                          disabled={!tempMemberId}
-                        />
+                        <p className="text-sm font-medium">
+                          {formatBirthDate(tempMemberData.member?.birthDate)}
+                        </p>
+                      </div>
+                      <div className="space-y-1 sm:col-span-2">
+                        <Label className="text-xs text-muted-foreground">
+                          Gênero
+                        </Label>
+                        <p className="text-sm font-medium capitalize">
+                          {tempMemberData.member?.gender || "-"}
+                        </p>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  <SheetFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t mt-4 sm:mt-6">
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsSheetOpen(false)}
-                        className="w-full sm:w-1/2 h-10 sm:h-auto"
-                        type="button"
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        onClick={handleAddMember}
-                        disabled={!tempMemberId || !tempTypeId}
-                        className="w-full sm:w-1/2 h-10 sm:h-auto"
-                        type="button"
-                      >
-                        Adicionar
-                      </Button>
-                    </div>
-                  </SheetFooter>
+                <div className="space-y-3">
+                  <Label htmlFor="typeSelect" className="text-sm font-medium">
+                    Tipo de Inscrição
+                  </Label>
+                  <ComboboxTypeInscription
+                    eventId={eventId}
+                    value={tempTypeId}
+                    onChange={(selectedValue) => {
+                      setTempTypeId(selectedValue);
+                      // Encontrar o nome do tipo selecionado para exibição na tabela
+                      if (Array.isArray(typeInscriptions)) {
+                        const selectedType = typeInscriptions.find(
+                          (t: TypeInscription) => t.id === selectedValue,
+                        );
+                        if (selectedType) {
+                          setTempTypeName(
+                            `${selectedType.description} - R$ ${selectedType.value.toFixed(
+                              2,
+                            )}`,
+                          );
+                        }
+                      }
+                    }}
+                    disabled={!tempMemberId}
+                  />
                 </div>
-              </SheetContent>
-            </Sheet>
+              </div>
+            </Drawer>
 
             {members.length === 0 ? (
               <div className="text-center py-8 sm:py-10 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-900/50">
@@ -530,11 +477,10 @@ export function GroupInscriptionForm({
                 </p>
                 <Button
                   variant="outline"
-                  onClick={handleOpenSheet}
+                  onClick={handleOpenDrawer}
                   type="button"
                   size="sm"
                   className="h-9 sm:h-10"
-                  disabled={!accountId}
                 >
                   Adicionar Membro
                 </Button>
@@ -660,8 +606,7 @@ export function GroupInscriptionForm({
                     isSubmitting ||
                     members.length === 0 ||
                     !!formErrors.responsible ||
-                    !!formErrors.phone ||
-                    !accountId
+                    !!formErrors.phone
                   }
                 >
                   {isSubmitting ? (
