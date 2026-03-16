@@ -103,7 +103,7 @@ export default function InscriptionModesDialog({
         },
       }}
     >
-      <Space direction="vertical" style={{ width: "100%" }}>
+      <Space orientation="vertical" style={{ width: "100%" }}>
         {inscriptionModeOptions.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">

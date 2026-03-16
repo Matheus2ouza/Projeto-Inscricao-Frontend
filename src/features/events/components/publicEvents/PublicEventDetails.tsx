@@ -446,11 +446,7 @@ export default function PublicEventDetails({
                     size="lg"
                     className="w-full h-12 text-base font-semibold"
                   >
-                    {event.allowedInscriptionModes.includes(
-                      InscriptionMode.GUEST,
-                    )
-                      ? "Fazer Login"
-                      : "Inscrever-se com Login"}
+                    Fazer Login
                   </Button>
 
                   {!event.allowedInscriptionModes.includes(
