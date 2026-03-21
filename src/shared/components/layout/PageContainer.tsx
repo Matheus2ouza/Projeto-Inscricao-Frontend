@@ -20,6 +20,10 @@ interface PageContainerProps {
   showTitle?: boolean;
   backButtonAction?: () => void;
   titleSize?: string;
+  titleClassName?: string; // Nova prop para cor/título personalizado
+  descriptionClassName?: string; // Nova prop para cor/descrição personalizada
+  titleColor?: string;
+  descriptionColor?: string;
   className?: string;
   containerClassName?: string;
   maxWidth?: ContainerWidth;
@@ -34,6 +38,8 @@ interface PageContainerProps {
  *   title="Minhas Inscrições"
  *   description="Visualize todas as suas inscrições nos eventos"
  *   showTitle={true}
+ *   titleClassName="text-primary"
+ *   descriptionClassName="text-muted-foreground"
  * >
  *   <MyContent />
  * </PageContainer>
@@ -50,6 +56,10 @@ export default function PageContainer({
   maxWidth = "2xl",
   actions,
   titleSize,
+  titleClassName,
+  descriptionClassName,
+  titleColor,
+  descriptionColor,
 }: PageContainerProps) {
   const router = useRouter();
 
@@ -82,11 +92,26 @@ export default function PageContainer({
               )}
               {title && showTitle && (
                 <div>
-                  <h1 className={cn(PAGE_CONTAINER_CLASSES.title, titleSize)}>
+                  <h1
+                    className={cn(
+                      PAGE_CONTAINER_CLASSES.title,
+                      titleSize,
+                      titleClassName,
+                    )}
+                    style={titleColor ? { color: titleColor } : undefined}
+                  >
                     {title}
                   </h1>
                   {description && (
-                    <p className={PAGE_CONTAINER_CLASSES.description}>
+                    <p
+                      className={cn(
+                        PAGE_CONTAINER_CLASSES.description,
+                        descriptionClassName,
+                      )}
+                      style={
+                        descriptionColor ? { color: descriptionColor } : undefined
+                      }
+                    >
                       {description}
                     </p>
                   )}

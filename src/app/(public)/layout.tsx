@@ -1,4 +1,6 @@
 import PublicNavbar from "@/shared/components/layout/public-navbar";
+import { ConfigProvider } from "antd";
+import ptBR from "antd/locale/pt_BR";
 
 export default function PublicLayout({
   children,
@@ -6,9 +8,11 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen">
-      <PublicNavbar />
-      <main className="flex-1">{children}</main>
-    </div>
+    <ConfigProvider locale={ptBR}>
+      <div className="min-h-screen">
+        <PublicNavbar />
+        <main className="flex-1">{children}</main>
+      </div>
+    </ConfigProvider>
   );
 }

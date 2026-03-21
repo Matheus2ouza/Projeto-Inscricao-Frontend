@@ -11,7 +11,7 @@ import { Card, CardBody, CardFooter } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-export default function SelectEventForListPaymentSuperPage() {
+export default function SelectEventForListPaymentAdminPage() {
   const router = useRouter();
   const defaultStatusFilter: boolean[] = [true];
   const [pendingFilter, setPendingFilter] =

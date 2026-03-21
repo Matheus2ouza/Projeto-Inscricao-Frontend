@@ -406,65 +406,63 @@ export default function PaymentDetailsContent({
         </div>
       )}
 
-      {payment.imageUrl && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileImage className="h-5 w-5" />
-              Comprovante de Pagamento
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button variant="outline" asChild className="w-full sm:w-auto">
-                  <a
-                    href={payment.imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <Link className="h-4 w-4" />
-                    Abrir em nova aba
-                  </a>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileImage className="h-5 w-5" />
+            Comprovante de Pagamento
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" asChild className="w-full sm:w-auto">
+                <a
+                  href={payment.imageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+                  <Link className="h-4 w-4" />
+                  Abrir em nova aba
+                </a>
+              </Button>
+              {onModifyReceiptPayment && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => setModifyDialogOpen(true)}
+                  disabled={!!isModifingReceiptPayment}
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  Modificar comprovante
                 </Button>
-                {onModifyReceiptPayment && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                    onClick={() => setModifyDialogOpen(true)}
-                    disabled={!!isModifingReceiptPayment}
-                  >
-                    <ImagePlus className="h-4 w-4" />
-                    Modificar comprovante
-                  </Button>
+              )}
+            </div>
+            <div className="max-w-lg">
+              <div className="relative h-64 sm:h-80 w-full bg-muted rounded-lg overflow-hidden border">
+                {!imageError ? (
+                  <Image
+                    src={payment.imageUrl}
+                    alt="Comprovante de pagamento"
+                    fill
+                    className="object-contain"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center">
+                    <ImageIcon className="h-12 w-12 text-muted-foreground mb-2" />
+                    <span className="text-muted-foreground text-center">
+                      Erro ao carregar imagem ou não há comprovante
+                    </span>
+                  </div>
                 )}
               </div>
-              <div className="max-w-lg">
-                <div className="relative h-64 sm:h-80 w-full bg-muted rounded-lg overflow-hidden border">
-                  {!imageError ? (
-                    <Image
-                      src={payment.imageUrl}
-                      alt="Comprovante de pagamento"
-                      fill
-                      className="object-contain"
-                      onError={() => setImageError(true)}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ImageIcon className="h-12 w-12 text-muted-foreground" />
-                      <span className="ml-2 text-muted-foreground">
-                        Erro ao carregar imagem
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
 
       <ImageUpdateDialog
         open={modifyDialogOpen}

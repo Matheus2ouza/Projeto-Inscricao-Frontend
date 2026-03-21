@@ -56,7 +56,7 @@ const PublicNavbar = () => {
 
   return (
     <>
-      <nav className="flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full overflow-hidden relative">
+      <nav className="flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full overflow-hidden relative z-2">
         {/* Left Section: Menu + Logo + Título */}
         <div className="flex items-center space-x-3">
           {/* Mobile Menu Toggle - apenas na home */}
@@ -156,7 +156,7 @@ const PublicNavbar = () => {
                 >
                   {item}
                 </button>
-              )
+              ),
             )}
           </div>
         </div>

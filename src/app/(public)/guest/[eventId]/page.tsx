@@ -1,7 +1,9 @@
 "use client";
 
+import BackgroundPaths from "@/features/guest/components/guestInscription/background-paths";
 import { RegisterGuest } from "@/features/guest/components/guestInscription/RegisterGuest";
 import { useDetailsEvent } from "@/features/guest/hook/guestInscription/useDetailsEvent";
+import { useImagePalette } from "@/features/guest/hook/guestInscription/useImagePalette";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
@@ -14,11 +16,28 @@ export default function RegisterGuestInscription() {
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
+  const { event, loading, error, refetch } = useDetailsEvent({
+    eventId: eventId ?? "",
+  });
+
+  const { palette, isDark, swatches, ready } = useImagePalette(event?.imageUrl);
+
+  const preferredSwatch =
+    (isDark ? swatches.DarkVibrant : swatches.LightVibrant) ??
+    swatches.Vibrant ??
+    swatches.Muted ??
+    swatches.DarkMuted ??
+    swatches.LightMuted;
+
+  const titleColor =
+    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
+  const bodyColor =
+    preferredSwatch?.bodyTextColor ??
+    (isDark ? "rgba(255,255,255,0.7)" : "#374151");
+
   if (!eventId) {
     return null;
   }
-
-  const { event, loading, error, refetch } = useDetailsEvent({ eventId });
 
   const handleViewInscription = () => {
     router.push(`/guest/${eventId}/inscription?scroll=payment`);
@@ -72,7 +91,7 @@ export default function RegisterGuestInscription() {
   };
 
   const renderContent = () => {
-    if (loading) {
+    if (loading || !ready) {
       return renderSkeletonGrid();
     }
 
@@ -88,16 +107,34 @@ export default function RegisterGuestInscription() {
     }
 
     return (
-      <RegisterGuest event={event} onViewInscription={handleViewInscription} />
+      <RegisterGuest
+        event={event}
+        palette={palette}
+        isDark={isDark}
+        swatches={swatches}
+        onViewInscription={handleViewInscription}
+      />
     );
   };
 
+  const handleBack = () => {
+    router.replace(`/events/${eventId}`);
+  };
+
   return (
-    <PageContainer
-      title="Registro de Inscrição"
-      description="Registre sua inscrição abaixo"
-    >
-      {renderContent()}
-    </PageContainer>
+    <div className="relative min-h-screen isolate">
+      <BackgroundPaths palette={palette} />
+
+      <PageContainer
+        title="Registro de Inscrição"
+        description="Registre sua inscrição abaixo"
+        className="bg-none bg-transparent"
+        titleColor={titleColor}
+        descriptionColor={bodyColor}
+        backButtonAction={handleBack}
+      >
+        {renderContent()}
+      </PageContainer>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ import { useListEventsForParticipants } from "@/features/participants/hooks/useL
 import type {
   Event,
   StatusEvent,
-} from "@/features/participants/types/listEventsForParticipants";
+} from "@/features/participants/types/listEventsForParticipantsTypes";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { useRouter } from "next/navigation";
@@ -45,12 +45,12 @@ export default function SelectedEventSuperPage() {
 
   const getInfoRows = (event: Event) => [
     {
-      label: "Total de Participantes",
-      value: event.countParticipants,
+      label: "Participantes (conta)",
+      value: event.countParticipants || 0,
     },
     {
-      label: "Pendentes",
-      value: event.countParticipantsInAnalysis,
+      label: "Participantes (direto)",
+      value: event.countParticipantsGuest || 0,
     },
   ];
 
@@ -99,7 +99,8 @@ export default function SelectedEventSuperPage() {
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
-        onViewEvent={handleViewEvent}
+        onSelectEvent={handleViewEvent}
+        showDateLocation={false}
         statusFilter={pendingFilter}
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
@@ -111,7 +112,7 @@ export default function SelectedEventSuperPage() {
   return (
     <PageContainer
       title="Selecionar Evento"
-      description="Escolha um evento para visualizar os participantes"
+      description="Escolha um evento para visualizar os participantes não vinculados"
       showBackButton
       backButtonAction={handleBack}
     >

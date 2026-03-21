@@ -3,7 +3,7 @@ import qs from "qs";
 import {
   getEventsResponse,
   StatusEvent,
-} from "../types/listEventsForParticipants";
+} from "../types/listEventsForParticipantsTypes";
 
 export async function getEvents(params: {
   page: number;

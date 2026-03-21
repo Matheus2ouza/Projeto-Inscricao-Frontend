@@ -215,6 +215,14 @@ export default function AppSidebarAdminManager({
                               <span>Lista de Pagamentos</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/payments/list-receipts"
+                              className="gap-1"
+                            >
+                              <span>Lista de Comprovantes</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </Collapsible>
@@ -274,14 +282,6 @@ export default function AppSidebarAdminManager({
                               className="gap-1"
                             >
                               <span>Lista de Participantes</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
-                              href="/admin/participants/list-guest-participants"
-                              className="gap-1"
-                            >
-                              <span>Participantes Não Vinculados</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>

@@ -1,17 +1,17 @@
 "use client";
 
 import { useFormCreateGuestInscription } from "@/features/guest/hook/guestInscription/useFormCreateGuestInscription";
+import type { ImageSwatches } from "@/features/guest/hook/guestInscription/useImagePalette";
+import {
+  guestInscriptionSchema,
+  GuestInscriptionSchemaType,
+} from "@/features/guest/schema/guestInscription/guestInscriptionSchema";
 import {
   Event,
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
 } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
 import { GuestInscriptionAlready } from "@/shared/components/GuestInscriptionAlready";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/shared/components/ui/alert";
 import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -36,39 +36,47 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import { Input } from "@/shared/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/components/ui/popover";
-import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { formatDate } from "@/shared/utils/formatDate";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getInitial } from "@/shared/utils/getInitials";
 import { getWithExpiry, setWithExpiry } from "@/shared/utils/storageWithExpiry";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DatePicker, Input } from "antd";
+import dayjs from "dayjs";
 import {
   AlertCircle,
   Calendar,
   Check,
   ChevronsUpDown,
-  Clock,
-  Copy,
+  Info,
   User,
-  Users,
 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { InscriptionSuccessModal } from "./InscriptionSuccessModal";
+import { InscriptionTypeSelector } from "./InscriptionTypeCard";
 
 interface RegisterGuestProps {
   event: Event | null;
+  palette: string[];
+  isDark: boolean;
+  swatches?: ImageSwatches;
   onViewInscription: () => void;
 }
 
 export function RegisterGuest({
   event,
+  palette,
+  isDark,
+  swatches,
   onViewInscription,
 }: RegisterGuestProps) {
   if (!event) {
@@ -84,20 +92,20 @@ export function RegisterGuest({
     );
   }
 
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [openGender, setOpenGender] = useState(false);
-  const [openGenderParticipant, setOpenGenderParticipant] = useState(false);
   const [openShirtSize, setOpenShirtSize] = useState(false);
   const [openShirtType, setOpenShirtType] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [successData, setSuccessData] =
     useState<RegisterGuestInscriptionResponse | null>(null);
-  const [isCopied, setIsCopied] = useState(false);
   const [paymentCountdownSeconds, setPaymentCountdownSeconds] = useState<
     number | null
   >(null);
   const [alreadyDialogOpen, setAlreadyDialogOpen] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [typeInscriptionId, setTypeInscriptionId] = useState<string>("");
+  const [infoPopoverOpen, setInfoPopoverOpen] = useState(false);
   const throttleKey = "guest_inscription_already_throttle_5m";
 
   useEffect(() => {
@@ -151,12 +159,6 @@ export function RegisterGuest({
     setAlreadyDialogOpen(true);
   }, [event.id, successModalOpen, throttleKey]);
 
-  const formatCountdown = (totalSeconds: number) => {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  };
-
   const genderOptions = [
     { value: "MASCULINO", label: "Masculino" },
     { value: "FEMININO", label: "Feminino" },
@@ -174,24 +176,123 @@ export function RegisterGuest({
     { value: "BABYLOOK", label: "Babylook" },
   ];
 
-  const {
-    control,
-    handleSubmit,
-    isSubmitting,
-    typeInscriptions,
-    formData,
-    handleInputChange,
-    form,
-  } = useFormCreateGuestInscription({
-    eventId: event.id,
-    onSuccess: (response) => {
-      setSuccessData(response);
-      setSuccessModalOpen(true);
+  type GuestFormValues = GuestInscriptionSchemaType & {
+    typeInscriptionId: string;
+  };
+
+  const formSchema = useMemo(
+    () =>
+      guestInscriptionSchema.extend({
+        typeInscriptionId: z
+          .string()
+          .trim()
+          .min(1, "Selecione o tipo de inscrição"),
+      }),
+    [],
+  );
+
+  const { initialValues, submit } = useFormCreateGuestInscription(
+    event.id,
+    typeInscriptionId,
+  );
+
+  const form = useForm<GuestFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      ...initialValues,
+      birthDate: "",
+      typeInscriptionId: "",
     },
+    mode: "onSubmit",
+  });
+
+  const formData = form.watch();
+  const isSubmitting = form.formState.isSubmitting;
+  const control = form.control;
+
+  useEffect(() => {
+    const current = formData.typeInscriptionId?.trim() ?? "";
+    if (current === typeInscriptionId) return;
+    setTypeInscriptionId(current);
+  }, [formData.typeInscriptionId, typeInscriptionId]);
+
+  const typeInscriptions = useMemo(() => {
+    const birthDate = formData.birthDate?.trim();
+    if (!birthDate || birthDate.length !== 10) return event.typeInscriptions;
+
+    const birth = new Date(birthDate);
+    if (Number.isNaN(birth.getTime())) return event.typeInscriptions;
+
+    return event.typeInscriptions.filter((t) => {
+      if (!t.rule) return true;
+      const ruleDate = new Date(t.rule as unknown as string);
+      if (Number.isNaN(ruleDate.getTime())) return true;
+      return birth.getTime() >= ruleDate.getTime();
+    });
+  }, [event.typeInscriptions, formData.birthDate]);
+
+  useEffect(() => {
+    const current = form.getValues("typeInscriptionId")?.trim();
+    if (!current) return;
+
+    const stillValid = typeInscriptions.some(
+      (t) => (t.id || t.description) === current,
+    );
+    if (stillValid) return;
+
+    form.setValue("typeInscriptionId", "");
+    setTypeInscriptionId("");
+  }, [form, typeInscriptions]);
+
+  const formatCpf = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    const part1 = digits.slice(0, 3);
+    const part2 = digits.slice(3, 6);
+    const part3 = digits.slice(6, 9);
+    const part4 = digits.slice(9, 11);
+
+    let out = part1;
+    if (part2) out += `.${part2}`;
+    if (part3) out += `.${part3}`;
+    if (part4) out += `-${part4}`;
+    return out;
+  };
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    const ddd = digits.slice(0, 2);
+    const first = digits.slice(2, 7);
+    const last = digits.slice(7, 11);
+
+    if (!ddd) return "";
+    if (digits.length <= 2) return `(${ddd}`;
+    if (digits.length <= 7) return `(${ddd}) ${first}`;
+    return `(${ddd}) ${first}-${last}`;
+  };
+
+  const onSubmit = form.handleSubmit(async (values) => {
+    setSubmitError(null);
+
+    const result = await submit(values);
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+
+    if (result.success) {
+      setWithExpiry("guest_inscription", {
+        eventId: event.id,
+        confirmationCode: result.success.confirmationCode,
+        thereIsPayment: event.paymentEnabled,
+      });
+
+      setSuccessData(result.success);
+      setSuccessModalOpen(true);
+    }
   });
 
   const calculateMaxAge = (ruleDate?: Date) => {
-    if (!ruleDate) return "Qualquer idade";
+    if (!ruleDate) return "";
 
     const today = new Date();
     const rule = new Date(ruleDate);
@@ -204,6 +305,50 @@ export function RegisterGuest({
 
     return hasHadBirthday ? age : age - 1;
   };
+
+  const preferredSwatch = useMemo(() => {
+    if (!swatches) return null;
+
+    return (
+      (isDark ? swatches.DarkVibrant : swatches.LightVibrant) ??
+      swatches.Vibrant ??
+      swatches.Muted ??
+      swatches.DarkMuted ??
+      swatches.LightMuted
+    );
+  }, [isDark, swatches]);
+
+  const recommendedTitleColor =
+    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
+  const recommendedBodyColor =
+    preferredSwatch?.bodyTextColor ??
+    (isDark ? "rgba(255,255,255,0.78)" : "#374151");
+
+  if (!event) {
+    return (
+      <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
+        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
+          Evento não encontrado
+        </h2>
+        <p className="text-muted-foreground">
+          O evento solicitado não está disponível.
+        </p>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
+        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
+          Evento não encontrado
+        </h2>
+        <p className="text-muted-foreground">
+          O evento solicitado não está disponível.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -222,9 +367,11 @@ export function RegisterGuest({
         }}
       />
       {/* Event Details Card */}
-      <Card className="border-0 shadow-sm overflow-hidden">
+      <Card
+        className={`border-0 shadow-sm overflow-hidden backdrop-blur-md border ${isDark ? "bg-white/20 border-white/30" : "bg-black/5 border-black/10"}`}
+      >
         <CardContent className="p-0">
-          <div className="flex flex-col lg:flex-row">
+          <div className="flex flex-col lg:flex-row p-2">
             {/* Imagem do Evento */}
             <div className="w-full lg:w-1/3">
               <AspectRatio
@@ -243,10 +390,16 @@ export function RegisterGuest({
                 ) : (
                   <div className="h-full w-full bg-muted flex items-center justify-center">
                     <div className="text-center">
-                      <div className="text-5xl font-semibold text-muted-foreground mb-2">
+                      <div
+                        className="text-5xl font-semibold text-muted-foreground mb-2"
+                        style={{ color: recommendedBodyColor }}
+                      >
                         {getInitial(event.name)}
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p
+                        className="text-sm text-muted-foreground"
+                        style={{ color: recommendedBodyColor }}
+                      >
                         Sem imagem
                       </p>
                     </div>
@@ -254,7 +407,10 @@ export function RegisterGuest({
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:hidden" />
                 <div className="absolute bottom-0 left-0 p-6 lg:hidden">
-                  <h1 className="text-2xl font-bold text-white uppercase shadow-sm">
+                  <h1
+                    className="text-xl font-bold text-white uppercase shadow-sm"
+                    style={{ color: recommendedTitleColor }}
+                  >
                     {event.name}
                   </h1>
                 </div>
@@ -264,34 +420,52 @@ export function RegisterGuest({
             {/* Informações do Evento (Desktop) */}
             <div className="flex-1 p-6 lg:p-8 space-y-6">
               <div className="hidden lg:block">
-                <h1 className="text-3xl font-bold tracking-tight uppercase text-foreground">
+                <h1
+                  className="text-4xl font-bold tracking-tight uppercase text-foreground [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
+                  style={{ color: recommendedTitleColor }}
+                >
                   {event.name}
                 </h1>
               </div>
 
-              <div className="flex flex-wrap items-center gap-6 text-muted-foreground">
+              <div
+                className="flex flex-wrap items-center gap-6 text-muted-foreground"
+                style={{ color: recommendedBodyColor }}
+              >
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-primary/10 rounded-full text-primary">
+                  <div
+                    className="p-2 bg-primary/10 rounded-full"
+                    style={{ color: palette[0] }}
+                  >
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-medium uppercase tracking-wider">
                       Início
                     </span>
-                    <span className="text-sm font-semibold text-foreground">
+                    <span
+                      className="text-sm font-semibold text-foreground"
+                      style={{ color: recommendedTitleColor }}
+                    >
                       {formatDate(event.startDate)}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-primary/10 rounded-full text-primary">
+                  <div
+                    className="p-2 bg-primary/10 rounded-full"
+                    style={{ color: palette[0] }}
+                  >
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-medium uppercase tracking-wider">
                       Fim
                     </span>
-                    <span className="text-sm font-semibold text-foreground">
+                    <span
+                      className="text-sm font-semibold text-foreground"
+                      style={{ color: recommendedTitleColor }}
+                    >
                       {formatDate(event.endDate)}
                     </span>
                   </div>
@@ -300,11 +474,11 @@ export function RegisterGuest({
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-4">
-                  <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <div
+                    className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                    style={{ color: recommendedBodyColor }}
+                  >
                     Tipos de inscrição
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {event.typeInscriptions.length}
                   </div>
                 </div>
 
@@ -318,14 +492,17 @@ export function RegisterGuest({
                           className={cn(
                             "rounded-lg border p-4 transition-all hover:shadow-sm",
                             type.specialType
-                              ? "border-amber-200/70 bg-amber-50/60 dark:border-amber-900/60 dark:bg-amber-950/30"
-                              : "border-gray-200/70 bg-gray-50/60 dark:border-gray-700/60 dark:bg-gray-900/30",
+                              ? "border-amber-200/30 bg-amber-50/10"
+                              : "border-white/20 bg-white/5",
                           )}
                         >
                           <div className="flex items-start justify-between gap-2 mb-3">
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <div className="text-sm font-medium truncate">
+                                <div
+                                  className="text-sm font-medium truncate"
+                                  style={{ color: recommendedTitleColor }}
+                                >
                                   {type.description}
                                 </div>
                                 {type.specialType && (
@@ -341,21 +518,74 @@ export function RegisterGuest({
                                     Especial
                                   </Badge>
                                 )}
+                                {type.specialType && (
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-5 w-5 p-0 text-muted-foreground hover:text-amber-600"
+                                        style={{ color: recommendedBodyColor }}
+                                      >
+                                        <Info className="h-3.5 w-3.5" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80 p-4">
+                                      <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                          <AlertCircle className="h-4 w-4 text-amber-500" />
+                                          <h4 className="font-semibold text-sm">
+                                            Inscrição Especial
+                                          </h4>
+                                        </div>
+                                        <p
+                                          className="text-sm text-muted-foreground"
+                                          style={{
+                                            color: recommendedBodyColor,
+                                          }}
+                                        >
+                                          Esta é uma inscrição marcada como{" "}
+                                          <strong>&quot;Especial&quot;</strong>{" "}
+                                          e necessita de aprovação. Após a
+                                          inscrição, os organizadores analisarão
+                                          sua solicitação.
+                                        </p>
+                                        <p
+                                          className="text-xs text-muted-foreground mt-2"
+                                          style={{
+                                            color: recommendedBodyColor,
+                                          }}
+                                        >
+                                          Você receberá uma notificação quando
+                                          sua inscrição for aprovada.
+                                        </p>
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                )}
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                {type.rule
-                                  ? `Até ${calculateMaxAge(type.rule)} anos`
-                                  : "Qualquer idade"}
+                              <div
+                                className="text-xs text-muted-foreground"
+                                style={{ color: recommendedBodyColor }}
+                              >
+                                {type.rule &&
+                                  `Até ${calculateMaxAge(type.rule)} anos`}
                               </div>
                             </div>
                           </div>
                           <div className="flex items-center justify-between pt-3 border-t">
-                            <div className="text-xs text-muted-foreground whitespace-nowrap">
+                            <div
+                              className="text-xs text-muted-foreground whitespace-nowrap"
+                              style={{ color: recommendedBodyColor }}
+                            >
                               {type.specialType
                                 ? "Necessita aprovação"
                                 : "Inscrição direta"}
                             </div>
-                            <div className="text-sm font-semibold whitespace-nowrap">
+                            <div
+                              className="text-sm font-semibold whitespace-nowrap"
+                              style={{ color: recommendedTitleColor }}
+                            >
                               {getFormatCurrency(type.value)}
                             </div>
                           </div>
@@ -363,7 +593,7 @@ export function RegisterGuest({
                       ))}
                     </div>
 
-                    {/* Layout para mobile - Lista vertical (mantido como estava) */}
+                    {/* Layout para mobile - Lista vertical */}
                     <div className="lg:hidden rounded-lg border bg-muted/20 overflow-hidden">
                       {event.typeInscriptions.map((type) => (
                         <div
@@ -377,7 +607,10 @@ export function RegisterGuest({
                         >
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <div className="text-sm font-medium truncate">
+                              <div
+                                className="text-sm font-medium truncate"
+                                style={{ color: recommendedTitleColor }}
+                              >
                                 {type.description}
                               </div>
                               {type.specialType && (
@@ -393,42 +626,71 @@ export function RegisterGuest({
                                   Especial
                                 </Badge>
                               )}
+                              {type.specialType && (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      className="h-5 w-5"
+                                      variant="ghost"
+                                      style={{ color: recommendedBodyColor }}
+                                    >
+                                      <Info className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80 p-4">
+                                    <div className="space-y-2">
+                                      <div className="flex items-center gap-2">
+                                        <AlertCircle className="h-4 w-4" />
+                                        <h4 className="font-semibold text-sm">
+                                          Inscrição Especial
+                                        </h4>
+                                      </div>
+                                      <p
+                                        className="text-sm"
+                                        style={{ color: recommendedBodyColor }}
+                                      >
+                                        Esta é uma inscrição marcada como{" "}
+                                        <strong>&quot;Especial&quot;</strong> e
+                                        necessita de aprovação. Após a
+                                        inscrição, os organizadores analisarão
+                                        sua solicitação.
+                                      </p>
+                                      <p
+                                        className="text-xs mt-2"
+                                        style={{ color: recommendedBodyColor }}
+                                      >
+                                        Você receberá uma notificação quando sua
+                                        inscrição for aprovada.
+                                      </p>
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              )}
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              {type.rule
-                                ? `Até ${calculateMaxAge(type.rule)} anos`
-                                : "Qualquer idade"}
+                            <div
+                              className="text-xs text-muted-foreground"
+                              style={{ color: recommendedBodyColor }}
+                            >
+                              {type.rule &&
+                                `Até ${calculateMaxAge(type.rule)} anos`}
                             </div>
                           </div>
 
-                          <div className="text-sm font-semibold whitespace-nowrap flex-shrink-0 ml-4">
+                          <div
+                            className="text-sm font-semibold whitespace-nowrap flex-shrink-0 ml-4"
+                            style={{ color: recommendedTitleColor }}
+                          >
                             {getFormatCurrency(type.value)}
                           </div>
                         </div>
                       ))}
                     </div>
-
-                    {event.typeInscriptions.some((t) => t.specialType) && (
-                      <Alert className="border-amber-200/70 bg-amber-50/60 text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-50 mt-4">
-                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <AlertTitle className="text-sm font-medium">
-                            Tipos especiais
-                          </AlertTitle>
-                          <AlertDescription className="text-sm">
-                            <span className="block break-words">
-                              As inscrições marcadas como{" "}
-                              <strong>"Especial"</strong>
-                              necessitam de aprovação. Após a inscrição, os
-                              organizadores analisarão sua solicitação.
-                            </span>
-                          </AlertDescription>
-                        </div>
-                      </Alert>
-                    )}
                   </>
                 ) : (
-                  <div className="text-sm text-muted-foreground">
+                  <div
+                    className="text-sm text-muted-foreground"
+                    style={{ color: recommendedBodyColor }}
+                  >
                     Nenhum tipo de inscrição disponível.
                   </div>
                 )}
@@ -440,15 +702,30 @@ export function RegisterGuest({
 
       {/* Inscription Form */}
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <Card>
+        <form onSubmit={onSubmit} className="space-y-8">
+          <Card
+            className={`backdrop-blur-md border ${isDark ? "bg-white/20 border-white/20" : "bg-black/5 border-black/10"}`}
+          >
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <User className="w-5 h-5 text-primary" />
+              <CardTitle
+                className="flex items-center gap-2 text-xl [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
+                style={{ color: recommendedTitleColor }}
+              >
+                <User
+                  className="w-5 h-5 [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
+                  style={{ color: recommendedTitleColor }}
+                />
                 Dados para Inscrição
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent
+              className={`space-y-6 ${isDark ? "dark-inputs" : "light-inputs"}
+                ${
+                  isDark
+                    ? "[&_input]:bg-white/20 [&_input]:text-white [&_input]:border-white/20 [&_label]:text-white/80"
+                    : "[&_input]:bg-white [&_input]:text-gray-900 [&_input]:border-gray-200 [&_label]:text-gray-700"
+                }`}
+            >
               <FormField
                 control={control}
                 name="name"
@@ -462,26 +739,22 @@ export function RegisterGuest({
                   </FormItem>
                 )}
               />
-
-              {!formData.isResponsibleParticipant && (
-                <FormField
-                  control={control}
-                  name="preferredName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Como quer ser chamado</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Como você quer ser chamado"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
+              <FormField
+                control={control}
+                name="preferredName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Como quer ser chamado</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Como você quer ser chamado"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={control}
                 name="email"
@@ -495,7 +768,6 @@ export function RegisterGuest({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={control}
                 name="phone"
@@ -504,9 +776,11 @@ export function RegisterGuest({
                     <FormLabel>Telefone</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="(99) 99999-9999"
+                        placeholder="(99) 9XXXX-XXXX"
                         {...field}
-                        onChange={handleInputChange}
+                        onChange={(e) =>
+                          field.onChange(formatPhone(e.target.value))
+                        }
                         maxLength={15}
                       />
                     </FormControl>
@@ -514,7 +788,26 @@ export function RegisterGuest({
                   </FormItem>
                 )}
               />
-
+              <FormField
+                control={control}
+                name="cpf"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CPF</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="000.000.000-00"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(formatCpf(e.target.value))
+                        }
+                        maxLength={14}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={control}
                 name="locality"
@@ -522,711 +815,284 @@ export function RegisterGuest({
                   <FormItem>
                     <FormLabel>Localidade</FormLabel>
                     <FormControl>
-                      <Input placeholder="Sua cidade/região" {...field} />
+                      <Input placeholder="Sua cidade" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={control}
-                name="isResponsibleParticipant"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mt-4">
-                    <div className="space-y-0.5">
-                      <FormLabel>A inscrição é para outra pessoa?</FormLabel>
-                      <div className="text-xs text-muted-foreground">
-                        Marque se você estiver inscrevendo um terceiro
-                      </div>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              {!formData.isResponsibleParticipant && (
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={control}
-                  name="cpf"
+                  name="birthDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>CPF do Participante</FormLabel>
+                      <FormLabel>Data de Nascimento</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="000.000.000-00"
+                        <DatePicker
                           {...field}
-                          onChange={handleInputChange}
-                          maxLength={14}
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={(date, dateString) => {
+                            // Converte para string no formato YYYY-MM-DD
+                            const formattedDate = date
+                              ? date.format("YYYY-MM-DD")
+                              : "";
+                            field.onChange(formattedDate);
+                          }}
+                          format="DD/MM/YYYY"
+                          placeholder="Selecione a data"
+                          style={{ width: "100%" }}
+                          className="w-full"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
 
-              {/* Se for inscrição para outra pessoa, mostra campos do participante */}
-              {formData.isResponsibleParticipant && (
-                <div className="space-y-4 pt-4 border-t mt-4 animate-in fade-in slide-in-from-top-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <Users className="w-4 h-4 text-primary" />
-                    Dados do Participante
-                  </h3>
-
-                  <FormField
-                    control={control}
-                    name="participantName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nome do Participante</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Nome do participante"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="cpf"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>CPF do Participante</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="000.000.000-00"
-                            {...field}
-                            onChange={handleInputChange}
-                            maxLength={14}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="preferredName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Como quer ser chamado</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Como o participante quer ser chamado"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={control}
-                      name="birthDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nascimento</FormLabel>
+                <FormField
+                  control={control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Gênero</FormLabel>
+                      <Popover open={openGender} onOpenChange={setOpenGender}>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <Input
-                              placeholder="DD/MM/AAAA"
-                              {...field}
-                              onChange={handleInputChange}
-                              maxLength={10}
-                            />
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={openGender}
+                              type="button"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value
+                                ? genderOptions.find(
+                                    (gender) => gender.value === field.value,
+                                  )?.label
+                                : "Selecione"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={control}
-                      name="gender"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Gênero</FormLabel>
-                          <Popover
-                            open={openGenderParticipant}
-                            onOpenChange={setOpenGenderParticipant}
-                          >
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  aria-expanded={openGenderParticipant}
-                                  type="button"
-                                  className={cn(
-                                    "w-full justify-between",
-                                    !field.value && "text-muted-foreground",
-                                  )}
-                                >
-                                  {field.value
-                                    ? genderOptions.find(
-                                        (gender) =>
-                                          gender.value === field.value,
-                                      )?.label
-                                    : "Selecione"}
-                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-[var(--radix-popover-trigger-width)] p-0"
-                              align="start"
-                              onOpenAutoFocus={(e) => e.preventDefault()}
-                            >
-                              <Command>
-                                <CommandList>
-                                  <CommandEmpty>
-                                    Nenhum gênero encontrado.
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                    {genderOptions.map((gender) => (
-                                      <CommandItem
-                                        value={gender.label}
-                                        key={gender.value}
-                                        onSelect={() => {
-                                          field.onChange(gender.value);
-                                          setOpenGenderParticipant(false);
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            gender.value === field.value
-                                              ? "opacity-100"
-                                              : "opacity-0",
-                                          )}
-                                        />
-                                        {gender.label}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={control}
-                      name="shirtSize"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Tamanho da camisa</FormLabel>
-                          <Popover
-                            open={openShirtSize}
-                            onOpenChange={setOpenShirtSize}
-                          >
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  aria-expanded={openShirtSize}
-                                  type="button"
-                                  className={cn(
-                                    "w-full justify-between",
-                                    !field.value && "text-muted-foreground",
-                                  )}
-                                >
-                                  {field.value
-                                    ? shirtSizeOptions.find(
-                                        (s) => s.value === field.value,
-                                      )?.label
-                                    : "Selecione"}
-                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-[var(--radix-popover-trigger-width)] p-0"
-                              align="start"
-                              onOpenAutoFocus={(e) => e.preventDefault()}
-                            >
-                              <Command>
-                                <CommandEmpty>
-                                  Nenhum tamanho encontrado.
-                                </CommandEmpty>
-                                <CommandList>
-                                  <CommandGroup>
-                                    {shirtSizeOptions.map((size) => (
-                                      <CommandItem
-                                        key={size.value}
-                                        value={size.value}
-                                        onSelect={() => {
-                                          field.onChange(size.value);
-                                          setOpenShirtSize(false);
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            size.value === field.value
-                                              ? "opacity-100"
-                                              : "opacity-0",
-                                          )}
-                                        />
-                                        {size.label}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={control}
-                      name="shirtType"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Modelo da camisa</FormLabel>
-                          <Popover
-                            open={openShirtType}
-                            onOpenChange={setOpenShirtType}
-                          >
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  aria-expanded={openShirtType}
-                                  type="button"
-                                  className={cn(
-                                    "w-full justify-between",
-                                    !field.value && "text-muted-foreground",
-                                  )}
-                                >
-                                  {field.value
-                                    ? shirtTypeOptions.find(
-                                        (s) => s.value === field.value,
-                                      )?.label
-                                    : "Selecione"}
-                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-[var(--radix-popover-trigger-width)] p-0"
-                              align="start"
-                              onOpenAutoFocus={(e) => e.preventDefault()}
-                            >
-                              <Command>
-                                <CommandEmpty>
-                                  Nenhum modelo encontrado.
-                                </CommandEmpty>
-                                <CommandList>
-                                  <CommandGroup>
-                                    {shirtTypeOptions.map((type) => (
-                                      <CommandItem
-                                        key={type.value}
-                                        value={type.value}
-                                        onSelect={() => {
-                                          field.onChange(type.value);
-                                          setOpenShirtType(false);
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            type.value === field.value
-                                              ? "opacity-100"
-                                              : "opacity-0",
-                                          )}
-                                        />
-                                        {type.label}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Se for inscrição para si mesmo (não é para outra pessoa), mostra nascimento e genero aqui */}
-              {!formData.isResponsibleParticipant && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={control}
-                      name="birthDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nascimento</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="DD/MM/AAAA"
-                              {...field}
-                              onChange={handleInputChange}
-                              maxLength={10}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={control}
-                      name="gender"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Gênero</FormLabel>
-                          <Popover
-                            open={openGender}
-                            onOpenChange={setOpenGender}
-                          >
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  aria-expanded={openGender}
-                                  type="button"
-                                  className={cn(
-                                    "w-full justify-between",
-                                    !field.value && "text-muted-foreground",
-                                  )}
-                                >
-                                  {field.value
-                                    ? genderOptions.find(
-                                        (gender) =>
-                                          gender.value === field.value,
-                                      )?.label
-                                    : "Selecione"}
-                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-[var(--radix-popover-trigger-width)] p-0"
-                              align="start"
-                              onOpenAutoFocus={(e) => e.preventDefault()}
-                            >
-                              <Command>
-                                <CommandList>
-                                  <CommandEmpty>
-                                    Nenhum gênero encontrado.
-                                  </CommandEmpty>
-                                  <CommandGroup>
-                                    {genderOptions.map((gender) => (
-                                      <CommandItem
-                                        value={gender.label}
-                                        key={gender.value}
-                                        onSelect={() => {
-                                          field.onChange(gender.value);
-                                          setOpenGender(false);
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            gender.value === field.value
-                                              ? "opacity-100"
-                                              : "opacity-0",
-                                          )}
-                                        />
-                                        {gender.label}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {!formData.isResponsibleParticipant && (
-                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-4">
-                  <FormField
-                    control={control}
-                    name="shirtSize"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Tamanho da camisa</FormLabel>
-                        <Popover
-                          open={openShirtSize}
-                          onOpenChange={setOpenShirtSize}
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-[var(--radix-popover-trigger-width)] p-0"
+                          align="start"
+                          onOpenAutoFocus={(e) => e.preventDefault()}
                         >
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={openShirtSize}
-                                type="button"
-                                className={cn(
-                                  "w-full justify-between",
-                                  !field.value && "text-muted-foreground",
-                                )}
-                              >
-                                {field.value
-                                  ? shirtSizeOptions.find(
-                                      (s) => s.value === field.value,
-                                    )?.label
-                                  : "Selecione"}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-[var(--radix-popover-trigger-width)] p-0"
-                            align="start"
-                            onOpenAutoFocus={(e) => e.preventDefault()}
-                          >
-                            <Command>
+                          <Command>
+                            <CommandList>
                               <CommandEmpty>
-                                Nenhum tamanho encontrado.
+                                Nenhum gênero encontrado.
                               </CommandEmpty>
-                              <CommandList>
-                                <CommandGroup>
-                                  {shirtSizeOptions.map((size) => (
-                                    <CommandItem
-                                      key={size.value}
-                                      value={size.value}
-                                      onSelect={() => {
-                                        field.onChange(size.value);
-                                        setOpenShirtSize(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          size.value === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0",
-                                        )}
-                                      />
-                                      {size.label}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={control}
-                    name="shirtType"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Modelo da camisa</FormLabel>
-                        <Popover
-                          open={openShirtType}
-                          onOpenChange={setOpenShirtType}
-                        >
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={openShirtType}
-                                type="button"
-                                className={cn(
-                                  "w-full justify-between",
-                                  !field.value && "text-muted-foreground",
-                                )}
-                              >
-                                {field.value
-                                  ? shirtTypeOptions.find(
-                                      (s) => s.value === field.value,
-                                    )?.label
-                                  : "Selecione"}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-[var(--radix-popover-trigger-width)] p-0"
-                            align="start"
-                            onOpenAutoFocus={(e) => e.preventDefault()}
-                          >
-                            <Command>
-                              <CommandEmpty>
-                                Nenhum modelo encontrado.
-                              </CommandEmpty>
-                              <CommandList>
-                                <CommandGroup>
-                                  {shirtTypeOptions.map((type) => (
-                                    <CommandItem
-                                      key={type.value}
-                                      value={type.value}
-                                      onSelect={() => {
-                                        field.onChange(type.value);
-                                        setOpenShirtType(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          type.value === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0",
-                                        )}
-                                      />
-                                      {type.label}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
-              <div className="space-y-4 border-t pt-6">
-                <div className="text-lg font-semibold">Tipo de Inscrição</div>
-
-                {formData.birthDate && formData.birthDate.length === 10 ? (
-                  <FormField
-                    control={control}
-                    name="typeInscriptionId"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col w-full">
-                        <FormLabel>Selecione o tipo</FormLabel>
-                        <Popover open={open} onOpenChange={setOpen}>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={open}
-                                type="button"
-                                className={cn(
-                                  "w-full justify-between",
-                                  !field.value && "text-muted-foreground",
-                                )}
-                              >
-                                {field.value
-                                  ? (() => {
-                                      const type = typeInscriptions.find(
-                                        (t) =>
-                                          (t.id || t.description) ===
-                                          field.value,
-                                      );
-                                      return type
-                                        ? `${type.description} - ${getFormatCurrency(
-                                            type.value,
-                                          )} (Max: ${calculateMaxAge(
-                                            type.rule,
-                                          )} anos)`
-                                        : "Selecione o tipo de inscrição";
-                                    })()
-                                  : "Selecione o tipo de inscrição"}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-[var(--radix-popover-trigger-width)] p-0"
-                            align="start"
-                            onOpenAutoFocus={(e) => e.preventDefault()}
-                          >
-                            <Command>
-                              <CommandList>
-                                <CommandEmpty>
-                                  Nenhum tipo encontrado.
-                                </CommandEmpty>
-                                <CommandGroup>
-                                  {typeInscriptions.length > 0 ? (
-                                    typeInscriptions.map((type) => (
-                                      <CommandItem
-                                        value={type.description}
-                                        key={type.id || type.description}
-                                        onSelect={() => {
-                                          field.onChange(
-                                            type.id || type.description,
-                                          );
-                                          setOpen(false);
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            (type.id || type.description) ===
-                                              field.value
-                                              ? "opacity-100"
-                                              : "opacity-0",
-                                          )}
-                                        />
-                                        {type.description} -{" "}
-                                        {getFormatCurrency(type.value)} (Max:{" "}
-                                        {calculateMaxAge(type.rule)} anos)
-                                      </CommandItem>
-                                    ))
-                                  ) : (
-                                    <div className="py-6 text-center text-sm text-muted-foreground">
-                                      Nenhum tipo disponível para esta idade
-                                    </div>
-                                  )}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                ) : (
-                  <div className="p-4 text-center border rounded-lg bg-muted/50 text-muted-foreground text-sm">
-                    Preencha a data de nascimento para ver os tipos de inscrição
-                    disponíveis.
-                  </div>
-                )}
+                              <CommandGroup>
+                                {genderOptions.map((gender) => (
+                                  <CommandItem
+                                    value={gender.label}
+                                    key={gender.value}
+                                    onSelect={() => {
+                                      field.onChange(gender.value);
+                                      setOpenGender(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        gender.value === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                    {gender.label}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={control}
+                  name="shirtSize"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Tamanho da camisa</FormLabel>
+                      <Popover
+                        open={openShirtSize}
+                        onOpenChange={setOpenShirtSize}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={openShirtSize}
+                              type="button"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value
+                                ? shirtSizeOptions.find(
+                                    (s) => s.value === field.value,
+                                  )?.label
+                                : "Selecione"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-[var(--radix-popover-trigger-width)] p-0"
+                          align="start"
+                          onOpenAutoFocus={(e) => e.preventDefault()}
+                        >
+                          <Command>
+                            <CommandEmpty>
+                              Nenhum tamanho encontrado.
+                            </CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {shirtSizeOptions.map((size) => (
+                                  <CommandItem
+                                    key={size.value}
+                                    value={size.value}
+                                    onSelect={() => {
+                                      field.onChange(size.value);
+                                      setOpenShirtSize(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        size.value === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                    {size.label}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
+                <FormField
+                  control={control}
+                  name="shirtType"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Modelo da camisa</FormLabel>
+                      <Popover
+                        open={openShirtType}
+                        onOpenChange={setOpenShirtType}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={openShirtType}
+                              type="button"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value
+                                ? shirtTypeOptions.find(
+                                    (s) => s.value === field.value,
+                                  )?.label
+                                : "Selecione"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-[var(--radix-popover-trigger-width)] p-0"
+                          align="start"
+                          onOpenAutoFocus={(e) => e.preventDefault()}
+                        >
+                          <Command>
+                            <CommandEmpty>
+                              Nenhum modelo encontrado.
+                            </CommandEmpty>
+                            <CommandList>
+                              <CommandGroup>
+                                {shirtTypeOptions.map((type) => (
+                                  <CommandItem
+                                    key={type.value}
+                                    value={type.value}
+                                    onSelect={() => {
+                                      field.onChange(type.value);
+                                      setOpenShirtType(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        type.value === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                    {type.label}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="space-y-4 border-t pt-6">
+                <div
+                  className="text-lg font-semibold"
+                  style={{ color: recommendedBodyColor }}
+                >
+                  Tipo de Inscrição
+                </div>
+
+                <InscriptionTypeSelector
+                  types={typeInscriptions}
+                  selectedTypeId={typeInscriptionId}
+                  onSelect={(typeId) => {
+                    setTypeInscriptionId(typeId);
+                    form.setValue("typeInscriptionId", typeId);
+                  }}
+                  hasBirthDate={
+                    !!(formData.birthDate && formData.birthDate.length === 10)
+                  }
+                  calculateMaxAge={calculateMaxAge}
+                />
+              </div>
               <div className="border-t pt-6">
                 <Button
                   type="submit"
                   size="lg"
                   className="w-full"
+                  style={{
+                    backgroundColor: palette[0],
+                  }}
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Enviando..." : "Realizar Inscrição"}
@@ -1238,183 +1104,13 @@ export function RegisterGuest({
       </Form>
 
       {successModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Overlay com blur sutil */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setSuccessModalOpen(false)}
-          />
-
-          {/* Modal */}
-          <div className="relative w-full max-w-md animate-in fade-in-0 zoom-in-95">
-            <div className="relative overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900">
-              {/* Botão de fechar no canto superior direito */}
-              <button
-                onClick={() => setSuccessModalOpen(false)}
-                className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
-                aria-label="Fechar modal"
-              >
-                <svg
-                  className="h-4 w-4 text-gray-500 dark:text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-
-              {/* Header */}
-              <div className="p-8 pt-12 text-center">
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-                  {successData?.status === InscriptionStatus.UNDER_REVIEW
-                    ? "Em Análise"
-                    : "Inscrição Reservada"}
-                </h3>
-
-                <p className="text-gray-500 dark:text-gray-400 ">
-                  {successData?.status === InscriptionStatus.UNDER_REVIEW
-                    ? "Sua inscrição entrou em analise, aguarde o retorno dos organizadores."
-                    : "Sua inscrição foi reservada."}
-                </p>
-              </div>
-
-              {/* Conteúdo */}
-              <div className="px-8 pb-8 space-y-6">
-                {successData?.status === InscriptionStatus.PENDING &&
-                  paymentCountdownSeconds !== null && (
-                    <div className="rounded-xl border border-green-200/70 dark:border-green-800/40 bg-green-50/70 dark:bg-green-900/20 px-4 py-3">
-                      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-green-800 dark:text-green-200">
-                        <Clock className="h-4 w-4" />
-                        Tempo restante para pagamento
-                      </div>
-                      <div className="mt-1 text-center text-3xl font-extrabold tabular-nums text-green-900 dark:text-green-100">
-                        {formatCountdown(paymentCountdownSeconds)}
-                      </div>
-                    </div>
-                  )}
-
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5">
-                  ,
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                      Código de inscrição
-                    </span>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(
-                          successData?.confirmationCode || "",
-                        );
-                        setIsCopied(true);
-                        setTimeout(() => setIsCopied(false), 2000);
-                      }}
-                      className={cn(
-                        "text-sm font-medium transition-colors flex items-center gap-1",
-                        isCopied
-                          ? "text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                          : "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
-                      )}
-                    >
-                      {isCopied ? (
-                        <Check className="h-4 w-4" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                      {isCopied ? "Copiado!" : "Copiar"}
-                    </button>
-                  </div>
-                  <div className="font-mono text-xl font-bold tracking-wider text-center py-2 px-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                    {successData?.confirmationCode}
-                  </div>
-                  {/* LINHA ADICIONADA CONFORME SOLICITADO */}
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-                    Este código é único e com ele você pode encontrar sua
-                    inscrição a qualquer momento.
-                  </p>
-                </div>
-
-                {/* Status e informações */}
-                <div className="space-y-4">
-                  {successData?.status === InscriptionStatus.PENDING && (
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-xl">
-                      <div className="flex items-start gap-3">
-                        <div className="mt-0.5">
-                          <svg
-                            className="h-5 w-5 text-green-600 dark:text-green-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-green-800 dark:text-green-300">
-                            Próximo passo
-                          </p>
-                          <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                            Sua Inscrição foi registrada, para garantir sua
-                            participação é necessário realizar o pagamento da
-                            sua inscrição dentro de <strong>30 minutos</strong>.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {successData?.status === InscriptionStatus.UNDER_REVIEW && (
-                    <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 rounded-xl">
-                      <div className="flex items-start gap-3">
-                        <div className="mt-0.5">
-                          <svg
-                            className="h-5 w-5 text-amber-600 dark:text-amber-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                            Aguarde a análise
-                          </p>
-                          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                            Infelizmente, sua inscrição entrou em análise assim
-                            que for validade pelos organizadores receberá um
-                            e-mail com o resultado da análise.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Botões de ação */}
-                <div className="space-y-3 pt-4">
-                  <div className="flex gap-3">
-                    <Button onClick={onViewInscription} className="flex-1">
-                      {successData?.status === InscriptionStatus.PENDING
-                        ? "Seguir para Pagamento"
-                        : "Visualizar Inscrição"}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <InscriptionSuccessModal
+          isOpen={successModalOpen}
+          onClose={() => setSuccessModalOpen(false)}
+          onViewInscription={onViewInscription}
+          successData={successData}
+          paymentCountdownSeconds={paymentCountdownSeconds}
+        />
       )}
     </div>
   );
