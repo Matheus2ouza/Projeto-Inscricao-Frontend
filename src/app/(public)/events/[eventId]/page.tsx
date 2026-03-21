@@ -2,6 +2,8 @@
 
 import PublicEventDetails from "@/features/events/components/publicEvents/PublicEventDetails";
 import { usePublicEvent } from "@/features/events/hooks/publicEvents/usePublicEvent";
+import BackgroundPaths from "@/features/guest/components/guestInscription/background-paths";
+import { useImagePalette } from "@/features/guest/hook/guestInscription/useImagePalette";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -18,6 +20,21 @@ export default function EventPage() {
   }
 
   const { event, loading, error, refetch } = usePublicEvent({ eventId });
+
+  const { palette, isDark, swatches, ready } = useImagePalette(event?.image);
+
+  const preferredSwatch =
+    (isDark ? swatches.DarkVibrant : swatches.LightVibrant) ??
+    swatches.Vibrant ??
+    swatches.Muted ??
+    swatches.DarkMuted ??
+    swatches.LightMuted;
+
+  const titleColor =
+    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
+  const bodyColor =
+    preferredSwatch?.bodyTextColor ??
+    (isDark ? "rgba(255,255,255,0.7)" : "#374151");
 
   const handleViewSubscription = (eventId: string) => {
     router.push(`/guest/${eventId}/inscription`);
@@ -117,6 +134,9 @@ export default function EventPage() {
 
     return (
       <PublicEventDetails
+        palette={palette}
+        isDark={isDark}
+        swatches={swatches}
         event={event}
         onViewSubscription={handleViewSubscription}
         onSubscribe={handleSubscribe}
@@ -126,12 +146,18 @@ export default function EventPage() {
   };
 
   return (
-    <PageContainer
-      title={event?.name.toUpperCase() ?? "Evento"}
-      description={event?.regionName ?? ""}
-      showTitle={!loading}
-    >
-      {renderContent()}
-    </PageContainer>
+    <div className="relative min-h-screen isolate">
+      <BackgroundPaths palette={palette} />
+      <PageContainer
+        title={event?.name.toUpperCase() ?? "Evento"}
+        description={event?.regionName ?? ""}
+        showTitle={!loading}
+        className="bg-none bg-transparent"
+        titleColor={titleColor}
+        descriptionColor={bodyColor}
+      >
+        {renderContent()}
+      </PageContainer>
+    </div>
   );
 }

@@ -7,8 +7,4 @@ export function cn(...inputs: ClassValue[]) {
 
 export const isProd = process.env.NODE_ENV === "production";
 
-if (isProd) {
-  console.log("Rodando em produção 🚀");
-} else {
-  console.log("Rodando em dev 🛠️");
-}
+if (!isProd) console.log("Rodando em dev 🛠️");

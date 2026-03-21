@@ -36,15 +36,23 @@ type InfoRow = {
 interface ListEventsForInscriptionProps {
   events: Event[];
   total: number;
+
+  // UI options
+  showDateLocation?: boolean;
+  buttonLabel?: string;
+
+  // Paginção
   page: number;
   pageCount: number;
-  buttonLabel?: string;
-  statusFilter: StatusEvent[];
-  showDateLocation?: boolean;
-  onStatusFilterChange: (value: StatusEvent[]) => void;
-  onApplyStatusFilter: () => void;
   setPage: (page: number) => void;
   onSelectEvent: (eventId: string) => void;
+
+  // Filtro
+  statusFilter: StatusEvent[];
+  onStatusFilterChange: (value: StatusEvent[]) => void;
+  onApplyStatusFilter: () => void;
+
+  // Info
   getInfoRows?: (event: Event) => InfoRow[];
 }
 

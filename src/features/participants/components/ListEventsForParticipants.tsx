@@ -15,14 +15,14 @@ import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
 import { getGradientClass } from "@/shared/utils/getGenerateGradient";
 import { getInitial } from "@/shared/utils/getInitials";
 import { Card, CardBody, CardFooter } from "@heroui/react";
-import { Loader2 } from "lucide-react";
+import { Calendar, Loader2, MapPin } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import type { Event } from "../types/listEventsForParticipants";
+import type { Event } from "../types/listEventsForParticipantsTypes";
 import {
   EVENT_STATUS_OPTIONS,
   StatusEvent,
-} from "../types/listEventsForParticipants";
+} from "../types/listEventsForParticipantsTypes";
 
 type InfoRow = {
   label: string;
@@ -30,15 +30,24 @@ type InfoRow = {
 };
 
 interface ListEventsForParticipantsProps {
-  buttonLabel: string;
   events: Event[];
+
+  // UI options
+  showDateLocation?: boolean;
+  buttonLabel?: string;
+
+  // Paginção
   page: number;
   pageCount: number;
   onPageChange: (page: number) => void;
-  onViewEvent: (eventId: string) => void;
+  onSelectEvent: (eventId: string) => void;
+
+  // Filtro
   statusFilter: StatusEvent[];
   onStatusFilterChange: (value: StatusEvent[]) => void;
   onApplyStatusFilter: () => void;
+
+  // Info
   getInfoRows?: (event: Event) => InfoRow[];
 }
 
@@ -48,8 +57,9 @@ export default function ListEventsForParticipants({
   page,
   pageCount,
   statusFilter,
+  showDateLocation = true,
   onPageChange,
-  onViewEvent,
+  onSelectEvent,
   onStatusFilterChange,
   onApplyStatusFilter,
   getInfoRows,
@@ -57,10 +67,6 @@ export default function ListEventsForParticipants({
   const [imageLoadingStates, setImageLoadingStates] = useState<
     Record<string, boolean>
   >({});
-
-  const handleIndividualInscription = (eventId: string) => {
-    onViewEvent(eventId);
-  };
 
   const handlePageChange = (newPage: number) => {
     onPageChange(newPage);
@@ -80,6 +86,10 @@ export default function ListEventsForParticipants({
       ...prev,
       [eventId]: true,
     }));
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
   return (
@@ -172,19 +182,31 @@ export default function ListEventsForParticipants({
                   {event.name}
                 </h3>
 
+                {showDateLocation && (
+                  <>
+                    <div className="flex items-center text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      <Calendar className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
+                      {event.startDate && event.endDate ? (
+                        <span className="line-clamp-1">
+                          {formatDate(event.startDate)} -{" "}
+                          {formatDate(event.endDate)}
+                        </span>
+                      ) : (
+                        <span className="line-clamp-1">Data não informada</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                      <MapPin className="w-4 h-4 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" />
+                      <span className="line-clamp-1">
+                        {event.location || "Local não informado"}
+                      </span>
+                    </div>
+                  </>
+                )}
+
                 <div className="flex flex-col gap-2 w-full">
-                  {(
-                    getInfoRows?.(event) ?? [
-                      {
-                        label: "Total de Participantes",
-                        value: event.countParticipants,
-                      },
-                      {
-                        label: "Pendentes",
-                        value: event.countParticipantsInAnalysis,
-                      },
-                    ]
-                  ).map(({ label, value }) => (
+                  {getInfoRows?.(event)?.map(({ label, value }) => (
                     <div
                       key={label}
                       className="flex justify-between items-center text-sm dark:text-white"
@@ -192,15 +214,7 @@ export default function ListEventsForParticipants({
                       <span className="text-gray-600 dark:text-gray-400">
                         {label}
                       </span>
-                      <span
-                        className={`font-semibold ${
-                          label.toLowerCase().includes("pendentes")
-                            ? "text-yellow-600 dark:text-yellow-400"
-                            : ""
-                        }`}
-                      >
-                        {value}
-                      </span>
+                      <span className="font-semibold">{value}</span>
                     </div>
                   ))}
                 </div>
@@ -209,7 +223,7 @@ export default function ListEventsForParticipants({
                   <Button
                     variant="default"
                     size="sm"
-                    onClick={() => handleIndividualInscription(event.id)}
+                    onClick={() => onSelectEvent(event.id)}
                     className="dark: text-white"
                   >
                     {buttonLabel}

@@ -1,9 +1,11 @@
 "use client";
 
 import {
-  Event,
-  InscriptionMode,
-} from "@/features/events/types/publicEvents/publicEventsTypes";
+  PublicEventInscriptionCta,
+  type SubscriptionStatus,
+} from "@/features/events/components/publicEvents/PublicEventInscriptionCta";
+import { Event } from "@/features/events/types/publicEvents/publicEventsTypes";
+import { ImageSwatches } from "@/features/guest/hook/guestInscription/useImagePalette";
 import EventMap from "@/shared/components/EventMap";
 import { GuestInscriptionAlready } from "@/shared/components/GuestInscriptionAlready";
 import { Button } from "@/shared/components/ui/button";
@@ -12,10 +14,13 @@ import { getWithExpiry, setWithExpiry } from "@/shared/utils/storageWithExpiry";
 import { Calendar, Loader2, MapPin, Share2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type PublicEventDetailsProps = {
   event: Event | null;
+  palette: string[];
+  isDark: boolean;
+  swatches?: ImageSwatches;
   onViewSubscription: (eventId: string) => void;
   onSubscribe: (eventId: string) => void;
   onLogin: () => void;
@@ -23,6 +28,9 @@ type PublicEventDetailsProps = {
 
 export default function PublicEventDetails({
   event,
+  palette,
+  isDark,
+  swatches,
   onViewSubscription,
   onSubscribe,
   onLogin,
@@ -89,7 +97,7 @@ export default function PublicEventDetails({
     return { status: "ongoing", label: "Ao Vivo", color: "bg-green-500" };
   };
 
-  const getSubscriptionStatus = () => {
+  const getSubscriptionStatus = (): SubscriptionStatus => {
     if (!event)
       return { status: "loading", label: "Carregando...", description: "" };
     const eventStatus = getEventStatus();
@@ -146,6 +154,28 @@ export default function PublicEventDetails({
     window.open(mapsUrl, "_blank");
   };
 
+  const preferredSwatch = useMemo(() => {
+    if (!swatches) return null;
+
+    return (
+      (isDark ? swatches.DarkVibrant : swatches.LightVibrant) ??
+      swatches.Vibrant ??
+      swatches.Muted ??
+      swatches.DarkMuted ??
+      swatches.LightMuted
+    );
+  }, [isDark, swatches]);
+
+  const recommendedTitleColor =
+    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
+  const recommendedBodyColor =
+    preferredSwatch?.bodyTextColor ??
+    (isDark ? "rgba(255,255,255,0.78)" : "#374151");
+  const glassSurfaceClass = isDark
+    ? "bg-white/20 border-white/20"
+    : "bg-black/5 border-black/10";
+  const accent = palette?.[0] ?? "hsl(var(--primary))";
+
   if (!event) {
     return (
       <div className="min-h-[400px] flex items-center justify-center">
@@ -160,6 +190,11 @@ export default function PublicEventDetails({
   const gradientClass = getGradientClass(event.name);
   const subscriptionStatus = getSubscriptionStatus();
   const shouldShowImage = Boolean(event.image && !imageFailed);
+  const hasCoordinates =
+    typeof event.latitude === "number" &&
+    typeof event.longitude === "number" &&
+    event.latitude !== 0 &&
+    event.longitude !== 0;
 
   return (
     <div className="space-y-6">
@@ -177,7 +212,9 @@ export default function PublicEventDetails({
           onViewSubscription(event.id);
         }}
       />
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-muted">
+      <div
+        className={`relative w-full aspect-video rounded-2xl overflow-hidden shadow-sm backdrop-blur-md border ${glassSurfaceClass}`}
+      >
         {shouldShowImage ? (
           <>
             {imageLoading && (
@@ -210,10 +247,16 @@ export default function PublicEventDetails({
         )}
 
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-10 z-20">
-          <p className="text-xs sm:text-xl uppercase tracking-[0.3em] text-white/90 mb-1 sm:mb-2 font-medium drop-shadow-md">
+          <p
+            className="text-xs sm:text-xl uppercase tracking-[0.3em] mb-1 sm:mb-2 font-medium drop-shadow-md"
+            style={{ color: recommendedBodyColor }}
+          >
             {event.regionName || "Evento"}
           </p>
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white uppercase leading-tight break-words drop-shadow-lg">
+          <h1
+            className="text-2xl sm:text-4xl md:text-5xl font-bold uppercase leading-tight break-words drop-shadow-lg"
+            style={{ color: recommendedTitleColor }}
+          >
             {event.name}
           </h1>
         </div>
@@ -222,59 +265,122 @@ export default function PublicEventDetails({
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <Button
           variant="outline"
-          className="flex-1 justify-center gap-2 py-4"
+          className={`group relative flex-1 justify-center gap-2 py-4 overflow-hidden backdrop-blur-md shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
           onClick={handleShare}
         >
-          <Share2 className="h-5 w-5" />
-          Compartilhar
+          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-white/10 via-white/0 to-white/10" />
+          <span
+            className="absolute inset-0 opacity-25 pointer-events-none"
+            style={{
+              background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
+            }}
+          />
+          <span className="relative inline-flex items-center justify-center gap-2">
+            <Share2 className="h-5 w-5" style={{ color: accent }} />
+            <span style={{ color: recommendedTitleColor }}>Compartilhar</span>
+          </span>
         </Button>
         <Button
           variant="outline"
-          className="flex-1 justify-center gap-2 py-4"
+          className={`group relative flex-1 justify-center gap-2 py-4 overflow-hidden backdrop-blur-md shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
           onClick={handleAddToCalendar}
         >
-          <Calendar className="h-5 w-5" />
-          Adicionar à Agenda
+          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-white/10 via-white/0 to-white/10" />
+          <span
+            className="absolute inset-0 opacity-25 pointer-events-none"
+            style={{
+              background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
+            }}
+          />
+          <span className="relative inline-flex items-center justify-center gap-2">
+            <Calendar className="h-5 w-5" style={{ color: accent }} />
+            <span style={{ color: recommendedTitleColor }}>
+              Adicionar à Agenda
+            </span>
+          </span>
         </Button>
-        {event.longitude && event.latitude && (
+        {hasCoordinates && (
           <Button
             variant="outline"
-            className="flex-1 justify-center gap-2 py-4"
+            className={`group relative flex-1 justify-center gap-2 py-4 overflow-hidden backdrop-blur-md shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
             onClick={handleOpenRoute}
           >
-            <MapPin className="h-5 w-5" />
-            Traçar Rota
+            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-white/10 via-white/0 to-white/10" />
+            <span
+              className="absolute inset-0 opacity-25 pointer-events-none"
+              style={{
+                background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
+              }}
+            />
+            <span className="relative inline-flex items-center justify-center gap-2">
+              <MapPin className="h-5 w-5" style={{ color: accent }} />
+              <span style={{ color: recommendedTitleColor }}>Traçar Rota</span>
+            </span>
           </Button>
         )}
       </div>
 
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="border rounded-lg p-6 bg-card">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-muted rounded-lg">
-                <Calendar className="h-6 w-6 text-muted-foreground" />
+          <div
+            className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur-md shadow-sm transition-shadow hover:shadow-md ${glassSurfaceClass}`}
+          >
+            <div
+              className="absolute inset-0 opacity-30 pointer-events-none"
+              style={{
+                background: `radial-gradient(650px circle at 15% 20%, ${accent} 0%, transparent 58%)`,
+              }}
+            />
+            <div className="relative flex items-center gap-4">
+              <div
+                className="p-3 bg-primary/10 rounded-lg"
+                style={{ color: accent }}
+              >
+                <Calendar className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-medium text-card-foreground">
+                <h3
+                  className="font-medium text-card-foreground"
+                  style={{ color: recommendedBodyColor }}
+                >
                   Data de Início
                 </h3>
-                <p className="text-xl font-semibold text-card-foreground mt-1">
+                <p
+                  className="text-xl font-semibold text-card-foreground mt-1"
+                  style={{ color: recommendedTitleColor }}
+                >
                   {formatDate(event.startDate)}
                 </p>
               </div>
             </div>
           </div>
-          <div className="border rounded-lg p-6 bg-card">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-muted rounded-lg">
-                <Calendar className="h-6 w-6 text-muted-foreground" />
+          <div
+            className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur-md shadow-sm transition-shadow hover:shadow-md ${glassSurfaceClass}`}
+          >
+            <div
+              className="absolute inset-0 opacity-30 pointer-events-none"
+              style={{
+                background: `radial-gradient(650px circle at 15% 20%, ${accent} 0%, transparent 58%)`,
+              }}
+            />
+            <div className="relative flex items-center gap-4">
+              <div
+                className="p-3 bg-primary/10 rounded-lg"
+                style={{ color: accent }}
+              >
+                <Calendar className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-medium text-card-foreground">
+                <h3
+                  className="font-medium text-card-foreground"
+                  style={{ color: recommendedBodyColor }}
+                >
                   Data de Término
                 </h3>
-                <p className="text-xl font-semibold text-card-foreground mt-1">
+                <p
+                  className="text-xl font-semibold text-card-foreground mt-1"
+                  style={{ color: recommendedTitleColor }}
+                >
                   {formatDate(event.endDate)}
                 </p>
               </div>
@@ -282,24 +388,41 @@ export default function PublicEventDetails({
           </div>
         </div>
 
-        <div className="border rounded-lg p-6 bg-card">
-          <div className="flex items-center gap-4 mb-6">
-            <MapPin className="h-6 w-6 text-card-foreground" />
-            <h3 className="font-semibold text-card-foreground text-xl">
+        <div
+          className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur-md shadow-sm transition-shadow hover:shadow-md ${glassSurfaceClass}`}
+        >
+          <div
+            className="absolute inset-0 opacity-30 pointer-events-none"
+            style={{
+              background: `radial-gradient(750px circle at 18% 15%, ${accent} 0%, transparent 60%), radial-gradient(900px circle at 85% 45%, ${accent} 0%, transparent 65%)`,
+            }}
+          />
+          <div className="relative flex items-center gap-4 mb-6">
+            <MapPin className="h-6 w-6" style={{ color: accent }} />
+            <h3
+              className="font-semibold text-card-foreground text-xl"
+              style={{ color: recommendedTitleColor }}
+            >
               Localização
             </h3>
           </div>
-          <div className="space-y-6">
+          <div className="relative space-y-6">
             <div>
-              <p className="text-card-foreground text-lg font-medium mb-2">
+              <p
+                className="text-card-foreground text-lg font-medium mb-2"
+                style={{ color: recommendedBodyColor }}
+              >
                 Endereço
               </p>
-              <p className="text-card-foreground/80">
+              <p
+                className="text-card-foreground/80"
+                style={{ color: recommendedBodyColor }}
+              >
                 {event.location || "Local a ser definido"}
               </p>
             </div>
-            {event.latitude && event.longitude && (
-              <div className="h-64 rounded-lg overflow-hidden border">
+            {hasCoordinates && (
+              <div className="h-64 rounded-2xl overflow-hidden border border-white/10">
                 <EventMap
                   lat={event.latitude}
                   lng={event.longitude}
@@ -312,159 +435,18 @@ export default function PublicEventDetails({
           </div>
         </div>
 
-        <div className="space-y-6">
-          {/* Card de status das inscrições */}
-          <div className="border rounded-lg p-6 bg-card">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-card-foreground text-xl">
-                  Inscrições
-                </h3>
-                <p
-                  className={`font-medium text-lg mt-2 ${subscriptionStatus.status === "open" ? "text-green-600" : subscriptionStatus.status === "closed" ? "text-yellow-600" : "text-red-600"}`}
-                >
-                  {subscriptionStatus.label}
-                </p>
-                <p className="text-muted-foreground text-sm mt-1">
-                  {subscriptionStatus.description}
-                </p>
-              </div>
-              {subscriptionStatus.status !== "open" && (
-                <div className="text-right">
-                  <Button
-                    className={`font-semibold px-6 py-4 ${subscriptionStatus.status === "finalized" ? "bg-red-600 hover:bg-red-700" : "bg-muted text-muted-foreground hover:bg-muted cursor-not-allowed"}`}
-                    disabled
-                  >
-                    {subscriptionStatus.status === "finalized"
-                      ? "Evento Encerrado"
-                      : "Inscrições Fechadas"}
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Se as inscrições estão abertas, mostra as opções */}
-          {subscriptionStatus.status === "open" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Card de inscrição direta - só mostra se allowGuest for true */}
-              {event.allowedInscriptionModes.includes(
-                InscriptionMode.GUEST,
-              ) && (
-                <div className="border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <svg
-                        className="h-6 w-6 text-primary"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-card-foreground text-lg">
-                        Inscreva-se agora
-                      </h3>
-                      <p className="text-muted-foreground text-sm mt-1">
-                        Preencha seus dados e faça sua inscrição diretamente
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Button
-                        onClick={() => onViewSubscription(event.id)}
-                        size="lg"
-                        className="w-full h-12 text-base font-semibold"
-                      >
-                        Visualizar Inscrição
-                      </Button>
-                      <Button
-                        onClick={() => onSubscribe(event.id)}
-                        size="lg"
-                        className="w-full h-12 text-base font-semibold"
-                      >
-                        Inscrever-se Agora
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Card de login - sempre mostra quando inscrições estão abertas */}
-              <div className="border rounded-lg p-6 bg-card hover:shadow-md transition-shadow">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="p-3 bg-blue-500/10 rounded-lg">
-                    <svg
-                      className="h-6 w-6 text-blue-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-card-foreground text-lg">
-                      {event.allowedInscriptionModes.includes(
-                        InscriptionMode.GUEST,
-                      )
-                        ? "Já tem uma conta?"
-                        : "Faça login para se inscrever"}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mt-1">
-                      {event.allowedInscriptionModes.includes(
-                        InscriptionMode.GUEST,
-                      )
-                        ? "Acesse para gerenciar suas inscrições e histórico"
-                        : "Entre com sua conta para realizar a inscrição"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <Button
-                    onClick={onLogin}
-                    variant={
-                      event.allowedInscriptionModes.includes(
-                        InscriptionMode.GUEST,
-                      )
-                        ? "outline"
-                        : "default"
-                    }
-                    size="lg"
-                    className="w-full h-12 text-base font-semibold"
-                  >
-                    {event.allowedInscriptionModes.includes(
-                      InscriptionMode.GUEST,
-                    )
-                      ? "Fazer Login"
-                      : "Inscrever-se com Login"}
-                  </Button>
-
-                  {!event.allowedInscriptionModes.includes(
-                    InscriptionMode.GUEST,
-                  ) && (
-                    <p className="text-xs text-muted-foreground text-center mt-3">
-                      É necessário ter uma conta para se inscrever neste evento
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        <PublicEventInscriptionCta
+          eventId={event.id}
+          allowedInscriptionModes={event.allowedInscriptionModes}
+          subscriptionStatus={subscriptionStatus}
+          accentColor={palette?.[0]}
+          titleColor={recommendedTitleColor}
+          bodyColor={recommendedBodyColor}
+          glassSurfaceClass={glassSurfaceClass}
+          onSubscribe={onSubscribe}
+          onLogin={onLogin}
+          onViewSubscription={onViewSubscription}
+        />
       </div>
     </div>
   );

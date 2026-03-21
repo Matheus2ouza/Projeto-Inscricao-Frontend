@@ -104,7 +104,7 @@ export default function SelectEventForListInscriptionAdminPage() {
         page={page}
         pageCount={pageCount}
         statusFilter={pendingFilter}
-        showDateLocation={false}
+        showDateLocation={true}
         onStatusFilterChange={handleStatusChange}
         onApplyStatusFilter={handleApplyStatusFilter}
         setPage={setPage}

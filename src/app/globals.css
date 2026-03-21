@@ -234,3 +234,49 @@ gmp-map {
     background: #6b7280;
   }
 }
+
+/* Dark inputs - Ant Design */
+.dark-inputs .ant-input::placeholder {
+  color: #d6d6d6 !important;
+}
+
+.dark-inputs .ant-input {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Light inputs - Ant Design */
+.light-inputs .ant-input::placeholder {
+  color: #9ca3af !important;
+}
+
+.light-inputs .ant-input {
+  color: #111827 !important;
+  background: white !important;
+  border-color: #e5e7eb !important;
+}
+
+/* DatePicker - tema claro */
+.ant-picker-input input::placeholder {
+  color: #6f6f6f !important;
+}
+
+/* DatePicker - tema escuro (quando isDark) */
+.dark-datepicker .ant-picker-input input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.dark-datepicker .ant-picker-input input {
+  color: white !important;
+}
+
+.dark-datepicker {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark-datepicker .ant-picker-suffix,
+.dark-datepicker .ant-picker-clear {
+  color: rgba(255, 255, 255, 0.5) !important;
+}

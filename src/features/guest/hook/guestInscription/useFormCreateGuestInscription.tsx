@@ -1,199 +1,76 @@
 "use client";
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
-import { registerGuest } from "@/features/guest/api/guestInscription/registerGuest";
-import { useDetailsEvent } from "@/features/guest/hook/guestInscription/useDetailsEvent";
-import { guestInscriptionSchema } from "@/features/guest/schema/guestInscription/guestInscriptionSchema";
-import {
-  GuestInscriptionFormInputs,
-  RegisterGuestInscriptionResponse,
-  UseFormGuestInscriptionProps,
-  UseFormGuestInscriptionReturn,
-} from "@/features/guest/types/guestInscription/guestInscriptionTypes";
-import { setWithExpiry } from "@/shared/utils/storageWithExpiry";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { GuestInscriptionSchemaType } from "@/features/guest/schema/guestInscription/guestInscriptionSchema";
+import { InscriptionStatus } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
+import dayjs from "dayjs";
 import * as React from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { registerGuest } from "../../api/guestInscription/registerGuest";
 
-// Funções auxiliares puras
-const formatPhone = (value: string): string => {
-  const numbers = value.replace(/\D/g, "");
-  if (numbers.length <= 2) return numbers ? `(${numbers}` : "";
-  if (numbers.length <= 6)
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-  if (numbers.length <= 10)
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
-  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+export type UseCreateGuestInscription = {
+  initialValues: GuestInscriptionSchemaType;
+  submit: (values: GuestInscriptionSchemaType) => Promise<{
+    success?: {
+      id: string;
+      status: InscriptionStatus;
+      confirmationCode: string;
+    };
+    error?: string;
+  }>;
 };
 
-const formatDate = (value: string): string => {
-  const numbers = value.replace(/\D/g, "");
-  if (numbers.length <= 2) return numbers;
-  if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
-  return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
-};
-
-const formatCpf = (value: string): string => {
-  const numbers = value.replace(/\D/g, "").slice(0, 11);
-  if (numbers.length <= 3) return numbers;
-  if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
-  if (numbers.length <= 9)
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
-  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
-};
-
-export function useFormCreateGuestInscription({
-  eventId,
-  onSuccess,
-}: UseFormGuestInscriptionProps): UseFormGuestInscriptionReturn {
+export function useFormCreateGuestInscription(
+  eventId: string,
+  typeInscriptionId: string,
+): UseCreateGuestInscription {
   const { setLoading } = useGlobalLoading();
+  const today = dayjs().format("YYYY-MM-DD");
 
-  const form = useForm<
-    GuestInscriptionFormInputs,
-    any,
-    GuestInscriptionFormInputs
-  >({
-    resolver: zodResolver(guestInscriptionSchema),
-    defaultValues: {
+  const initialValues: GuestInscriptionSchemaType = React.useMemo(
+    () => ({
       name: "",
       preferredName: "",
       email: "",
       phone: "",
       cpf: "",
+      gender: "FEMININO",
       locality: "",
-      participantName: "",
-      birthDate: "",
-      gender: "",
-      shirtSize: undefined,
-      shirtType: undefined,
-      typeInscriptionId: "",
-      isResponsibleParticipant: false,
-    },
-    mode: "onChange",
-  });
-
-  const { watch, setValue, trigger, formState } = form;
-  const formData = watch();
-  const { event } = useDetailsEvent({ eventId });
-  const typeInscriptions = React.useMemo(
-    () => event?.typeInscriptions || [],
-    [event],
+      birthDate: today,
+      shirtSize: "M",
+      shirtType: "TRADICIONAL",
+    }),
+    [today],
   );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const fieldName = name as keyof GuestInscriptionFormInputs;
-
-    if (name === "phone") {
-      setValue(fieldName, formatPhone(value));
-    } else if (name === "cpf") {
-      setValue(fieldName, formatCpf(value));
-    } else if (name === "birthDate") {
-      setValue(fieldName, formatDate(value));
-    } else {
-      setValue(
-        fieldName,
-        value === "true" ? true : value === "false" ? false : value,
-      );
-    }
-
-    trigger(fieldName);
-  };
-
-  const filteredTypeInscriptions = React.useMemo(() => {
-    if (!formData.birthDate || formData.birthDate.length < 10)
-      return typeInscriptions;
-
-    const [day, month, year] = formData.birthDate.split("/").map(Number);
-    const birthDate = new Date(year, month - 1, day);
-
-    if (isNaN(birthDate.getTime())) return typeInscriptions;
-
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-
-    return typeInscriptions.filter((type) => {
-      if (!type.rule) return true;
-      const ruleDate = new Date(type.rule);
-      let ruleAge = today.getFullYear() - ruleDate.getFullYear();
-      const mr = today.getMonth() - ruleDate.getMonth();
-      if (mr < 0 || (mr === 0 && today.getDate() < ruleDate.getDate())) {
-        ruleAge--;
-      }
-      return age <= ruleAge;
-    });
-  }, [formData.birthDate, typeInscriptions]);
-
-  const onSubmit: SubmitHandler<GuestInscriptionFormInputs> = async (data) => {
+  async function submit(values: GuestInscriptionSchemaType) {
     setLoading(true);
-    try {
-      const [day, month, year] = data.birthDate.split("/").map(Number);
-      const birthDate = new Date(year, month - 1, day);
 
-      const payload = {
+    try {
+      const response = await registerGuest({
+        ...values,
         eventId,
-        guestEmail: data.email,
-        guestName: data.name,
-        guestLocality: data.locality,
-        phone: data.phone,
-        participant: {
-          name: data.isResponsibleParticipant
-            ? data.participantName || ""
-            : data.name,
-          cpf: data.cpf.replace(/\D/g, ""),
-          preferredName: data.preferredName,
-          birthDate: birthDate,
-          gender: data.gender,
-          shirtSize: data.shirtSize,
-          shirtType: data.shirtType,
-          typeInscriptionId: data.typeInscriptionId,
+        typeInscriptionId,
+      });
+
+      return {
+        success: {
+          id: response.id,
+          status: response.status,
+          confirmationCode: response.confirmationCode,
         },
       };
-
-      const response: RegisterGuestInscriptionResponse =
-        await registerGuest(payload);
-
-      if (typeof window !== "undefined") {
-        setWithExpiry(
-          "guest_inscription",
-          {
-            eventId,
-            confirmationCode: response.confirmationCode,
-            thereIsPayment: false,
-          },
-          30 * 60 * 1000,
-        );
-      }
-
-      form.reset();
-      onSuccess?.(response);
     } catch (error) {
-      console.error("Erro na inscrição:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Erro ao realizar inscrição. Tente novamente.",
-      );
+      const err = error as Error;
+      toast.error(err.message);
+      return { error: err.message };
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return {
-    formData,
-    typeInscriptions: filteredTypeInscriptions,
-    isSubmitting: formState.isSubmitting,
-    formErrors: formState.errors,
-    register: form.register,
-    handleSubmit: form.handleSubmit(onSubmit),
-    handleInputChange,
-    setValue,
-    control: form.control,
-    form,
+    initialValues,
+    submit,
   };
 }

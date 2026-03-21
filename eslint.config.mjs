@@ -12,18 +12,21 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // Global ignores (flat config ignores are per-entry unless specified here)
+  {
+    ignores: [
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/out/**",
+      "**/build/**",
+      "next-env.d.ts",
+    ],
+  },
+
   // Base Next.js + TypeScript
   ...compat.extends("next/core-web-vitals", "next/typescript"),
 
   {
-    ignores: [
-      "node_modules/**",
-      ".next/**",
-      "out/**",
-      "build/**",
-      "next-env.d.ts",
-    ],
-
     plugins: {
       prettier: eslintPluginPrettier,
       "unused-imports": eslintPluginUnusedImports,

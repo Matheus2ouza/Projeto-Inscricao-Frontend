@@ -5,7 +5,7 @@ import {
   STATUS_EVENT_VALUES,
   UseEventsParams,
   UseEventsResult,
-} from "../types/listEventsForParticipants";
+} from "../types/listEventsForParticipantsTypes";
 import {
   usePrefetchSelectEventForListParticipants,
   useSelectEventForListParticipantsQuery,

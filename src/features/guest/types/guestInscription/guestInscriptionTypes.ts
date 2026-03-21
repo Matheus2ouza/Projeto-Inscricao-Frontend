@@ -5,7 +5,7 @@ import type {
   UseFormReturn,
   UseFormSetValue,
 } from "react-hook-form";
-import type { GuestInscriptionSchemaFormInput } from "../../schema/guestInscription/guestInscriptionSchema";
+import type { GuestInscriptionSchemaType } from "../../schema/guestInscription/guestInscriptionSchema";
 
 export type Event = {
   id: string;
@@ -43,7 +43,7 @@ export type UseFormGuestInscriptionProps = {
   onSuccess?: (response: RegisterGuestInscriptionResponse) => void;
 };
 
-export type GuestInscriptionFormInputs = GuestInscriptionSchemaFormInput;
+export type GuestInscriptionFormInputs = GuestInscriptionSchemaType;
 
 export enum InscriptionStatus {
   PENDING = "PENDING",
@@ -52,30 +52,31 @@ export enum InscriptionStatus {
   CANCELLED = "CANCELLED",
 }
 
-export type GenderType = "M" | "F" | "O" | string;
+export type GenderType = "MASCULINO" | "FEMININO" | string;
 
-export type ShirtSizeType = "PP" | "P" | "M" | "G" | "GG" | "XG";
+export type ShirtSizeType = "PP" | "P" | "M" | "G" | "GG" | "XG" | string;
 
-export type ShirtType = "TRADICIONAL" | "BABYLOOK";
-
-export type ParticipantGuest = {
-  name: string;
-  cpf: string;
-  preferredName: string;
-  birthDate: Date;
-  gender: GenderType;
-  shirtSize: ShirtSizeType;
-  shirtType: ShirtType;
-  typeInscriptionId: string;
-};
+export type ShirtType = "TRADICIONAL" | "BABYLOOK" | string;
 
 export type RegisterGuestInscriptionInput = {
   eventId: string;
-  guestEmail: string;
-  guestName: string;
-  guestLocality: string;
+
+  // Dados do inscrito guest
+  email: string;
+  name: string;
+  preferredName?: string;
+  cpf: string;
+  gender: GenderType;
   phone: string;
-  participant: ParticipantGuest;
+  locality: string;
+  birthDate: Date | string;
+
+  // dados complementares
+  shirtSize?: ShirtSizeType;
+  shirtType?: ShirtType;
+
+  // id da inscrição
+  typeInscriptionId: string;
 };
 
 export type RegisterGuestInscriptionResponse = {

@@ -270,14 +270,6 @@ export default function AppSidebarSuper({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/super/participants/list-guest-participants"
-                              className="gap-1"
-                            >
-                              <span>Participantes Não Vinculados</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
                               href="/super/events/check-in"
                               className="gap-1"
                             >
