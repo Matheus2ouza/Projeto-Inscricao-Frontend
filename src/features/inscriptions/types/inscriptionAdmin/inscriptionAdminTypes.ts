@@ -27,8 +27,8 @@ export type createInscriptionAdminData = {
   // Dados Normais
   accountId?: string;
   responsible: string;
-  email: string;
-  phone: string;
+  email?: string;
+  phone?: string;
 
   // Dados Guest
   guestLocality?: string;
