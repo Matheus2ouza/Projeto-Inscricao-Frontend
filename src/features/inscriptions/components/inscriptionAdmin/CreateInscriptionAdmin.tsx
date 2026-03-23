@@ -243,13 +243,13 @@ export default function CreateInscriptionAdmin() {
     // Adiciona um novo participante com todos os dados do membro
     append({
       accountParticipantId: memberId,
-      typeInscriptionId: "", // Campo obrigatório que o usuário precisa preencher
-      name: fullMember.name,
-      preferredName: fullMember.preferredName,
-      cpf: fullMember.cpf,
+      typeInscriptionId: "",
+      name: fullMember.name ?? "",
+      preferredName: fullMember.preferredName ?? "",
+      cpf: fullMember.cpf ?? "",
       birthDate: fullMember.birthDate
         ? new Date(fullMember.birthDate).toISOString().split("T")[0]
-        : undefined,
+        : "",
       gender: fullMember.gender,
       shirtSize: fullMember.shirtSize,
       shirtType: fullMember.shirtType,
@@ -278,7 +278,13 @@ export default function CreateInscriptionAdmin() {
 
     append({
       typeInscriptionId: "",
-      // Para participantes manuais, os campos serão preenchidos pelo usuário
+      name: "",
+      preferredName: "",
+      cpf: "",
+      birthDate: "",
+      gender: undefined,
+      shirtSize: undefined,
+      shirtType: undefined,
     });
   };
 
@@ -467,7 +473,6 @@ export default function CreateInscriptionAdmin() {
                     label="Email"
                     validateStatus={fieldState.error ? "error" : ""}
                     help={fieldState.error?.message}
-                    required
                   >
                     <Input
                       {...field}
@@ -487,7 +492,6 @@ export default function CreateInscriptionAdmin() {
                     label="Telefone"
                     validateStatus={fieldState.error ? "error" : ""}
                     help={fieldState.error?.message}
-                    required
                   >
                     <Input
                       {...field}
@@ -1293,11 +1297,6 @@ export default function CreateInscriptionAdmin() {
               <Button
                 type="submit"
                 className="dark:bg-secondary dark:text-secondary-foreground"
-                disabled={
-                  showPayment &&
-                  watch("payment.methodPayment") === "PIX" &&
-                  !receiptFile
-                }
               >
                 Criar Inscrição
               </Button>

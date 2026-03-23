@@ -28,20 +28,14 @@ export function useFormCreateInscriptionAdmin(): UseFormCreateInscriptionAdmin {
       eventId: "",
       status: "PENDING",
       isGuest: false,
-
       accountId: undefined,
-
       responsible: "",
       email: "",
       phone: "",
-
-      guestLocality: undefined,
-
+      guestLocality: "",
       totalValue: 0,
       totalPaid: 0,
-
       participants: [],
-
       payment: undefined,
     },
   });
