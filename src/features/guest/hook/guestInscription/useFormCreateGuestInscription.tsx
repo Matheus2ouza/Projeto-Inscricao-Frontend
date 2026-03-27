@@ -38,7 +38,6 @@ export function useFormCreateGuestInscription(
       locality: "",
       birthDate: today,
       shirtSize: "M",
-      shirtType: "TRADICIONAL",
     }),
     [today],
   );

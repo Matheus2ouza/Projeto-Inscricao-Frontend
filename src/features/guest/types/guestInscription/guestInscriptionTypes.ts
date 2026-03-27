@@ -73,7 +73,6 @@ export type RegisterGuestInscriptionInput = {
 
   // dados complementares
   shirtSize?: ShirtSizeType;
-  shirtType?: ShirtType;
 
   // id da inscrição
   typeInscriptionId: string;

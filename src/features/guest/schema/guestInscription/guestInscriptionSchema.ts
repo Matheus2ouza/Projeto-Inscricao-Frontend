@@ -22,9 +22,6 @@ export const guestInscriptionSchema = z.object({
   shirtSize: z.enum(["PP", "P", "M", "G", "GG", "XG"], {
     error: "Tamanho de camiseta inválido",
   }),
-  shirtType: z.enum(["TRADICIONAL", "BABYLOOK"], {
-    error: "Tipo de camiseta inválido",
-  }),
 });
 
 export type GuestInscriptionSchemaType = z.infer<typeof guestInscriptionSchema>;
