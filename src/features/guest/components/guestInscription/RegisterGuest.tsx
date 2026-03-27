@@ -578,9 +578,7 @@ export function RegisterGuest({
                               className="text-xs text-muted-foreground whitespace-nowrap"
                               style={{ color: recommendedBodyColor }}
                             >
-                              {type.specialType
-                                ? "Necessita aprovação"
-                                : "Inscrição direta"}
+                              {type.specialType ? "Necessita aprovação" : ""}
                             </div>
                             <div
                               className="text-sm font-semibold whitespace-nowrap"
