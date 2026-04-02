@@ -1,16 +1,16 @@
 "use client";
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
+import { generatelistInscriptionsPdf } from "@/features/inscriptions/api/actions/reports/generateListInscriptionsPdf";
+import { generatelistInscriptionsXlsx } from "@/features/inscriptions/api/actions/reports/generateListInscriptionsXlsx";
 import {
-  generatelistInscriptionsPdf,
-  type DownloadListInscriptionsPdfInput,
-  type ListInscriptionsPdfResponse,
-} from "@/features/inscriptions/api/actions/reports/generateListInscriptionsPdf";
+  DownloadListInscriptionsPdfInput,
+  ListInscriptionsPdfResponse,
+} from "@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes";
 import {
-  generatelistInscriptionsXlsx,
-  type DownloadListInscriptionsXlsxInput,
-  type ListInscriptionsXlsxResponse,
-} from "@/features/inscriptions/api/actions/reports/generateListInscriptionsXlsx";
+  DownloadListInscriptionsXlsxInput,
+  ListInscriptionsXlsxResponse,
+} from "@/features/inscriptions/types/actions/reports/generateListInscriptionsXlsxTypes";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -57,7 +57,7 @@ export function useInscriptionReports() {
     mutationFn: generatelistInscriptionsPdf,
     onMutate: () => setLoading(true),
     onSuccess: (data) => {
-      const fileBase64 = data.fileBase64 ?? data.pdfBase64;
+      const fileBase64 = data.fileBase64;
       const filename = data.filename;
       const contentType =
         (data.contentType as ListInscriptionsReportContentType) ??
@@ -88,7 +88,7 @@ export function useInscriptionReports() {
     mutationFn: generatelistInscriptionsXlsx,
     onMutate: () => setLoading(true),
     onSuccess: (data) => {
-      const fileBase64 = data.fileBase64 ?? data.pdfBase64;
+      const fileBase64 = data.fileBase64;
       const filename = data.filename;
       const contentType =
         (data.contentType as ListInscriptionsReportContentType) ??
