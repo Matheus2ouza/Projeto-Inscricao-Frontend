@@ -1,7 +1,7 @@
 import {
   CreatePaymentLinkParams,
   CreatePaymentLinkResponse,
-} from "@/features/inscriptions/types/list-inscriptions/actions/createPaymentLinkTypes";
+} from "@/features/inscriptions/types/actions/createPaymentLinkTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function createPaymentLink({

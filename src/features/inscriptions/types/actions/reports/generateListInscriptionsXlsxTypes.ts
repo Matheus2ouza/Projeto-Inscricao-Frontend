@@ -1,11 +1,9 @@
-export type ListInscriptionsPdfResponse = {
-  pdfBase64: string;
+export type ListInscriptionsXlsxResponse = {
   filename: string;
-};
-
-export type ProcessListInscriptionsPdfDownloadOptions = {
-  successMessage?: string;
-  defaultFilename?: string;
+  fileBase64?: string;
+  contentType:
+    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    | "application/zip";
 };
 
 export enum InscriptionStatus {
@@ -28,7 +26,7 @@ export enum PaymentMethod {
   CARTAO = "CARTAO",
 }
 
-export type DownloadListInscriptionsPdfInput = {
+export type DownloadListInscriptionsXlsxInput = {
   eventId: string;
   participants?: boolean;
   payment?: boolean;

@@ -1,20 +1,25 @@
-import { createPaymentLink } from "@/features/inscriptions/api/list-inscriptions/actions/createPaymentLink";
-import { deleteInscription } from "@/features/inscriptions/api/list-inscriptions/actions/deleteInscription";
-import { updateExpired } from "@/features/inscriptions/api/list-inscriptions/actions/updateExpired";
+import { createPaymentLink } from "@/features/inscriptions/api/actions/createPaymentLink";
+import { deleteInscription } from "@/features/inscriptions/api/actions/deleteInscription";
+import { updateExpired } from "@/features/inscriptions/api/actions/updateExpired";
+import { updateInscription } from "@/features/inscriptions/api/actions/updeteInscription";
 import type {
   CreatePaymentLinkParams,
   CreatePaymentLinkResponse,
-} from "@/features/inscriptions/types/list-inscriptions/actions/createPaymentLinkTypes";
-import type { deleteInscriptionParams } from "@/features/inscriptions/types/list-inscriptions/actions/deleteInscriptionTypes";
+} from "@/features/inscriptions/types/actions/createPaymentLinkTypes";
+import type { deleteInscriptionParams } from "@/features/inscriptions/types/actions/deleteInscriptionTypes";
 import {
   UpdateExpiredInput,
   UpdateExpiredResponse,
-} from "@/features/inscriptions/types/list-inscriptions/actions/updateExpiredTypes";
+} from "@/features/inscriptions/types/actions/updateExpiredTypes";
+import {
+  UpdateInscriptionInput,
+  UpdateInscriptionResponse,
+} from "@/features/inscriptions/types/actions/updeteInscriptionType";
 import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useInvalidateDetailsInscriptionQuery } from "../inscription/useDetailsInscriptionQuery";
-import { useInvalidateListInscriptionsQuery } from "../useListInscriptionsQuery";
+import { useInvalidateDetailsInscriptionQuery } from "../list-inscriptions/inscription/useDetailsInscriptionQuery";
+import { useInvalidateListInscriptionsQuery } from "../list-inscriptions/useListInscriptionsQuery";
 
 export function useActionsInscription() {
   const router = useRouter();
@@ -81,25 +86,37 @@ export function useActionsInscription() {
     },
   });
 
-  const handleCreatePaymentLink = async ({
-    inscriptionId,
-  }: CreatePaymentLinkParams): Promise<CreatePaymentLinkResponse> => {
-    return await createPaymentLinkMutation({ inscriptionId });
-  };
-
-  const handleDeleteInscription = async ({
-    eventId,
-    inscriptionId,
-  }: deleteInscriptionParams): Promise<void> => {
-    await deleteInscriptionMutation({ eventId, inscriptionId });
-  };
+  const {
+    mutateAsync: updateInscriptionMutation,
+    isPending: isUpdatingInscription,
+  } = useMutation<UpdateInscriptionResponse, Error, UpdateInscriptionInput>({
+    mutationFn: updateInscription,
+    onSuccess: (_data, variables) => {
+      toast.success(
+        `Inscrição ${variables.responsible} atualizado com sucesso`,
+      );
+      invalidateInscriptionDetails();
+    },
+    onError: (error) => {
+      toast.error(`Erro ao atualizar os dados da inscrição: ${error.message}`);
+    },
+  });
 
   return {
-    handleUpdateExpired,
+    // Atualiza expiração da inscrição
+    handleUpdateExpired: updateExpiredMutation,
     isUpdatingExpired,
-    handleCreatePaymentLink,
+
+    // Cria o link de pagamento
+    handleCreatePaymentLink: createPaymentLinkMutation,
     isCreatingPaymentLink,
-    handleDeleteInscription,
+
+    // Deleta a inscrição
+    handleDeleteInscription: deleteInscriptionMutation,
     isDeletingInscription,
+
+    // Atualiza os dados da inscrição
+    handleUpdateInscription: updateInscriptionMutation,
+    isUpdatingInscription,
   };
 }

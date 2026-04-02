@@ -1,9 +1,10 @@
-export type TypeInscriptions = {
+export type TypeInscription = {
   id: string;
   description: string;
   rule: Date | null;
   value: number;
   specialType: boolean;
+  active: boolean;
   createdAt: Date;
 };
 
@@ -22,21 +23,14 @@ export type UpdateTypeInscriptionInput = {
   rule?: Date | null;
 };
 
-export type getTypeInscriptionsByEventResponse = {
-  id: string;
-  description: string;
-  rule: Date | null;
-  value: number;
-  specialType: boolean;
-  createdAt: Date;
-}[];
+export type getTypeInscriptionsByEventResponse = TypeInscription[];
 
 export type useTypeInscriptionParams = {
   eventId: string;
 };
 
 export type useTypeInscriptionResult = {
-  typeInscriptions: TypeInscriptions[];
+  typeInscriptions: TypeInscription[];
   loading: boolean;
   fetching: boolean;
   fetched: boolean;

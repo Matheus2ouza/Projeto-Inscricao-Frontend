@@ -38,7 +38,8 @@ const defaultSummary: Summary = {
 
 export function useUserDashboard() {
   const queryClient = useQueryClient();
-  const [refreshingMetric, setRefreshingMetric] = useState<DashboardUserMetric | null>(null);
+  const [refreshingMetric, setRefreshingMetric] =
+    useState<DashboardUserMetric | null>(null);
 
   const summaryQuery = useQuery({
     queryKey: dashboardUserKeys.summary(),
@@ -58,7 +59,7 @@ export function useUserDashboard() {
             (old) => {
               const current = old ?? defaultSummary;
               return { ...current, events };
-            }
+            },
           );
         }
 
@@ -69,7 +70,7 @@ export function useUserDashboard() {
             (old) => {
               const current = old ?? defaultSummary;
               return { ...current, inscriptions };
-            }
+            },
           );
         }
 
@@ -80,7 +81,7 @@ export function useUserDashboard() {
             (old) => {
               const current = old ?? defaultSummary;
               return { ...current, payments };
-            }
+            },
           );
         }
       } catch (error) {
@@ -92,7 +93,7 @@ export function useUserDashboard() {
         setRefreshingMetric(null);
       }
     },
-    [queryClient]
+    [queryClient],
   );
 
   const refetchAll = useCallback(async () => {
@@ -117,7 +118,7 @@ export function useUserDashboard() {
       refreshingMetric,
       refreshMetric,
       refetchAll,
-    ]
+    ],
   );
 
   return value;

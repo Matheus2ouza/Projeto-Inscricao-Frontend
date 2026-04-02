@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/lib/apiClient";
-import { TypeInscriptions } from "../types/typesInscriptionsTypes";
+import { TypeInscription } from "../types/typesInscriptionsTypes";
 
 export type UpdateTypeInscriptionInput = {
   description?: string;
@@ -11,10 +11,10 @@ export type UpdateTypeInscriptionInput = {
 export async function updateTypeInscription(
   typeInscriptionId: string,
   input: UpdateTypeInscriptionInput,
-): Promise<TypeInscriptions> {
+): Promise<TypeInscription> {
   try {
     console.log(input);
-    const response = await axiosInstance.put<TypeInscriptions>(
+    const response = await axiosInstance.put<TypeInscription>(
       `/type-inscription/${typeInscriptionId}/update`,
       input,
     );
@@ -28,7 +28,7 @@ export async function updateTypeInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os pagamentos",
+        "Não foi possível atualizar este tipo de inscrição",
     );
   }
 }

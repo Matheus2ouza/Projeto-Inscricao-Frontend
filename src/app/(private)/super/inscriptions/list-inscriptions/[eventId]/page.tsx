@@ -2,7 +2,7 @@
 
 import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable";
 import type { InscriptionsFiltersValue } from "@/features/inscriptions/components/list-inscriptions/filters/InscriptionsFilters";
-import useDownloadPdf from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadListInscriptionsPdf";
+import useDownloadPdf from "@/features/inscriptions/hooks/actions/reports/useInscriptionsReports";
 import { useListInscriptions } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptions";
 import { listInscriptionsKeys } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery";
 import PageContainer from "@/shared/components/layout/PageContainer";

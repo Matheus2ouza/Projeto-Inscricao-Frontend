@@ -19,7 +19,7 @@ export async function getTypeInscriptionsByEvent(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os pagamentos",
+        "Não foi possível carregar os tipos de inscrição",
     );
   }
 }

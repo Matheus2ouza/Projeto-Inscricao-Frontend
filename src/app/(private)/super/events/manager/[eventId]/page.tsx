@@ -2,6 +2,7 @@
 
 import EventManagement from "@/features/events/components/manager/EventManagement";
 import { useEventManager } from "@/features/events/hooks/manager/useEventManager";
+import { useTypeInscriptionsActions } from "@/features/typeInscription/hook/useTypeInscriptionsActions";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -32,6 +33,17 @@ export default function EventManagementSuperPage() {
     errorTypeInscriptions,
     refetchTypeInscriptions,
   } = useEventManager({ eventId });
+
+  const {
+    handleCreateTypeInscription,
+    isCreatingTypeInscription,
+    handleUpdateTypeInscription,
+    isUpdatingTypeInscription,
+    handleDeleteTypeInscription,
+    isDeletingTypeInscription,
+    handleDisableTypeInscription,
+    isDisablingTypeInscription,
+  } = useTypeInscriptionsActions(eventId);
 
   const handleBack = () => {
     router.replace(`/super/events/manager`);
@@ -99,6 +111,14 @@ export default function EventManagementSuperPage() {
         typeInscriptions={typeInscriptions}
         refreshEvent={refetchEvent}
         refreshTypeInscriptions={refetchTypeInscriptions}
+        onCreateTypeInscription={handleCreateTypeInscription}
+        isCreatingTypeInscription={isCreatingTypeInscription}
+        onUpdateTypeInscription={handleUpdateTypeInscription}
+        isUpdatingTypeInscription={isUpdatingTypeInscription}
+        onDeleteTypeInscription={handleDeleteTypeInscription}
+        isDeletingTypeInscription={isDeletingTypeInscription}
+        onDisableTypeInscription={handleDisableTypeInscription}
+        isDisablingTypeInscription={isDisablingTypeInscription}
       />
     );
   };

@@ -1,7 +1,7 @@
 import {
   UpdateExpiredParams,
   UpdateExpiredResponse,
-} from "@/features/inscriptions/types/list-inscriptions/actions/updateExpiredTypes";
+} from "@/features/inscriptions/types/actions/updateExpiredTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function updateExpired({

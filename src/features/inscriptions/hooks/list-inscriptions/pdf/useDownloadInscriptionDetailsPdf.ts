@@ -2,9 +2,9 @@
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
 import { listInscriptionDetailsPdf } from "@/features/inscriptions/api/list-inscriptions/pdf/inscriptionDetailsPdf";
+import { ListInscriptionsPdfResponse } from "@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes";
 import { ListDownloadInscriptionDetailsPdfInput } from "@/features/inscriptions/types/list-inscriptions/pdf/inscriptionDetailsPdfTypes";
-import { ListInscriptionsPdfResponse } from "@/features/inscriptions/types/list-inscriptions/pdf/listInscriptionsPdfTypes";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 const DEFAULT_ERROR_MESSAGE =
@@ -32,10 +32,13 @@ function downloadPdf(pdfBase64: string, filename: string) {
 
 export function useDownloadInscriptionDetailsPdf() {
   const { setLoading } = useGlobalLoading();
+  const [isDownloadingInscriptionPdf, setIsDownloadingInscriptionPdf] =
+    useState(false);
 
   const processDownload = useCallback(
     async (fetchPdf: () => Promise<ListInscriptionsPdfResponse>) => {
       setLoading(true);
+      setIsDownloadingInscriptionPdf(true);
 
       try {
         const response = await fetchPdf();
@@ -56,9 +59,10 @@ export function useDownloadInscriptionDetailsPdf() {
         return false;
       } finally {
         setLoading(false);
+        setIsDownloadingInscriptionPdf(false);
       }
     },
-    [setLoading],
+    [setLoading, setIsDownloadingInscriptionPdf],
   );
 
   const downloadInscriptionDetailsPdf = useCallback(
@@ -77,5 +81,6 @@ export function useDownloadInscriptionDetailsPdf() {
 
   return {
     downloadInscriptionDetailsPdf,
+    isDownloadingInscriptionPdf,
   };
 }

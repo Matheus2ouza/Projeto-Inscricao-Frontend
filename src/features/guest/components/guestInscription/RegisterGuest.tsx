@@ -923,7 +923,7 @@ export function RegisterGuest({
                   name="shirtSize"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>Tamanho da camisa</FormLabel>
+                      <FormLabel>Tamanho da camisa (Babylook)</FormLabel>
                       <Popover
                         open={openShirtSize}
                         onOpenChange={setOpenShirtSize}

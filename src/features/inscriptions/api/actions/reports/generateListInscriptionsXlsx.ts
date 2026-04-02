@@ -1,28 +1,26 @@
 import {
-  InscriptionStatus,
-  ListInscriptionsPdfResponse,
-  PaymentMethod,
-  StatusPayment,
-} from "@/features/inscriptions/types/list-inscriptions/pdf/listInscriptionsPdfTypes";
+  DownloadListInscriptionsXlsxInput,
+  ListInscriptionsXlsxResponse,
+} from "@/features/inscriptions/types/actions/reports/generateListInscriptionsXlsxTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 import qs from "qs";
 
-export async function listInscriptionsPdf(
-  eventId: string,
-  participants?: boolean,
-  payment?: boolean,
-  status?: InscriptionStatus | InscriptionStatus[],
-  statusPayment?: StatusPayment | StatusPayment[],
-  methodPayment?: PaymentMethod | PaymentMethod[],
-  isGuest?: boolean,
-  startDate?: string,
-  endDate?: string,
-): Promise<ListInscriptionsPdfResponse> {
+export async function generatelistInscriptionsXlsx({
+  eventId,
+  participants,
+  payment,
+  status,
+  statusPayment,
+  methodPayment,
+  isGuest,
+  startDate,
+  endDate,
+}: DownloadListInscriptionsXlsxInput): Promise<ListInscriptionsXlsxResponse> {
   try {
     const normalizedIsGuest = isGuest === false ? false : undefined;
 
-    const { data } = await axiosInstance.get<ListInscriptionsPdfResponse>(
-      `/inscriptions/${eventId}/all/pdf`,
+    const { data } = await axiosInstance.get<ListInscriptionsXlsxResponse>(
+      `/inscriptions/${eventId}/all/xlsx`,
       {
         params: {
           participants,

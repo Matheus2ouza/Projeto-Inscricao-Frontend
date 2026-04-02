@@ -3,11 +3,12 @@
 import {
   CreatePaymentLinkInput,
   CreatePaymentLinkResponse,
-} from "@/features/inscriptions/types/list-inscriptions/actions/createPaymentLinkTypes";
+} from "@/features/inscriptions/types/actions/createPaymentLinkTypes";
 import {
   UpdateExpiredInput,
   UpdateExpiredResponse,
-} from "@/features/inscriptions/types/list-inscriptions/actions/updateExpiredTypes";
+} from "@/features/inscriptions/types/actions/updateExpiredTypes";
+import { UpdateInscriptionResponse } from "@/features/inscriptions/types/actions/updeteInscriptionType";
 import {
   Inscription,
   InscriptionStatus,
@@ -15,6 +16,13 @@ import {
   Payment,
   PaymentLink,
 } from "@/features/inscriptions/types/list-inscriptions/inscription/detailsInscriptionTypes";
+import type {
+  GenderType,
+  ShirtSizeType,
+  ShirtType,
+  UpdateParticipantInput,
+  UpdateParticipantResponse,
+} from "@/features/participants/types/actions/updateParticipantTypes";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import { Button } from "@/shared/components/ui/button";
 import { Calendar } from "@/shared/components/ui/calendar";
@@ -33,11 +41,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { formatInput } from "@/shared/utils/format";
 import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
 import { getCalculateAge } from "@/shared/utils/getCalculateAge";
+import { getGenderInfo } from "@/shared/utils/getConvertGender";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
+import { Empty } from "antd";
 import {
   CalendarIcon,
   Check,
@@ -48,29 +60,60 @@ import {
   Eye,
   FileText,
   Mail,
+  Pencil,
   Phone,
+  Save,
+  Trash2,
+  Undo2,
   User,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import ParticipantEditModal from "./ParticipantEditModal";
+
+export interface InscriptionFormFields {
+  responsible: string;
+  email: string;
+  phone: string;
+  observation: string;
+}
+
+export interface ParticipantFomrFields {
+  id: string;
+  name?: string;
+  cpf: string;
+  birthDate?: Date;
+  gender?: GenderType;
+  preferredName?: string;
+  shirtSize?: ShirtSizeType;
+  shirtType?: ShirtType;
+}
 
 interface DetailsInscriptionProps {
   inscription: Inscription | null;
   participants: Participant[];
   payments: Payment[];
-  paymentLink?: PaymentLink | null;
+  paymentLink: PaymentLink | null;
   onViewPayment: (paymentId: string) => void;
-  onUpdateExpired?: (
+  onUpdateExpired: (
     input: UpdateExpiredInput,
   ) => Promise<UpdateExpiredResponse>;
-  isUpdatingExpired?: boolean;
-  onCreatePaymentLink?: (
+  isUpdatingExpired: boolean;
+  onCreatePaymentLink: (
     input: CreatePaymentLinkInput,
   ) => Promise<CreatePaymentLinkResponse>;
-  isCreatingPaymentLink?: boolean;
-  onDownloadInscriptionDetailsPdf?: (inscriptionId: string) => Promise<boolean>;
-  isDownloadingInscriptionDetailsPdf?: boolean;
-  onDeleteInscription?: (inscriptionId: string) => Promise<void>;
+  isCreatingPaymentLink: boolean;
+  onDownloadInscriptionDetailsPdf: (inscriptionId: string) => Promise<boolean>;
+  isDownloadingInscriptionDetailsPdf: boolean;
+  onDeleteInscription: (inscriptionId: string) => Promise<void>;
   isDeletingInscription?: boolean;
+  onSaveInscription: (
+    fields: InscriptionFormFields,
+  ) => Promise<UpdateInscriptionResponse>;
+  isSavingInscription: boolean;
+  onSaveParticipant: (
+    fields: ParticipantFomrFields,
+  ) => Promise<UpdateParticipantResponse>;
+  isSavingParticipants: boolean;
 }
 
 export default function DetailsInscriptionTable({
@@ -87,6 +130,10 @@ export default function DetailsInscriptionTable({
   isDownloadingInscriptionDetailsPdf = false,
   onDeleteInscription,
   isDeletingInscription,
+  onSaveInscription,
+  isSavingInscription,
+  onSaveParticipant,
+  isSavingParticipants,
 }: DetailsInscriptionProps) {
   if (!inscription) {
     return (
@@ -115,10 +162,40 @@ export default function DetailsInscriptionTable({
     return `${hh}:${mm}`;
   });
 
+  const [isEditingInscription, setIsEditingInscription] = useState(false);
+  const [inscriptionForm, setInscriptionForm] = useState<InscriptionFormFields>(
+    {
+      responsible: inscription.responsible,
+      email: inscription.email ?? "",
+      phone: inscription.phone ?? "",
+      observation: inscription.observation ?? "",
+    },
+  );
+
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    if (!isEditingInscription) {
+      setInscriptionForm({
+        responsible: inscription.responsible,
+        email: inscription.email ?? "",
+        phone: inscription.phone ?? "",
+        observation: inscription.observation ?? "",
+      });
+    }
+  }, [inscription, isEditingInscription]);
+
+  const handleCancelInscriptionEdit = () => {
+    setIsEditingInscription(false);
+  };
+
+  const handleSaveInscription = async () => {
+    await onSaveInscription(inscriptionForm);
+    setIsEditingInscription(false);
+  };
 
   const [paymentLinkCreated, setPaymentLinkCreated] =
     useState<CreatePaymentLinkResponse | null>(null);
@@ -213,6 +290,102 @@ export default function DetailsInscriptionTable({
         )
       : 0;
 
+  const [editingParticipant, setEditingParticipant] =
+    useState<Participant | null>(null);
+
+  const ActionButtons = () => (
+    <>
+      {!isEditingInscription && (
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          onClick={async () => {
+            await onDownloadInscriptionDetailsPdf(inscription.id);
+          }}
+          disabled={
+            !onDownloadInscriptionDetailsPdf ||
+            isDownloadingInscriptionDetailsPdf
+          }
+          className="bg-blue-500 text-white p-0 flex items-center justify-center gap-1"
+        >
+          <Download className="h-4 w-4" />
+          <span className="hidden sm:inline">Baixar PDF</span>
+        </Button>
+      )}
+
+      {!isEditingInscription ? (
+        <Button
+          variant="link"
+          type="button"
+          size="sm"
+          className="bg-green-500 text-white p-0 flex items-center justify-center gap-1"
+          onClick={() => setIsEditingInscription(true)}
+        >
+          <Pencil className="h-4 w-4" />
+          <span className="hidden sm:inline">Editar</span>
+        </Button>
+      ) : (
+        <>
+          <Button
+            type="button"
+            size="sm"
+            variant="link"
+            onClick={handleCancelInscriptionEdit}
+            disabled={isSavingInscription}
+            className="bg-red-500 text-white flex items-center justify-center gap-1"
+          >
+            <Undo2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Cancelar</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSaveInscription}
+            disabled={isSavingInscription}
+            className="gap-1"
+          >
+            <Save className="h-4 w-4" />
+            <span className="hidden sm:inline">
+              {isSavingInscription ? "Salvando..." : "Salvar alterações"}
+            </span>
+          </Button>
+        </>
+      )}
+
+      {!isEditingInscription && (
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          onClick={() => setDeleteDialogOpen(true)}
+          disabled={!onDeleteInscription || !!isDeletingInscription}
+          className="bg-red-500 text-white flex items-center justify-center gap-1"
+        >
+          <Trash2 className="h-4 w-4" />
+          <span className="hidden sm:inline">
+            {isDeletingInscription ? "Deletando..." : "Deletar"}
+          </span>
+        </Button>
+      )}
+    </>
+  );
+
+  const handleCloseParticipantModal = () => setEditingParticipant(null);
+  const handleSubmitParticipant = async (input: UpdateParticipantInput) => {
+    await onSaveParticipant({
+      id: input.id,
+      name: input.name,
+      cpf: input.cpf ?? "",
+      birthDate: input.birthDate,
+      gender: input.gender,
+      preferredName: input.preferredName,
+      shirtSize: input.shirtSize,
+      shirtType: input.shirtType,
+    });
+    handleCloseParticipantModal();
+  };
+
   return (
     <div className="space-y-8">
       <ConfirmationDialog
@@ -228,90 +401,191 @@ export default function DetailsInscriptionTable({
         isLoading={!!isDeletingInscription}
         variant="destructive"
       />
+
       <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-        <div className="p-6">
+        {/* Card dos dados da inscrição */}
+        <div className="p-4 sm:p-6">
           <div className="space-y-4">
             <div>
-              <div className="flex items-center justify-between gap-3">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {/* Primeira linha: Título à esquerda, botões à direita em telas maiores */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                   Detalhes da Inscrição
                 </h1>
-                <div className="flex items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      await onDownloadInscriptionDetailsPdf?.(inscription.id);
-                    }}
-                    disabled={
-                      !onDownloadInscriptionDetailsPdf ||
-                      isDownloadingInscriptionDetailsPdf
-                    }
-                    className="flex items-center gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    {isDownloadingInscriptionDetailsPdf
-                      ? "Baixando..."
-                      : "Baixar PDF"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteDialogOpen(true)}
-                    disabled={!onDeleteInscription || !!isDeletingInscription}
-                  >
-                    {isDeletingInscription
-                      ? "Deletando..."
-                      : "Deletar Inscrição"}
-                  </Button>
+                <div className="hidden sm:flex flex-wrap items-center gap-2 justify-end">
+                  <ActionButtons />
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 mt-2">
-                <code className="font-mono bg-muted px-2 py-1 rounded">
-                  {inscription.id.substring(0, 12)}...
-                </code>
-              </div>
-
-              <div className="text-xs text-muted-foreground">
-                Criada em: {formatDateTime(inscription.createdAt)}
+              {/* Segunda linha: ID, data e botões em telas menores */}
+              <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground mt-2">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <code className="font-mono bg-muted px-2 py-1 rounded text-xs sm:text-sm">
+                    {inscription.id.substring(0, 12)}...
+                  </code>
+                  <div className="text-xs sm:text-sm">
+                    Criada em: {formatDateTime(inscription.createdAt)}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0 sm:hidden">
+                  <ActionButtons />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Cards de informações - versão responsiva */}
+            {/* Versão para mobile (cards empilhados) */}
+            <div className="block sm:hidden space-y-3">
               <div className="bg-muted/30 p-4 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Responsável</span>
                 </div>
-                <p className="text-lg font-semibold">
-                  {inscription.responsible}
-                </p>
+                {isEditingInscription ? (
+                  <Input
+                    value={inscriptionForm.responsible}
+                    onChange={(event) =>
+                      setInscriptionForm((prev) => ({
+                        ...prev,
+                        responsible: event.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-base font-semibold">
+                    {inscription.responsible}
+                  </p>
+                )}
               </div>
 
-              {inscription.email && (
-                <div className="bg-muted/30 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Email</span>
-                  </div>
-                  <p className="text-sm font-medium break-all">
-                    {inscription.email}
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Email</span>
+                </div>
+                {isEditingInscription ? (
+                  <Input
+                    type="email"
+                    value={inscriptionForm.email}
+                    onChange={(event) =>
+                      setInscriptionForm((prev) => ({
+                        ...prev,
+                        email: event.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-sm break-all">
+                    {inscription.email ?? "Não informado"}
                   </p>
-                </div>
-              )}
+                )}
+              </div>
 
-              {inscription.phone && (
-                <div className="bg-muted/30 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Telefone</span>
-                  </div>
-                  <p className="text-sm font-medium">{inscription.phone}</p>
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Telefone</span>
                 </div>
-              )}
+                {isEditingInscription ? (
+                  <Input
+                    value={inscriptionForm.phone}
+                    onChange={(event) =>
+                      setInscriptionForm((prev) => ({
+                        ...prev,
+                        phone: event.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-sm">
+                    {inscription.phone ? inscription.phone : "Não informado"}
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Status</span>
+                </div>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+                    inscription.status,
+                  )}`}
+                >
+                  {getConvertStatusInscription(inscription.status)}
+                </span>
+              </div>
+            </div>
+
+            {/* Versão para desktop (grid 4 colunas) */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Responsável</span>
+                </div>
+                {isEditingInscription ? (
+                  <Input
+                    value={inscriptionForm.responsible}
+                    onChange={(event) =>
+                      setInscriptionForm((prev) => ({
+                        ...prev,
+                        responsible: event.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-lg font-semibold">
+                    {inscription.responsible}
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Email</span>
+                </div>
+                {isEditingInscription ? (
+                  <Input
+                    type="email"
+                    value={inscriptionForm.email}
+                    onChange={(event) =>
+                      setInscriptionForm((prev) => ({
+                        ...prev,
+                        email: event.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-sm font-medium break-all">
+                    {inscription.email ?? "Não informado"}
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Telefone</span>
+                </div>
+                {isEditingInscription ? (
+                  <Input
+                    value={inscriptionForm.phone}
+                    onChange={(event) =>
+                      setInscriptionForm((prev) => ({
+                        ...prev,
+                        phone: event.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <p className="text-sm font-medium">
+                    {inscription.phone ? inscription.phone : "Não informado"}
+                  </p>
+                )}
+              </div>
 
               <div className="bg-muted/30 p-4 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
@@ -331,6 +605,46 @@ export default function DetailsInscriptionTable({
         </div>
       </div>
 
+      <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+        <div className="p-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Observação
+              </h2>
+            </div>
+          </div>
+          {isEditingInscription ? (
+            <Textarea
+              value={inscriptionForm.observation}
+              onChange={(event) =>
+                setInscriptionForm((prev) => ({
+                  ...prev,
+                  observation: event.target.value,
+                }))
+              }
+              className="min-h-[120px]"
+            />
+          ) : (
+            <>
+              {inscription.observation ? (
+                // Mostra a observação quando existe conteúdo
+                <p className="text-sm text-foreground whitespace-pre-wrap">
+                  {inscription.observation}
+                </p>
+              ) : (
+                // Mostra o Empty quando não há observação
+                <Empty
+                  description="Nenhuma observação registrada para essa inscrição."
+                  className="py-4"
+                />
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Card do tempo de expiração da inscrição */}
       {inscription.status !== InscriptionStatus.PAID &&
         inscription.status !== InscriptionStatus.CANCELLED && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
@@ -493,86 +807,133 @@ export default function DetailsInscriptionTable({
             </div>
           ) : (
             <div className="space-y-3">
-              {participants.map((participant) => (
-                <div
-                  key={participant.id}
-                  className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <h3 className="font-semibold">{participant.name}</h3>
+              {participants.map((participant) => {
+                const { label: genderLabel } = getGenderInfo(
+                  participant.gender,
+                );
+                return (
+                  <div
+                    key={participant.id}
+                    className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <h3 className="font-semibold">{participant.name}</h3>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Tipo</p>
-                      <p className="text-sm font-medium">
-                        {participant.typeInscription || "Não informado"}
-                      </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Tipo</p>
+                        <p className="text-sm font-medium">
+                          {participant.typeInscription || "Não informado"}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Idade</p>
+                        <p className="text-sm font-medium">
+                          {getCalculateAge(participant.birthDate)} anos
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">Gênero</p>
+                        <p className="text-sm font-medium">{genderLabel}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground">
+                          Nascimento
+                        </p>
+                        <p className="text-sm font-medium">
+                          {formatDate(participant.birthDate)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Idade</p>
-                      <p className="text-sm font-medium">
-                        {getCalculateAge(participant.birthDate)} anos
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">Gênero</p>
-                      <p className="text-sm font-medium">
-                        {participant.gender}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground">
-                        Nascimento
-                      </p>
-                      <p className="text-sm font-medium">
-                        {formatDate(participant.birthDate)}
-                      </p>
+                    <div className="flex justify-end mt-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingParticipant(participant)}
+                      >
+                        Editar
+                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
-        <div className="hidden sm:block rounded-md border">
-          <Table>
+        <div className="hidden sm:block rounded-md border overflow-x-auto">
+          <Table className="min-w-[1100px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead className="w-[140px]">Tipo</TableHead>
+                <TableHead className="w-[250px]">Nome</TableHead>
+                <TableHead className="w-[140px]">CPF</TableHead>
+                <TableHead className="w-[120px]">Tipo</TableHead>
                 <TableHead className="w-[100px]">Idade</TableHead>
-                <TableHead className="w-[120px]">Gênero</TableHead>
-                <TableHead className="w-[140px]">Nascimento</TableHead>
+                <TableHead className="w-[100px]">Gênero</TableHead>
+                <TableHead className="w-[140px]">Data de Nasc.</TableHead>
+                <TableHead className="w-[100px]">Modelo</TableHead>
+                <TableHead className="w-[100px]">Tamanho</TableHead>
+                <TableHead className="w-[80px] text-center">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {participants.map((participant) => (
-                <TableRow key={participant.id} className="hover:bg-muted/50">
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      {participant.name}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {participant.typeInscription || "Não informado"}
-                  </TableCell>
-                  <TableCell>
-                    {getCalculateAge(participant.birthDate)} anos
-                  </TableCell>
-                  <TableCell>{participant.gender}</TableCell>
-                  <TableCell>{formatDate(participant.birthDate)}</TableCell>
-                </TableRow>
-              ))}
+              {participants.map((participant) => {
+                const { label: genderLabel } = getGenderInfo(
+                  participant.gender,
+                );
+                return (
+                  <TableRow key={participant.id} className="hover:bg-muted/50">
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate">{participant.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {participant.cpf
+                        ? formatInput("cpf", participant.cpf)
+                        : "-"}
+                    </TableCell>
+                    <TableCell>{participant.typeInscription || "—"}</TableCell>
+                    <TableCell>
+                      {getCalculateAge(participant.birthDate)} anos
+                    </TableCell>
+                    <TableCell>{genderLabel}</TableCell>
+                    <TableCell>
+                      {formatDate(participant.birthDate) || "—"}
+                    </TableCell>
+                    <TableCell>{participant.shirtType || "—"}</TableCell>
+                    <TableCell>{participant.shirtSize || "—"}</TableCell>
+                    <TableCell className="text-center">
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="h-8 w-8 rounded-lg bg-green-500 text-white p-0 hover:bg-green-600 transition-colors"
+                        onClick={() => setEditingParticipant(participant)}
+                        aria-label="Editar Participante"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
       </div>
+
+      <ParticipantEditModal
+        open={!!editingParticipant}
+        participant={editingParticipant}
+        onClose={handleCloseParticipantModal}
+        onSubmit={handleSubmitParticipant}
+        loading={isSavingParticipants}
+      />
 
       <div className="space-y-6">
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
@@ -585,22 +946,24 @@ export default function DetailsInscriptionTable({
                     Resumo Financeiro
                   </h3>
                 </div>
-                <Button
-                  type="button"
-                  size="sm"
-                  disabled={
-                    !onCreatePaymentLink ||
-                    isCreatingPaymentLink ||
-                    !!activePaymentLink?.active
-                  }
-                  onClick={handleCreatePaymentLink}
-                >
-                  {activePaymentLink?.active
-                    ? "Link ativo"
-                    : isCreatingPaymentLink
-                      ? "Criando..."
-                      : "Criar link de pagamento"}
-                </Button>
+                {inscription.status === InscriptionStatus.PENDING && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={
+                      !onCreatePaymentLink ||
+                      isCreatingPaymentLink ||
+                      !!activePaymentLink?.active
+                    }
+                    onClick={handleCreatePaymentLink}
+                  >
+                    {activePaymentLink?.active
+                      ? "Link ativo"
+                      : isCreatingPaymentLink
+                        ? "Criando..."
+                        : "Criar link de pagamento"}
+                  </Button>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -749,8 +1112,8 @@ export default function DetailsInscriptionTable({
               Nenhum pagamento registrado ainda
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table className="table-fixed">
+            <div className="rounded-md border overflow-x-auto">
+              <Table className="table-fixed min-w-[520px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-16">#</TableHead>

@@ -2,73 +2,111 @@ import {
   updateTypeInscription,
   UpdateTypeInscriptionInput,
 } from "@/features/typeInscription/api/updateTypeInscription";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  createTypeInscription,
-  CreateTypeInscriptionInput,
-} from "../api/createTypeInscription";
+import { createTypeInscription } from "../api/createTypeInscription";
 import { deleteTypeInscription } from "../api/deleteTypeInscription";
+import { updateTypeInscriptionActive } from "../api/updateTypeInscriptionActive";
 import { useInvalidateTypeInscriptionsQuery } from "./useTypeInscriptionsQuery";
 
 export function useTypeInscriptionsActions(eventId: string) {
-  const [loading, setLoading] = useState(false);
   const { invalidateDetail } = useInvalidateTypeInscriptionsQuery();
 
-  const create = async (input: CreateTypeInscriptionInput) => {
-    try {
-      setLoading(true);
-      const newType = await createTypeInscription(input);
+  const {
+    mutateAsync: createTypeInscriptionMutation,
+    isPending: isCreatingTypeInscription,
+  } = useMutation({
+    mutationFn: createTypeInscription,
+    onSuccess: () => {
       invalidateDetail(eventId);
       toast.success("Tipo de inscrição criado com sucesso!");
-      return newType;
-    } catch (error) {
-      const err = error as Error;
+    },
+    onError: (error: Error) => {
       toast.error("Erro ao criar tipo de inscrição", {
-        description: err.message,
+        description: error.message,
       });
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
-  const update = async (
-    typeInscriptionId: string,
-    input: UpdateTypeInscriptionInput,
-  ) => {
-    try {
-      setLoading(true);
-      const updatedType = await updateTypeInscription(typeInscriptionId, input);
+  const {
+    mutateAsync: updateTypeInscriptionMutation,
+    isPending: isUpdatingTypeInscription,
+  } = useMutation({
+    mutationFn: ({
+      typeInscriptionId,
+      input,
+    }: {
+      typeInscriptionId: string;
+      input: UpdateTypeInscriptionInput;
+    }) => updateTypeInscription(typeInscriptionId, input),
+    onSuccess: () => {
       invalidateDetail(eventId);
       toast.success("Tipo de inscrição atualizado com sucesso!");
-      return updatedType;
-    } catch (error) {
+    },
+    onError: (error: Error) => {
       toast.error("Erro ao atualizar tipo de inscrição");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
-  const remove = async (typeInscriptionId: string) => {
-    try {
-      setLoading(true);
-      await deleteTypeInscription(typeInscriptionId);
+  const {
+    mutateAsync: deleteTypeInscriptionMutation,
+    isPending: isDeletingTypeInscription,
+  } = useMutation({
+    mutationFn: deleteTypeInscription,
+    onSuccess: () => {
       invalidateDetail(eventId);
       toast.success("Tipo de inscrição excluído com sucesso!");
-    } catch (error) {
+    },
+    onError: () => {
       toast.error("Erro ao excluir tipo de inscrição");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
+
+  const {
+    mutateAsync: updateTypeInscriptionActiveMutation,
+    isPending: isUpdateTypeInscriptionActive,
+  } = useMutation({
+    mutationFn: ({
+      typeInscriptionId,
+      active,
+    }: {
+      typeInscriptionId: string;
+      active: boolean;
+    }) => updateTypeInscriptionActive(typeInscriptionId, active),
+    onSuccess: (_data, variables) => {
+      invalidateDetail(eventId);
+      toast.success(
+        variables.active
+          ? "Tipo de inscrição ativado com sucesso!"
+          : "Tipo de inscrição desabilitado com sucesso!",
+      );
+    },
+    onError: (_error, variables) => {
+      toast.error(
+        variables.active
+          ? "Erro ao ativar tipo de inscrição"
+          : "Erro ao desabilitar tipo de inscrição",
+      );
+    },
+  });
 
   return {
-    loading,
-    create,
-    update,
-    remove,
+    handleCreateTypeInscription: createTypeInscriptionMutation,
+    isCreatingTypeInscription,
+
+    handleUpdateTypeInscription: ({
+      typeInscriptionId,
+      input,
+    }: {
+      typeInscriptionId: string;
+      input: UpdateTypeInscriptionInput;
+    }) => updateTypeInscriptionMutation({ typeInscriptionId, input }),
+    isUpdatingTypeInscription,
+
+    handleDeleteTypeInscription: deleteTypeInscriptionMutation,
+    isDeletingTypeInscription,
+
+    handleDisableTypeInscription: updateTypeInscriptionActiveMutation,
+    isDisablingTypeInscription: isUpdateTypeInscriptionActive,
   };
 }

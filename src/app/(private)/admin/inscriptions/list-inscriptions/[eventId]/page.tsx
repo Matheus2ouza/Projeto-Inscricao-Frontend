@@ -2,7 +2,7 @@
 
 import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable";
 import type { InscriptionsFiltersValue } from "@/features/inscriptions/components/list-inscriptions/filters/InscriptionsFilters";
-import useDownloadPdf from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadListInscriptionsPdf";
+import useInscriptionReports from "@/features/inscriptions/hooks/actions/reports/useInscriptionsReports";
 import { useListInscriptions } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptions";
 import { listInscriptionsKeys } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery";
 import PageContainer from "@/shared/components/layout/PageContainer";
@@ -80,7 +80,12 @@ export default function ListInscriptionsAdminPage() {
     responsible: responsible.trim() ? responsible.trim() : undefined,
   });
 
-  const { downloadListInscriptionsPdf } = useDownloadPdf();
+  const {
+    handleGeneratePdfReport,
+    isGeneratePdfMutation,
+    handleGenerateXlsxReport,
+    isGenerateXlsxMutation,
+  } = useInscriptionReports();
 
   const renderSkeletonGrid = () => {
     return (
@@ -199,7 +204,10 @@ export default function ListInscriptionsAdminPage() {
             queryKey: listInscriptionsKeys.lists(),
           });
         }}
-        onDownloadPdf={downloadListInscriptionsPdf}
+        onDownloadPdf={handleGeneratePdfReport}
+        onDownloadXlsx={handleGenerateXlsxReport}
+        isGeneratingPdf={isGeneratePdfMutation}
+        isGeneratingXlsx={isGenerateXlsxMutation}
       />
     );
   };

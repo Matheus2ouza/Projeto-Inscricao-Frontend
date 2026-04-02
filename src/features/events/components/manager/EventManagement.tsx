@@ -12,9 +12,10 @@ import {
   Event,
   InscriptionMode,
 } from "@/features/events/types/manager/eventManagerTypes";
+import { CreateTypeInscriptionInput } from "@/features/typeInscription/api/createTypeInscription";
+import { UpdateTypeInscriptionInput } from "@/features/typeInscription/api/updateTypeInscription";
 import TypeInscriptionDialog from "@/features/typeInscription/components/TypeInscriptionDialog";
-import { useTypeInscriptionsActions } from "@/features/typeInscription/hook/useTypeInscriptionsActions";
-import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
+import { TypeInscription } from "@/features/typeInscription/types/typesInscriptionsTypes";
 import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
 import EventMap from "@/shared/components/EventMap";
 import ImageCropDialog from "@/shared/components/ImageCropDialog";
@@ -54,9 +55,25 @@ import InscriptionModesDialog from "./InscriptionModesDialog";
 
 interface EventManagementProps {
   event: Event | null;
-  typeInscriptions: TypeInscriptions[] | null;
+  typeInscriptions: TypeInscription[] | null;
   refreshEvent: () => void;
   refreshTypeInscriptions: () => void;
+  onCreateTypeInscription: (
+    input: CreateTypeInscriptionInput,
+  ) => Promise<TypeInscription>;
+  isCreatingTypeInscription: boolean;
+  onUpdateTypeInscription: (params: {
+    typeInscriptionId: string;
+    input: UpdateTypeInscriptionInput;
+  }) => Promise<TypeInscription>;
+  isUpdatingTypeInscription: boolean;
+  onDeleteTypeInscription: (typeInscriptionId: string) => Promise<void>;
+  isDeletingTypeInscription: boolean;
+  onDisableTypeInscription: (params: {
+    typeInscriptionId: string;
+    active: boolean;
+  }) => Promise<unknown>;
+  isDisablingTypeInscription: boolean;
 }
 
 export default function EventManagement({
@@ -64,6 +81,14 @@ export default function EventManagement({
   typeInscriptions,
   refreshEvent,
   refreshTypeInscriptions,
+  onCreateTypeInscription,
+  isCreatingTypeInscription,
+  onUpdateTypeInscription,
+  isUpdatingTypeInscription,
+  onDeleteTypeInscription,
+  isDeletingTypeInscription,
+  onDisableTypeInscription,
+  isDisablingTypeInscription,
 }: EventManagementProps) {
   if (!event) {
     return (
@@ -81,7 +106,7 @@ export default function EventManagement({
 
   const [showAmount, setShowAmount] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentType, setCurrentType] = useState<TypeInscriptions | null>(null);
+  const [currentType, setCurrentType] = useState<TypeInscription | null>(null);
   const dialogScrollPositionRef = useRef(0);
 
   const {
@@ -105,12 +130,11 @@ export default function EventManagement({
   // Buscar contas para obter os nomes dos responsáveis
   const { accounts } = useAccount(isEditing);
 
-  const {
-    loading: typeInscriptionLoading,
-    create,
-    update,
-    remove,
-  } = useTypeInscriptionsActions(event.id);
+  const typeInscriptionLoading =
+    isCreatingTypeInscription ||
+    isUpdatingTypeInscription ||
+    isDeletingTypeInscription ||
+    isDisablingTypeInscription;
 
   const { remove: removeResponsible, loading: removingResponsible } =
     useEventResponsible();
@@ -135,6 +159,20 @@ export default function EventManagement({
     open: false,
     responsibleId: null,
     responsibleName: null,
+  });
+  const [deleteTypeDialog, setDeleteTypeDialog] = useState<{
+    open: boolean;
+    type: TypeInscription | null;
+  }>({
+    open: false,
+    type: null,
+  });
+  const [disableTypeDialog, setDisableTypeDialog] = useState<{
+    open: boolean;
+    type: TypeInscription | null;
+  }>({
+    open: false,
+    type: null,
   });
 
   // Opções para os modos de inscrição
@@ -225,7 +263,7 @@ export default function EventManagement({
     });
   };
 
-  const handleEditType = (type: TypeInscriptions) => {
+  const handleEditType = (type: TypeInscription) => {
     dialogScrollPositionRef.current =
       typeof window !== "undefined" ? window.scrollY : 0;
     setCurrentType(type);
@@ -240,20 +278,12 @@ export default function EventManagement({
     });
   };
 
-  const handleDeleteType = async (type: TypeInscriptions) => {
-    if (
-      confirm(`Tem certeza que deseja excluir o tipo "${type.description}"?`)
-    ) {
-      try {
-        await remove(type.id);
-        // Invalidar cache do evento para recarregar os tipos de inscrição
-        invalidateDetail(event.id);
-        await refreshTypeInscriptions(); // Recarrega os dados do evento
-        await refreshEvent();
-      } catch (error) {
-        // Erro já tratado no hook
-      }
-    }
+  const handleDeleteType = (type: TypeInscription) => {
+    setDeleteTypeDialog({ open: true, type });
+  };
+
+  const handleDisableType = (type: TypeInscription) => {
+    setDisableTypeDialog({ open: true, type });
   };
 
   const handleSubmitType = async (data: {
@@ -265,23 +295,71 @@ export default function EventManagement({
     try {
       const payload = {
         ...data,
-        rule: data.rule,
+        ruleDate: data.rule,
       };
       if (currentType) {
         // Edição
-        await update(currentType.id, payload);
+        await onUpdateTypeInscription({
+          typeInscriptionId: currentType.id,
+          input: payload,
+        });
       } else {
         // Criação
-        await create({ ...payload, eventId: event.id });
+        await onCreateTypeInscription({ ...data, eventId: event.id });
       }
       // Invalidar cache do evento para recarregar os tipos de inscrição
       invalidateDetail(event.id);
-      refreshTypeInscriptions(); // Recarrega os dados do evento
-      refreshEvent();
+      await refreshTypeInscriptions(); // Recarrega os dados do evento
+      await refreshEvent();
     } catch (error) {
       // Erro já tratado no hook
     }
   };
+
+  const handleConfirmDeleteType = useCallback(async () => {
+    if (!deleteTypeDialog.type) return;
+
+    try {
+      await onDeleteTypeInscription(deleteTypeDialog.type.id);
+      invalidateDetail(event.id);
+      await refreshTypeInscriptions();
+      await refreshEvent();
+      setDeleteTypeDialog({ open: false, type: null });
+    } catch (error) {
+      // Erro já tratado no hook
+    }
+  }, [
+    deleteTypeDialog.type,
+    event.id,
+    invalidateDetail,
+    onDeleteTypeInscription,
+    refreshEvent,
+    refreshTypeInscriptions,
+  ]);
+
+  const handleConfirmDisableType = useCallback(async () => {
+    if (!disableTypeDialog.type) return;
+
+    try {
+      await onDisableTypeInscription({
+        typeInscriptionId: disableTypeDialog.type.id,
+        active: !disableTypeDialog.type.active,
+      });
+      invalidateDetail(event.id);
+      await refreshTypeInscriptions();
+      await refreshEvent();
+      setDisableTypeDialog({ open: false, type: null });
+    } catch (error) {
+      // Erro já tratado no hook
+    }
+  }, [
+    disableTypeDialog.type,
+    event.id,
+    invalidateDetail,
+    onDisableTypeInscription,
+    refreshEvent,
+    refreshTypeInscriptions,
+  ]);
 
   const handleConfirmDelete = useCallback(async () => {
     const success = await handleDelete();
@@ -837,48 +915,73 @@ export default function EventManagement({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {typesInscriptions.map((type) => (
-                    <div
-                      key={type.id}
-                      className="flex items-center justify-between p-4 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-medium text-gray-900 dark:text-white uppercase">
-                            {type.description}
-                          </h4>
-                          {type.specialType && (
+                  {typesInscriptions.map((type) => {
+                    const isTypeActive = type.active !== false;
+
+                    return (
+                      <div
+                        key={type.id}
+                        className="flex items-center justify-between p-4 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="font-medium text-gray-900 dark:text-white uppercase">
+                              {type.description}
+                            </h4>
                             <Badge
-                              variant="secondary"
-                              className="flex items-center gap-1 text-xs uppercase tracking-wide"
+                              className={
+                                isTypeActive
+                                  ? "text-xs bg-emerald-600 hover:bg-emerald-600 text-white"
+                                  : "text-xs"
+                              }
+                              variant={isTypeActive ? "default" : "destructive"}
                             >
-                              Especial
+                              {isTypeActive ? "Ativo" : "Desabilitado"}
                             </Badge>
-                          )}
+                            {type.specialType && (
+                              <Badge
+                                variant="secondary"
+                                className="flex items-center gap-1 text-xs uppercase tracking-wide"
+                              >
+                                Especial
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {getFormatCurrency(type.value)} •{" "}
+                            {calculateMaxAge(type.rule)}
+                          </p>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {getFormatCurrency(type.value)} •{" "}
-                          {calculateMaxAge(type.rule)}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditType(type)}
+                            disabled={typeInscriptionLoading}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            variant={isTypeActive ? "outline" : "default"}
+                            size="sm"
+                            className="flex items-center gap-1"
+                            onClick={() => handleDisableType(type)}
+                            disabled={typeInscriptionLoading}
+                          >
+                            {isTypeActive ? "Desabilitar" : "Ativar"}
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteType(type)}
+                            disabled={typeInscriptionLoading}
+                          >
+                            Excluir
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditType(type)}
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteType(type)}
-                        >
-                          Excluir
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <Button
                     variant="outline"
                     className="w-full flex items-center gap-2"
@@ -1188,6 +1291,46 @@ export default function EventManagement({
           cancelText="Cancelar"
           isLoading={loading}
           variant="destructive"
+        />
+        <ConfirmationDialog
+          open={deleteTypeDialog.open}
+          onOpenChange={(open) => {
+            setDeleteTypeDialog({
+              open,
+              type: open ? deleteTypeDialog.type : null,
+            });
+          }}
+          onConfirm={handleConfirmDeleteType}
+          title="Excluir tipo de inscrição?"
+          message={`Tem certeza que deseja excluir o tipo "${deleteTypeDialog.type?.description ?? ""}"? Esta ação não pode ser desfeita.`}
+          confirmText="Excluir tipo"
+          cancelText="Cancelar"
+          isLoading={isDeletingTypeInscription}
+          variant="destructive"
+        />
+        <ConfirmationDialog
+          open={disableTypeDialog.open}
+          onOpenChange={(open) => {
+            setDisableTypeDialog({
+              open,
+              type: open ? disableTypeDialog.type : null,
+            });
+          }}
+          onConfirm={handleConfirmDisableType}
+          title={
+            disableTypeDialog.type?.active
+              ? "Desabilitar tipo de inscrição?"
+              : "Ativar tipo de inscrição?"
+          }
+          message={`Tem certeza que deseja ${
+            disableTypeDialog.type?.active ? "desabilitar" : "ativar"
+          } o tipo "${disableTypeDialog.type?.description ?? ""}"?`}
+          confirmText={
+            disableTypeDialog.type?.active ? "Desabilitar" : "Ativar"
+          }
+          cancelText="Cancelar"
+          isLoading={isDisablingTypeInscription}
+          variant="default"
         />
         {/* Diálogo de confirmação para excluir responsável */}
         <ConfirmationDialog

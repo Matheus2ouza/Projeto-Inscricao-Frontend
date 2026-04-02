@@ -14,7 +14,7 @@ export async function deleteTypeInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os pagamentos",
+        "Não foi possível deletar o tipo de inscrição",
     );
   }
 }

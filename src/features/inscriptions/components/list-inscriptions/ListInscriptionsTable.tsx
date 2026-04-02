@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
-import { formatDate, formatDateTime } from "@/shared/utils/formatDate";
+import { formatDate } from "@/shared/utils/formatDate";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
@@ -29,7 +29,6 @@ import {
   Calendar,
   ChevronDown,
   Download,
-  FileText,
   Filter,
   Image as ImageIcon,
   Info,
@@ -38,7 +37,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { DownloadListInscriptionsPdfInput } from "../../types/list-inscriptions/pdf/listInscriptionsPdfTypes";
+import { DownloadListInscriptionsPdfInput } from "../../types/actions/reports/generateListInscriptionsPdfTypes";
+import { DownloadListInscriptionsXlsxInput } from "../../types/actions/reports/generateListInscriptionsXlsxTypes";
 import InscriptionsFilters, {
   InscriptionsFiltersValue,
 } from "./filters/InscriptionsFilters";
@@ -71,7 +71,20 @@ interface listInscriptionsTableProps {
     isGuest,
     startDate,
     endDate,
-  }: DownloadListInscriptionsPdfInput) => void;
+  }: DownloadListInscriptionsPdfInput) => Promise<{
+    fileBase64?: string;
+    filename?: string;
+    contentType?: string;
+  }>;
+
+  onDownloadXlsx: (input: DownloadListInscriptionsXlsxInput) => Promise<{
+    fileBase64?: string;
+    filename?: string;
+    contentType?: string;
+  }>;
+
+  isGeneratingPdf?: boolean;
+  isGeneratingXlsx?: boolean;
 }
 
 export default function ListInscriptionsTable({
@@ -89,11 +102,14 @@ export default function ListInscriptionsTable({
   onClearFilters,
   onSearchResponsible,
   onDownloadPdf,
+  onDownloadXlsx,
+  isGeneratingPdf = false,
+  isGeneratingXlsx = false,
 }: listInscriptionsTableProps) {
   const [imageError, setImageError] = useState(false);
-  const [pdfOpen, setPdfOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [pdfSheetOpen, setPdfSheetOpen] = useState(false);
+  const [reportsDrawerOpen, setReportsDrawerOpen] = useState(false);
+  const generatingReport = isGeneratingPdf || isGeneratingXlsx;
 
   const calculateGlobalIndex = (localIndex: number): number => {
     return (page - 1) * pageSize + localIndex + 1;
@@ -150,12 +166,6 @@ export default function ListInscriptionsTable({
                     </span>
                   </div>
                 </div>
-
-                {(event as any).createdAt && (
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    Criado em: {formatDateTime((event as any).createdAt)}
-                  </div>
-                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -231,45 +241,21 @@ export default function ListInscriptionsTable({
               onSearch={onSearchResponsible}
             />
             <div className="flex items-center gap-2">
-              <Popover
-                open={pdfOpen}
-                onOpenChange={(open) => {
-                  setPdfOpen(open);
-                  if (open) setFiltersOpen(false);
-                }}
+              <Button
+                type="button"
+                variant="outline"
+                className="inline-flex items-center gap-2"
+                onClick={() => setReportsDrawerOpen(true)}
+                disabled={generatingReport}
               >
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Gerar PDF
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-72 rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0">
-                  <div className="py-2">
-                    <button
-                      type="button"
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors"
-                      onClick={() => {
-                        setPdfOpen(false);
-                        setPdfSheetOpen(true);
-                      }}
-                    >
-                      <FileText className="w-4 h-4" />
-                      Lista de Inscritos
-                    </button>
-                  </div>
-                </PopoverContent>
-              </Popover>
+                <Download className="w-4 h-4" />
+                {generatingReport ? "Gerando..." : "Gerar Relatório"}
+              </Button>
 
               <Popover
                 open={filtersOpen}
                 onOpenChange={(open) => {
                   setFiltersOpen(open);
-                  if (open) setPdfOpen(false);
                 }}
               >
                 <PopoverTrigger asChild>
@@ -304,10 +290,13 @@ export default function ListInscriptionsTable({
         </div>
 
         <SheetListInscriptions
-          open={pdfSheetOpen}
-          onOpenChange={setPdfSheetOpen}
+          open={reportsDrawerOpen}
+          onOpenChange={setReportsDrawerOpen}
           eventId={event.id}
           onDownloadPdf={onDownloadPdf}
+          onDownloadXlsx={onDownloadXlsx}
+          generatingPdf={isGeneratingPdf}
+          generatingXlsx={isGeneratingXlsx}
         />
 
         <div className="px-6 pb-6">

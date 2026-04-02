@@ -1,7 +1,7 @@
 "use client";
 
 import ListParticipants from "@/features/participants/components/list-participants/ListParticipants";
-import { useParticipantsExportActions } from "@/features/participants/hooks/list-participants/actions/useParticipantsExportActions";
+import { useParticipantsReports } from "@/features/participants/hooks/actions/useParticipantsReports";
 import { useListParticipants } from "@/features/participants/hooks/list-participants/useListParticipants";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Skeleton } from "@/shared/components/ui/skeleton";
@@ -40,7 +40,7 @@ export default function ListGuestParticipantsSuperPage() {
     // xlsx
     handleGenerateLocalityXlsxReport,
     isGenerateXlsxLocalityMutation,
-  } = useParticipantsExportActions();
+  } = useParticipantsReports();
 
   const renderSkeletonGrid = () => {
     return (

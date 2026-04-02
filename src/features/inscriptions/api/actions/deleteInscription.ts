@@ -1,4 +1,4 @@
-import { deleteInscriptionParams } from "@/features/inscriptions/types/list-inscriptions/actions/deleteInscriptionTypes";
+import { deleteInscriptionParams } from "@/features/inscriptions/types/actions/deleteInscriptionTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function deleteInscription({

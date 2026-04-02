@@ -1,5 +1,5 @@
+import { ListInscriptionsPdfResponse } from "@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes";
 import { ListDownloadInscriptionDetailsPdfInput } from "@/features/inscriptions/types/list-inscriptions/pdf/inscriptionDetailsPdfTypes";
-import { ListInscriptionsPdfResponse } from "@/features/inscriptions/types/list-inscriptions/pdf/listInscriptionsPdfTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 
 export async function listInscriptionDetailsPdf({
