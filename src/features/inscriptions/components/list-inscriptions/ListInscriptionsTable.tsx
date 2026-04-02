@@ -37,8 +37,14 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { DownloadListInscriptionsPdfInput } from "../../types/actions/reports/generateListInscriptionsPdfTypes";
-import { DownloadListInscriptionsXlsxInput } from "../../types/actions/reports/generateListInscriptionsXlsxTypes";
+import {
+  GeneratelistInscriptionsPdfInput,
+  GeneratelistInscriptionsPdfResponse,
+} from "../../types/actions/reports/generateListInscriptionsPdfTypes";
+import {
+  GeneratelistInscriptionsXlsxInput,
+  GeneratelistInscriptionsXlsxResponse,
+} from "../../types/actions/reports/generateListInscriptionsXlsxTypes";
 import InscriptionsFilters, {
   InscriptionsFiltersValue,
 } from "./filters/InscriptionsFilters";
@@ -71,17 +77,11 @@ interface listInscriptionsTableProps {
     isGuest,
     startDate,
     endDate,
-  }: DownloadListInscriptionsPdfInput) => Promise<{
-    fileBase64?: string;
-    filename?: string;
-    contentType?: string;
-  }>;
+  }: GeneratelistInscriptionsPdfInput) => Promise<GeneratelistInscriptionsPdfResponse>;
 
-  onDownloadXlsx: (input: DownloadListInscriptionsXlsxInput) => Promise<{
-    fileBase64?: string;
-    filename?: string;
-    contentType?: string;
-  }>;
+  onDownloadXlsx: (
+    input: GeneratelistInscriptionsXlsxInput,
+  ) => Promise<GeneratelistInscriptionsXlsxResponse>;
 
   isGeneratingPdf?: boolean;
   isGeneratingXlsx?: boolean;

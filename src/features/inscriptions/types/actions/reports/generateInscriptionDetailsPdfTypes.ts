@@ -1,9 +1,9 @@
-export type ListInscriptionsPdfResponse = {
+export type GenerateInscriptionDetailsPdfResponse = {
   fileBase64: string;
   filename: string;
   contentType: "application/pdf";
 };
 
-export type ListDownloadInscriptionDetailsPdfInput = {
+export type GenerateInscriptionDetailsPdfInput = {
   inscriptionId: string;
 };

@@ -1,16 +1,17 @@
 import {
-  ListDownloadInscriptionDetailsPdfInput,
-  ListInscriptionsPdfResponse,
+  GenerateInscriptionDetailsPdfInput,
+  GenerateInscriptionDetailsPdfResponse,
 } from "@/features/inscriptions/types/actions/reports/generateInscriptionDetailsPdfTypes";
 import axiosInstance from "@/shared/lib/apiClient";
 
-export async function generateListInscriptionDetailsPdf({
+export async function generateInscriptionDetailsPdf({
   inscriptionId,
-}: ListDownloadInscriptionDetailsPdfInput) {
+}: GenerateInscriptionDetailsPdfInput) {
   try {
-    const { data } = await axiosInstance.get<ListInscriptionsPdfResponse>(
-      `/inscriptions/${inscriptionId}/details/pdf`,
-    );
+    const { data } =
+      await axiosInstance.get<GenerateInscriptionDetailsPdfResponse>(
+        `/inscriptions/${inscriptionId}/details/pdf`,
+      );
     return data;
   } catch (error) {
     const axiosError = error as {

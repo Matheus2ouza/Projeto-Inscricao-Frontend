@@ -4,12 +4,12 @@ import { useGlobalLoading } from "@/components/GlobalLoading";
 import { generatelistInscriptionsPdf } from "@/features/inscriptions/api/actions/reports/generateListInscriptionsPdf";
 import { generatelistInscriptionsXlsx } from "@/features/inscriptions/api/actions/reports/generateListInscriptionsXlsx";
 import {
-  DownloadListInscriptionsPdfInput,
-  ListInscriptionsPdfResponse,
+  GeneratelistInscriptionsPdfInput,
+  GeneratelistInscriptionsPdfResponse,
 } from "@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes";
 import {
-  DownloadListInscriptionsXlsxInput,
-  ListInscriptionsXlsxResponse,
+  GeneratelistInscriptionsXlsxInput,
+  GeneratelistInscriptionsXlsxResponse,
 } from "@/features/inscriptions/types/actions/reports/generateListInscriptionsXlsxTypes";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -50,9 +50,9 @@ export function useInscriptionReports() {
     mutateAsync: generatePdfListMutation,
     isPending: isGeneratePdfListMutation,
   } = useMutation<
-    ListInscriptionsPdfResponse,
+    GeneratelistInscriptionsPdfResponse,
     Error,
-    DownloadListInscriptionsPdfInput
+    GeneratelistInscriptionsPdfInput
   >({
     mutationFn: generatelistInscriptionsPdf,
     onMutate: () => setLoading(true),
@@ -81,9 +81,9 @@ export function useInscriptionReports() {
     mutateAsync: generateXlsxListMutation,
     isPending: isGenerateXlsxListMutation,
   } = useMutation<
-    ListInscriptionsXlsxResponse,
+    GeneratelistInscriptionsXlsxResponse,
     Error,
-    DownloadListInscriptionsXlsxInput
+    GeneratelistInscriptionsXlsxInput
   >({
     mutationFn: generatelistInscriptionsXlsx,
     onMutate: () => setLoading(true),
@@ -109,11 +109,11 @@ export function useInscriptionReports() {
   });
 
   const handleGenerateListInscriptionsPdfReport = async (
-    params: DownloadListInscriptionsPdfInput,
+    params: GeneratelistInscriptionsPdfInput,
   ) => generatePdfListMutation(params);
 
   const handleGenerateListInscriptionsXlsxReport = async (
-    params: DownloadListInscriptionsXlsxInput,
+    params: GeneratelistInscriptionsXlsxInput,
   ) => generateXlsxListMutation(params);
 
   return {

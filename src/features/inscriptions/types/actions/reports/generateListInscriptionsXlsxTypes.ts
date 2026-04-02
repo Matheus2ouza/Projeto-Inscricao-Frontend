@@ -1,11 +1,3 @@
-export type ListInscriptionsXlsxResponse = {
-  filename: string;
-  fileBase64?: string;
-  contentType:
-    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    | "application/zip";
-};
-
 export enum InscriptionStatus {
   PENDING = "PENDING",
   UNDER_REVIEW = "UNDER_REVIEW",
@@ -26,7 +18,7 @@ export enum PaymentMethod {
   CARTAO = "CARTAO",
 }
 
-export type DownloadListInscriptionsXlsxInput = {
+export type GeneratelistInscriptionsXlsxInput = {
   eventId: string;
   participants?: boolean;
   payment?: boolean;
@@ -36,4 +28,12 @@ export type DownloadListInscriptionsXlsxInput = {
   isGuest?: boolean;
   startDate?: string;
   endDate?: string;
+};
+
+export type GeneratelistInscriptionsXlsxResponse = {
+  filename: string;
+  fileBase64?: string;
+  contentType:
+    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    | "application/zip";
 };

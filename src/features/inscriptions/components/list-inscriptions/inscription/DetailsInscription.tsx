@@ -4,6 +4,7 @@ import {
   CreatePaymentLinkInput,
   CreatePaymentLinkResponse,
 } from "@/features/inscriptions/types/actions/createPaymentLinkTypes";
+import { GenerateInscriptionDetailsPdfResponse } from "@/features/inscriptions/types/actions/reports/generateInscriptionDetailsPdfTypes";
 import {
   UpdateExpiredInput,
   UpdateExpiredResponse,
@@ -102,7 +103,9 @@ interface DetailsInscriptionProps {
     input: CreatePaymentLinkInput,
   ) => Promise<CreatePaymentLinkResponse>;
   isCreatingPaymentLink: boolean;
-  onDownloadInscriptionDetailsPdf: (inscriptionId: string) => Promise<boolean>;
+  onDownloadInscriptionDetailsPdf: (
+    inscriptionId: string,
+  ) => Promise<GenerateInscriptionDetailsPdfResponse>;
   isDownloadingInscriptionDetailsPdf: boolean;
   onDeleteInscription: (inscriptionId: string) => Promise<void>;
   isDeletingInscription?: boolean;

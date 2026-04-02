@@ -22,12 +22,12 @@ import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import { Separator } from "@/shared/components/ui/separator";
 import { Switch } from "@/shared/components/ui/switch";
 import type {
-  DownloadListInscriptionsPdfInput,
+  GeneratelistInscriptionsPdfInput,
   InscriptionStatus,
   PaymentMethod,
   StatusPayment,
 } from "../../../types/actions/reports/generateListInscriptionsPdfTypes";
-import type { DownloadListInscriptionsXlsxInput } from "../../../types/actions/reports/generateListInscriptionsXlsxTypes";
+import type { GeneratelistInscriptionsXlsxInput } from "../../../types/actions/reports/generateListInscriptionsXlsxTypes";
 
 type DatePreset = "1h" | "24h" | "7d" | null;
 
@@ -55,12 +55,16 @@ type SheetListInscriptionsProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   eventId: string;
-  onDownloadPdf: (
-    input: DownloadListInscriptionsPdfInput,
-  ) => Promise<{ fileBase64?: string; filename?: string; contentType?: string }>;
-  onDownloadXlsx: (
-    input: DownloadListInscriptionsXlsxInput,
-  ) => Promise<{ fileBase64?: string; filename?: string; contentType?: string }>;
+  onDownloadPdf: (input: GeneratelistInscriptionsPdfInput) => Promise<{
+    fileBase64?: string;
+    filename?: string;
+    contentType?: string;
+  }>;
+  onDownloadXlsx: (input: GeneratelistInscriptionsXlsxInput) => Promise<{
+    fileBase64?: string;
+    filename?: string;
+    contentType?: string;
+  }>;
   generatingPdf?: boolean;
   generatingXlsx?: boolean;
 };
@@ -153,7 +157,7 @@ export default function SheetListInscriptions({
   );
 
   const buildReportInput = React.useCallback(
-    (filters: ReportFilters): DownloadListInscriptionsPdfInput => {
+    (filters: ReportFilters): GeneratelistInscriptionsPdfInput => {
       const isGuest = filters.includeNotAllocated ? undefined : false;
 
       return {
@@ -232,7 +236,9 @@ export default function SheetListInscriptions({
     const optionId = selectedOption?.id;
     if (!optionId) return baseFilters;
 
-    return filtersByOption[optionId] ?? selectedOption.defaultFilters ?? baseFilters;
+    return (
+      filtersByOption[optionId] ?? selectedOption.defaultFilters ?? baseFilters
+    );
   }, [baseFilters, filtersByOption, selectedOption]);
 
   const setSelectedFilters = React.useCallback(
@@ -387,7 +393,8 @@ export default function SheetListInscriptions({
                         Incluir participantes
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Inclui a lista de participantes dentro de cada inscrição.
+                        Inclui a lista de participantes dentro de cada
+                        inscrição.
                       </div>
                     </div>
                     <Switch
@@ -416,7 +423,10 @@ export default function SheetListInscriptions({
                     <Switch
                       checked={selectedFilters.payment}
                       onCheckedChange={(checked) =>
-                        setSelectedFilters({ ...selectedFilters, payment: checked })
+                        setSelectedFilters({
+                          ...selectedFilters,
+                          payment: checked,
+                        })
                       }
                       disabled={generating}
                     />
@@ -450,13 +460,19 @@ export default function SheetListInscriptions({
                   <div className="text-sm font-medium">Status da inscrição</div>
                   <div className="grid gap-2">
                     {[
-                      { label: "Pendente", value: "PENDING" as InscriptionStatus },
+                      {
+                        label: "Pendente",
+                        value: "PENDING" as InscriptionStatus,
+                      },
                       {
                         label: "Em análise",
                         value: "UNDER_REVIEW" as InscriptionStatus,
                       },
                       { label: "Pago", value: "PAID" as InscriptionStatus },
-                      { label: "Expirado", value: "EXPIRED" as InscriptionStatus },
+                      {
+                        label: "Expirado",
+                        value: "EXPIRED" as InscriptionStatus,
+                      },
                       {
                         label: "Cancelado",
                         value: "CANCELLED" as InscriptionStatus,
@@ -596,7 +612,11 @@ export default function SheetListInscriptions({
                   <div className="flex flex-wrap gap-2">
                     <Button
                       type="button"
-                      variant={selectedFilters.datePreset === "1h" ? "default" : "outline"}
+                      variant={
+                        selectedFilters.datePreset === "1h"
+                          ? "default"
+                          : "outline"
+                      }
                       size="sm"
                       onClick={() => applyPreset("1h")}
                       disabled={generating}
@@ -605,7 +625,11 @@ export default function SheetListInscriptions({
                     </Button>
                     <Button
                       type="button"
-                      variant={selectedFilters.datePreset === "24h" ? "default" : "outline"}
+                      variant={
+                        selectedFilters.datePreset === "24h"
+                          ? "default"
+                          : "outline"
+                      }
                       size="sm"
                       onClick={() => applyPreset("24h")}
                       disabled={generating}
@@ -614,7 +638,11 @@ export default function SheetListInscriptions({
                     </Button>
                     <Button
                       type="button"
-                      variant={selectedFilters.datePreset === "7d" ? "default" : "outline"}
+                      variant={
+                        selectedFilters.datePreset === "7d"
+                          ? "default"
+                          : "outline"
+                      }
                       size="sm"
                       onClick={() => applyPreset("7d")}
                       disabled={generating}
@@ -649,7 +677,11 @@ export default function SheetListInscriptions({
               Próximo
             </Button>
           ) : (
-            <Button type="button" onClick={handleGenerate} disabled={generating}>
+            <Button
+              type="button"
+              onClick={handleGenerate}
+              disabled={generating}
+            >
               {generating ? "Gerando..." : "Gerar"}
             </Button>
           )}

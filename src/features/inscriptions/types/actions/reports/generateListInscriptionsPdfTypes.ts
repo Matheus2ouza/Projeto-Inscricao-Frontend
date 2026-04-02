@@ -1,9 +1,3 @@
-export type ListInscriptionsPdfResponse = {
-  filename: string;
-  fileBase64?: string;
-  contentType: "application/pdf" | "application/zip";
-};
-
 export enum InscriptionStatus {
   PENDING = "PENDING",
   UNDER_REVIEW = "UNDER_REVIEW",
@@ -24,7 +18,7 @@ export enum PaymentMethod {
   CARTAO = "CARTAO",
 }
 
-export type DownloadListInscriptionsPdfInput = {
+export type GeneratelistInscriptionsPdfInput = {
   eventId: string;
   participants?: boolean;
   payment?: boolean;
@@ -34,4 +28,10 @@ export type DownloadListInscriptionsPdfInput = {
   isGuest?: boolean;
   startDate?: string;
   endDate?: string;
+};
+
+export type GeneratelistInscriptionsPdfResponse = {
+  filename: string;
+  fileBase64?: string;
+  contentType: "application/pdf" | "application/zip";
 };
