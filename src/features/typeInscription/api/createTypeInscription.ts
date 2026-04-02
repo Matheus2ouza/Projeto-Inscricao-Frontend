@@ -1,6 +1,6 @@
 import axiosInstance from "@/shared/lib/apiClient";
 import qs from "qs";
-import { TypeInscriptions } from "../types/typesInscriptionsTypes";
+import { TypeInscription } from "../types/typesInscriptionsTypes";
 
 export type CreateTypeInscriptionInput = {
   description: string;
@@ -12,9 +12,9 @@ export type CreateTypeInscriptionInput = {
 
 export async function createTypeInscription(
   input: CreateTypeInscriptionInput,
-): Promise<TypeInscriptions> {
+): Promise<TypeInscription> {
   try {
-    const response = await axiosInstance.post<TypeInscriptions>(
+    const response = await axiosInstance.post<TypeInscription>(
       `/type-inscription/${input.eventId}/create`,
       input,
       {
@@ -31,7 +31,7 @@ export async function createTypeInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os pagamentos",
+        "Não foi possível criar o tipo de inscrição",
     );
   }
 }

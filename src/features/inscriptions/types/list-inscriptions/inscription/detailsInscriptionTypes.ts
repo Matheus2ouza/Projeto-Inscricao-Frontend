@@ -1,16 +1,3 @@
-export type Inscription = {
-  id: string;
-  responsible: string;
-  email?: string;
-  phone?: string;
-  status: InscriptionStatus;
-  totalValue: number;
-  totalPaid: number;
-  totalDebt: number;
-  createdAt: Date;
-  expiresAt: Date;
-};
-
 export enum InscriptionStatus {
   PENDING = "PENDING",
   UNDER_REVIEW = "UNDER_REVIEW",
@@ -19,12 +6,34 @@ export enum InscriptionStatus {
   CANCELLED = "CANCELLED",
 }
 
+export type GenderType = "MASCULINO" | "FEMININO";
+export type ShirtSizeType = "PP" | "P" | "M" | "G" | "GG" | "XG";
+export type ShirtType = "TRADICIONAL" | "BABYLOOK";
+
+export type Inscription = {
+  id: string;
+  responsible: string;
+  email?: string;
+  phone?: string;
+  status: InscriptionStatus;
+  observation?: string;
+  totalValue: number;
+  totalPaid: number;
+  totalDebt: number;
+  createdAt: Date;
+  expiresAt: Date;
+};
+
 export type Participant = {
   id: string;
-  typeInscription: string | undefined;
   name: string;
+  preferredName?: string;
+  cpf?: string;
+  typeInscription?: string;
   birthDate: Date;
-  gender: string;
+  gender: GenderType;
+  shirtSize?: ShirtSizeType;
+  shirtType?: ShirtType;
 };
 
 export type Payment = {

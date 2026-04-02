@@ -1,13 +1,3 @@
-export type ListInscriptionsPdfResponse = {
-  pdfBase64: string;
-  filename: string;
-};
-
-export type ProcessListInscriptionsPdfDownloadOptions = {
-  successMessage?: string;
-  defaultFilename?: string;
-};
-
 export enum InscriptionStatus {
   PENDING = "PENDING",
   UNDER_REVIEW = "UNDER_REVIEW",
@@ -28,7 +18,7 @@ export enum PaymentMethod {
   CARTAO = "CARTAO",
 }
 
-export type DownloadListInscriptionsPdfInput = {
+export type GeneratelistInscriptionsXlsxInput = {
   eventId: string;
   participants?: boolean;
   payment?: boolean;
@@ -38,4 +28,12 @@ export type DownloadListInscriptionsPdfInput = {
   isGuest?: boolean;
   startDate?: string;
   endDate?: string;
+};
+
+export type GeneratelistInscriptionsXlsxResponse = {
+  filename: string;
+  fileBase64?: string;
+  contentType:
+    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    | "application/zip";
 };

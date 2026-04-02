@@ -5,12 +5,12 @@ import {
   generateParticipantsByLocalityPdf,
   type GenerateParticipantsByLocalityPdfParams,
   type GenerateParticipantsByLocalityPdfResponse,
-} from "@/features/participants/api/list-participants/actions/generateParticipantsByLocalityPdf";
+} from "@/features/participants/api/actions/reports/generateListParticipantsByLocalityPdf";
 import {
   generateParticipantsByLocalityXlsx,
   GenerateParticipantsByLocalityXlsxParams,
   GenerateParticipantsByLocalityXlsxResponse,
-} from "@/features/participants/api/list-participants/actions/generateParticipantsByLocalityXlsx";
+} from "@/features/participants/api/actions/reports/generateListParticipantsByLocalityXlsx";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -41,7 +41,7 @@ function download(
   URL.revokeObjectURL(url);
 }
 
-export function useParticipantsExportActions() {
+export function useParticipantsReports() {
   const { setLoading } = useGlobalLoading();
 
   const {

@@ -17,8 +17,8 @@ import { Label } from "@/shared/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
 import { Separator } from "@/shared/components/ui/separator";
 import { Switch } from "@/shared/components/ui/switch";
-import type { GenerateParticipantsByLocalityPdfResponse } from "../../api/list-participants/actions/generateParticipantsByLocalityPdf";
-import type { GenerateParticipantsByLocalityXlsxResponse } from "../../api/list-participants/actions/generateParticipantsByLocalityXlsx";
+import type { GenerateParticipantsByLocalityPdfResponse } from "../../api/actions/reports/generateListParticipantsByLocalityPdf";
+import type { GenerateParticipantsByLocalityXlsxResponse } from "../../api/actions/reports/generateListParticipantsByLocalityXlsx";
 
 type ExportOption = {
   id: string;
@@ -141,7 +141,7 @@ export default function PdfGeneratorDrawer({
           <div className="space-y-0.5">
             <div className="text-sm font-medium">Separar por localidade</div>
             <div className="text-xs text-muted-foreground">
-              Se ativado, gera um arquivo para cada localidade (zip).
+              Gera um arquivo para cada localidade (zip).
             </div>
           </div>
           <Switch
@@ -196,7 +196,7 @@ export default function PdfGeneratorDrawer({
     () => [
       {
         id: "participants-by-locality-pdf",
-        title: "Participantes por localidade (PDF)",
+        title: "Lista de participantes por localidade (PDF)",
         description:
           "Gera um PDF com a lista de participantes agrupada por localidade.",
         defaultFilters: { separate: false, reduced: false },
@@ -218,7 +218,7 @@ export default function PdfGeneratorDrawer({
       },
       {
         id: "participants-by-locality-xlsx",
-        title: "Participantes por localidade (Excel)",
+        title: "Lista de participantes por localidade (Excel)",
         description:
           "Gera um Excel (.xlsx) com a lista de participantes agrupada por localidade.",
         defaultFilters: { separate: false },

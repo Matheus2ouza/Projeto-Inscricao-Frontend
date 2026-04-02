@@ -40,7 +40,7 @@ const pickNumber = (data: unknown, keys: string[]): number => {
 };
 
 const normalizeActiveEvents = (
-  data: unknown
+  data: unknown,
 ): FindActiveEventsUserResponse => ({
   activeEvents: pickNumber(data, [
     "activeEvents",
@@ -52,7 +52,7 @@ const normalizeActiveEvents = (
 });
 
 const normalizeTotalInscriptions = (
-  data: unknown
+  data: unknown,
 ): FindTotalInscriptionsUserResponse => {
   if (data && typeof data === "object") {
     const obj = data as Record<string, unknown>;
@@ -61,13 +61,13 @@ const normalizeTotalInscriptions = (
         obj.countTotalInscriptions ??
           obj.totalInscriptions ??
           obj.inscriptions ??
-          obj.total
+          obj.total,
       ),
       countTotalParticipants: toNumber(
-        obj.countTotalParticipants ?? obj.totalParticipants ?? obj.participants
+        obj.countTotalParticipants ?? obj.totalParticipants ?? obj.participants,
       ),
       countPendingInscriptions: toNumber(
-        obj.countPendingInscriptions ?? obj.pendingInscriptions ?? obj.pending
+        obj.countPendingInscriptions ?? obj.pendingInscriptions ?? obj.pending,
       ),
     };
   }
@@ -83,10 +83,12 @@ const normalizeTotalDebt = (data: unknown): FindTotalDebtUserResponse => {
   if (data && typeof data === "object") {
     const obj = data as Record<string, unknown>;
     return {
-      countTotalDebt: toNumber(obj.countTotalDebt ?? obj.totalDebt ?? obj.total),
+      countTotalDebt: toNumber(
+        obj.countTotalDebt ?? obj.totalDebt ?? obj.total,
+      ),
       countTotalPaid: toNumber(obj.countTotalPaid ?? obj.totalPaid ?? obj.paid),
       debtCompletionPercentage: toNumber(
-        obj.debtCompletionPercentage ?? obj.percentage ?? obj.progress
+        obj.debtCompletionPercentage ?? obj.percentage ?? obj.progress,
       ),
     };
   }

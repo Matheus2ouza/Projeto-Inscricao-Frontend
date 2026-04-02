@@ -12,8 +12,8 @@ import type { ColumnsType } from "antd/es/table";
 import Pagination from "antd/lib/pagination";
 import { Download, Users } from "lucide-react";
 import { useState } from "react";
-import { GenerateParticipantsByLocalityPdfResponse } from "../../api/list-participants/actions/generateParticipantsByLocalityPdf";
-import { GenerateParticipantsByLocalityXlsxResponse } from "../../api/list-participants/actions/generateParticipantsByLocalityXlsx";
+import { GenerateParticipantsByLocalityPdfResponse } from "../../api/actions/reports/generateListParticipantsByLocalityPdf";
+import { GenerateParticipantsByLocalityXlsxResponse } from "../../api/actions/reports/generateListParticipantsByLocalityXlsx";
 import { Participant } from "../../types/list-participants/listParticipantsTypes";
 import PdfGeneratorDrawer from "./PdfGeneratorDrawer";
 

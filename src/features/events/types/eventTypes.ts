@@ -1,5 +1,3 @@
-import { TypeInscriptions } from "@/features/typeInscription/types/typesInscriptionsTypes";
-
 export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
 export const STATUS_EVENT_VALUES: StatusEvent[] = [
   "OPEN",
@@ -25,7 +23,7 @@ export type Event = {
   latitude?: number;
   longitude?: number;
   status: string;
-  active?: boolean;
+  active: boolean;
   paymentEnebled: boolean;
   ticketEnabled: boolean;
   regionId: string;
@@ -33,7 +31,7 @@ export type Event = {
   createdAt: string;
   updatedAt: string;
   countTypeInscriptions?: number;
-  typesInscriptions: TypeInscriptions[];
+  typesInscriptions: TypeInscription[];
   responsibles?: Responsible[];
   description?: string;
   maxParticipants?: number;

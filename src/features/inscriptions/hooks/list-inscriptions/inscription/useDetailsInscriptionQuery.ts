@@ -1,5 +1,8 @@
 import { getDetailsInscription } from "@/features/inscriptions/api/list-inscriptions/inscription/getDetailsInscriptions";
-import { DetailsInscriptionResponse } from "@/features/inscriptions/types/list-inscriptions/inscription/detailsInscriptionTypes";
+import {
+  DetailsInscriptionResponse,
+  Participant,
+} from "@/features/inscriptions/types/list-inscriptions/inscription/detailsInscriptionTypes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const DetailsInscriptionKey = {
@@ -47,6 +50,23 @@ export function useInvalidateDetailsInscriptionQuery() {
       queryClient.removeQueries({
         queryKey: DetailsInscriptionKey.details(inscriptionId),
       });
+    },
+    updateParticipant: (
+      inscriptionId: string,
+      updatedParticipant: Participant,
+    ) => {
+      queryClient.setQueryData<DetailsInscriptionResponse>(
+        DetailsInscriptionKey.detail(inscriptionId),
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            participants: old.participants.map((p) =>
+              p.id === updatedParticipant.id ? updatedParticipant : p,
+            ),
+          };
+        },
+      );
     },
   };
 }

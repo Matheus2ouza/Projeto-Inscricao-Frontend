@@ -1,14 +1,17 @@
 "use client";
 
-import DetailsInscriptionTable from "@/features/inscriptions/components/list-inscriptions/inscription/DetailsInscription";
-import { useActionsInscription } from "@/features/inscriptions/hooks/list-inscriptions/actions/useActionsInscription";
+import DetailsInscriptionTable, {
+  InscriptionFormFields,
+  ParticipantFomrFields,
+} from "@/features/inscriptions/components/list-inscriptions/inscription/DetailsInscription";
+import useInscriptionReports from "@/features/inscriptions/hooks/actions/reports/useInscriptionsReports";
+import { useActionsInscription } from "@/features/inscriptions/hooks/actions/useActionsInscription";
+import { useUpdateParticipant } from "@/features/inscriptions/hooks/actions/useUpdateParticipant";
 import { useDetailsInscription } from "@/features/inscriptions/hooks/list-inscriptions/inscription/useDetailsInscription";
-import { useDownloadInscriptionDetailsPdf } from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadInscriptionDetailsPdf";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function InscriptionDetailListAdminPage() {
   const params = useParams();
@@ -35,24 +38,82 @@ export default function InscriptionDetailListAdminPage() {
   } = useDetailsInscription({ inscriptionId });
 
   const {
+    // Atualiza expiração da inscrição
     handleUpdateExpired,
     isUpdatingExpired,
+
+    // Cria o link de pagamento
     handleCreatePaymentLink,
     isCreatingPaymentLink,
+
+    // Deleta a inscrição
     handleDeleteInscription,
     isDeletingInscription,
+
+    // Atualiza os dados da inscrição
+    handleUpdateInscription,
+    isUpdatingInscription,
   } = useActionsInscription();
 
-  const { downloadInscriptionDetailsPdf } = useDownloadInscriptionDetailsPdf();
-  const [isDownloadingInscriptionPdf, setIsDownloadingInscriptionPdf] =
-    useState(false);
+  const { handleUpdateParticipant, isUpdatingParticipant } =
+    useUpdateParticipant(inscription?.id!);
+
+  const handleSaveInscription = (fields: InscriptionFormFields) =>
+    handleUpdateInscription({
+      id: inscription!.id,
+      responsible: fields.responsible.trim(),
+      email: fields.email.trim() || undefined,
+      phone: fields.phone.trim() || undefined,
+      observation: fields.observation.trim() || undefined,
+    });
+
+  const handleSaveParticipant = (fields: ParticipantFomrFields) =>
+    handleUpdateParticipant({
+      id: fields.id,
+      name: fields.name,
+      cpf: fields.cpf,
+      birthDate: fields.birthDate,
+      gender: fields.gender,
+      preferredName: fields.preferredName,
+      shirtSize: fields.shirtSize,
+      shirtType: fields.shirtType,
+    });
+
+  const {
+    handleGenerateDetailsInscriptionPdfReport,
+    isgenerateInscriptionDetailsPdfMutation,
+  } = useInscriptionReports();
 
   const renderSkeletonGrid = () => {
     return (
-      <div className="grid grid-cols-1 gap-4">
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-16 w-full" />
+      <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+        <div className="p-4 sm:p-6">
+          <div className="space-y-4">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <Skeleton className="h-8 w-64" />
+              <div className="flex gap-2">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </div>
+
+            {/* ID e data */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-6 w-48" />
+            </div>
+
+            {/* Cards de informações */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -89,19 +150,20 @@ export default function InscriptionDetailListAdminPage() {
         isUpdatingExpired={isUpdatingExpired}
         onCreatePaymentLink={handleCreatePaymentLink}
         isCreatingPaymentLink={isCreatingPaymentLink}
-        onDownloadInscriptionDetailsPdf={async (id) => {
-          setIsDownloadingInscriptionPdf(true);
-          try {
-            return await downloadInscriptionDetailsPdf({ inscriptionId: id });
-          } finally {
-            setIsDownloadingInscriptionPdf(false);
-          }
-        }}
-        isDownloadingInscriptionDetailsPdf={isDownloadingInscriptionPdf}
+        onDownloadInscriptionDetailsPdf={(inscriptionId) =>
+          handleGenerateDetailsInscriptionPdfReport({ inscriptionId })
+        }
+        isDownloadingInscriptionDetailsPdf={
+          isgenerateInscriptionDetailsPdfMutation
+        }
+        onSaveInscription={handleSaveInscription}
+        isSavingInscription={isUpdatingInscription}
         onDeleteInscription={(id) =>
           handleDeleteInscription({ eventId, inscriptionId: id })
         }
         isDeletingInscription={isDeletingInscription}
+        onSaveParticipant={handleSaveParticipant}
+        isSavingParticipants={isUpdatingParticipant}
       />
     );
   };

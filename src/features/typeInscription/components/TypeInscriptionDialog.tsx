@@ -2,12 +2,12 @@
 
 import { Button, Input, InputNumber, Modal, Switch, Typography } from "antd";
 import React, { useEffect } from "react";
-import { TypeInscriptions } from "../types/typesInscriptionsTypes";
+import { TypeInscription } from "../types/typesInscriptionsTypes";
 
 interface TypeInscriptionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  typeInscription?: TypeInscriptions | null;
+  typeInscription?: TypeInscription | null;
   eventId: string;
   eventStartDate?: string | Date;
   onSubmit: (data: {

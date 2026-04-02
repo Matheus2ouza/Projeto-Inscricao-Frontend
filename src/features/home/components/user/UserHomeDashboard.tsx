@@ -1,7 +1,7 @@
 "use client";
 
 import type { GetDashboardUserResponse } from "@/features/home/api/user/dashboard";
-import { useDates } from "@/features/home/hook/admin/useDates";
+import { useDates } from "@/features/home/hook/user/useDates";
 import type { DashboardUserMetric } from "@/features/home/hook/user/useUserDashboard";
 import DismissibleAlert from "@/shared/components/DismissibleAlert";
 import { Badge } from "@/shared/components/ui/badge";
@@ -459,7 +459,10 @@ export default function UserHomeDashboard({
                         {eventsDay.slice(0, 3).map((evt) => (
                           <span
                             key={evt.id}
-                            className={`h-1.5 w-1.5 rounded-full ${statusColors[evt.displayStatus] ?? "bg-emerald-500"}`}
+                            className={`h-1.5 w-1.5 rounded-full ${
+                              statusColors[evt.displayStatus] ??
+                              "bg-emerald-500"
+                            }`}
                           />
                         ))}
                       </div>
@@ -494,10 +497,16 @@ export default function UserHomeDashboard({
                   </Link>
                   <Badge
                     variant="outline"
-                    className={`text-xs gap-1 border ${statusColors[evt.displayStatus] ? "border-transparent" : ""}`}
+                    className={`text-xs gap-1 border ${
+                      statusColors[evt.displayStatus]
+                        ? "border-transparent"
+                        : ""
+                    }`}
                   >
                     <span
-                      className={`h-2 w-2 rounded-full ${statusColors[evt.displayStatus] ?? "bg-emerald-500"}`}
+                      className={`h-2 w-2 rounded-full ${
+                        statusColors[evt.displayStatus] ?? "bg-emerald-500"
+                      }`}
                     />
                     {getConvertStatusEvent(evt.displayStatus)}
                   </Badge>

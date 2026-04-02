@@ -1,6 +1,5 @@
 "use client";
 
-import { getPaymentsDates } from "@/features/home/api/admin/paymentsDates";
 import { getEventsDates } from "@/features/home/api/eventsDates";
 import { useQuery } from "@tanstack/react-query";
 
@@ -13,17 +12,11 @@ export function useDates() {
   const query = useQuery({
     queryKey: eventDatesKeys.list(),
     queryFn: async () => {
-      const [eventsResult, paymentsResult] = await Promise.allSettled([
-        getEventsDates(),
-        getPaymentsDates(),
-      ]);
+      const [eventsResult] = await Promise.allSettled([getEventsDates()]);
 
       return {
         events:
           eventsResult.status === "fulfilled" ? eventsResult.value.events : [],
-
-        payments:
-          paymentsResult.status === "fulfilled" ? paymentsResult.value : [],
       };
     },
     staleTime: 5 * 60 * 1000,
@@ -32,7 +25,6 @@ export function useDates() {
 
   return {
     events: query.data?.events ?? [],
-    payments: query.data?.payments ?? [],
     loading: query.isLoading,
     isFetching: query.isFetching,
     error: null, // nunca quebra o hook

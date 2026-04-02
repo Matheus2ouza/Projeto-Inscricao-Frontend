@@ -1,3 +1,5 @@
+import type { TypeInscription } from "@/features/typeInscription/types/typesInscriptionsTypes";
+
 export enum InscriptionMode {
   NORMAL = "NORMAL",
   GUEST = "GUEST",
@@ -40,14 +42,7 @@ export type Event = {
   address?: string;
 };
 
-export type TypeInscriptions = {
-  id: string;
-  description: string;
-  rule: Date | null;
-  value: number;
-  specialType: boolean;
-  createdAt: Date;
-};
+export type TypeInscriptions = TypeInscription;
 
 export type Responsible = {
   id: string;
@@ -127,11 +122,4 @@ export type UpdateEventInput = {
 };
 
 //types para os tipos de inscrição
-export type getTypeInscriptionsByEventResponse = {
-  id: string;
-  description: string;
-  rule: Date;
-  value: number;
-  specialType: boolean;
-  createdAt: Date;
-}[];
+export type getTypeInscriptionsByEventResponse = TypeInscription[];
