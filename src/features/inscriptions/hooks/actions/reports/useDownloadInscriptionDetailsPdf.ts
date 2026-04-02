@@ -1,34 +1,17 @@
 "use client";
 
 import { useGlobalLoading } from "@/components/GlobalLoading";
-import { listInscriptionDetailsPdf } from "@/features/inscriptions/api/list-inscriptions/pdf/inscriptionDetailsPdf";
-import { ListInscriptionsPdfResponse } from "@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes";
-import { ListDownloadInscriptionDetailsPdfInput } from "@/features/inscriptions/types/list-inscriptions/pdf/inscriptionDetailsPdfTypes";
+import { generateListInscriptionDetailsPdf } from "@/features/inscriptions/api/actions/reports/generateInscriptionDetailsPdf";
+import {
+  ListDownloadInscriptionDetailsPdfInput,
+  ListInscriptionsPdfResponse,
+} from "@/features/inscriptions/types/actions/reports/generateInscriptionDetailsPdfTypes";
+import { downloadFile } from "@/shared/utils/downloadFile";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 const DEFAULT_ERROR_MESSAGE =
   "Não foi possível gerar o PDF. Tente novamente em instantes.";
-
-function downloadPdf(pdfBase64: string, filename: string) {
-  const byteCharacters = atob(pdfBase64);
-  const byteNumbers = new Array(byteCharacters.length);
-
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
 
 export function useDownloadInscriptionDetailsPdf() {
   const { setLoading } = useGlobalLoading();
@@ -42,14 +25,16 @@ export function useDownloadInscriptionDetailsPdf() {
 
       try {
         const response = await fetchPdf();
-        const pdfBase64 = response.pdfBase64;
+        const fileBase64 = response.fileBase64;
         const filename = response.filename;
+        const contentType = response.contentType;
 
-        if (!pdfBase64) {
-          throw new Error("O servidor não retornou o arquivo PDF.");
+        if (!fileBase64 || !filename || !contentType) {
+          toast.error("Não foi possível gerar o relatório.");
+          return;
         }
 
-        downloadPdf(pdfBase64, filename);
+        downloadFile(fileBase64, filename, contentType);
         toast.success("Download iniciado.");
         return true;
       } catch (error) {
@@ -73,7 +58,7 @@ export function useDownloadInscriptionDetailsPdf() {
       }
 
       return processDownload(
-        async () => await listInscriptionDetailsPdf({ inscriptionId }),
+        async () => await generateListInscriptionDetailsPdf({ inscriptionId }),
       );
     },
     [processDownload],

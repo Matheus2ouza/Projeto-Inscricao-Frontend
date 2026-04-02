@@ -4,10 +4,10 @@ import DetailsInscriptionTable, {
   InscriptionFormFields,
   ParticipantFomrFields,
 } from "@/features/inscriptions/components/list-inscriptions/inscription/DetailsInscription";
+import { useDownloadInscriptionDetailsPdf } from "@/features/inscriptions/hooks/actions/reports/useDownloadInscriptionDetailsPdf";
 import { useActionsInscription } from "@/features/inscriptions/hooks/actions/useActionsInscription";
 import { useUpdateParticipant } from "@/features/inscriptions/hooks/actions/useUpdateParticipant";
 import { useDetailsInscription } from "@/features/inscriptions/hooks/list-inscriptions/inscription/useDetailsInscription";
-import { useDownloadInscriptionDetailsPdf } from "@/features/inscriptions/hooks/list-inscriptions/pdf/useDownloadInscriptionDetailsPdf";
 import PageContainer from "@/shared/components/layout/PageContainer";
 import { Button } from "@/shared/components/ui/button";
 import { Skeleton } from "@/shared/components/ui/skeleton";
