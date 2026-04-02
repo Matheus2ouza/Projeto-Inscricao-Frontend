@@ -301,7 +301,7 @@ export default function DetailsInscriptionTable({
       {!isEditingInscription && (
         <Button
           type="button"
-          variant="link"
+          variant="none"
           size="sm"
           onClick={async () => {
             await onDownloadInscriptionDetailsPdf(inscription.id);
@@ -310,7 +310,7 @@ export default function DetailsInscriptionTable({
             !onDownloadInscriptionDetailsPdf ||
             isDownloadingInscriptionDetailsPdf
           }
-          className="bg-blue-500 text-white p-0 flex items-center justify-center gap-1"
+          className="bg-blue-500 text-white p-0 flex items-center justify-center gap-1 hover:bg-blue-600 transition-colors"
         >
           <Download className="h-4 w-4" />
           <span className="hidden sm:inline">Baixar PDF</span>
@@ -319,10 +319,10 @@ export default function DetailsInscriptionTable({
 
       {!isEditingInscription ? (
         <Button
-          variant="link"
+          variant="none"
           type="button"
           size="sm"
-          className="bg-green-500 text-white p-0 flex items-center justify-center gap-1"
+          className="bg-green-500 text-white p-0 flex items-center justify-center gap-1 hover:bg-green-600 transition-colors"
           onClick={() => setIsEditingInscription(true)}
         >
           <Pencil className="h-4 w-4" />
@@ -333,10 +333,10 @@ export default function DetailsInscriptionTable({
           <Button
             type="button"
             size="sm"
-            variant="link"
+            variant="none"
             onClick={handleCancelInscriptionEdit}
             disabled={isSavingInscription}
-            className="bg-red-500 text-white flex items-center justify-center gap-1"
+            className="bg-red-500 text-white flex items-center justify-center gap-1 hover:bg-red-600 transition-colors"
           >
             <Undo2 className="h-4 w-4" />
             <span className="hidden sm:inline">Cancelar</span>
@@ -344,9 +344,10 @@ export default function DetailsInscriptionTable({
           <Button
             type="button"
             size="sm"
+            variant="none"
             onClick={handleSaveInscription}
             disabled={isSavingInscription}
-            className="gap-1"
+            className="bg-primary text-white gap-1 hover:bg-primary/90 transition-colors"
           >
             <Save className="h-4 w-4" />
             <span className="hidden sm:inline">
@@ -359,11 +360,11 @@ export default function DetailsInscriptionTable({
       {!isEditingInscription && (
         <Button
           type="button"
-          variant="link"
+          variant="none"
           size="sm"
           onClick={() => setDeleteDialogOpen(true)}
           disabled={!onDeleteInscription || !!isDeletingInscription}
-          className="bg-red-500 text-white flex items-center justify-center gap-1"
+          className="bg-red-500 text-white flex items-center justify-center gap-1 hover:bg-red-600 transition-colors"
         >
           <Trash2 className="h-4 w-4" />
           <span className="hidden sm:inline">

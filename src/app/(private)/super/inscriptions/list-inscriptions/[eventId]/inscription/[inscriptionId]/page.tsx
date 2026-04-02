@@ -4,7 +4,7 @@ import DetailsInscriptionTable, {
   InscriptionFormFields,
   ParticipantFomrFields,
 } from "@/features/inscriptions/components/list-inscriptions/inscription/DetailsInscription";
-import { useDownloadInscriptionDetailsPdf } from "@/features/inscriptions/hooks/actions/reports/useDownloadInscriptionDetailsPdf";
+import useInscriptionReports from "@/features/inscriptions/hooks/actions/reports/useInscriptionsReports";
 import { useActionsInscription } from "@/features/inscriptions/hooks/actions/useActionsInscription";
 import { useUpdateParticipant } from "@/features/inscriptions/hooks/actions/useUpdateParticipant";
 import { useDetailsInscription } from "@/features/inscriptions/hooks/list-inscriptions/inscription/useDetailsInscription";
@@ -79,8 +79,10 @@ export default function InscriptionDetailListSuperPage() {
       shirtType: fields.shirtType,
     });
 
-  const { downloadInscriptionDetailsPdf, isDownloadingInscriptionPdf } =
-    useDownloadInscriptionDetailsPdf();
+  const {
+    handleGenerateDetailsInscriptionPdfReport,
+    isgenerateInscriptionDetailsPdfMutation,
+  } = useInscriptionReports();
 
   const renderSkeletonGrid = () => {
     return (
@@ -149,9 +151,11 @@ export default function InscriptionDetailListSuperPage() {
         onCreatePaymentLink={handleCreatePaymentLink}
         isCreatingPaymentLink={isCreatingPaymentLink}
         onDownloadInscriptionDetailsPdf={(inscriptionId) =>
-          downloadInscriptionDetailsPdf({ inscriptionId })
+          handleGenerateDetailsInscriptionPdfReport({ inscriptionId })
         }
-        isDownloadingInscriptionDetailsPdf={isDownloadingInscriptionPdf}
+        isDownloadingInscriptionDetailsPdf={
+          isgenerateInscriptionDetailsPdfMutation
+        }
         onSaveInscription={handleSaveInscription}
         isSavingInscription={isUpdatingInscription}
         onDeleteInscription={(id) =>

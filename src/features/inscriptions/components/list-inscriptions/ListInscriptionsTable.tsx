@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { calculateGlobalIndex } from "@/shared/utils/calculateGlobalIndex";
 import { formatDate } from "@/shared/utils/formatDate";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
@@ -110,10 +111,6 @@ export default function ListInscriptionsTable({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [reportsDrawerOpen, setReportsDrawerOpen] = useState(false);
   const generatingReport = isGeneratingPdf || isGeneratingXlsx;
-
-  const calculateGlobalIndex = (localIndex: number): number => {
-    return (page - 1) * pageSize + localIndex + 1;
-  };
 
   if (!event) {
     return (
