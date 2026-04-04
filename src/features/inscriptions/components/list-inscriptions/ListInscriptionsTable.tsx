@@ -191,17 +191,6 @@ export default function ListInscriptionsTable({
                 <div className="bg-muted/30 p-4 rounded-lg">
                   <div className="flex flex-col space-y-1">
                     <span className="text-sm text-muted-foreground">
-                      Participantes Não Alocados
-                    </span>
-                    <span className="text-2xl font-bold">
-                      {event.totalGuestInscription || 0}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="bg-muted/30 p-4 rounded-lg">
-                  <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-muted-foreground">
                       Total Pago
                     </span>
                     <span className="text-2xl font-bold text-green-600 dark:text-green-400">
