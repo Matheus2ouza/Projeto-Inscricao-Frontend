@@ -108,18 +108,10 @@ export default function ParticipantEditModal({
     >
       <Form form={form} layout="vertical" onFinish={handleFinish}>
         <div className="grid gap-4 md:grid-cols-2">
-          <Form.Item
-            label="Nome"
-            name="name"
-            rules={[{ required: true, message: "Informe o nome" }]}
-          >
+          <Form.Item label="Nome" name="name">
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Cpf"
-            name="cpf"
-            rules={[{ required: true, message: "Informe o cpf" }]}
-          >
+          <Form.Item label="Cpf" name="cpf">
             <Input />
           </Form.Item>
         </div>
@@ -128,7 +120,11 @@ export default function ParticipantEditModal({
             <Input />
           </Form.Item>
           <Form.Item label="Nascimento" name="birthDate">
-            <DatePicker className="w-full" />
+            <DatePicker
+              format="DD/MM/YYYY"
+              placeholder="Selecione a data de nascimento"
+              className="w-full"
+            />
           </Form.Item>
         </div>
         <div className="grid gap-4 md:grid-cols-2">

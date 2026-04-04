@@ -916,7 +916,7 @@ export default function DetailsInscriptionTable({
                       <Button
                         variant="link"
                         size="sm"
-                        className="h-8 w-8 rounded-lg bg-green-500 text-white p-0 hover:bg-green-600 transition-colors"
+                        className="h-6 w-6 rounded-lg bg-green-500 text-white p-0 hover:bg-green-600 transition-colors"
                         onClick={() => setEditingParticipant(participant)}
                         aria-label="Editar Participante"
                       >
