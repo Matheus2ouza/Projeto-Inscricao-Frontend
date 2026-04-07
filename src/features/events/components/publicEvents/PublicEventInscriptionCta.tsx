@@ -126,7 +126,7 @@ export function PublicEventInscriptionCta({
             onClick={() => onViewSubscription(eventId)}
             disabled={subscriptionStatus.status === "loading"}
           >
-            Ver minha inscrição
+            Visualizar minha inscrição
           </Button>
         </div>
       </div>

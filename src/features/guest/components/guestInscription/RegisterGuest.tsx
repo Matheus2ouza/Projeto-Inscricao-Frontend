@@ -169,11 +169,6 @@ export function RegisterGuest({
     { value: "M", label: "M" },
     { value: "G", label: "G" },
     { value: "GG", label: "GG" },
-    { value: "XG", label: "XG" },
-  ];
-  const shirtTypeOptions = [
-    { value: "TRADICIONAL", label: "Tradicional" },
-    { value: "BABYLOOK", label: "Babylook" },
   ];
 
   type GuestFormValues = GuestInscriptionSchemaType & {

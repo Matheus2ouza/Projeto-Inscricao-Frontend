@@ -1,0 +1,46 @@
+# Dependências
+node_modules
+.pnp
+.pnp.js
+
+# Build
+.next
+out
+build
+dist
+
+# Git
+.git
+.gitignore
+
+# Envs
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+.eslintcache
+.turbo
+
+# Misc
+.DS_Store
+*.pem
+coverage
+.nyc_output
+
+# Documentação
+README.md
+*.md
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts

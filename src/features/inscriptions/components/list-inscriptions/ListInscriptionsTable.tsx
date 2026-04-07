@@ -5,7 +5,6 @@ import {
   Inscription,
 } from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
 import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -25,10 +24,9 @@ import { formatDate } from "@/shared/utils/formatDate";
 import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
 import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
 import { getStatusColor } from "@/shared/utils/getStatusColor";
-import { Pagination } from "antd";
+import { Button, Pagination } from "antd";
 import {
   Calendar,
-  ChevronDown,
   Download,
   Filter,
   Image as ImageIcon,
@@ -228,13 +226,11 @@ export default function ListInscriptionsTable({
             />
             <div className="flex items-center gap-2">
               <Button
-                type="button"
-                variant="outline"
-                className="inline-flex items-center gap-2"
+                type="primary"
+                icon={<Download className="w-4 h-4" />}
                 onClick={() => setReportsDrawerOpen(true)}
                 disabled={generatingReport}
               >
-                <Download className="w-4 h-4" />
                 {generatingReport ? "Gerando..." : "Gerar Relatório"}
               </Button>
 
@@ -245,14 +241,9 @@ export default function ListInscriptionsTable({
                 }}
               >
                 <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-600 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-400 dark:hover:bg-blue-900/20 text-sm font-semibold transition-colors"
-                  >
-                    <Filter className="w-4 h-4" />
+                  <Button type="primary" icon={<Filter className="w-4 h-4" />}>
                     Filtros
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </PopoverTrigger>
                 <PopoverContent
                   align="end"
@@ -329,15 +320,14 @@ export default function ListInscriptionsTable({
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
-                          variant="link"
-                          size="sm"
-                          className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center"
+                        <button
+                          type="button"
+                          className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center hover:bg-emerald-600 cursor-pointer"
                           onClick={() => onSelectInscription(inscription.id)}
                           aria-label="Detalhes"
                         >
                           <Info className="h-4 w-4" />
-                        </Button>
+                        </button>
                       </div>
                     </div>
 
@@ -477,15 +467,14 @@ export default function ListInscriptionsTable({
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex justify-center gap-1">
-                          <Button
-                            variant="link"
-                            size="sm"
+                          <button
+                            type="button"
                             className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center"
                             onClick={() => onSelectInscription(inscription.id)}
                             aria-label="Detalhes"
                           >
                             <Info className="h-4 w-4" />
-                          </Button>
+                          </button>
                         </div>
                       </TableCell>
                     </TableRow>
