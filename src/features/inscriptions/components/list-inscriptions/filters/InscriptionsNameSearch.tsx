@@ -1,9 +1,8 @@
 "use client";
 
 import { useListNames } from "@/features/inscriptions/hooks/list-inscriptions/filters/useListNames";
-import { Button } from "@/shared/components/ui/button";
 import type { AutoCompleteProps } from "antd";
-import { AutoComplete } from "antd";
+import { AutoComplete, Button } from "antd";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -65,16 +64,14 @@ export default function InscriptionsNameSearch({
         allowClear
       />
       <Button
-        type="button"
-        variant="outline"
-        size="sm"
+        type="default"
+        icon={<Search className="h-4 w-4" />}
         onClick={() => {
           const trimmed = value.trim();
           onSearch?.(trimmed ? trimmed : undefined);
         }}
         className="flex items-center gap-2"
       >
-        <Search className="h-4 w-4" />
         Buscar
       </Button>
     </div>
