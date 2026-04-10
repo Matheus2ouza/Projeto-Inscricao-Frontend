@@ -226,7 +226,7 @@ export function DetailsInscription({
   return (
     <div className="w-full space-y-8">
       <div className="w-full">
-        <Card className="border border-gray-200 dark:border-gray-800 shadow-sm w-full gap-2">
+        <Card className="liquid-panel w-full gap-2">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
               Buscar por código
@@ -298,7 +298,7 @@ export function DetailsInscription({
                     </Button>
                   </div>
                 </div>
-                <div className="flex items-start gap-2 rounded-md border border-blue-200 dark:border-blue-900/60 bg-blue-50 dark:bg-blue-950/40 px-4 py-2 text-sm text-blue-700 dark:text-blue-200">
+                <div className="liquid-field flex items-start gap-2 rounded-md border-blue-300/70 px-4 py-2 text-sm text-blue-700 dark:text-blue-200">
                   <HelpCircle className="h-4 w-4 mt-0.5 text-blue-500 dark:text-blue-300" />
                   <span>
                     O codigo foi enviado para o e-mail inserido no ato da
@@ -313,7 +313,7 @@ export function DetailsInscription({
 
       {inscriptionDetails && (
         <div className="space-y-8">
-          <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+          <div className="liquid-panel overflow-hidden">
             <div className="p-6">
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div className="space-y-4 flex-1">
@@ -368,7 +368,7 @@ export function DetailsInscription({
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-muted/30 p-4 rounded-lg">
+                    <div className="liquid-field p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <User className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Responsável</span>
@@ -386,7 +386,7 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="bg-muted/30 p-4 rounded-lg">
+                    <div className="liquid-field p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Mail className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Email</span>
@@ -404,7 +404,7 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="bg-muted/30 p-4 rounded-lg">
+                    <div className="liquid-field p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Phone className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Telefone</span>
@@ -422,7 +422,7 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="bg-muted/30 p-4 rounded-lg">
+                    <div className="liquid-field p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Localidade</span>
@@ -440,7 +440,7 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="bg-muted/30 p-4 rounded-lg">
+                    <div className="liquid-field p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <FileText className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">Status</span>
@@ -477,7 +477,7 @@ export function DetailsInscription({
                 {participantsList.map((participant) => (
                   <div
                     key={participant.id}
-                    className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden"
+                    className="liquid-panel overflow-hidden"
                   >
                     <div className="p-6">
                       <div className="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-6">
@@ -547,7 +547,7 @@ export function DetailsInscription({
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="bg-muted/30 p-4 rounded-lg">
+                            <div className="liquid-field p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -568,7 +568,7 @@ export function DetailsInscription({
                               )}
                             </div>
 
-                            <div className="bg-muted/30 p-4 rounded-lg">
+                            <div className="liquid-field p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <FileText className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -591,7 +591,7 @@ export function DetailsInscription({
                               )}
                             </div>
 
-                            <div className="bg-muted/30 p-4 rounded-lg">
+                            <div className="liquid-field p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -683,7 +683,7 @@ export function DetailsInscription({
                               )}
                             </div>
 
-                            <div className="bg-muted/30 p-4 rounded-lg">
+                            <div className="liquid-field p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -710,7 +710,7 @@ export function DetailsInscription({
                               )}
                             </div>
 
-                            <div className="bg-muted/30 p-4 rounded-lg">
+                            <div className="liquid-field p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -723,7 +723,7 @@ export function DetailsInscription({
                               </p>
                             </div>
 
-                            <div className="bg-muted/30 p-4 rounded-lg">
+                            <div className="liquid-field p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <FileText className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -818,7 +818,7 @@ export function DetailsInscription({
                               )}
                             </div>
 
-                            <div className="bg-muted/30 p-4 rounded-lg">
+                            <div className="liquid-field p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
                                 <FileText className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -923,10 +923,7 @@ export function DetailsInscription({
           </div>
 
           <div className="space-y-6">
-            <div
-              id="guest-payment"
-              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 scroll-mt-24"
-            >
+            <div id="guest-payment" className="liquid-panel p-6 scroll-mt-24">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="space-y-4 flex-1">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1001,7 +998,7 @@ export function DetailsInscription({
                         {paymentProgress}%
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div className="h-2 rounded-full overflow-hidden bg-foreground/15">
                       <div
                         className="h-full bg-green-500 rounded-full transition-all duration-300"
                         style={{ width: `${paymentProgress}%` }}
@@ -1067,10 +1064,7 @@ export function DetailsInscription({
                   );
 
                   return (
-                    <div
-                      key={p.id}
-                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4"
-                    >
+                    <div key={p.id} className="liquid-panel p-6 space-y-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />

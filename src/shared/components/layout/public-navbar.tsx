@@ -56,7 +56,7 @@ const PublicNavbar = () => {
 
   return (
     <>
-      <nav className="flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 w-full overflow-hidden relative z-2">
+      <nav className="liquid-panel-strong flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 w-full overflow-hidden relative z-2 rounded-none border-x-0 border-t-0">
         {/* Left Section: Menu + Logo + Título */}
         <div className="flex items-center space-x-3">
           {/* Mobile Menu Toggle - apenas na home */}
@@ -68,17 +68,17 @@ const PublicNavbar = () => {
             >
               <div className="w-6 h-6 flex flex-col justify-center space-y-1">
                 <span
-                  className={`block h-0.5 w-full bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
+                  className={`block h-0.5 w-full bg-foreground/80 transition-all duration-300 ${
                     isMenuOpen ? "rotate-45 translate-y-1.5" : ""
                   }`}
                 ></span>
                 <span
-                  className={`block h-0.5 w-full bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
+                  className={`block h-0.5 w-full bg-foreground/80 transition-all duration-300 ${
                     isMenuOpen ? "opacity-0" : ""
                   }`}
                 ></span>
                 <span
-                  className={`block h-0.5 w-full bg-gray-700 dark:bg-gray-300 transition-all duration-300 ${
+                  className={`block h-0.5 w-full bg-foreground/80 transition-all duration-300 ${
                     isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
                   }`}
                 ></span>
@@ -141,7 +141,7 @@ const PublicNavbar = () => {
 
       {/* Mobile Menu - apenas na home */}
       {showNavigationLinks && isMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="liquid-panel-strong lg:hidden mt-1 rounded-t-none border-x-0">
           <div className="px-4 py-2 space-y-1">
             {["Sobre", "Eventos", "Documentação", "Login"].map(
               (item, index) => (
