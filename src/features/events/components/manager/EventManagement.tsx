@@ -1059,9 +1059,9 @@ export default function EventManagement({
                 ratio={16 / 9}
                 className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden w-full max-w-[640px] mx-auto"
               >
-                {event.imageUrl ? (
+                {event.image ? (
                   <Image
-                    src={event.imageUrl}
+                    src={event.image}
                     alt={event.name}
                     width={400}
                     height={225}

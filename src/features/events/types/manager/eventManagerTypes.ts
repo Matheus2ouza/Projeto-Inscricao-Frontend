@@ -18,7 +18,7 @@ export type Event = {
   endDate: string;
   quantityParticipants: number;
   amountCollected: number;
-  imageUrl?: string;
+  image?: string;
   logoUrl?: string;
   location?: string;
   latitude?: number;
