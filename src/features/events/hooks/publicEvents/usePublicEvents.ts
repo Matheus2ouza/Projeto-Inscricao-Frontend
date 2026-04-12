@@ -1,5 +1,5 @@
-import { UsePublicEventsResult } from "../../types/publicEvents/publicEventsTypes";
-import { usePublicEventsQuery } from "./usePublicEventsQuery";
+import { UsePublicEventsResult } from '../../types/publicEvents/publicEventsTypes';
+import { usePublicEventsQuery } from './usePublicEventsQuery';
 
 export function usePublicEvents(): UsePublicEventsResult {
   const { data, isLoading, error, refetch } = usePublicEventsQuery();

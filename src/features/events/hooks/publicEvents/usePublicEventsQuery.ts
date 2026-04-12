@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { getPublicEvents } from "../../api/publicEvents/getPublicEvents";
+import { useQuery } from '@tanstack/react-query';
+import { getPublicEvents } from '../../api/publicEvents/getPublicEvents';
 
 export const publicEventsKeys = {
-  all: ["public-events"] as const,
-  lists: () => [...publicEventsKeys.all, "list"] as const,
+  all: ['public-events'] as const,
+  lists: () => [...publicEventsKeys.all, 'list'] as const,
   list: () => [...publicEventsKeys.lists()] as const,
 };
 
