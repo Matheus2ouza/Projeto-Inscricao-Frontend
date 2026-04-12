@@ -65,16 +65,6 @@ export default function Footer() {
                   Contato
                 </a>
               </li>
-              <li>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="/documentation"
-                  className="text-gray-400 transition-colors hover:text-white"
-                >
-                  Suporte
-                </a>
-              </li>
             </ul>
           </div>
 
