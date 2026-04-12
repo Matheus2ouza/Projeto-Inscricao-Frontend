@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import type { UpdateGuestInscriptionFormInputs } from "@/features/guest/schema/actions/updateGuestInscriptionSchema";
-import type { UpdateGuestParticipantFormInputs } from "@/features/guest/schema/actions/updateGuestParticipantSchema";
+import type { UpdateGuestInscriptionFormInputs } from '@/features/guest/schema/actions/updateGuestInscriptionSchema';
+import type { UpdateGuestParticipantFormInputs } from '@/features/guest/schema/actions/updateGuestParticipantSchema';
 import {
   InscriptionDetails,
   InscriptionStatus,
@@ -9,32 +9,32 @@ import {
   Payment,
   PaymentInstallment,
   StatusPayment,
-} from "@/features/guest/types/detailsInscription/detailsInscriptionType";
-import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
-import ImageUpdateDialog from "@/shared/components/ImageUpdateDialog";
+} from '@/features/guest/types/detailsInscription/detailsInscriptionType';
+import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
+import ImageUpdateDialog from '@/shared/components/ImageUpdateDialog';
 import ImageViewerDialog, {
   ImageViewerDownloadExtension,
-} from "@/shared/components/ImageViewerDialog";
-import { Button } from "@/shared/components/ui/button";
+} from '@/shared/components/ImageViewerDialog';
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
+} from '@/shared/components/ui/card';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/shared/components/ui/command";
-import { Input } from "@/shared/components/ui/input";
+} from '@/shared/components/ui/command';
+import { Input } from '@/shared/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
+} from '@/shared/components/ui/popover';
 import {
   Table,
   TableBody,
@@ -42,16 +42,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { cn } from "@/shared/lib/utils";
-import { formatDateTime } from "@/shared/utils/formatDate";
-import { getCalculateAge } from "@/shared/utils/getCalculateAge";
+} from '@/shared/components/ui/table';
+import { cn } from '@/shared/lib/utils';
+import { formatDateTime } from '@/shared/utils/formatDate';
+import { getCalculateAge } from '@/shared/utils/getCalculateAge';
 import {
   getConvertStatusInscription,
   getConvertStatusPayment,
-} from "@/shared/utils/getConvertStatus";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
-import { getStatusColor } from "@/shared/utils/getStatusColor";
+} from '@/shared/utils/getConvertStatus';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
+import { getStatusColor } from '@/shared/utils/getStatusColor';
 import {
   Calendar,
   Check,
@@ -65,13 +65,13 @@ import {
   Phone,
   Search,
   User,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import type { UseFormReturn } from "react-hook-form";
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 import type {
   ModifyReceiptPaymentInput,
   ModifyReceiptPaymentResponse,
-} from "../../types/detailsInscription/actions/modifyReceiptPaymentTypes";
+} from '../../types/detailsInscription/actions/modifyReceiptPaymentTypes';
 
 interface DetailsInscriptionProps {
   confirmationCode: string | null;
@@ -120,7 +120,7 @@ export function DetailsInscription({
   onModifyReceipt,
   isModifingReceipt,
 }: DetailsInscriptionProps) {
-  const [searchCode, setSearchCode] = useState(confirmationCode || "");
+  const [searchCode, setSearchCode] = useState(confirmationCode || '');
   const [receiptViewerOpen, setReceiptViewerOpen] = useState(false);
   const [receiptViewerUrl, setReceiptViewerUrl] = useState<string | null>(null);
   const [receiptViewerFileName, setReceiptViewerFileName] = useState<
@@ -142,26 +142,26 @@ export function DetailsInscription({
     useState(false);
 
   const genderOptions = [
-    { value: "MASCULINO", label: "Masculino" },
-    { value: "FEMININO", label: "Feminino" },
+    { value: 'MASCULINO', label: 'Masculino' },
+    { value: 'FEMININO', label: 'Feminino' },
   ];
   const shirtSizeOptions = [
-    { value: "PP", label: "PP" },
-    { value: "P", label: "P" },
-    { value: "M", label: "M" },
-    { value: "G", label: "G" },
-    { value: "GG", label: "GG" },
-    { value: "XG", label: "XG" },
+    { value: 'PP', label: 'PP' },
+    { value: 'P', label: 'P' },
+    { value: 'M', label: 'M' },
+    { value: 'G', label: 'G' },
+    { value: 'GG', label: 'GG' },
+    { value: 'XG', label: 'XG' },
   ];
   const shirtTypeOptions = [
-    { value: "TRADICIONAL", label: "Tradicional" },
-    { value: "BABYLOOK", label: "Babylook" },
+    { value: 'TRADICIONAL', label: 'Tradicional' },
+    { value: 'BABYLOOK', label: 'Babylook' },
   ];
 
   const formatSearchCode = (value: string) => {
     const normalized = value
       .toUpperCase()
-      .replace(/[^A-Z0-9]/g, "")
+      .replace(/[^A-Z0-9]/g, '')
       .slice(0, 12);
 
     if (normalized.length <= 4) return normalized;
@@ -170,7 +170,7 @@ export function DetailsInscription({
     return `${normalized.slice(0, 4)}-${normalized.slice(4, 8)}-${normalized.slice(8)}`;
   };
 
-  const searchCodeNormalized = searchCode.replace(/[^A-Z0-9]/g, "");
+  const searchCodeNormalized = searchCode.replace(/[^A-Z0-9]/g, '');
 
   useEffect(() => {
     if (confirmationCode) {
@@ -234,10 +234,10 @@ export function DetailsInscription({
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSearch} className="w-full space-y-4">
-              <div className="space-y-4 w-full">
-                <div className="flex flex-col gap-3 w-full lg:flex-row lg:items-center">
+              <div className="w-full space-y-4">
+                <div className="flex w-full flex-col gap-3 lg:flex-row lg:items-center">
                   <div className="relative w-full">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                    <div className="absolute top-1/2 left-4 -translate-y-1/2 transform">
                       <Search className="h-4 w-4 text-gray-400" />
                     </div>
                     <Input
@@ -247,17 +247,17 @@ export function DetailsInscription({
                         setSearchCode(formatSearchCode(e.target.value))
                       }
                       placeholder="Digite o código (ex: N4LJ-3QTT-ECGL)"
-                      className="w-full pl-10 pr-16 h-10 text-sm font-mono tracking-wider border border-gray-300 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500 rounded-md"
+                      className="h-10 w-full rounded-md border border-gray-300 pr-16 pl-10 font-mono text-sm tracking-wider focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700"
                       disabled={loading}
                       maxLength={14}
                     />
-                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <div className="absolute top-1/2 right-4 -translate-y-1/2 transform">
                       <div className="flex items-center gap-2">
                         <div className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
                           {searchCodeNormalized.length}/12
                         </div>
                         {searchCodeNormalized.length === 12 && (
-                          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                          <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
                         )}
                       </div>
                     </div>
@@ -270,11 +270,11 @@ export function DetailsInscription({
                         loading ||
                         searchCodeNormalized.length !== 12
                       }
-                      className="w-full h-10 text-sm font-semibold bg-blue-600 hover:bg-blue-700 rounded-md lg:w-36"
+                      className="h-10 w-full rounded-md bg-blue-600 text-sm font-semibold hover:bg-blue-700 lg:w-36"
                     >
                       {loading ? (
                         <div className="flex items-center justify-center gap-2">
-                          <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                           <span>Buscando</span>
                         </div>
                       ) : (
@@ -289,17 +289,17 @@ export function DetailsInscription({
                       variant="outline"
                       disabled={loading || !searchCode.trim()}
                       onClick={() => {
-                        setSearchCode("");
+                        setSearchCode('');
                         onClear();
                       }}
-                      className="w-full h-10 text-sm font-semibold rounded-md lg:w-28"
+                      className="h-10 w-full rounded-md text-sm font-semibold lg:w-28"
                     >
                       Limpar
                     </Button>
                   </div>
                 </div>
-                <div className="liquid-field flex items-start gap-2 rounded-md border-blue-300/70 px-4 py-2 text-sm text-blue-700 dark:text-blue-200">
-                  <HelpCircle className="h-4 w-4 mt-0.5 text-blue-500 dark:text-blue-300" />
+                <div className="liquid-panel-strong flex items-start gap-2 rounded-md border-blue-300/70 px-4 py-2 text-sm text-blue-700 dark:text-blue-200">
+                  <HelpCircle className="mt-0.5 h-4 w-4 text-blue-500 dark:text-blue-300" />
                   <span>
                     O codigo foi enviado para o e-mail inserido no ato da
                     inscrição. Seu formato é parecido com XXXX-XXXX-XXXX
@@ -315,16 +315,16 @@ export function DetailsInscription({
         <div className="space-y-8">
           <div className="liquid-panel overflow-hidden">
             <div className="p-6">
-              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                <div className="space-y-4 flex-1">
+              <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+                <div className="flex-1 space-y-4">
                   <div>
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                           Detalhes da Inscrição
                         </h1>
-                        <div className="text-xs text-muted-foreground">
-                          Registrada em:{" "}
+                        <div className="text-muted-foreground text-xs">
+                          Registrada em:{' '}
                           {formatDateTime(inscriptionDetails.createdAt)}
                         </div>
                       </div>
@@ -334,8 +334,8 @@ export function DetailsInscription({
                         size="sm"
                         className={`gap-2 ${
                           isEditingCurrentInscription || !inscriptionEdit
-                            ? "hidden"
-                            : ""
+                            ? 'hidden'
+                            : ''
                         }`}
                         onClick={() => inscriptionEdit?.onStart()}
                       >
@@ -367,17 +367,17 @@ export function DetailsInscription({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="liquid-field p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="liquid-panel-strong rounded-lg p-4">
+                      <div className="mb-2 flex items-center gap-2">
+                        <User className="text-muted-foreground h-4 w-4" />
                         <span className="text-sm font-medium">Responsável</span>
                       </div>
                       {isEditingCurrentInscription ? (
                         <Input
                           disabled={loading}
                           className="h-10"
-                          {...inscriptionEdit?.form.register("guestName")}
+                          {...inscriptionEdit?.form.register('guestName')}
                         />
                       ) : (
                         <p className="text-lg font-semibold">
@@ -386,16 +386,16 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="liquid-field p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
+                    <div className="liquid-panel-strong rounded-lg p-4">
+                      <div className="mb-2 flex items-center gap-2">
+                        <Mail className="text-muted-foreground h-4 w-4" />
                         <span className="text-sm font-medium">Email</span>
                       </div>
                       {isEditingCurrentInscription ? (
                         <Input
                           disabled={loading}
                           className="h-10"
-                          {...inscriptionEdit?.form.register("guestEmail")}
+                          {...inscriptionEdit?.form.register('guestEmail')}
                         />
                       ) : (
                         <p className="text-sm font-medium break-all">
@@ -404,16 +404,16 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="liquid-field p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Phone className="h-4 w-4 text-muted-foreground" />
+                    <div className="liquid-panel-strong rounded-lg p-4">
+                      <div className="mb-2 flex items-center gap-2">
+                        <Phone className="text-muted-foreground h-4 w-4" />
                         <span className="text-sm font-medium">Telefone</span>
                       </div>
                       {isEditingCurrentInscription ? (
                         <Input
                           disabled={loading}
                           className="h-10"
-                          {...inscriptionEdit?.form.register("phone")}
+                          {...inscriptionEdit?.form.register('phone')}
                         />
                       ) : (
                         <p className="text-sm font-medium">
@@ -422,16 +422,16 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="liquid-field p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <div className="liquid-panel-strong rounded-lg p-4">
+                      <div className="mb-2 flex items-center gap-2">
+                        <MapPin className="text-muted-foreground h-4 w-4" />
                         <span className="text-sm font-medium">Localidade</span>
                       </div>
                       {isEditingCurrentInscription ? (
                         <Input
                           disabled={loading}
                           className="h-10"
-                          {...inscriptionEdit?.form.register("guestLocality")}
+                          {...inscriptionEdit?.form.register('guestLocality')}
                         />
                       ) : (
                         <p className="text-sm font-medium">
@@ -440,13 +440,13 @@ export function DetailsInscription({
                       )}
                     </div>
 
-                    <div className="liquid-field p-4 rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
+                    <div className="liquid-panel-strong rounded-lg p-4">
+                      <div className="mb-2 flex items-center gap-2">
+                        <FileText className="text-muted-foreground h-4 w-4" />
                         <span className="text-sm font-medium">Status</span>
                       </div>
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${getStatusColor(
                           inscriptionDetails.status,
                         )}`}
                       >
@@ -469,7 +469,7 @@ export function DetailsInscription({
             </div>
 
             {participantsList.length === 0 ? (
-              <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
+              <div className="text-muted-foreground rounded-lg border px-4 py-8 text-center">
                 Nenhum participante encontrado
               </div>
             ) : (
@@ -480,8 +480,8 @@ export function DetailsInscription({
                     className="liquid-panel overflow-hidden"
                   >
                     <div className="p-6">
-                      <div className="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-6">
-                        <div className="space-y-4 flex-1 w-full">
+                      <div className="flex flex-col items-stretch justify-between gap-6 lg:flex-row lg:items-center">
+                        <div className="w-full flex-1 space-y-4">
                           <div>
                             <div className="flex items-start justify-between gap-4">
                               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -546,10 +546,10 @@ export function DetailsInscription({
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div className="liquid-field p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <User className="h-4 w-4 text-muted-foreground" />
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <div className="liquid-panel-strong rounded-lg p-4">
+                              <div className="mb-2 flex items-center gap-2">
+                                <User className="text-muted-foreground h-4 w-4" />
                                 <span className="text-sm font-medium">
                                   Nome
                                 </span>
@@ -559,18 +559,18 @@ export function DetailsInscription({
                                 <Input
                                   disabled={loading}
                                   className="h-10"
-                                  {...participantEdit.form.register("name")}
+                                  {...participantEdit.form.register('name')}
                                 />
                               ) : (
                                 <p className="text-sm font-medium">
-                                  {participant.name || "-"}
+                                  {participant.name || '-'}
                                 </p>
                               )}
                             </div>
 
-                            <div className="liquid-field p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="h-4 w-4 text-muted-foreground" />
+                            <div className="liquid-panel-strong rounded-lg p-4">
+                              <div className="mb-2 flex items-center gap-2">
+                                <FileText className="text-muted-foreground h-4 w-4" />
                                 <span className="text-sm font-medium">
                                   Nome Preferido
                                 </span>
@@ -581,19 +581,19 @@ export function DetailsInscription({
                                   disabled={loading}
                                   className="h-10"
                                   {...participantEdit.form.register(
-                                    "preferredName",
+                                    'preferredName',
                                   )}
                                 />
                               ) : (
                                 <p className="text-sm font-medium">
-                                  {participant.preferredName || "N/ Definido"}
+                                  {participant.preferredName || 'N/ Definido'}
                                 </p>
                               )}
                             </div>
 
-                            <div className="liquid-field p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <User className="h-4 w-4 text-muted-foreground" />
+                            <div className="liquid-panel-strong rounded-lg p-4">
+                              <div className="mb-2 flex items-center gap-2">
+                                <User className="text-muted-foreground h-4 w-4" />
                                 <span className="text-sm font-medium">
                                   Gênero
                                 </span>
@@ -612,20 +612,20 @@ export function DetailsInscription({
                                       type="button"
                                       disabled={loading}
                                       className={cn(
-                                        "w-full justify-between",
-                                        !participantEdit.form.watch("gender") &&
-                                          "text-muted-foreground",
+                                        'w-full justify-between',
+                                        !participantEdit.form.watch('gender') &&
+                                          'text-muted-foreground',
                                       )}
                                     >
-                                      {participantEdit.form.watch("gender")
+                                      {participantEdit.form.watch('gender')
                                         ? genderOptions.find(
                                             (gender) =>
                                               gender.value ===
                                               participantEdit.form.watch(
-                                                "gender",
+                                                'gender',
                                               ),
                                           )?.label
-                                        : "Selecione"}
+                                        : 'Selecione'}
                                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                     </Button>
                                   </PopoverTrigger>
@@ -646,7 +646,7 @@ export function DetailsInscription({
                                               key={gender.value}
                                               onSelect={() => {
                                                 participantEdit.form.setValue(
-                                                  "gender",
+                                                  'gender',
                                                   gender.value,
                                                   {
                                                     shouldDirty: true,
@@ -659,13 +659,13 @@ export function DetailsInscription({
                                             >
                                               <Check
                                                 className={cn(
-                                                  "mr-2 h-4 w-4",
+                                                  'mr-2 h-4 w-4',
                                                   gender.value ===
                                                     participantEdit.form.watch(
-                                                      "gender",
+                                                      'gender',
                                                     )
-                                                    ? "opacity-100"
-                                                    : "opacity-0",
+                                                    ? 'opacity-100'
+                                                    : 'opacity-0',
                                                 )}
                                               />
                                               {gender.label}
@@ -683,14 +683,14 @@ export function DetailsInscription({
                               )}
                             </div>
 
-                            <div className="liquid-field p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <div className="liquid-panel-strong rounded-lg p-4">
+                              <div className="mb-2 flex items-center gap-2">
+                                <Calendar className="text-muted-foreground h-4 w-4" />
                                 <span className="text-sm font-medium">
                                   {participantEdit?.editingParticipantId ===
                                   participant.id
-                                    ? "Data de nascimento"
-                                    : "Idade"}
+                                    ? 'Data de nascimento'
+                                    : 'Idade'}
                                 </span>
                               </div>
                               {participantEdit?.editingParticipantId ===
@@ -700,7 +700,7 @@ export function DetailsInscription({
                                   disabled={loading}
                                   className="h-10"
                                   {...participantEdit.form.register(
-                                    "birthDate",
+                                    'birthDate',
                                   )}
                                 />
                               ) : (
@@ -710,22 +710,22 @@ export function DetailsInscription({
                               )}
                             </div>
 
-                            <div className="liquid-field p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <User className="h-4 w-4 text-muted-foreground" />
+                            <div className="liquid-panel-strong rounded-lg p-4">
+                              <div className="mb-2 flex items-center gap-2">
+                                <User className="text-muted-foreground h-4 w-4" />
                                 <span className="text-sm font-medium">
                                   Inscrição
                                 </span>
                               </div>
                               <p className="text-sm font-medium uppercase">
                                 {participant.typeInscription.description ||
-                                  "N/ Definido"}
+                                  'N/ Definido'}
                               </p>
                             </div>
 
-                            <div className="liquid-field p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="h-4 w-4 text-muted-foreground" />
+                            <div className="liquid-panel-strong rounded-lg p-4">
+                              <div className="mb-2 flex items-center gap-2">
+                                <FileText className="text-muted-foreground h-4 w-4" />
                                 <span className="text-sm font-medium">
                                   Tamanho da camisa
                                 </span>
@@ -744,21 +744,21 @@ export function DetailsInscription({
                                       type="button"
                                       disabled={loading}
                                       className={cn(
-                                        "w-full justify-between",
+                                        'w-full justify-between',
                                         !participantEdit.form.watch(
-                                          "shirtSize",
-                                        ) && "text-muted-foreground",
+                                          'shirtSize',
+                                        ) && 'text-muted-foreground',
                                       )}
                                     >
-                                      {participantEdit.form.watch("shirtSize")
+                                      {participantEdit.form.watch('shirtSize')
                                         ? shirtSizeOptions.find(
                                             (s) =>
                                               s.value ===
                                               participantEdit.form.watch(
-                                                "shirtSize",
+                                                'shirtSize',
                                               ),
                                           )?.label
-                                        : "Selecione"}
+                                        : 'Selecione'}
                                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                     </Button>
                                   </PopoverTrigger>
@@ -779,7 +779,7 @@ export function DetailsInscription({
                                               value={size.value}
                                               onSelect={() => {
                                                 participantEdit.form.setValue(
-                                                  "shirtSize",
+                                                  'shirtSize',
                                                   size.value,
                                                   {
                                                     shouldDirty: true,
@@ -794,13 +794,13 @@ export function DetailsInscription({
                                             >
                                               <Check
                                                 className={cn(
-                                                  "mr-2 h-4 w-4",
+                                                  'mr-2 h-4 w-4',
                                                   size.value ===
                                                     participantEdit.form.watch(
-                                                      "shirtSize",
+                                                      'shirtSize',
                                                     )
-                                                    ? "opacity-100"
-                                                    : "opacity-0",
+                                                    ? 'opacity-100'
+                                                    : 'opacity-0',
                                                 )}
                                               />
                                               {size.label}
@@ -813,14 +813,14 @@ export function DetailsInscription({
                                 </Popover>
                               ) : (
                                 <p className="text-sm font-medium">
-                                  {participant.shirtSize || "-"}
+                                  {participant.shirtSize || '-'}
                                 </p>
                               )}
                             </div>
 
-                            <div className="liquid-field p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="h-4 w-4 text-muted-foreground" />
+                            <div className="liquid-panel-strong rounded-lg p-4">
+                              <div className="mb-2 flex items-center gap-2">
+                                <FileText className="text-muted-foreground h-4 w-4" />
                                 <span className="text-sm font-medium">
                                   Modelo da camisa
                                 </span>
@@ -839,21 +839,21 @@ export function DetailsInscription({
                                       type="button"
                                       disabled={loading}
                                       className={cn(
-                                        "w-full justify-between",
+                                        'w-full justify-between',
                                         !participantEdit.form.watch(
-                                          "shirtType",
-                                        ) && "text-muted-foreground",
+                                          'shirtType',
+                                        ) && 'text-muted-foreground',
                                       )}
                                     >
-                                      {participantEdit.form.watch("shirtType")
+                                      {participantEdit.form.watch('shirtType')
                                         ? shirtTypeOptions.find(
                                             (s) =>
                                               s.value ===
                                               participantEdit.form.watch(
-                                                "shirtType",
+                                                'shirtType',
                                               ),
                                           )?.label
-                                        : "Selecione"}
+                                        : 'Selecione'}
                                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                     </Button>
                                   </PopoverTrigger>
@@ -874,7 +874,7 @@ export function DetailsInscription({
                                               value={type.value}
                                               onSelect={() => {
                                                 participantEdit.form.setValue(
-                                                  "shirtType",
+                                                  'shirtType',
                                                   type.value,
                                                   {
                                                     shouldDirty: true,
@@ -889,13 +889,13 @@ export function DetailsInscription({
                                             >
                                               <Check
                                                 className={cn(
-                                                  "mr-2 h-4 w-4",
+                                                  'mr-2 h-4 w-4',
                                                   type.value ===
                                                     participantEdit.form.watch(
-                                                      "shirtType",
+                                                      'shirtType',
                                                     )
-                                                    ? "opacity-100"
-                                                    : "opacity-0",
+                                                    ? 'opacity-100'
+                                                    : 'opacity-0',
                                                 )}
                                               />
                                               {type.label}
@@ -908,7 +908,7 @@ export function DetailsInscription({
                                 </Popover>
                               ) : (
                                 <p className="text-sm font-medium">
-                                  {participant.shirtType || "-"}
+                                  {participant.shirtType || '-'}
                                 </p>
                               )}
                             </div>
@@ -923,9 +923,9 @@ export function DetailsInscription({
           </div>
 
           <div className="space-y-6">
-            <div id="guest-payment" className="liquid-panel p-6 scroll-mt-24">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <div className="space-y-4 flex-1">
+            <div id="guest-payment" className="liquid-panel scroll-mt-24 p-6">
+              <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+                <div className="flex-1 space-y-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
                       <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
@@ -952,13 +952,13 @@ export function DetailsInscription({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div className="space-y-1">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Total pago
                       </p>
                       <p
-                        className={`text-2xl font-bold ${paymentTotalPaid > 0 ? "text-green-600 dark:text-green-400" : "text-gray-900 dark:text-white"}`}
+                        className={`text-2xl font-bold ${paymentTotalPaid > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}
                       >
                         {getFormatCurrency(paymentTotalPaid)}
                       </p>
@@ -980,7 +980,7 @@ export function DetailsInscription({
                         </p>
                         <p
                           className={
-                            "text-2xl font-bold text-amber-600 dark:text-amber-500"
+                            'text-2xl font-bold text-amber-600 dark:text-amber-500'
                           }
                         >
                           {getFormatCurrency(paymentDebt)}
@@ -990,7 +990,7 @@ export function DetailsInscription({
                   </div>
 
                   <div className="pt-2">
-                    <div className="flex justify-between text-sm mb-1">
+                    <div className="mb-1 flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
                         Progresso
                       </span>
@@ -998,9 +998,9 @@ export function DetailsInscription({
                         {paymentProgress}%
                       </span>
                     </div>
-                    <div className="h-2 rounded-full overflow-hidden bg-foreground/15">
+                    <div className="bg-foreground/15 h-2 overflow-hidden rounded-full">
                       <div
-                        className="h-full bg-green-500 rounded-full transition-all duration-300"
+                        className="h-full rounded-full bg-green-500 transition-all duration-300"
                         style={{ width: `${paymentProgress}%` }}
                       />
                     </div>
@@ -1035,17 +1035,17 @@ export function DetailsInscription({
                 </h2>
                 <p className="text-muted-foreground">
                   {paymentsList.length} pagamento
-                  {paymentsList.length !== 1 ? "s" : ""} registrado
-                  {paymentsList.length !== 1 ? "s" : ""}
+                  {paymentsList.length !== 1 ? 's' : ''} registrado
+                  {paymentsList.length !== 1 ? 's' : ''}
                 </p>
               </div>
             </div>
 
             {paymentsList.length === 0 ? (
-              <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
+              <div className="text-muted-foreground rounded-lg border px-4 py-8 text-center">
                 {inscriptionDetails.status === InscriptionStatus.UNDER_REVIEW
-                  ? "Aguardando revisão"
-                  : "Nenhum pagamento registrado"}
+                  ? 'Aguardando revisão'
+                  : 'Nenhum pagamento registrado'}
               </div>
             ) : (
               <div className="space-y-4">
@@ -1053,7 +1053,7 @@ export function DetailsInscription({
                   const installments: PaymentInstallment[] =
                     p.paymentInstallment ?? [];
                   const isApproved =
-                    String(p.status).toUpperCase() === "APPROVED";
+                    String(p.status).toUpperCase() === 'APPROVED';
                   const installmentsTotal = Math.max(
                     Number(p.installments) || 0,
                     1,
@@ -1064,7 +1064,7 @@ export function DetailsInscription({
                   );
 
                   return (
-                    <div key={p.id} className="liquid-panel p-6 space-y-4">
+                    <div key={p.id} className="liquid-panel space-y-4 p-6">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-2">
                           <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
@@ -1102,7 +1102,7 @@ export function DetailsInscription({
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div className="space-y-1">
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             Total pago
@@ -1110,8 +1110,8 @@ export function DetailsInscription({
                           <p
                             className={`text-xl font-bold ${
                               p.totalPaid > 0
-                                ? "text-green-600 dark:text-green-400"
-                                : "text-gray-900 dark:text-white"
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-gray-900 dark:text-white'
                             }`}
                           >
                             {getFormatCurrency(p.totalPaid)}
@@ -1131,7 +1131,7 @@ export function DetailsInscription({
                             Status
                           </p>
                           <span
-                            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${getStatusColor(
                               p.status,
                             )}`}
                           >
@@ -1140,7 +1140,7 @@ export function DetailsInscription({
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div className="space-y-1">
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             Método
@@ -1164,9 +1164,9 @@ export function DetailsInscription({
                       </div>
 
                       {p.rejectionReason && (
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t">
+                        <div className="grid grid-cols-1 gap-4 border-t sm:grid-cols-3">
                           <div className="space-y-1">
-                            <p className="text-base font-bold uppercase mt-3 text-gray-900 dark:text-gray-400">
+                            <p className="mt-3 text-base font-bold text-gray-900 uppercase dark:text-gray-400">
                               Motivo da recusa
                             </p>
                             <p className="text-base text-red-600">
@@ -1198,7 +1198,7 @@ export function DetailsInscription({
 
                           <div className="block sm:hidden">
                             {p.paymentInstallment.length === 0 ? (
-                              <div className="px-4 py-6 text-center text-muted-foreground border rounded-lg">
+                              <div className="text-muted-foreground rounded-lg border px-4 py-6 text-center">
                                 Nenhuma parcela registrada
                               </div>
                             ) : (
@@ -1206,11 +1206,11 @@ export function DetailsInscription({
                                 {p.paymentInstallment.map((installment) => (
                                   <div
                                     key={installment.id}
-                                    className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                                    className="hover:bg-muted/30 rounded-lg border p-4 transition-colors"
                                   >
-                                    <div className="flex items-center justify-between mb-3">
+                                    <div className="mb-3 flex items-center justify-between">
                                       <div className="flex items-center gap-2">
-                                        <span className="text-sm font-medium text-muted-foreground">
+                                        <span className="text-muted-foreground text-sm font-medium">
                                           #
                                         </span>
                                         <span className="font-semibold">
@@ -1221,25 +1221,25 @@ export function DetailsInscription({
 
                                     <div className="grid grid-cols-2 gap-3">
                                       <div className="space-y-1">
-                                        <p className="text-xs text-muted-foreground">
+                                        <p className="text-muted-foreground text-xs">
                                           Valor
                                         </p>
                                         <p className="text-base font-bold text-green-600 dark:text-green-400">
                                           {getFormatCurrency(installment.value)}
                                         </p>
                                       </div>
-                                      <div className="space-y-1 col-span-2">
-                                        <p className="text-xs text-muted-foreground">
+                                      <div className="col-span-2 space-y-1">
+                                        <p className="text-muted-foreground text-xs">
                                           Data
                                         </p>
                                         <div className="flex items-center gap-2">
-                                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                                          <Calendar className="text-muted-foreground h-4 w-4" />
                                           <p className="text-sm font-medium">
                                             {installment.paidAt
                                               ? formatDateTime(
                                                   installment.paidAt,
                                                 )
-                                              : "Em aberto"}
+                                              : 'Em aberto'}
                                           </p>
                                         </div>
                                       </div>
@@ -1250,17 +1250,17 @@ export function DetailsInscription({
                             )}
                           </div>
 
-                          <div className="hidden sm:block rounded-md border sm:w-1/2">
+                          <div className="hidden rounded-md border sm:block sm:w-1/2">
                             <Table>
                               <TableHeader>
                                 <TableRow>
                                   <TableHead className="w-16">#</TableHead>
                                   <TableHead>
-                                    <div className="w-fit mx-auto text-left">
+                                    <div className="mx-auto w-fit text-left">
                                       Valor
                                     </div>
                                   </TableHead>
-                                  <TableHead className="w-[180px] ">
+                                  <TableHead className="w-[180px]">
                                     Data
                                   </TableHead>
                                 </TableRow>
@@ -1270,7 +1270,7 @@ export function DetailsInscription({
                                   <TableRow>
                                     <TableCell
                                       colSpan={3}
-                                      className="h-24 text-center text-muted-foreground"
+                                      className="text-muted-foreground h-24 text-center"
                                     >
                                       Nenhuma parcela registrada
                                     </TableCell>
@@ -1285,14 +1285,14 @@ export function DetailsInscription({
                                         {installment.installmentNumber}
                                       </TableCell>
                                       <TableCell className="font-semibold text-green-600 dark:text-green-400">
-                                        <div className="w-fit mx-auto text-left whitespace-nowrap">
+                                        <div className="mx-auto w-fit text-left whitespace-nowrap">
                                           {getFormatCurrency(installment.value)}
                                         </div>
                                       </TableCell>
                                       <TableCell className="whitespace-nowrap">
                                         {installment.paidAt
                                           ? formatDateTime(installment.paidAt)
-                                          : "Em aberto"}
+                                          : 'Em aberto'}
                                       </TableCell>
                                     </TableRow>
                                   ))

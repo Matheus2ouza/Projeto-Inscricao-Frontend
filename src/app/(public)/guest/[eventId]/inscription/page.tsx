@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { DetailsInscription } from "@/features/guest/components/detailsInscription/detailsInscription";
-import { useDeletePayment } from "@/features/guest/hook/detailsInscription/actions/useDeletePayment";
-import { useModifyReceiptPayment } from "@/features/guest/hook/detailsInscription/actions/useModifyReceiptPayment";
-import { useUpdateGuestInscription } from "@/features/guest/hook/detailsInscription/actions/useUpdateInscription";
-import { useUpdateGuestParticipant } from "@/features/guest/hook/detailsInscription/actions/useUpdateParticipant";
-import { useDetailsInscription } from "@/features/guest/hook/detailsInscription/useDetailsInscription";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { getWithExpiry } from "@/shared/utils/storageWithExpiry";
-import { Frown } from "lucide-react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { DetailsInscription } from '@/features/guest/components/detailsInscription/detailsInscription';
+import { useDeletePayment } from '@/features/guest/hook/detailsInscription/actions/useDeletePayment';
+import { useModifyReceiptPayment } from '@/features/guest/hook/detailsInscription/actions/useModifyReceiptPayment';
+import { useUpdateGuestInscription } from '@/features/guest/hook/detailsInscription/actions/useUpdateInscription';
+import { useUpdateGuestParticipant } from '@/features/guest/hook/detailsInscription/actions/useUpdateParticipant';
+import { useDetailsInscription } from '@/features/guest/hook/detailsInscription/useDetailsInscription';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { getWithExpiry } from '@/shared/utils/storageWithExpiry';
+import { Frown } from 'lucide-react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 export default function GuestInscriptionPage() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function GuestInscriptionPage() {
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const hasAutoScrolledRef = useRef(false);
-  const persistKey = "guest_inscription_persist";
+  const persistKey = 'guest_inscription_persist';
   const [isEditingInscription, setIsEditingInscription] = useState(false);
   const [editingParticipantId, setEditingParticipantId] = useState<
     string | null
@@ -32,8 +32,8 @@ export default function GuestInscriptionPage() {
   }
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const urlCode = searchParams.get("confirmationCode");
+    if (typeof window !== 'undefined') {
+      const urlCode = searchParams.get('confirmationCode');
       if (urlCode) {
         setConfirmationCode(urlCode);
         return;
@@ -42,7 +42,7 @@ export default function GuestInscriptionPage() {
       const cached = getWithExpiry<{
         eventId: string;
         confirmationCode: string;
-      }>("guest_inscription");
+      }>('guest_inscription');
       if (cached?.eventId === eventId && cached.confirmationCode) {
         setConfirmationCode(cached.confirmationCode);
         return;
@@ -70,12 +70,12 @@ export default function GuestInscriptionPage() {
 
   const { inscription, participants, payments, loading, error, refetch } =
     useDetailsInscription({
-      confirmationCode: confirmationCode ?? "",
+      confirmationCode: confirmationCode ?? '',
     });
 
   const { form: updateInscriptionForm, handleUpdateInscription } =
     useUpdateGuestInscription({
-      inscriptionId: inscription?.id ?? "",
+      inscriptionId: inscription?.id ?? '',
       initialValues: inscription
         ? {
             guestName: inscription.guestName,
@@ -97,17 +97,17 @@ export default function GuestInscriptionPage() {
   const handleCancelEditInscription = () => {
     setIsEditingInscription(false);
     updateInscriptionForm.reset({
-      guestName: inscription?.guestName ?? "",
-      guestEmail: inscription?.guestEmail ?? "",
-      guestLocality: inscription?.guestLocality ?? "",
-      phone: inscription?.phone ?? "",
+      guestName: inscription?.guestName ?? '',
+      guestEmail: inscription?.guestEmail ?? '',
+      guestLocality: inscription?.guestLocality ?? '',
+      phone: inscription?.phone ?? '',
     });
   };
 
   const toDateInputValue = (value: string | Date | null | undefined) => {
-    if (!value) return "";
+    if (!value) return '';
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
+    if (Number.isNaN(date.getTime())) return '';
     return date.toISOString().slice(0, 10);
   };
 
@@ -116,15 +116,15 @@ export default function GuestInscriptionPage() {
 
   const { form: updateParticipantForm, handleUpdateParticipant } =
     useUpdateGuestParticipant({
-      participantId: editingParticipantId ?? "",
+      participantId: editingParticipantId ?? '',
       initialValues: participantBeingEdited
         ? {
-            name: participantBeingEdited.name ?? "",
-            preferredName: participantBeingEdited.preferredName ?? "",
+            name: participantBeingEdited.name ?? '',
+            preferredName: participantBeingEdited.preferredName ?? '',
             birthDate: toDateInputValue(participantBeingEdited.birthDate),
-            gender: String(participantBeingEdited.gender ?? ""),
-            shirtSize: String(participantBeingEdited.shirtSize ?? ""),
-            shirtType: String(participantBeingEdited.shirtType ?? ""),
+            gender: String(participantBeingEdited.gender ?? ''),
+            shirtSize: String(participantBeingEdited.shirtSize ?? ''),
+            shirtType: String(participantBeingEdited.shirtType ?? ''),
           }
         : undefined,
       onSuccess: () => {
@@ -142,12 +142,12 @@ export default function GuestInscriptionPage() {
   const handleCancelEditParticipant = () => {
     const current = participants?.find((p) => p.id === editingParticipantId);
     updateParticipantForm.reset({
-      name: current?.name ?? "",
-      preferredName: current?.preferredName ?? "",
+      name: current?.name ?? '',
+      preferredName: current?.preferredName ?? '',
       birthDate: toDateInputValue(current?.birthDate),
-      gender: String(current?.gender ?? ""),
-      shirtSize: String(current?.shirtSize ?? ""),
-      shirtType: String(current?.shirtType ?? ""),
+      gender: String(current?.gender ?? ''),
+      shirtSize: String(current?.shirtSize ?? ''),
+      shirtType: String(current?.shirtType ?? ''),
     });
     setEditingParticipantId(null);
   };
@@ -156,16 +156,16 @@ export default function GuestInscriptionPage() {
 
   useEffect(() => {
     if (hasAutoScrolledRef.current) return;
-    if (searchParams.get("scroll") !== "payment") return;
+    if (searchParams.get('scroll') !== 'payment') return;
     if (loading) return;
     if (!inscription) return;
     if (error) return;
 
     requestAnimationFrame(() => {
-      const el = document.getElementById("guest-payment");
+      const el = document.getElementById('guest-payment');
       if (!el) return;
       const top = el.getBoundingClientRect().top + window.scrollY - 96;
-      window.scrollTo({ top, behavior: "smooth" });
+      window.scrollTo({ top, behavior: 'smooth' });
       hasAutoScrolledRef.current = true;
     });
   }, [searchParams, loading, inscription, error]);
@@ -182,8 +182,8 @@ export default function GuestInscriptionPage() {
     const totalPaid = payment?.totalPaid ?? 0;
     const remainingTotal = Math.max(totalValue - totalPaid, 0);
     const search = new URLSearchParams();
-    search.set("inscriptions", inscription.id);
-    search.set("totalValue", String(remainingTotal));
+    search.set('inscriptions', inscription.id);
+    search.set('totalValue', String(remainingTotal));
     router.push(`/guest/${eventId}/payment/card?${search.toString()}`);
   };
 
@@ -199,11 +199,11 @@ export default function GuestInscriptionPage() {
     const totalPaid = payment?.totalPaid ?? 0;
     const remainingTotal = Math.max(totalValue - totalPaid, 0);
     const search = new URLSearchParams();
-    search.set("inscriptions", inscription.id);
-    search.set("confirmationCode", confirmationCode ?? "");
-    search.set("guestName", inscription.guestName ?? "");
-    search.set("guestEmail", inscription.guestEmail ?? "");
-    search.set("totalValue", String(remainingTotal));
+    search.set('inscriptions', inscription.id);
+    search.set('confirmationCode', confirmationCode ?? '');
+    search.set('guestName', inscription.guestName ?? '');
+    search.set('guestEmail', inscription.guestEmail ?? '');
+    search.set('totalValue', String(remainingTotal));
     router.push(`/guest/${eventId}/payment/pix?${search.toString()}`);
   };
 
@@ -242,7 +242,7 @@ export default function GuestInscriptionPage() {
           isModifingReceipt={isModifingReceiptPayment}
         />
         {error && (
-          <div className="min-h-[160px] flex items-center justify-center">
+          <div className="flex min-h-[160px] items-center justify-center">
             <div className="w-full max-w-xl rounded-xl border border-gray-200 p-6 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900/50">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                 <Frown className="h-9 w-9" />

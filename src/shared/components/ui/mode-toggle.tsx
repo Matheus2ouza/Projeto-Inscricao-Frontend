@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
-import { Monitor, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { Button } from '@/shared/components/ui/button';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
   const [isSwitching, setIsSwitching] = useState(false);
 
   const cycleTheme = () => {
-    if (!theme || theme === "system") {
-      setTheme("light");
-    } else if (theme === "light") {
-      setTheme("dark");
+    if (!theme || theme === 'system') {
+      setTheme('light');
+    } else if (theme === 'light') {
+      setTheme('dark');
     } else {
-      setTheme("system");
+      setTheme('system');
     }
   };
 
@@ -25,10 +25,10 @@ export function ModeToggle() {
   }, [theme]);
 
   const renderIcon = () => {
-    if (theme === "light") {
+    if (theme === 'light') {
       return <Sun className="h-[1.2rem] w-[1.2rem]" />;
     }
-    if (theme === "dark") {
+    if (theme === 'dark') {
       return <Moon className="h-[1.2rem] w-[1.2rem]" />;
     }
     return <Monitor className="h-[1.2rem] w-[1.2rem]" />;
@@ -36,16 +36,16 @@ export function ModeToggle() {
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={cycleTheme}
-      className="transition-all duration-300"
+      className="liquid-glass-button"
     >
       <span
         className={`transition-all duration-300 ${
           isSwitching
-            ? "rotate-90 scale-75 opacity-0"
-            : "rotate-0 scale-100 opacity-100"
+            ? 'scale-75 rotate-90 opacity-0'
+            : 'scale-100 rotate-0 opacity-100'
         }`}
       >
         {renderIcon()}

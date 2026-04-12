@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import Logo from "@/shared/components/ui/logo";
-import { ModeToggle } from "@/shared/components/ui/mode-toggle";
-import { Button } from "@heroui/react";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import Logo from '@/shared/components/ui/logo';
+import { ModeToggle } from '@/shared/components/ui/mode-toggle';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const PublicNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,70 +15,70 @@ const PublicNavbar = () => {
   };
 
   const handleLogoClick = () => {
-    router.push("/");
+    router.push('/');
   };
 
   const handleNavigation = (item: string) => {
     setIsMenuOpen(false);
 
     switch (item) {
-      case "Sobre":
-        if (pathname === "/") {
+      case 'Sobre':
+        if (pathname === '/') {
           document
-            .getElementById("sobre")
-            ?.scrollIntoView({ behavior: "smooth" });
+            .getElementById('sobre')
+            ?.scrollIntoView({ behavior: 'smooth' });
         } else {
-          router.push("/#sobre");
+          router.push('/#sobre');
         }
         break;
-      case "Eventos":
-        if (pathname === "/") {
+      case 'Eventos':
+        if (pathname === '/') {
           document
-            .getElementById("eventos")
-            ?.scrollIntoView({ behavior: "smooth" });
+            .getElementById('eventos')
+            ?.scrollIntoView({ behavior: 'smooth' });
         } else {
-          router.push("/#eventos");
+          router.push('/#eventos');
         }
         break;
-      case "Login":
-        router.push("/login");
+      case 'Login':
+        router.push('/login');
         break;
     }
   };
 
   const handleLoginClick = () => {
-    router.push("/login");
+    router.push('/login');
   };
 
   // Determina se deve mostrar os links de navegação (apenas na home)
-  const showNavigationLinks = pathname === "/";
+  const showNavigationLinks = pathname === '/';
 
   return (
     <>
-      <nav className="liquid-panel-strong flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 w-full overflow-hidden relative z-2 rounded-none border-x-0 border-t-0">
+      <nav className="liquid-panel relative z-2 mx-auto mt-2 flex w-[95%] items-center justify-between overflow-hidden border-x-5 border-t-0 px-2 py-3 sm:px-4 lg:px-6">
         {/* Left Section: Menu + Logo + Título */}
         <div className="flex items-center space-x-3">
           {/* Mobile Menu Toggle - apenas na home */}
           {showNavigationLinks && (
             <button
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+              className="rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 lg:hidden dark:hover:bg-gray-800"
               onClick={toggleMenu}
-              aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
+              aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             >
-              <div className="w-6 h-6 flex flex-col justify-center space-y-1">
+              <div className="flex h-6 w-6 flex-col justify-center space-y-1">
                 <span
-                  className={`block h-0.5 w-full bg-foreground/80 transition-all duration-300 ${
-                    isMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                  className={`bg-foreground/80 block h-0.5 w-full transition-all duration-300 ${
+                    isMenuOpen ? 'translate-y-1.5 rotate-45' : ''
                   }`}
                 ></span>
                 <span
-                  className={`block h-0.5 w-full bg-foreground/80 transition-all duration-300 ${
-                    isMenuOpen ? "opacity-0" : ""
+                  className={`bg-foreground/80 block h-0.5 w-full transition-all duration-300 ${
+                    isMenuOpen ? 'opacity-0' : ''
                   }`}
                 ></span>
                 <span
-                  className={`block h-0.5 w-full bg-foreground/80 transition-all duration-300 ${
-                    isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                  className={`bg-foreground/80 block h-0.5 w-full transition-all duration-300 ${
+                    isMenuOpen ? '-translate-y-1.5 -rotate-45' : ''
                   }`}
                 ></span>
               </div>
@@ -88,12 +87,15 @@ const PublicNavbar = () => {
 
           {/* Logo + Título - clicável para voltar à home */}
           <div
-            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+            className="flex cursor-pointer items-center space-x-3 transition-opacity duration-200 hover:opacity-90"
             onClick={handleLogoClick}
           >
-            <Logo className="w-12 h-12 object-contain" showTitle={false} />
-            <h1 className="hidden sm:block text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate tracking-[0.2em] uppercase">
-              Sistema de Inscrições
+            <Logo className="h-12 w-12 object-contain" showTitle={false} />
+            <h1 className="hidden truncate text-lg font-bold tracking-[0.2em] text-gray-900 uppercase sm:block sm:text-xl lg:text-2xl dark:text-white">
+              Sistema de{' '}
+              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Inscrições
+              </span>
             </h1>
           </div>
         </div>
@@ -102,35 +104,32 @@ const PublicNavbar = () => {
         <div className="flex items-center space-x-6">
           {/* Desktop Navigation - apenas na home */}
           {showNavigationLinks && (
-            <div className="hidden lg:flex items-center space-x-8">
-              <button
-                onClick={() => handleNavigation("Sobre")}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200 relative group"
+            <div className="hidden items-center space-x-8 lg:flex">
+              {/* <button
+                onClick={() => handleNavigation('Sobre')}
+                className="group relative font-medium text-gray-700 transition-colors duration-200 hover:text-blue-600 dark:text-gray-300 dark:hover:text-white"
               >
                 Sobre
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
-              </button>
+              </button> */}
+
               <button
-                onClick={() => handleNavigation("Eventos")}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-200 relative group"
+                onClick={() => handleNavigation('Eventos')}
+                className="group relative font-medium text-gray-700 transition-colors duration-200 hover:text-blue-600 dark:text-gray-300 dark:hover:text-white"
               >
                 Eventos
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
               </button>
             </div>
           )}
 
           {/* Desktop Login/Signup - apenas se não estiver na página de login */}
-          {pathname !== "/login" && (
-            <div className="hidden md:flex items-center">
-              <Button
-                color="primary"
-                variant="solid"
+          {pathname !== '/login' && (
+            <div className="hidden items-center md:flex">
+              <button
                 onClick={handleLoginClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                className="text-primary-foreground cursor-pointer rounded-4xl bg-indigo-600 px-6 py-2 font-medium transition duration-200 hover:brightness-90 dark:bg-white dark:text-neutral-900 dark:hover:bg-gray-200"
               >
                 Login
-              </Button>
+              </button>
             </div>
           )}
 
@@ -141,17 +140,17 @@ const PublicNavbar = () => {
 
       {/* Mobile Menu - apenas na home */}
       {showNavigationLinks && isMenuOpen && (
-        <div className="liquid-panel-strong lg:hidden mt-1 rounded-t-none border-x-0">
-          <div className="px-4 py-2 space-y-1">
-            {["Sobre", "Eventos", "Documentação", "Login"].map(
+        <div className="liquid-panel-strong mt-1 rounded-t-none border-x-0 lg:hidden">
+          <div className="space-y-1 px-4 py-2">
+            {['Sobre', 'Eventos', 'Documentação', 'Login'].map(
               (item, index) => (
                 <button
                   key={`${item}-${index}`}
                   onClick={() => handleNavigation(item)}
-                  className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                    item === "Login"
-                      ? "text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400"
+                  className={`block w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors duration-200 ${
+                    item === 'Login'
+                      ? 'text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400'
                   }`}
                 >
                   {item}

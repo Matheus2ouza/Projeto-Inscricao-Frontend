@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import { Button } from '@/shared/components/ui/button';
 import {
   CONTAINER_WIDTHS,
   PAGE_CONTAINER_CLASSES,
-} from "@/shared/constants/layout";
-import { cn } from "@/shared/lib/utils";
-import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { ReactNode } from "react";
+} from '@/shared/constants/layout';
+import { cn } from '@/shared/lib/utils';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ReactNode } from 'react';
 
 type ContainerWidth = keyof typeof CONTAINER_WIDTHS;
 
@@ -53,7 +53,7 @@ export default function PageContainer({
   backButtonAction,
   className,
   containerClassName,
-  maxWidth = "2xl",
+  maxWidth = '2xl',
   actions,
   titleSize,
   titleClassName,
@@ -74,11 +74,11 @@ export default function PageContainer({
   const maxWidthClass = CONTAINER_WIDTHS[maxWidth];
 
   return (
-    <div className={cn(PAGE_CONTAINER_CLASSES.background, className)}>
+    <div className={cn(className)}>
       <div
         className={cn(
           maxWidthClass,
-          "mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-8",
+          'mx-auto space-y-8 px-4 py-5 sm:px-6 lg:px-8',
           containerClassName,
         )}
       >
@@ -109,7 +109,9 @@ export default function PageContainer({
                         descriptionClassName,
                       )}
                       style={
-                        descriptionColor ? { color: descriptionColor } : undefined
+                        descriptionColor
+                          ? { color: descriptionColor }
+                          : undefined
                       }
                     >
                       {description}
