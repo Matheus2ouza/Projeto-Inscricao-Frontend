@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import { useAccount } from "@/features/accounts/hooks/useAccount";
-import { deleteImageEvent } from "@/features/events/api/manager/eventActions/deleteImageEvent";
-import { deleteLogoEvent } from "@/features/events/api/manager/eventActions/deleteLogoEvent";
-import { updateEventImage } from "@/features/events/api/manager/eventActions/updateEventImage";
-import { updateEventLogo } from "@/features/events/api/manager/eventActions/updateEventLogo";
-import ResponsiblesDialog from "@/features/events/components/manager/ResponsiblesDialog";
-import { useFormEditEvent } from "@/features/events/hooks/manager/useFormEditEvent";
-import { useEventResponsible } from "@/features/events/hooks/useEventResponsible";
+import { useAccount } from '@/features/accounts/hooks/useAccount';
+import { deleteImageEvent } from '@/features/events/api/manager/eventActions/deleteImageEvent';
+import { deleteLogoEvent } from '@/features/events/api/manager/eventActions/deleteLogoEvent';
+import { updateEventImage } from '@/features/events/api/manager/eventActions/updateEventImage';
+import { updateEventLogo } from '@/features/events/api/manager/eventActions/updateEventLogo';
+import ResponsiblesDialog from '@/features/events/components/manager/ResponsiblesDialog';
+import { useFormEditEvent } from '@/features/events/hooks/manager/useFormEditEvent';
+import { useEventResponsible } from '@/features/events/hooks/useEventResponsible';
 import {
   Event,
   InscriptionMode,
-} from "@/features/events/types/manager/eventManagerTypes";
-import { CreateTypeInscriptionInput } from "@/features/typeInscription/api/createTypeInscription";
-import { UpdateTypeInscriptionInput } from "@/features/typeInscription/api/updateTypeInscription";
-import TypeInscriptionDialog from "@/features/typeInscription/components/TypeInscriptionDialog";
-import { TypeInscription } from "@/features/typeInscription/types/typesInscriptionsTypes";
-import { ConfirmationDialog } from "@/shared/components/ConfirmationDialog";
-import EventMap from "@/shared/components/EventMap";
-import ImageCropDialog from "@/shared/components/ImageCropDialog";
+} from '@/features/events/types/manager/eventManagerTypes';
+import { CreateTypeInscriptionInput } from '@/features/typeInscription/api/createTypeInscription';
+import { UpdateTypeInscriptionInput } from '@/features/typeInscription/api/updateTypeInscription';
+import TypeInscriptionDialog from '@/features/typeInscription/components/TypeInscriptionDialog';
+import { TypeInscription } from '@/features/typeInscription/types/typesInscriptionsTypes';
+import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
+import EventMap from '@/shared/components/EventMap';
+import ImageCropDialog from '@/shared/components/ImageCropDialog';
 import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from "@/shared/components/ui/alert";
-import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import calculateMaxAge from "@/shared/utils/calculateMaxAge";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+} from '@/shared/components/ui/alert';
+import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import calculateMaxAge from '@/shared/utils/calculateMaxAge';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import {
   AlertCircle,
   Calendar,
@@ -46,12 +46,12 @@ import {
   User,
   UserCheck,
   Users,
-} from "lucide-react";
-import Image from "next/image";
-import { useCallback, useRef, useState } from "react";
-import { toast } from "sonner";
-import { useInvalidateDetailsEventQuery } from "../../hooks/manager/useEventManagerQuery";
-import InscriptionModesDialog from "./InscriptionModesDialog";
+} from 'lucide-react';
+import Image from 'next/image';
+import { useCallback, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { useInvalidateDetailsEventQuery } from '../../hooks/manager/useEventManagerQuery';
+import InscriptionModesDialog from './InscriptionModesDialog';
 
 interface EventManagementProps {
   event: Event | null;
@@ -92,9 +92,9 @@ export default function EventManagement({
 }: EventManagementProps) {
   if (!event) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex min-h-screen flex-col items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Evento não encontrado</h2>
+          <h2 className="mb-4 text-2xl font-bold">Evento não encontrado</h2>
           <p className="text-muted-foreground">
             O evento que você está tentando acessar não existe ou não foi
             carregado.
@@ -177,12 +177,12 @@ export default function EventManagement({
 
   // Opções para os modos de inscrição
   const inscriptionModeOptions = [
-    { value: InscriptionMode.NORMAL, label: "Normal" },
-    { value: InscriptionMode.GUEST, label: "Não Alocados" },
+    { value: InscriptionMode.NORMAL, label: 'Normal' },
+    { value: InscriptionMode.GUEST, label: 'Não Alocados' },
   ];
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR");
+    return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
   const getEventStatus = () => {
@@ -191,18 +191,18 @@ export default function EventManagement({
     const end = new Date(event.endDate);
 
     if (now >= start && now <= end) {
-      return { label: "Em Andamento", color: "bg-blue-600" };
+      return { label: 'Em Andamento', color: 'bg-blue-600' };
     }
 
     switch (event.status) {
-      case "OPEN":
-        return { label: "Inscrições Abertas", color: "bg-green-600" };
-      case "CLOSE":
-        return { label: "Inscrições Fechadas", color: "bg-amber-600" };
-      case "FINALIZED":
-        return { label: "Finalizado", color: "bg-red-600" };
+      case 'OPEN':
+        return { label: 'Inscrições Abertas', color: 'bg-green-600' };
+      case 'CLOSE':
+        return { label: 'Inscrições Fechadas', color: 'bg-amber-600' };
+      case 'FINALIZED':
+        return { label: 'Finalizado', color: 'bg-red-600' };
       default:
-        return { label: "Status desconhecido", color: "bg-gray-600" };
+        return { label: 'Status desconhecido', color: 'bg-gray-600' };
     }
   };
 
@@ -210,14 +210,14 @@ export default function EventManagement({
     try {
       setDeleteImage(true);
       await deleteImageEvent(event.id);
-      toast.success("Imagem deletada com sucesso!");
+      toast.success('Imagem deletada com sucesso!');
       setIsDeleteImageOpen(false);
       await refreshEvent();
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
-          : "Falha ao tentar deletar a imagem do evento";
+          : 'Falha ao tentar deletar a imagem do evento';
       toast.error(message);
     } finally {
       setDeleteImage(false);
@@ -228,14 +228,14 @@ export default function EventManagement({
     try {
       setDeleteLogo(true);
       await deleteLogoEvent(event.id);
-      toast.success("Logo deletada com sucesso!");
+      toast.success('Logo deletada com sucesso!');
       setIsDeleteLogoOpen(false);
       refreshEvent();
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
-          : "Falha ao tentar deletar o logo do evento";
+          : 'Falha ao tentar deletar o logo do evento';
       toast.error(message);
     } finally {
       setDeleteLogo(false);
@@ -250,14 +250,14 @@ export default function EventManagement({
   // Funções para gerenciar tipos de inscrição
   const handleCreateType = () => {
     dialogScrollPositionRef.current =
-      typeof window !== "undefined" ? window.scrollY : 0;
+      typeof window !== 'undefined' ? window.scrollY : 0;
     setCurrentType(null);
     setDialogOpen(true);
     requestAnimationFrame(() => {
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.scrollTo({
           top: dialogScrollPositionRef.current,
-          behavior: "auto",
+          behavior: 'auto',
         });
       }
     });
@@ -265,14 +265,14 @@ export default function EventManagement({
 
   const handleEditType = (type: TypeInscription) => {
     dialogScrollPositionRef.current =
-      typeof window !== "undefined" ? window.scrollY : 0;
+      typeof window !== 'undefined' ? window.scrollY : 0;
     setCurrentType(type);
     setDialogOpen(true);
     requestAnimationFrame(() => {
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.scrollTo({
           top: dialogScrollPositionRef.current,
-          behavior: "auto",
+          behavior: 'auto',
         });
       }
     });
@@ -370,9 +370,9 @@ export default function EventManagement({
 
   if (!event) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex min-h-screen flex-col items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Evento não encontrado</h2>
+          <h2 className="mb-4 text-2xl font-bold">Evento não encontrado</h2>
           <p className="text-muted-foreground">
             O evento que você está tentando acessar não existe ou não foi
             carregado.
@@ -383,45 +383,45 @@ export default function EventManagement({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="bg-background min-h-screen">
+      <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Header com ações principais */}
-        <div className="flex items-center justify-end mb-8">
+        <div className="mb-8 flex items-center justify-end">
           <div className="flex items-center gap-3">
             {!isEditing ? (
               <>
                 <Button
-                  variant={event.status === "OPEN" ? "destructive" : "outline"}
+                  variant={event.status === 'OPEN' ? 'destructive' : 'outline'}
                   onClick={() =>
                     handleUpdateInscription(
-                      event.status === "OPEN" ? "CLOSE" : "OPEN",
+                      event.status === 'OPEN' ? 'CLOSE' : 'OPEN',
                     )
                   }
                   className="flex items-center gap-2"
                   disabled={loading}
                 >
-                  {event.status === "OPEN"
-                    ? "Fechar Inscrições"
-                    : "Abrir Inscrições"}
+                  {event.status === 'OPEN'
+                    ? 'Fechar Inscrições'
+                    : 'Abrir Inscrições'}
                 </Button>
                 <Button
-                  variant={event.paymentEnebled ? "destructive" : "outline"}
+                  variant={event.paymentEnebled ? 'destructive' : 'outline'}
                   onClick={() => handleUpdatePayment(!event.paymentEnebled)}
                   className="flex items-center gap-2"
                   disabled={loading}
                 >
                   {event.paymentEnebled
-                    ? "Fechar Pagamentos"
-                    : "Abrir Pagamentos"}
+                    ? 'Fechar Pagamentos'
+                    : 'Abrir Pagamentos'}
                 </Button>
                 <Button
-                  variant={event.allowCard ? "destructive" : "outline"}
+                  variant={event.allowCard ? 'destructive' : 'outline'}
                   onClick={() => handleUpdateAllowCard(!event.allowCard)}
                   className="flex items-center gap-2"
                   disabled={loading}
                 >
                   <CreditCard className="h-4 w-4" />
-                  {event.allowCard ? "Desabilitar Cartão" : "Habilitar Cartão"}
+                  {event.allowCard ? 'Desabilitar Cartão' : 'Habilitar Cartão'}
                 </Button>
                 <Button
                   variant="outline"
@@ -463,29 +463,29 @@ export default function EventManagement({
                   disabled={loading}
                 >
                   <Save className="h-4 w-4" />
-                  {loading ? "Salvando..." : "Salvar Alterações"}
+                  {loading ? 'Salvando...' : 'Salvar Alterações'}
                 </Button>
               </>
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Coluna Principal */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6 lg:col-span-2">
             {/* Card de Informações Básicas */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Informações Básicas
                 </h2>
-                <Badge className={statusBadge.color + " text-white"}>
+                <Badge className={statusBadge.color + ' text-white'}>
                   {statusBadge.label}
                 </Badge>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nome do Evento
                   </label>
                   {isEditing ? (
@@ -505,14 +505,14 @@ export default function EventManagement({
             </div>
 
             {/* Card de Datas e Horários */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
                 Datas e Horários
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Data de Início
                   </label>
                   {isEditing ? (
@@ -533,7 +533,7 @@ export default function EventManagement({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Data de Término
                   </label>
                   {isEditing ? (
@@ -556,8 +556,8 @@ export default function EventManagement({
             </div>
 
             {/* Card de Modos de Inscrição */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Modos de Inscrição
                 </h2>
@@ -569,12 +569,12 @@ export default function EventManagement({
 
               <div className="space-y-4">
                 {!event.allowedInscriptionModes?.length ? (
-                  <div className="text-center flex flex-col items-center justify-center py-8">
-                    <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <User className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                    <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
                       Nenhum modo de inscrição configurado
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="mb-4 text-gray-600 dark:text-gray-400">
                       Selecione os modos de inscrição disponíveis para este
                       evento.
                     </p>
@@ -607,9 +607,9 @@ export default function EventManagement({
                           return (
                             <div
                               key={mode}
-                              className="flex items-center justify-between p-3 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
+                              className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-gray-50/80 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-white/5"
                             >
-                              <div className="flex items-center gap-2 flex-1">
+                              <div className="flex flex-1 items-center gap-2">
                                 <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                                 <span className="text-sm font-medium text-gray-900 dark:text-white">
                                   {modeOption?.label || mode}
@@ -625,7 +625,7 @@ export default function EventManagement({
                       <Button
                         type="button"
                         variant="outline"
-                        className="w-full flex items-center gap-2"
+                        className="flex w-full items-center gap-2"
                         onClick={() => setInscriptionModesDialogOpen(true)}
                       >
                         <Plus className="h-4 w-4" />
@@ -638,8 +638,8 @@ export default function EventManagement({
             </div>
 
             {/* Card de Localização */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Localização
                 </h2>
@@ -647,7 +647,7 @@ export default function EventManagement({
 
               {/* Card de Endereço */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Endereço
                 </label>
                 <div className="flex items-center gap-2 text-gray-900 dark:text-white">
@@ -661,16 +661,16 @@ export default function EventManagement({
                   ) : (
                     <div className="flex items-center gap-2 text-gray-900 dark:text-white">
                       <MapPin className="h-4 w-4" />
-                      <span>{event.location || "Local não definido"}</span>
+                      <span>{event.location || 'Local não definido'}</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* Card de Latitude */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Latitude
                   </label>
                   <div className="flex items-center gap-2 text-gray-900 dark:text-white">
@@ -684,7 +684,7 @@ export default function EventManagement({
                     ) : (
                       <div className="flex items-center gap-2 text-gray-900 dark:text-white">
                         <MapPin className="h-4 w-4" />
-                        <span>{event.latitude || "não definido"}</span>
+                        <span>{event.latitude || 'não definido'}</span>
                       </div>
                     )}
                   </div>
@@ -692,7 +692,7 @@ export default function EventManagement({
 
                 {/* Card de Longitude */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Longitude
                   </label>
                   <div className="flex items-center gap-2 text-gray-900 dark:text-white">
@@ -706,7 +706,7 @@ export default function EventManagement({
                     ) : (
                       <div className="flex items-center gap-2 text-gray-900 dark:text-white">
                         <MapPin className="h-4 w-4" />
-                        <span>{event.longitude || "não definido"}</span>
+                        <span>{event.longitude || 'não definido'}</span>
                       </div>
                     )}
                   </div>
@@ -714,25 +714,25 @@ export default function EventManagement({
               </div>
 
               {isEditing && (
-                <Alert className="mb-4 border-yellow-500/50 text-yellow-600 dark:text-yellow-400 dark:border-yellow-500/30 bg-yellow-50 dark:bg-yellow-950/20">
+                <Alert className="mb-4 border-yellow-500/50 bg-yellow-50 text-yellow-600 dark:border-yellow-500/30 dark:bg-yellow-950/20 dark:text-yellow-400">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Atenção</AlertTitle>
                   <AlertDescription>
                     Alterar a latitude e longitude afetará a posição do marcador
                     no mapa. Certifique-se de usar coordenadas válidas. Caso
                     tenha dúvidas sobre como obter as coordenadas, consulte no
-                    site do{" "}
+                    site do{' '}
                     <a
                       href={
                         formData.location
                           ? `https://www.google.com.br/maps/search/${encodeURIComponent(
                               formData.location,
                             )}`
-                          : "https://www.google.com.br/maps"
+                          : 'https://www.google.com.br/maps'
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium no-underline hover:underline underline-offset-4"
+                      className="font-medium no-underline underline-offset-4 hover:underline"
                     >
                       Google Maps
                     </a>
@@ -744,7 +744,7 @@ export default function EventManagement({
                 event.latitude &&
                 event.longitude &&
                 (event.latitude !== 0 || event.longitude !== 0) && (
-                  <div className="mt-6 rounded-lg overflow-hidden border border-gray-200 dark:border-white/10">
+                  <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 dark:border-white/10">
                     <EventMap
                       lat={event.latitude as number}
                       lng={event.longitude as number}
@@ -756,8 +756,8 @@ export default function EventManagement({
             </div>
 
             {/* Card de Responsáveis */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Responsáveis
                 </h2>
@@ -820,9 +820,9 @@ export default function EventManagement({
                       {displayResponsibles.map((responsible) => (
                         <div
                           key={responsible.id}
-                          className="flex items-center justify-between p-3 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
+                          className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-gray-50/80 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-white/5"
                         >
-                          <div className="flex items-center gap-2 flex-1">
+                          <div className="flex flex-1 items-center gap-2">
                             <UserCheck className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
                               {responsible.name}
@@ -837,10 +837,10 @@ export default function EventManagement({
                                 // Verificar se é o último responsável
                                 if (displayResponsibles.length === 1) {
                                   toast.error(
-                                    "Impossível remover o responsável",
+                                    'Impossível remover o responsável',
                                     {
                                       description:
-                                        "O evento deve ter pelo menos um responsável.",
+                                        'O evento deve ter pelo menos um responsável.',
                                     },
                                   );
                                   return;
@@ -852,7 +852,7 @@ export default function EventManagement({
                                 });
                               }}
                               disabled={removingResponsible}
-                              className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300"
+                              className="h-8 px-3 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
                             >
                               Remover
                             </Button>
@@ -861,8 +861,8 @@ export default function EventManagement({
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <UserCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <div className="py-8 text-center">
+                      <UserCheck className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                       <p className="text-gray-600 dark:text-gray-400">
                         Nenhum responsável atribuído
                       </p>
@@ -884,8 +884,8 @@ export default function EventManagement({
             </div>
 
             {/* Card de Tipos de Inscrição */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Tipos de Inscrição
                 </h2>
@@ -896,12 +896,12 @@ export default function EventManagement({
               </div>
 
               {!hasTypeInscriptions ? (
-                <div className="text-center flex flex-col items-center justify-center py-8">
-                  <Tag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Tag className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                  <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
                     Nenhum tipo de inscrição configurado
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="mb-4 text-gray-600 dark:text-gray-400">
                     Adicione tipos de inscrição para permitir que participantes
                     se inscrevam no evento.
                   </p>
@@ -921,34 +921,34 @@ export default function EventManagement({
                     return (
                       <div
                         key={type.id}
-                        className="flex items-center justify-between p-4 border border-gray-200/60 dark:border-white/10 rounded-lg bg-gray-50/80 dark:bg-white/5 backdrop-blur-sm"
+                        className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-gray-50/80 p-4 backdrop-blur-sm dark:border-white/10 dark:bg-white/5"
                       >
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="font-medium text-gray-900 dark:text-white uppercase">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-medium text-gray-900 uppercase dark:text-white">
                               {type.description}
                             </h4>
                             <Badge
                               className={
                                 isTypeActive
-                                  ? "text-xs bg-emerald-600 hover:bg-emerald-600 text-white"
-                                  : "text-xs"
+                                  ? 'bg-emerald-600 text-xs text-white hover:bg-emerald-600'
+                                  : 'text-xs'
                               }
-                              variant={isTypeActive ? "default" : "destructive"}
+                              variant={isTypeActive ? 'default' : 'destructive'}
                             >
-                              {isTypeActive ? "Ativo" : "Desabilitado"}
+                              {isTypeActive ? 'Ativo' : 'Desabilitado'}
                             </Badge>
                             {type.specialType && (
                               <Badge
                                 variant="secondary"
-                                className="flex items-center gap-1 text-xs uppercase tracking-wide"
+                                className="flex items-center gap-1 text-xs tracking-wide uppercase"
                               >
                                 Especial
                               </Badge>
                             )}
                           </div>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {getFormatCurrency(type.value)} •{" "}
+                            {getFormatCurrency(type.value)} •{' '}
                             {calculateMaxAge(type.rule)}
                           </p>
                         </div>
@@ -962,13 +962,13 @@ export default function EventManagement({
                             Editar
                           </Button>
                           <Button
-                            variant={isTypeActive ? "outline" : "default"}
+                            variant={isTypeActive ? 'outline' : 'default'}
                             size="sm"
                             className="flex items-center gap-1"
                             onClick={() => handleDisableType(type)}
                             disabled={typeInscriptionLoading}
                           >
-                            {isTypeActive ? "Desabilitar" : "Ativar"}
+                            {isTypeActive ? 'Desabilitar' : 'Ativar'}
                           </Button>
                           <Button
                             variant="destructive"
@@ -984,7 +984,7 @@ export default function EventManagement({
                   })}
                   <Button
                     variant="outline"
-                    className="w-full flex items-center gap-2"
+                    className="flex w-full items-center gap-2"
                     onClick={handleCreateType}
                   >
                     <Plus className="h-4 w-4" />
@@ -998,13 +998,13 @@ export default function EventManagement({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Card de Estatísticas */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
                 Estatísticas
               </h2>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-blue-50/80 dark:bg-blue-500/10 backdrop-blur-sm rounded-lg border border-blue-200/60 dark:border-blue-500/10">
+                <div className="flex items-center justify-between rounded-lg border border-blue-200/60 bg-blue-50/80 p-3 backdrop-blur-sm dark:border-blue-500/10 dark:bg-blue-500/10">
                   <div className="flex items-center gap-3">
                     <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     <span className="text-sm font-medium">Participantes</span>
@@ -1014,14 +1014,14 @@ export default function EventManagement({
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-green-50/80 dark:bg-green-500/10 backdrop-blur-sm rounded-lg border border-green-200/60 dark:border-green-500/10">
+                <div className="flex items-center justify-between rounded-lg border border-green-200/60 bg-green-50/80 p-3 backdrop-blur-sm dark:border-green-500/10 dark:bg-green-500/10">
                   <div className="flex items-center gap-3">
                     <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
                     <span className="text-sm font-medium">Arrecadado</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                      {showAmount ? "****" : getFormatCurrency(totalRevenue)}
+                      {showAmount ? '****' : getFormatCurrency(totalRevenue)}
                     </span>
                     <button
                       onClick={() => setShowAmount(!showAmount)}
@@ -1037,7 +1037,7 @@ export default function EventManagement({
                 </div>
 
                 {event.maxParticipants && (
-                  <div className="flex items-center justify-between p-3 bg-purple-50/80 dark:bg-purple-500/10 backdrop-blur-sm rounded-lg border border-purple-200/60 dark:border-purple-500/10">
+                  <div className="flex items-center justify-between rounded-lg border border-purple-200/60 bg-purple-50/80 p-3 backdrop-blur-sm dark:border-purple-500/10 dark:bg-purple-500/10">
                     <div className="flex items-center gap-3">
                       <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                       <span className="text-sm font-medium">Vagas Totais</span>
@@ -1051,13 +1051,13 @@ export default function EventManagement({
             </div>
 
             {/* Card de Imagem do Evento */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
                 Imagem do Evento
               </h2>
               <AspectRatio
                 ratio={16 / 9}
-                className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden w-full max-w-[640px] mx-auto"
+                className="mx-auto w-full max-w-[640px] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700"
               >
                 {event.image ? (
                   <Image
@@ -1065,10 +1065,10 @@ export default function EventManagement({
                     alt={event.name}
                     width={400}
                     height={225}
-                    className="w-full h-full object-contain"
+                    className="h-full w-full object-contain"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
+                  <div className="flex h-full w-full items-center justify-center">
                     <p className="text-gray-500 dark:text-gray-400">
                       Sem imagem
                     </p>
@@ -1076,14 +1076,14 @@ export default function EventManagement({
                 )}
               </AspectRatio>
               {isEditing && (
-                <div className="flex gap-2 mt-4">
+                <div className="mt-4 flex gap-2">
                   <Button
                     variant="outline"
                     className="flex-1"
                     onClick={() => setImageDialogOpen(true)}
                     disabled={uploadingImage}
                   >
-                    {uploadingImage ? "Enviando..." : "Alterar Imagem"}
+                    {uploadingImage ? 'Enviando...' : 'Alterar Imagem'}
                   </Button>
                   <Button
                     variant="destructive"
@@ -1091,25 +1091,25 @@ export default function EventManagement({
                     onClick={() => setIsDeleteImageOpen(true)}
                     disabled={deleteImage}
                   >
-                    {deleteImage ? "Deletando..." : "Deletar Imagem"}
+                    {deleteImage ? 'Deletando...' : 'Deletar Imagem'}
                   </Button>
                 </div>
               )}
             </div>
 
             {/* Card de Logo do Evento */}
-            <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
                 Logo do Evento
               </h2>
               <div className="flex justify-center">
                 <div className="w-[180px]">
                   <AspectRatio
                     ratio={1}
-                    className="bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden"
+                    className="overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700"
                   >
                     {event.logoUrl ? (
-                      <div className="relative w-full h-full">
+                      <div className="relative h-full w-full">
                         <Image
                           src={event.logoUrl}
                           alt={`Logo do evento ${event.name}`}
@@ -1118,7 +1118,7 @@ export default function EventManagement({
                         />
                       </div>
                     ) : (
-                      <span className="flex h-full w-full items-center justify-center text-gray-500 dark:text-gray-400 text-sm font-medium">
+                      <span className="flex h-full w-full items-center justify-center text-sm font-medium text-gray-500 dark:text-gray-400">
                         SEM LOGO
                       </span>
                     )}
@@ -1126,14 +1126,14 @@ export default function EventManagement({
                 </div>
               </div>
               {isEditing && (
-                <div className="flex gap-2 mt-4">
+                <div className="mt-4 flex gap-2">
                   <Button
                     variant="outline"
                     className="flex-1"
                     onClick={() => setLogoDialogOpen(true)}
                     disabled={uploadingLogo}
                   >
-                    {uploadingLogo ? "Enviando..." : "Alterar Logo"}
+                    {uploadingLogo ? 'Enviando...' : 'Alterar Logo'}
                   </Button>
                   <Button
                     variant="destructive"
@@ -1141,7 +1141,7 @@ export default function EventManagement({
                     onClick={() => setIsDeleteLogoOpen(true)}
                     disabled={deleteLogo}
                   >
-                    {deleteLogo ? "Deletando..." : "Deletar Logo"}
+                    {deleteLogo ? 'Deletando...' : 'Deletar Logo'}
                   </Button>
                 </div>
               )}
@@ -1207,7 +1207,7 @@ export default function EventManagement({
               targetHeight={1080}
               title="Alterar imagem do evento"
               description="Arraste/solte sua imagem, ajuste o zoom e posição. Salvaremos em 1920x1080."
-              confirmLabel={uploadingImage ? "Enviando..." : "Salvar imagem"}
+              confirmLabel={uploadingImage ? 'Enviando...' : 'Salvar imagem'}
               onConfirm={async ({ base64 }) => {
                 try {
                   setUploadingImage(true);
@@ -1215,12 +1215,12 @@ export default function EventManagement({
                     eventId: event.id,
                     imageBase64: base64,
                   });
-                  toast.success("Imagem atualizada com sucesso!");
+                  toast.success('Imagem atualizada com sucesso!');
                   setImageDialogOpen(false);
                   invalidateDetail(event.id);
                   refreshEvent();
                 } catch (err) {
-                  toast.error("Falha ao atualizar imagem do evento");
+                  toast.error('Falha ao atualizar imagem do evento');
                 } finally {
                   setUploadingImage(false);
                 }
@@ -1235,7 +1235,7 @@ export default function EventManagement({
               targetHeight={500}
               title="Alterar logo do evento"
               description="Faça upload da logo, ajustando no formato quadrado. Salvaremos em 500x500."
-              confirmLabel={uploadingLogo ? "Enviando..." : "Salvar logo"}
+              confirmLabel={uploadingLogo ? 'Enviando...' : 'Salvar logo'}
               onConfirm={async ({ base64 }) => {
                 try {
                   setUploadingLogo(true);
@@ -1243,12 +1243,12 @@ export default function EventManagement({
                     eventId: event.id,
                     imageBase64: base64,
                   });
-                  toast.success("Logo atualizada com sucesso!");
+                  toast.success('Logo atualizada com sucesso!');
                   setLogoDialogOpen(false);
                   invalidateDetail(event.id);
                   refreshEvent();
                 } catch (err) {
-                  toast.error("Falha ao atualizar logo do evento");
+                  toast.error('Falha ao atualizar logo do evento');
                 } finally {
                   setUploadingLogo(false);
                 }
@@ -1302,7 +1302,7 @@ export default function EventManagement({
           }}
           onConfirm={handleConfirmDeleteType}
           title="Excluir tipo de inscrição?"
-          message={`Tem certeza que deseja excluir o tipo "${deleteTypeDialog.type?.description ?? ""}"? Esta ação não pode ser desfeita.`}
+          message={`Tem certeza que deseja excluir o tipo "${deleteTypeDialog.type?.description ?? ''}"? Esta ação não pode ser desfeita.`}
           confirmText="Excluir tipo"
           cancelText="Cancelar"
           isLoading={isDeletingTypeInscription}
@@ -1319,14 +1319,14 @@ export default function EventManagement({
           onConfirm={handleConfirmDisableType}
           title={
             disableTypeDialog.type?.active
-              ? "Desabilitar tipo de inscrição?"
-              : "Ativar tipo de inscrição?"
+              ? 'Desabilitar tipo de inscrição?'
+              : 'Ativar tipo de inscrição?'
           }
           message={`Tem certeza que deseja ${
-            disableTypeDialog.type?.active ? "desabilitar" : "ativar"
-          } o tipo "${disableTypeDialog.type?.description ?? ""}"?`}
+            disableTypeDialog.type?.active ? 'desabilitar' : 'ativar'
+          } o tipo "${disableTypeDialog.type?.description ?? ''}"?`}
           confirmText={
-            disableTypeDialog.type?.active ? "Desabilitar" : "Ativar"
+            disableTypeDialog.type?.active ? 'Desabilitar' : 'Ativar'
           }
           cancelText="Cancelar"
           isLoading={isDisablingTypeInscription}
