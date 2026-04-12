@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? '',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -66,9 +66,20 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Guard: se não houver config, não tenta tratar (ex: erro de rede/build estático)
+    if (!originalRequest) {
+      console.error(
+        '[apiClient] response interceptor: error.config is undefined',
+        error,
+      );
+      return Promise.reject(error);
+    }
+
     // Evita loop: não tenta refresh se já for a chamada de refresh
     const isRefreshCall =
       originalRequest.url && originalRequest.url.includes('/users/refresh');
+
     if (error.response && error.response.status === 403 && !isRefreshCall) {
       console.warn(
         '[apiClient] response interceptor: 403 received, attempting refresh',
