@@ -242,7 +242,7 @@ export default function Home() {
           )}
         </div>
       </section>
-      {/*
+
       <section
         id="sobre"
         className="flex min-h-screen items-center justify-center bg-white/50 px-4 backdrop-blur-sm dark:bg-gray-800/50"
@@ -298,7 +298,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section> */}
+      </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 px-4 py-12 text-white dark:bg-gray-950">
