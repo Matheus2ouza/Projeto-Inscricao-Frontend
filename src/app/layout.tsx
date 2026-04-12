@@ -1,4 +1,5 @@
 import { GlobalLoadingProvider } from "@/components/GlobalLoading";
+import GlobalBackground from "@/shared/components/layout/global-background";
 import { Toaster } from "@/shared/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -54,17 +55,20 @@ export default function RootLayout({
                 attribute="class"
                 defaultTheme="light"
                 enableSystem
-                disableTransitionOnChange
+                disableTransitionOnChange={false}
               >
-                <main className="h-screen">
-                  {children}
-                  <Toaster
-                    richColors={true}
-                    position="top-right"
-                    swipeDirections={["right", "left"]}
-                    closeButton
-                  />
-                </main>
+                <div className="relative min-h-screen isolate">
+                  <GlobalBackground />
+                  <main className="relative z-10 min-h-screen">
+                    {children}
+                    <Toaster
+                      richColors={true}
+                      position="top-right"
+                      swipeDirections={["right", "left"]}
+                      closeButton
+                    />
+                  </main>
+                </div>
               </ThemeProvider>
             </HeroUIProviderWrapper>
           </GlobalLoadingProvider>

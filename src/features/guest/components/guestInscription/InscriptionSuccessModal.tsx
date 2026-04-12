@@ -4,9 +4,8 @@ import {
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
 } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
-import { Button } from "@/shared/components/ui/button";
 import { cn } from "@/shared/lib/utils";
-import { Check, Clock, Copy } from "lucide-react";
+import { Check, Copy, CreditCard } from "lucide-react";
 import { useState } from "react";
 
 interface InscriptionSuccessModalProps {
@@ -15,6 +14,7 @@ interface InscriptionSuccessModalProps {
   onViewInscription: () => void;
   successData: RegisterGuestInscriptionResponse | null;
   paymentCountdownSeconds: number | null;
+  primaryColor?: string;
 }
 
 export function InscriptionSuccessModal({
@@ -23,6 +23,7 @@ export function InscriptionSuccessModal({
   onViewInscription,
   successData,
   paymentCountdownSeconds,
+  primaryColor,
 }: InscriptionSuccessModalProps) {
   const [isCopied, setIsCopied] = useState(false);
 
@@ -34,178 +35,239 @@ export function InscriptionSuccessModal({
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
 
+  const isUrgent =
+    paymentCountdownSeconds !== null && paymentCountdownSeconds <= 300;
+  const accentColor = primaryColor || "#d97706";
+
   const handleCopyCode = () => {
     navigator.clipboard.writeText(successData.confirmationCode);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
   };
 
+  const isPending = successData.status === InscriptionStatus.PENDING;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Overlay com blur sutil */}
+    <div className="fixed inset-0 flex items-end justify-center p-0 sm:items-center sm:p-4">
+      {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md animate-in fade-in-0 zoom-in-95">
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900">
-          {/* Botão de fechar no canto superior direito */}
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
-            aria-label="Fechar modal"
-          >
-            <svg
-              className="h-4 w-4 text-gray-500 dark:text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      <div className="relative w-full animate-in slide-in-from-bottom-4 sm:max-w-md sm:animate-in sm:fade-in-0 sm:zoom-in-95 duration-200">
+        <div className="overflow-hidden rounded-t-3xl bg-white shadow-2xl dark:bg-gray-950 sm:rounded-2xl">
+          {/* Alert Banner — só para PENDING */}
+          {isPending ? (
+            <div
+              className="flex items-center gap-3 px-5 py-4"
+              style={{ backgroundColor: accentColor }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
+                <svg
+                  className="h-4 w-4 text-white"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <path
+                    d="M10 2L2 17h16L10 2z"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M10 9v3M10 13.5v.5"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-white">
+                  Ação necessária
+                </p>
+                <p className="text-xs text-white/80">
+                  Sua vaga ainda não está confirmada
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 bg-amber-500 px-5 py-4">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/20">
+                <svg
+                  className="h-4 w-4 text-white"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-white">
+                  Em análise
+                </p>
+                <p className="text-xs text-white/80">
+                  Aguarde o retorno dos organizadores
+                </p>
+              </div>
+            </div>
+          )}
 
-          {/* Header */}
-          <div className="p-8 pt-12 text-center">
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-              {successData.status === InscriptionStatus.UNDER_REVIEW
-                ? "Em Análise"
-                : "Inscrição Reservada"}
-            </h3>
-
-            <p className="text-gray-500 dark:text-gray-400">
-              {successData.status === InscriptionStatus.UNDER_REVIEW
-                ? "Sua inscrição entrou em analise, aguarde o retorno dos organizadores."
-                : "Sua inscrição foi reservada."}
-            </p>
-          </div>
-
-          {/* Conteúdo */}
-          <div className="px-8 pb-8 space-y-6">
-            {successData.status === InscriptionStatus.PENDING &&
-              paymentCountdownSeconds !== null && (
-                <div className="rounded-xl border border-green-200/70 dark:border-green-800/40 bg-green-50/70 dark:bg-green-900/20 px-4 py-3">
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-green-800 dark:text-green-200">
-                    <Clock className="h-4 w-4" />
-                    Tempo restante para pagamento
-                  </div>
-                  <div className="mt-1 text-center text-3xl font-extrabold tabular-nums text-green-900 dark:text-green-100">
-                    {formatCountdown(paymentCountdownSeconds)}
-                  </div>
+          <div className="px-5 pb-8 pt-6 space-y-4">
+            {/* Warning box — só para PENDING */}
+            {isPending && (
+              <div className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20">
+                <svg
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r="9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M10 6v5M10 13v1"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+                    Realize o pagamento para garantir sua vaga
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-amber-800 dark:text-amber-400">
+                    Sua inscrição foi <strong>reservada temporariamente</strong>
+                    . Sem o pagamento dentro do prazo, ela será{" "}
+                    <strong>cancelada automaticamente</strong> e a vaga liberada
+                    para outra pessoa.
+                  </p>
                 </div>
-              )}
+              </div>
+            )}
 
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium uppercase tracking-wider text-gray-600 dark:text-gray-400">
+            {/* Under Review info box */}
+            {!isPending && (
+              <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/40 dark:bg-amber-900/20">
+                <svg
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+                    Aguarde a análise
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-amber-800 dark:text-amber-400">
+                    Assim que validada pelos organizadores, você receberá um
+                    e-mail com o resultado.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Countdown — só para PENDING */}
+            {isPending && paymentCountdownSeconds !== null && (
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
+                <div className="mb-2 flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "inline-block h-2 w-2 rounded-full",
+                      isUrgent ? "animate-pulse bg-red-500" : "bg-amber-500",
+                    )}
+                  />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                    Tempo restante para pagar
+                  </span>
+                </div>
+                <p
+                  className={cn(
+                    "text-center font-mono text-5xl font-semibold tabular-nums tracking-tight",
+                    isUrgent
+                      ? "text-red-600 dark:text-red-400"
+                      : "text-gray-900 dark:text-white",
+                  )}
+                >
+                  {formatCountdown(paymentCountdownSeconds)}
+                </p>
+                <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">
+                  A reserva expira se o pagamento não for efetuado
+                </p>
+              </div>
+            )}
+
+            {/* Código de inscrição */}
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
                   Código de inscrição
                 </span>
                 <button
                   onClick={handleCopyCode}
                   className={cn(
-                    "text-sm font-medium transition-colors flex items-center gap-1",
+                    "flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors",
                     isCopied
-                      ? "text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                      : "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
+                      ? "border-green-300 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400"
+                      : "border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700",
                   )}
                 >
                   {isCopied ? (
-                    <Check className="h-4 w-4" />
+                    <Check className="h-3 w-3" />
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-3 w-3" />
                   )}
                   {isCopied ? "Copiado!" : "Copiar"}
                 </button>
               </div>
-              <div className="font-mono text-xl font-bold tracking-wider text-center py-2 px-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-center font-mono text-xl font-bold tracking-widest text-gray-900 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
                 {successData.confirmationCode}
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-                Este código é único e com ele você pode encontrar sua inscrição
-                a qualquer momento.
+              <p className="mt-2.5 text-center text-xs leading-relaxed text-gray-400 dark:text-gray-500">
+                Guarde este código — com ele você acessa sua inscrição a
+                qualquer momento.
               </p>
             </div>
 
-            {/* Status e informações */}
-            <div className="space-y-4">
-              {successData.status === InscriptionStatus.PENDING && (
-                <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      <svg
-                        className="h-5 w-5 text-green-600 dark:text-green-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-green-800 dark:text-green-300">
-                        Próximo passo
-                      </p>
-                      <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                        Sua Inscrição foi registrada, para garantir sua
-                        participação é necessário realizar o pagamento da sua
-                        inscrição dentro de <strong>30 minutos</strong>.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+            {/* Botão principal */}
+            <button
+              onClick={onViewInscription}
+              className={cn(
+                "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]",
+                isPending
+                  ? ""
+                  : "bg-gray-800 hover:bg-gray-900 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-white",
               )}
+              style={isPending ? { backgroundColor: accentColor } : undefined}
+            >
+              {isPending && <CreditCard className="h-4 w-4" />}
+              {isPending
+                ? "Pagar agora e confirmar vaga"
+                : "Visualizar inscrição"}
+            </button>
 
-              {successData.status === InscriptionStatus.UNDER_REVIEW && (
-                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      <svg
-                        className="h-5 w-5 text-amber-600 dark:text-amber-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                        Aguarde a análise
-                      </p>
-                      <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                        Infelizmente, sua inscrição entrou em análise assim que
-                        for validade pelos organizadores receberá um e-mail com
-                        o resultado da análise.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Botões de ação */}
-            <div className="space-y-3 pt-4">
-              <div className="flex gap-3">
-                <Button onClick={onViewInscription} className="flex-1">
-                  {successData.status === InscriptionStatus.PENDING
-                    ? "Seguir para Pagamento"
-                    : "Visualizar Inscrição"}
-                </Button>
-              </div>
-            </div>
+            {/* Dismiss */}
+            <button
+              onClick={onClose}
+              className="w-full py-2 text-sm text text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
+            >
+              {isPending ? "Voltar e pagar depois" : "Fechar"}
+            </button>
           </div>
         </div>
       </div>

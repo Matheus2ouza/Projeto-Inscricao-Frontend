@@ -1,53 +1,56 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
-
-import { Button } from "@/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
+import { Button } from '@/shared/components/ui/button';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();
+  const [isSwitching, setIsSwitching] = useState(false);
+
+  const cycleTheme = () => {
+    if (!theme || theme === 'system') {
+      setTheme('light');
+    } else if (theme === 'light') {
+      setTheme('dark');
+    } else {
+      setTheme('system');
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsSwitching(false), 260);
+    return () => clearTimeout(timer);
+  }, [theme]);
+
+  const renderIcon = () => {
+    if (theme === 'light') {
+      return <Sun className="h-[1.2rem] w-[1.2rem]" />;
+    }
+    if (theme === 'dark') {
+      return <Moon className="h-[1.2rem] w-[1.2rem]" />;
+    }
+    return <Monitor className="h-[1.2rem] w-[1.2rem]" />;
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          {theme === "light" && (
-            <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all" />
-          )}
-          {theme === "dark" && (
-            <Moon className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all" />
-          )}
-          {theme === "system" && (
-            <Monitor className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all" />
-          )}
-          {!theme && (
-            <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all" />
-          )}
-          <span className="sr-only">Alternar tema</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" />
-          Claro
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
-          Escuro
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Monitor className="mr-2 h-4 w-4" />
-          Sistema
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={cycleTheme}
+      className="liquid-glass-button"
+    >
+      <span
+        className={`transition-all duration-300 ${
+          isSwitching
+            ? 'scale-75 rotate-90 opacity-0'
+            : 'scale-100 rotate-0 opacity-100'
+        }`}
+      >
+        {renderIcon()}
+      </span>
+      <span className="sr-only">Alternar tema</span>
+    </Button>
   );
 }

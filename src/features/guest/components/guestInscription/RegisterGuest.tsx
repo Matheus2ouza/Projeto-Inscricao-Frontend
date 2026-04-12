@@ -1031,6 +1031,7 @@ export function RegisterGuest({
           onViewInscription={onViewInscription}
           successData={successData}
           paymentCountdownSeconds={paymentCountdownSeconds}
+          primaryColor={palette[0]}
         />
       )}
     </div>

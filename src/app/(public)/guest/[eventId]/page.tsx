@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import BackgroundPaths from "@/features/guest/components/guestInscription/background-paths";
-import { RegisterGuest } from "@/features/guest/components/guestInscription/RegisterGuest";
-import { useDetailsEvent } from "@/features/guest/hook/guestInscription/useDetailsEvent";
-import { useImagePalette } from "@/features/guest/hook/guestInscription/useImagePalette";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
+import BackgroundPaths from '@/features/guest/components/guestInscription/background-paths';
+import { RegisterGuest } from '@/features/guest/components/guestInscription/RegisterGuest';
+import { useDetailsEvent } from '@/features/guest/hook/guestInscription/useDetailsEvent';
+import { useImagePalette } from '@/features/guest/hook/guestInscription/useImagePalette';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function RegisterGuestInscription() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function RegisterGuestInscription() {
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
   const { event, loading, error, refetch } = useDetailsEvent({
-    eventId: eventId ?? "",
+    eventId: eventId ?? '',
   });
 
   const { palette, isDark, swatches, ready } = useImagePalette(event?.imageUrl);
@@ -30,10 +30,10 @@ export default function RegisterGuestInscription() {
     swatches.LightMuted;
 
   const titleColor =
-    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
+    preferredSwatch?.titleTextColor ?? (isDark ? '#ffffff' : '#111111');
   const bodyColor =
     preferredSwatch?.bodyTextColor ??
-    (isDark ? "rgba(255,255,255,0.7)" : "#374151");
+    (isDark ? 'rgba(255,255,255,0.7)' : '#374151');
 
   if (!eventId) {
     return null;
@@ -76,7 +76,7 @@ export default function RegisterGuestInscription() {
             </div>
 
             {/* Skeleton Informações Adicionais */}
-            <div className="pt-4 border-t border-border space-y-3">
+            <div className="border-border space-y-3 border-t pt-4">
               <Skeleton className="h-5 w-48" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-full" />
@@ -97,9 +97,9 @@ export default function RegisterGuestInscription() {
 
     if (error) {
       return (
-        <div className="min-h-[400px] flex items-center justify-center">
+        <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <p className="mb-4 text-foreground">{error}</p>
+            <p className="text-foreground mb-4">{error}</p>
             <Button onClick={() => refetch()}>Tentar Novamente</Button>
           </div>
         </div>
@@ -122,13 +122,13 @@ export default function RegisterGuestInscription() {
   };
 
   return (
-    <div className="relative min-h-screen isolate">
+    <div className="relative isolate min-h-screen">
       <BackgroundPaths palette={palette} />
 
       <PageContainer
         title="Registro de Inscrição"
         description="Registre sua inscrição abaixo"
-        className="bg-none bg-transparent"
+        className="bg-transparent bg-none"
         titleColor={titleColor}
         descriptionColor={bodyColor}
         backButtonAction={handleBack}
