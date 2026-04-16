@@ -1,40 +1,40 @@
-import { GlobalLoadingProvider } from "@/components/GlobalLoading";
-import GlobalBackground from "@/shared/components/layout/global-background";
-import { Toaster } from "@/shared/components/ui/sonner";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, PT_Serif, Roboto } from "next/font/google";
-import { HeroUIProviderWrapper } from "../providers/heroui-provider";
-import { QueryProvider } from "../providers/query-provider";
-import { ThemeProvider } from "../providers/theme-provider";
-import "./globals.css";
+import { GlobalLoadingProvider } from '@/components/GlobalLoading';
+import GlobalBackground from '@/shared/components/layout/global-background';
+import { Toaster } from '@/shared/components/ui/sonner';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono, PT_Serif, Roboto } from 'next/font/google';
+import { HeroUIProviderWrapper } from '../providers/heroui-provider';
+import { QueryProvider } from '../providers/query-provider';
+import { ThemeProvider } from '../providers/theme-provider';
+import './globals.css';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 const roboto = Roboto({
-  variable: "--font-roboto",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  variable: '--font-roboto',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '700'],
 });
 
 export const ptSerif = PT_Serif({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-pt-serif",
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-pt-serif',
 });
 
 export const metadata: Metadata = {
-  title: "Sistema de Inscrição",
-  description: "Sistema de Inscrição para conferências",
+  title: 'Sistema de Inscrição',
+  description: 'Sistema de Inscrição para conferências',
 };
 
 export default function RootLayout({
@@ -57,14 +57,14 @@ export default function RootLayout({
                 enableSystem
                 disableTransitionOnChange={false}
               >
-                <div className="relative min-h-screen isolate">
+                <div className="relative isolate min-h-screen">
                   <GlobalBackground />
                   <main className="relative z-10 min-h-screen">
                     {children}
                     <Toaster
                       richColors={true}
                       position="top-right"
-                      swipeDirections={["right", "left"]}
+                      swipeDirections={['right', 'left']}
                       closeButton
                     />
                   </main>

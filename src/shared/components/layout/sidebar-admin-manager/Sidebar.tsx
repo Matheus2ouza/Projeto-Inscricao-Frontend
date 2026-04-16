@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@/shared/components/ui/avatar";
+} from '@/shared/components/ui/avatar';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/shared/components/ui/collapsible";
+} from '@/shared/components/ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu";
-import Logo from "@/shared/components/ui/logo";
+} from '@/shared/components/ui/dropdown-menu';
+import Logo from '@/shared/components/ui/logo';
 import {
   Sidebar,
   SidebarContent,
@@ -32,17 +32,17 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarProvider,
-} from "@/shared/components/ui/sidebar";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { useLogout } from "@/shared/hooks/logout/logout";
-import { useIsMobile } from "@/shared/hooks/use-mobile";
-import { cn } from "@/shared/lib/utils";
+} from '@/shared/components/ui/sidebar';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { useLogout } from '@/shared/hooks/logout/logout';
+import { useIsMobile } from '@/shared/hooks/use-mobile';
+import { cn } from '@/shared/lib/utils';
 import {
   BanknoteArrowDown,
   CalendarDays,
   ChevronRight,
   ChevronsUpDown,
-  House,
+  Command,
   LogOut,
   Map,
   ScrollText,
@@ -51,9 +51,9 @@ import {
   TrendingUp,
   Users,
   Wallet,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import React from "react";
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
 export default function AppSidebarAdminManager({
   children,
@@ -73,18 +73,18 @@ export default function AppSidebarAdminManager({
 
   const userInitials = React.useMemo(() => {
     if (user?.username) {
-      const [first, second] = user.username.trim().split(" ");
+      const [first, second] = user.username.trim().split(' ');
       if (second) {
         return `${first.charAt(0)}${second.charAt(0)}`.toUpperCase();
       }
       return first.charAt(0).toUpperCase();
     }
-    return "U";
+    return 'U';
   }, [user?.username]);
 
   const accountPath = React.useMemo(() => {
     if (!user?.role) {
-      return "/conta";
+      return '/conta';
     }
 
     return `/${user.role.toLowerCase()}/conta`;
@@ -97,7 +97,7 @@ export default function AppSidebarAdminManager({
   const sidebarStyle = React.useMemo(
     () =>
       ({
-        "--sidebar-width": "18rem",
+        '--sidebar-width': '18rem',
       }) as React.CSSProperties,
     [],
   );
@@ -105,8 +105,11 @@ export default function AppSidebarAdminManager({
   return (
     <SidebarProvider style={sidebarStyle}>
       <div className="flex w-full">
-        <Sidebar className="bg-sidebar">
-          <SidebarHeader className="flex items-center justify-center border-b border-sidebar-border py-4">
+        <Sidebar
+          className="bg-transparent"
+          sidebarClassName="liquid-panel liquid-panel-no-border"
+        >
+          <SidebarHeader className="border-sidebar-border flex items-center justify-center border-b py-4">
             <Logo className="h-10 w-10" showTitle={false} />
           </SidebarHeader>
           <SidebarContent className="px-2 pb-4">
@@ -116,8 +119,8 @@ export default function AppSidebarAdminManager({
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <a href="/admin/home" className="flex items-center gap-1">
-                        <House className="size-4" />
-                        Início
+                        <Command className="size-4" />
+                        Dashboard
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -134,8 +137,8 @@ export default function AppSidebarAdminManager({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              inscriptionsOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              inscriptionsOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -191,8 +194,8 @@ export default function AppSidebarAdminManager({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              paymentsOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              paymentsOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -260,8 +263,8 @@ export default function AppSidebarAdminManager({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              eventsOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              eventsOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -310,8 +313,8 @@ export default function AppSidebarAdminManager({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              eventsOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              eventsOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -386,8 +389,8 @@ export default function AppSidebarAdminManager({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              eventsOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              eventsOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -431,56 +434,56 @@ export default function AppSidebarAdminManager({
                       {user?.image && (
                         <AvatarImage
                           src={user.image}
-                          alt={user?.username ?? "Avatar"}
+                          alt={user?.username ?? 'Avatar'}
                         />
                       )}
-                      <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                         {userInitials}
                       </AvatarFallback>
                     </Avatar>
                     <span className="flex flex-col text-left leading-tight">
                       <span className="text-sm font-medium">
-                        {user?.username ?? "Usuário"}
+                        {user?.username ?? 'Usuário'}
                       </span>
                       {user?.email && (
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-muted-foreground text-xs">
                           {user.email}
                         </span>
                       )}
                     </span>
                   </span>
-                  <ChevronsUpDown className="size-4 hidden lg:block text-muted-foreground" />
+                  <ChevronsUpDown className="text-muted-foreground hidden size-4 lg:block" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "center" : "start"}
+                side={isMobile ? 'bottom' : 'right'}
+                align={isMobile ? 'center' : 'start'}
                 sideOffset={isMobile ? 6 : 12}
                 className={cn(
-                  "overflow-hidden rounded-xl border bg-popover shadow-lg lg:mb-5",
+                  'bg-popover overflow-hidden rounded-xl border shadow-lg lg:mb-5',
                   isMobile
-                    ? "mx-auto w-full min-w-[15rem] max-w-[15rem]"
-                    : "w-60",
+                    ? 'mx-auto w-full max-w-[15rem] min-w-[15rem]'
+                    : 'w-60',
                 )}
               >
-                <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+                <div className="border-border flex items-center gap-3 border-b px-4 py-3">
                   <Avatar className="size-9">
                     {user?.image && (
                       <AvatarImage
                         src={user.image}
-                        alt={user?.username ?? "Avatar"}
+                        alt={user?.username ?? 'Avatar'}
                       />
                     )}
-                    <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col text-left leading-tight">
                     <span className="text-sm font-semibold">
-                      {user?.username ?? "Usuário"}
+                      {user?.username ?? 'Usuário'}
                     </span>
                     {user?.email && (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">
                         {user.email}
                       </span>
                     )}

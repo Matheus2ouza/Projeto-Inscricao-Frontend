@@ -367,14 +367,19 @@
   }
 
   .liquid-panel {
-    background: oklch(1 0 0 / 40%);
-    border: 1px solid var(--liquid-glass-border);
+    background: oklch(1 0 0 / 40%) !important;
+    border: 1px solid var(--liquid-glass-border) !important;
     border-radius: var(--radius-4xl);
     box-shadow: var(--liquid-glass-shadow);
     backdrop-filter: blur(var(--liquid-glass-blur))
       saturate(var(--liquid-glass-saturation));
     -webkit-backdrop-filter: blur(var(--liquid-glass-blur))
       saturate(var(--liquid-glass-saturation));
+  }
+
+  .liquid-panel-no-border {
+    border: none;
+    border-radius: 0;
   }
 
   .dark .liquid-panel {
