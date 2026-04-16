@@ -29,16 +29,14 @@ export default function EventsSection({ events }: EventsSectionProps) {
   return (
     <section id="eventos" className="min-h-screen w-full px-4 py-20">
       <div className="mx-auto max-w-7xl">
-        {/* CONTAINER PRINCIPAL COM STAGGER */}
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: '-50px' }}
           variants={{
+            hidden: {},
             visible: {
-              transition: {
-                staggerChildren: 0.2,
-              },
+              transition: { staggerChildren: 0.2 },
             },
           }}
         >
@@ -47,9 +45,12 @@ export default function EventsSection({ events }: EventsSectionProps) {
             className="mb-8 max-w-3xl"
             variants={{
               hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.5, ease: 'easeOut' },
+              },
             }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             <h2 className="mb-2 text-5xl leading-tight font-bold tracking-[-0.02em] text-gray-900 md:text-6xl lg:text-7xl dark:text-white">
               Próximos Eventos
@@ -59,9 +60,12 @@ export default function EventsSection({ events }: EventsSectionProps) {
               className="h-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
               variants={{
                 hidden: { width: 0, opacity: 0 },
-                visible: { width: 100, opacity: 1 },
+                visible: {
+                  width: 100,
+                  opacity: 1,
+                  transition: { duration: 0.5, ease: 'easeOut' },
+                },
               }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
             />
 
             <p className="mt-2 text-base leading-relaxed text-gray-600 md:text-lg dark:text-gray-300">
@@ -76,14 +80,14 @@ export default function EventsSection({ events }: EventsSectionProps) {
               className="w-full"
               variants={{
                 hidden: { opacity: 0, y: 30 },
-                visible: { opacity: 1, y: 0 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.5, ease: 'easeOut' },
+                },
               }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
             >
-              <Carousel
-                opts={{ align: 'start', loop: true }}
-                className="w-full"
-              >
+              <Carousel opts={{ align: 'start' }} className="w-full">
                 <CarouselContent>
                   {events.map((event) => (
                     <CarouselItem
@@ -136,8 +140,12 @@ export default function EventsSection({ events }: EventsSectionProps) {
             <motion.div
               className="py-12 text-center"
               variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1 },
+                hidden: { opacity: 0, y: 30 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.5, ease: 'easeOut' },
+                },
               }}
             >
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">

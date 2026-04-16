@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import RegisterPaymentCardDialog from "@/features/payment/components/registerPayment/RegisterPaymentCard";
-import useFormCreatePaymentCard from "@/features/payment/hooks/registerPayment/useRegisterPaymentCard";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import RegisterPaymentCardDialog from '@/features/payments/components/registerPayment/RegisterPaymentCard';
+import useFormCreatePaymentCard from '@/features/payments/hooks/registerPayment/useRegisterPaymentCard';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 export default function GuestRegisterPaymentCardPage() {
   const params = useParams();
@@ -16,20 +16,20 @@ export default function GuestRegisterPaymentCardPage() {
     return null;
   }
 
-  const totalValueParam = searchParams.get("totalValue");
+  const totalValueParam = searchParams.get('totalValue');
   const totalValue = Number(totalValueParam ?? 0);
   const resolvedTotalValue = Number.isFinite(totalValue) ? totalValue : 0;
 
-  const queryCsv = searchParams.get("inscriptions");
+  const queryCsv = searchParams.get('inscriptions');
   const queryList = queryCsv
     ? queryCsv
-        .split(",")
+        .split(',')
         .map((s) => s.trim())
         .filter(Boolean)
     : [];
   const repeatedParams =
-    typeof searchParams.getAll === "function"
-      ? searchParams.getAll("inscriptionId")
+    typeof searchParams.getAll === 'function'
+      ? searchParams.getAll('inscriptionId')
       : [];
 
   const rawInscriptionParam = params.inscriptionId;

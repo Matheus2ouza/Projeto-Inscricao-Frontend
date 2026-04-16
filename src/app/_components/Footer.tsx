@@ -10,34 +10,7 @@ export default function Footer() {
               inscrições, desenvolvida para facilitar a organização e
               participação em Conferência.
             </p>
-            <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-gray-400 transition-colors hover:text-white"
-              >
-                <i className="bi bi-facebook text-xl"></i>
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 transition-colors hover:text-white"
-              >
-                <i className="bi bi-twitter text-xl"></i>
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 transition-colors hover:text-white"
-              >
-                <i className="bi bi-linkedin text-xl"></i>
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 transition-colors hover:text-white"
-              >
-                <i className="bi bi-instagram text-xl"></i>
-              </a>
-            </div>
           </div>
-
           <div>
             <h4 className="mb-4 text-lg font-semibold">Links Úteis</h4>
             <ul className="space-y-2">
