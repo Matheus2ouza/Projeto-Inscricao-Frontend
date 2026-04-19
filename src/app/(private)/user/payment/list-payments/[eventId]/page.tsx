@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import ListPayments from "@/features/payment/components/userListPayment/ListPayments";
-import { useListPayment } from "@/features/payment/hooks/listPayment/useListPayment";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { cn } from "@/shared/lib/utils";
-import { FileText, RefreshCw } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import ListPayments from '@/features/payments/components/userListPayment/ListPayments';
+import { useListPayment } from '@/features/payments/hooks/listPayment/useListPayment';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { cn } from '@/shared/lib/utils';
+import { FileText, RefreshCw } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 10;
 export default function ListPaymentsPage() {
@@ -40,8 +40,8 @@ export default function ListPaymentsPage() {
 
   const renderSkeletonGrid = () => {
     return (
-      <div className="p-6 space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 bg-muted/30 rounded-lg border">
+      <div className="space-y-6 p-6">
+        <div className="bg-muted/30 mb-6 flex flex-col items-start justify-between gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
           <div className="space-y-1">
             <Skeleton className="h-6 w-40" />
             <Skeleton className="h-4 w-60" />
@@ -70,8 +70,8 @@ export default function ListPaymentsPage() {
 
     if (error) {
       return (
-        <div className="p-6 flex items-center justify-center min-h-96">
-          <div className="text-center text-destructive">
+        <div className="flex min-h-96 items-center justify-center p-6">
+          <div className="text-destructive text-center">
             <p className="mb-4">
               Erro ao carregar histórico de pagamentos: {error.message}
             </p>
@@ -83,15 +83,15 @@ export default function ListPaymentsPage() {
 
     if (payments.length === 0) {
       return (
-        <div className="py-12 px-4">
-          <div className="max-w-md mx-auto text-center">
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-                <FileText className="h-10 w-10 text-muted-foreground" />
+        <div className="px-4 py-12">
+          <div className="mx-auto max-w-md text-center">
+            <div className="mb-6 flex justify-center">
+              <div className="bg-muted flex h-20 w-20 items-center justify-center rounded-full">
+                <FileText className="text-muted-foreground h-10 w-10" />
               </div>
             </div>
 
-            <h3 className="text-xl font-semibold mb-2">
+            <h3 className="mb-2 text-xl font-semibold">
               Nenhum pagamento registrado
             </h3>
 
@@ -101,7 +101,7 @@ export default function ListPaymentsPage() {
               Os pagamentos aparecerão aqui quando forem realizados.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Button
                 onClick={handleRegisterPayment}
                 variant="default"
@@ -117,9 +117,9 @@ export default function ListPaymentsPage() {
                 disabled={fetching}
               >
                 <RefreshCw
-                  className={cn("h-4 w-4", fetching && "animate-spin")}
+                  className={cn('h-4 w-4', fetching && 'animate-spin')}
                 />
-                {fetching ? "Atualizando..." : "Atualizar"}
+                {fetching ? 'Atualizando...' : 'Atualizar'}
               </Button>
             </div>
           </div>

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useListReceipts } from "@/features/payment/hooks/list-receipts/useListReceipts";
-import ListReceipts from "@/features/payment/components/list-receipts/ListReceipts";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
+import ListReceipts from '@/features/payments/components/list-receipts/ListReceipts';
+import { useListReceipts } from '@/features/payments/hooks/list-receipts/useListReceipts';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function ListReceiptsAdminPage() {
   const params = useParams();
@@ -44,8 +44,8 @@ export default function ListReceiptsAdminPage() {
 
     if (error) {
       return (
-        <div className="p-6 flex items-center justify-center min-h-96">
-          <div className="text-center text-destructive">
+        <div className="flex min-h-96 items-center justify-center p-6">
+          <div className="text-destructive text-center">
             <p className="mb-4">
               Erro ao carregar os comprovantes: {error.message}
             </p>
@@ -67,7 +67,7 @@ export default function ListReceiptsAdminPage() {
   };
 
   const handleBack = () => {
-    router.push("/admin/payments/list-receipts");
+    router.push('/admin/payments/list-receipts');
   };
 
   return (

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import type { AutoCompleteProps } from "antd";
-import { AutoComplete, Space, Spin, Tag } from "antd";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAccount } from "../hooks/useAccount";
+import type { AutoCompleteProps } from 'antd';
+import { AutoComplete, Space, Spin, Tag } from 'antd';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAccount } from '../hooks/useAccount';
 
 export type AccountOption = {
   label: string;
@@ -29,12 +29,12 @@ export function ComboboxAccountSingle({
   onChange,
   loading: loadingProp,
   className,
-  placeholder = "Selecione uma conta...",
+  placeholder = 'Selecione uma conta...',
   showRole = true,
 }: ComboboxAccountSingleProps) {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
+  const [options, setOptions] = useState<AutoCompleteProps['options']>([]);
   const shouldFetch = true;
   const {
     accounts: fetched,
@@ -81,7 +81,7 @@ export function ComboboxAccountSingle({
             <Space orientation="vertical" size={0} className="w-full">
               <span className="font-medium">{account.name}</span>
               {showRole && account.role && (
-                <Tag color="blue" className="text-xs mt-1">
+                <Tag color="blue" className="mt-1 text-xs">
                   {account.role}
                 </Tag>
               )}
@@ -121,8 +121,8 @@ export function ComboboxAccountSingle({
       id={id}
       open={open}
       onOpenChange={setOpen}
-      placeholder={loading ? "Carregando contas..." : placeholder}
-      value={searchText || (selectedAccount ? selectedAccount.name : "")}
+      placeholder={loading ? 'Carregando contas...' : placeholder}
+      value={searchText || (selectedAccount ? selectedAccount.name : '')}
       onSearch={handleSearch}
       onSelect={(selectedValue, option) => {
         const account = (option as any)?.account;
@@ -130,32 +130,32 @@ export function ComboboxAccountSingle({
         const selectedAccount = normalizedAccounts.find(
           (acc) => acc.id === selectedValue,
         );
-        setSearchText(selectedAccount?.name || "");
+        setSearchText(selectedAccount?.name || '');
         setOpen(false);
       }}
       onChange={(text) => {
         setSearchText(text);
         if (!text) {
-          onChange("", undefined);
+          onChange('', undefined);
         }
       }}
       options={options || []}
       disabled={loading}
       className={className}
-      style={{ width: "100%" }}
+      style={{ width: '100%' }}
       notFoundContent={
         error ? (
-          <div className="text-center py-4">
+          <div className="py-4 text-center">
             <p className="text-red-500">Falha ao carregar contas.</p>
           </div>
         ) : loading ? (
           <Spin size="small" />
         ) : normalizedAccounts.length === 0 ? (
-          "Nenhuma conta encontrada"
+          'Nenhuma conta encontrada'
         ) : options?.length === 0 && searchText.trim() ? (
-          "Nenhuma conta encontrada com esse nome"
+          'Nenhuma conta encontrada com esse nome'
         ) : (
-          "Digite para filtrar contas..."
+          'Digite para filtrar contas...'
         )
       }
       allowClear

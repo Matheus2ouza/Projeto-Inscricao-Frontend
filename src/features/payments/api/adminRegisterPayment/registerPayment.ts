@@ -1,12 +1,17 @@
+import {
+  RegisterPaymentInput,
+  RegisterPaymentResponse,
+} from '@/features/payments/types/adminRegisterPayment/registerPaymentType';
 import axiosInstance from '@/shared/lib/apiClient';
 
-export async function listInscriptionsPending(eventId: string) {
+export async function registerPayment(
+  body: RegisterPaymentInput,
+): Promise<RegisterPaymentResponse> {
   try {
-    const { data } = await axiosInstance.get(`inscriptions/${eventId}/list`, {
-      params: {
-        status: 'PENDING',
-      },
-    });
+    const { data } = await axiosInstance.post<RegisterPaymentResponse>(
+      `payments/register/admin`,
+      body,
+    );
     return data;
   } catch (error) {
     const axiosError = error as {

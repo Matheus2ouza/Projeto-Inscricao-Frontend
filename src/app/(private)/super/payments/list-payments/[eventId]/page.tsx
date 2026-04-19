@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import PaymentListTable from "@/features/payment/components/adminListPaymant/PaymentListTable";
-import { usePaymentList } from "@/features/payment/hooks/adminListPaymants/usePaymentList";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { AlertTriangle } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import PaymentListTable from '@/features/payments/components/adminListPaymant/PaymentListTable';
+import { usePaymentList } from '@/features/payments/hooks/adminListPaymants/usePaymentList';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { AlertTriangle } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function PaymentListSuperPage() {
   const params = useParams();
@@ -25,13 +25,13 @@ export default function PaymentListSuperPage() {
     setPage,
     refetch,
   } = usePaymentList({
-    eventId: eventId || "",
+    eventId: eventId || '',
     initialPage: 1,
     pageSize: 10,
   });
 
   const handleBack = () => {
-    router.push("/super/payments/list-payments");
+    router.push('/super/payments/list-payments');
   };
 
   const handleDetails = (paymentsInscriptionId: string) => {
@@ -57,12 +57,12 @@ export default function PaymentListSuperPage() {
     if (!eventId) {
       return (
         <div className="flex min-h-96 items-center justify-center text-center">
-          <div className="space-y-2 max-w-sm">
+          <div className="max-w-sm space-y-2">
             <AlertTriangle className="mx-auto h-8 w-8 text-amber-500" />
-            <p className="text-lg font-medium text-foreground">
+            <p className="text-foreground text-lg font-medium">
               Nenhum evento selecionado
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Utilize a tela anterior para escolher o evento que deseja
               consultar.
             </p>
@@ -81,15 +81,15 @@ export default function PaymentListSuperPage() {
     if (error) {
       return (
         <div className="flex min-h-96 items-center justify-center text-center">
-          <div className="space-y-4 max-w-sm">
-            <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-950/40 flex items-center justify-center mx-auto">
+          <div className="max-w-sm space-y-4">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/40">
               <AlertTriangle className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <p className="text-lg font-semibold text-foreground">
+              <p className="text-foreground text-lg font-semibold">
                 Erro ao carregar os pagamentos
               </p>
-              <p className="text-sm text-muted-foreground">{error}</p>
+              <p className="text-muted-foreground text-sm">{error}</p>
             </div>
             <Button onClick={() => refetch()}>Tentar novamente</Button>
           </div>

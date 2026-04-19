@@ -3,6 +3,9 @@ import { toast } from 'sonner';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? '',
+  // Evita o adapter HTTP do Node (follow-redirects/url.parse) em SSR/RSC.
+  // No browser continua usando XHR (default).
+  adapter: typeof window === 'undefined' ? ['fetch', 'http'] : ['xhr'],
   headers: {
     'Content-Type': 'application/json',
   },

@@ -191,46 +191,17 @@
     position: absolute;
     inset: 0;
 
-    background: linear-gradient(
-      135deg,
-      oklch(0.98 0.02 250),
-      oklch(0.95 0.03 280),
-      oklch(0.92 0.04 300)
-    );
+    background: linear-gradient(135deg,
+        oklch(0.98 0.02 250),
+        oklch(0.95 0.03 280),
+        oklch(0.92 0.04 300));
   }
 
   .dark .global-liquid-bg-base {
-    background: linear-gradient(
-      135deg,
-      oklch(0.12 0.02 260),
-      oklch(0.14 0.03 280),
-      oklch(0.16 0.04 300)
-    );
-  }
-
-  .global-liquid-bg-veil {
-    position: absolute;
-    inset: 0;
-
-    backdrop-filter: blur(80px);
-    -webkit-backdrop-filter: blur(80px);
-
-    background: radial-gradient(
-      circle at 30% 30%,
-      rgba(255, 255, 255, 0.15),
-      transparent 60%
-    );
-  }
-
-  .dark .global-liquid-bg-veil {
-    background: linear-gradient(
-      180deg,
-      oklch(0.08 0.01 270 / 32%) 0%,
-      oklch(0.08 0.01 270 / 20%) 40%,
-      oklch(0.08 0.01 270 / 28%) 100%
-    );
-    backdrop-filter: blur(1px) saturate(106%);
-    -webkit-backdrop-filter: blur(1px) saturate(106%);
+    background: linear-gradient(135deg,
+        oklch(0.12 0.02 260),
+        oklch(0.14 0.03 280),
+        oklch(0.16 0.04 300));
   }
 
   /* BLOBS */
@@ -288,10 +259,8 @@
     border: 1px solid oklch(1 0 0 / 55%);
 
     /* glass mais sutil */
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
+    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
 
     /* só um brilho interno leve */
     box-shadow: inset 0 1px 0 oklch(1 0 0 / 60%);
@@ -311,59 +280,47 @@
   .liquid-glass {
     background: var(--liquid-glass-bg);
     border: 1px solid var(--liquid-glass-border);
-    backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
+    backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
     box-shadow: var(--liquid-glass-shadow);
   }
 
   .liquid-glass-strong {
     background: var(--liquid-glass-bg-strong);
     border: 1px solid var(--liquid-glass-border-strong);
-    backdrop-filter: blur(var(--liquid-glass-blur-strong))
-      saturate(var(--liquid-glass-saturation-strong));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-strong))
-      saturate(var(--liquid-glass-saturation-strong));
+    backdrop-filter: blur(var(--liquid-glass-blur-strong)) saturate(var(--liquid-glass-saturation-strong));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-strong)) saturate(var(--liquid-glass-saturation-strong));
     box-shadow: var(--liquid-glass-shadow-strong);
   }
 
   .liquid-glass-subtle {
     background: var(--secondary);
     border: 1px solid var(--liquid-glass-border);
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
+    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
   }
 
   .glass {
     background: var(--liquid-glass-bg);
     border: 1px solid var(--liquid-glass-border);
-    backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
+    backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
     box-shadow: var(--liquid-glass-shadow);
   }
 
   .glass-strong {
     background: var(--liquid-glass-bg-strong);
     border: 1px solid var(--liquid-glass-border-strong);
-    backdrop-filter: blur(var(--liquid-glass-blur-strong))
-      saturate(var(--liquid-glass-saturation-strong));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-strong))
-      saturate(var(--liquid-glass-saturation-strong));
+    backdrop-filter: blur(var(--liquid-glass-blur-strong)) saturate(var(--liquid-glass-saturation-strong));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-strong)) saturate(var(--liquid-glass-saturation-strong));
     box-shadow: var(--liquid-glass-shadow-strong);
   }
 
   .glass-subtle {
     background: var(--secondary);
     border: 1px solid var(--liquid-glass-border);
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
+    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
   }
 
   .liquid-panel {
@@ -371,10 +328,8 @@
     border: 1px solid var(--liquid-glass-border) !important;
     border-radius: var(--radius-4xl);
     box-shadow: var(--liquid-glass-shadow);
-    backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
+    backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
   }
 
   .liquid-panel-no-border {
@@ -387,10 +342,8 @@
     border: 1px solid var(--liquid-glass-border);
     border-radius: var(--radius-4xl);
     box-shadow: var(--liquid-glass-shadow);
-    backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur))
-      saturate(var(--liquid-glass-saturation));
+    backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur)) saturate(var(--liquid-glass-saturation));
   }
 
   .liquid-panel-strong {
@@ -398,20 +351,16 @@
     border: 1px solid var(--liquid-glass-border-strong);
     border-radius: var(--radius-4xl);
     box-shadow: var(--liquid-glass-shadow-strong);
-    backdrop-filter: blur(var(--liquid-glass-blur-strong))
-      saturate(var(--liquid-glass-saturation-strong));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-strong))
-      saturate(var(--liquid-glass-saturation-strong));
+    backdrop-filter: blur(var(--liquid-glass-blur-strong)) saturate(var(--liquid-glass-saturation-strong));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-strong)) saturate(var(--liquid-glass-saturation-strong));
   }
 
   .liquid-field {
     background: var(--secondary);
     border: 1px solid var(--liquid-glass-border);
     border-radius: 0.5rem;
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
+    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
   }
 }
 
@@ -594,7 +543,8 @@ gmp-map {
 }
 
 .liquid-glass-button {
-  background: oklch(0.9 0 0 / 65%) !important; /* cinza mais presente */
+  background: oklch(0.9 0 0 / 65%) !important;
+  /* cinza mais presente */
   border: 1px solid oklch(0.9 0 0 / 80%) !important;
 
   backdrop-filter: blur(12px) saturate(140%);

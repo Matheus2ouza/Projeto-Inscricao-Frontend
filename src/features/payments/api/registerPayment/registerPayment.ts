@@ -1,5 +1,5 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { CreatePaymentResponse } from "../../types/registerPayment/registerPaymentTypes";
+import axiosInstance from '@/shared/lib/apiClient';
+import { CreatePaymentResponse } from '../../types/registerPayment/registerPaymentTypes';
 
 export type CreatePaymentInscriptionRequest = {
   eventId: string;

@@ -226,6 +226,14 @@ export default function AppSidebarAdminManager({
                               <span>Lista de Comprovantes</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
+                              href="/admin/payments/register-payment"
+                              className="gap-1"
+                            >
+                              <span>Registrar Pagamento</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </Collapsible>

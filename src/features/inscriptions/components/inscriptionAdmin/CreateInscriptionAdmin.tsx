@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ComboboxAccountSingle } from "@/features/accounts/components/ComboboxAccount";
-import { ComboboxEvent } from "@/features/events/components/combobox/ComboBoxEvent";
-import { useFormCreateInscriptionAdmin } from "@/features/inscriptions/hooks/inscriptionAdmin/useFormCreateInscriptionAdmin";
+import { ComboboxAccountSingle } from '@/features/accounts/components/ComboboxAccount';
+import { ComboboxEvent } from '@/features/events/components/combobox/ComboBoxEvent';
+import { useFormCreateInscriptionAdmin } from '@/features/inscriptions/hooks/inscriptionAdmin/useFormCreateInscriptionAdmin';
 import {
   genderEnum,
   inscriptionStatusEnum,
@@ -10,19 +10,19 @@ import {
   shirtSizeEnum,
   shirtTypeEnum,
   statusPaymentEnum,
-} from "@/features/inscriptions/schema/inscriptionAdmin/createInscriptionAdminSchema";
-import { ComboboxMemberSingle } from "@/features/members/components/combobox/ComboboxMemberSingle";
+} from '@/features/inscriptions/schema/inscriptionAdmin/createInscriptionAdminSchema';
+import { ComboboxMemberSingle } from '@/features/members/components/combobox/ComboboxMemberSingle';
 import {
   ComboboxTypeInscription,
   TypeInscriptionOption,
-} from "@/features/typeInscription/components/ComboboxTypeInscription";
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
+} from '@/features/typeInscription/components/ComboboxTypeInscription';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
 import {
   getConvertStatusInscription,
   getConvertStatusPayment,
-} from "@/shared/utils/getConvertStatus";
-import type { SelectProps } from "antd";
+} from '@/shared/utils/getConvertStatus';
+import type { SelectProps } from 'antd';
 import {
   Card,
   DatePicker,
@@ -35,8 +35,8 @@ import {
   Space,
   Switch,
   Tag,
-} from "antd";
-import dayjs from "dayjs";
+} from 'antd';
+import dayjs from 'dayjs';
 import {
   FileText,
   ImageIcon,
@@ -45,95 +45,95 @@ import {
   RotateCw,
   User,
   X,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Controller,
   FormProvider,
   useFieldArray,
   useWatch,
-} from "react-hook-form";
-import { toast } from "sonner";
+} from 'react-hook-form';
+import { toast } from 'sonner';
 
 // Opções para selects baseadas nos enums
-const statusOptions: SelectProps["options"] = inscriptionStatusEnum.options.map(
+const statusOptions: SelectProps['options'] = inscriptionStatusEnum.options.map(
   (value) => ({
     label: getConvertStatusInscription(value),
     value,
   }),
 );
 
-const paymentMethodOptions: SelectProps["options"] =
+const paymentMethodOptions: SelectProps['options'] =
   paymentMethodEnum.options.map((value) => ({
     label: value,
     value,
   }));
 
-const paymentStatusOptions: SelectProps["options"] =
+const paymentStatusOptions: SelectProps['options'] =
   statusPaymentEnum.options.map((value) => ({
     label: getConvertStatusPayment(value),
     value,
   }));
 
-const genderOptions: SelectProps["options"] = genderEnum.options.map(
+const genderOptions: SelectProps['options'] = genderEnum.options.map(
   (value) => ({
-    label: value === "MASCULINO" ? "Masculino" : "Feminino",
+    label: value === 'MASCULINO' ? 'Masculino' : 'Feminino',
     value,
   }),
 );
 
-const shirtSizeOptions: SelectProps["options"] = shirtSizeEnum.options.map(
+const shirtSizeOptions: SelectProps['options'] = shirtSizeEnum.options.map(
   (value) => ({
     label: value,
     value,
   }),
 );
 
-const shirtTypeOptions: SelectProps["options"] = shirtTypeEnum.options.map(
+const shirtTypeOptions: SelectProps['options'] = shirtTypeEnum.options.map(
   (value) => ({
-    label: value === "TRADICIONAL" ? "Tradicional" : "Baby Look",
+    label: value === 'TRADICIONAL' ? 'Tradicional' : 'Baby Look',
     value,
   }),
 );
 
 // Funções auxiliares para formatação
 const formatGender = (gender?: string): string => {
-  if (!gender) return "Não informado";
-  return gender === "MASCULINO" ? "Masculino" : "Feminino";
+  if (!gender) return 'Não informado';
+  return gender === 'MASCULINO' ? 'Masculino' : 'Feminino';
 };
 
 const formatDate = (date?: string): string => {
-  if (!date) return "Não informado";
-  return dayjs(date).format("DD/MM/YYYY");
+  if (!date) return 'Não informado';
+  return dayjs(date).format('DD/MM/YYYY');
 };
 
 const formatCPF = (cpf?: string): string => {
-  if (!cpf) return "Não informado";
-  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  if (!cpf) return 'Não informado';
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 };
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
 ];
 
 const formatFileSize = (bytes: number) => {
-  if (bytes === 0) return "0 Bytes";
+  if (bytes === 0) return '0 Bytes';
   const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
 const getFileTypeName = (type: string) => {
   const typeMap: { [key: string]: string } = {
-    "image/jpeg": "JPEG",
-    "image/jpg": "JPG",
-    "image/png": "PNG",
-    "image/webp": "WebP",
+    'image/jpeg': 'JPEG',
+    'image/jpg': 'JPG',
+    'image/png': 'PNG',
+    'image/webp': 'WebP',
   };
   return typeMap[type] || type;
 };
@@ -156,23 +156,23 @@ export default function CreateInscriptionAdmin() {
     formState: { errors },
   } = form;
 
-  const isGuest = watch("isGuest");
-  const eventId = watch("eventId");
-  const accountId = watch("accountId");
+  const isGuest = watch('isGuest');
+  const eventId = watch('eventId');
+  const accountId = watch('accountId');
 
   // Observar os participantes para recalcular total quando mudarem
   const participants = useWatch({
     control,
-    name: "participants",
+    name: 'participants',
   });
 
   // Efeito para calcular o total sempre que os participantes ou typeValues mudarem
   useEffect(() => {
     if (!participants || participants.length === 0) {
-      setValue("totalValue", 0);
+      setValue('totalValue', 0);
       // Se o pagamento estiver visível, atualizar também o payment.totalValue
       if (showPayment) {
-        setValue("payment.totalValue", 0);
+        setValue('payment.totalValue', 0);
       }
       return;
     }
@@ -187,11 +187,11 @@ export default function CreateInscriptionAdmin() {
       }
     });
 
-    setValue("totalValue", total);
+    setValue('totalValue', total);
 
     // Se o pagamento estiver visível, atualizar também o payment.totalValue
     if (showPayment) {
-      setValue("payment.totalValue", total);
+      setValue('payment.totalValue', total);
     }
   }, [participants, typeValues, setValue, showPayment]);
 
@@ -203,7 +203,7 @@ export default function CreateInscriptionAdmin() {
   // Field array para participantes
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "participants",
+    name: 'participants',
   });
 
   const handleSubmit = async (event?: React.BaseSyntheticEvent) => {
@@ -211,17 +211,17 @@ export default function CreateInscriptionAdmin() {
 
     // Atualizar o campo payment.image com o arquivo selecionado
     if (receiptFile) {
-      setValue("payment.image", receiptFile);
+      setValue('payment.image', receiptFile);
     }
 
     const result = await onSubmit(event);
     if (result.success) {
-      toast.success("Inscrição criada com sucesso!");
+      toast.success('Inscrição criada com sucesso!');
       // Limpar o arquivo após submit bem-sucedido
       setReceiptFile(null);
       setReceiptPreview(null);
     } else {
-      toast.error(result.error || "Erro ao criar inscrição");
+      toast.error(result.error || 'Erro ao criar inscrição');
     }
   };
 
@@ -234,8 +234,8 @@ export default function CreateInscriptionAdmin() {
       (f) => f.accountParticipantId === memberId,
     );
     if (alreadyAdded) {
-      toast.warning("Membro já adicionado", {
-        description: "Este membro já está na lista de participantes",
+      toast.warning('Membro já adicionado', {
+        description: 'Este membro já está na lista de participantes',
       });
       return;
     }
@@ -243,45 +243,45 @@ export default function CreateInscriptionAdmin() {
     // Adiciona um novo participante com todos os dados do membro
     append({
       accountParticipantId: memberId,
-      typeInscriptionId: "",
-      name: fullMember.name ?? "",
-      preferredName: fullMember.preferredName ?? "",
-      cpf: fullMember.cpf ?? "",
+      typeInscriptionId: '',
+      name: fullMember.name ?? '',
+      preferredName: fullMember.preferredName ?? '',
+      cpf: fullMember.cpf ?? '',
       birthDate: fullMember.birthDate
-        ? new Date(fullMember.birthDate).toISOString().split("T")[0]
-        : "",
+        ? new Date(fullMember.birthDate).toISOString().split('T')[0]
+        : '',
       gender: fullMember.gender,
       shirtSize: fullMember.shirtSize,
       shirtType: fullMember.shirtType,
     });
 
-    toast.success("Membro adicionado!", {
-      description: "Selecione o tipo de inscrição para este participante",
+    toast.success('Membro adicionado!', {
+      description: 'Selecione o tipo de inscrição para este participante',
     });
   };
 
   // Função para adicionar participante manualmente com validação
   const handleAddManualParticipant = () => {
     if (!isGuest && !eventId) {
-      toast.warning("Selecione um evento primeiro", {
-        description: "Escolha o evento antes de adicionar um participante",
+      toast.warning('Selecione um evento primeiro', {
+        description: 'Escolha o evento antes de adicionar um participante',
       });
       return;
     }
 
     if (!isGuest && !accountId) {
-      toast.warning("Selecione uma conta primeiro", {
-        description: "Escolha a conta antes de adicionar um participante",
+      toast.warning('Selecione uma conta primeiro', {
+        description: 'Escolha a conta antes de adicionar um participante',
       });
       return;
     }
 
     append({
-      typeInscriptionId: "",
-      name: "",
-      preferredName: "",
-      cpf: "",
-      birthDate: "",
+      typeInscriptionId: '',
+      name: '',
+      preferredName: '',
+      cpf: '',
+      birthDate: '',
       gender: undefined,
       shirtSize: undefined,
       shirtType: undefined,
@@ -316,15 +316,15 @@ export default function CreateInscriptionAdmin() {
   // Funções para upload de imagem
   const validateFile = (file: File): boolean => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      toast.error("Tipo de arquivo não permitido", {
-        description: "Por favor, selecione uma imagem JPG, PNG ou WebP.",
+      toast.error('Tipo de arquivo não permitido', {
+        description: 'Por favor, selecione uma imagem JPG, PNG ou WebP.',
       });
       return false;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("Arquivo muito grande", {
-        description: "O tamanho máximo permitido é 5MB.",
+      toast.error('Arquivo muito grande', {
+        description: 'O tamanho máximo permitido é 5MB.',
       });
       return false;
     }
@@ -342,7 +342,7 @@ export default function CreateInscriptionAdmin() {
       reader.readAsDataURL(file);
 
       // Atualizar o valor no formulário
-      setValue("payment.image", file);
+      setValue('payment.image', file);
     }
   };
 
@@ -375,9 +375,9 @@ export default function CreateInscriptionAdmin() {
   const handleRemoveFile = () => {
     setReceiptFile(null);
     setReceiptPreview(null);
-    setValue("payment.image", undefined);
+    setValue('payment.image', undefined);
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -387,14 +387,14 @@ export default function CreateInscriptionAdmin() {
         <FormProvider {...form}>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Event ID - Agora usando ComboboxEvent */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Controller
                 control={control}
                 name="eventId"
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Evento"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                     required
                   >
@@ -412,7 +412,7 @@ export default function CreateInscriptionAdmin() {
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Status da Inscrição"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                     required
                   >
@@ -445,14 +445,14 @@ export default function CreateInscriptionAdmin() {
             />
 
             {/* Dados do responsável */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <Controller
                 control={control}
                 name="responsible"
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Responsável"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                     required
                   >
@@ -471,7 +471,7 @@ export default function CreateInscriptionAdmin() {
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Email"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                   >
                     <Input
@@ -490,7 +490,7 @@ export default function CreateInscriptionAdmin() {
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Telefone"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                   >
                     <Input
@@ -505,14 +505,14 @@ export default function CreateInscriptionAdmin() {
 
             {/* Campos condicionais conforme isGuest */}
             {isGuest ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <Controller
                   control={control}
                   name="guestLocality"
                   render={({ field, fieldState }) => (
                     <Form.Item
                       label="Localidade"
-                      validateStatus={fieldState.error ? "error" : ""}
+                      validateStatus={fieldState.error ? 'error' : ''}
                       help={fieldState.error?.message}
                     >
                       <Input
@@ -531,7 +531,7 @@ export default function CreateInscriptionAdmin() {
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Conta"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                   >
                     <ComboboxAccountSingle
@@ -546,37 +546,37 @@ export default function CreateInscriptionAdmin() {
             )}
 
             {/* Valor total - READONLY E CALCULADO AUTOMATICAMENTE */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Controller
                 control={control}
                 name="totalValue"
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Valor total"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                     required
                   >
                     <InputNumber
                       {...field}
-                      style={{ width: "100%" }}
+                      style={{ width: '100%' }}
                       min={0}
                       step={0.01}
                       precision={2}
                       placeholder="0,00"
                       disabled={true}
-                      className="bg-gray-50 cursor-not-allowed w-full"
+                      className="w-full cursor-not-allowed bg-gray-50"
                       formatter={(value) => {
                         const numValue = Number(value);
-                        if (isNaN(numValue)) return "R$ 0,00";
-                        return `R$ ${numValue.toFixed(2).replace(".", ",")}`;
+                        if (isNaN(numValue)) return 'R$ 0,00';
+                        return `R$ ${numValue.toFixed(2).replace('.', ',')}`;
                       }}
                       parser={(value) => {
                         if (!value) return 0;
                         const parsed = value
-                          .replace(/R\$\s?/g, "")
-                          .replace(/\./g, "")
-                          .replace(",", ".");
+                          .replace(/R\$\s?/g, '')
+                          .replace(/\./g, '')
+                          .replace(',', '.');
                         return Number(parsed) || 0;
                       }}
                     />
@@ -590,28 +590,28 @@ export default function CreateInscriptionAdmin() {
                 render={({ field, fieldState }) => (
                   <Form.Item
                     label="Valor pago"
-                    validateStatus={fieldState.error ? "error" : ""}
+                    validateStatus={fieldState.error ? 'error' : ''}
                     help={fieldState.error?.message}
                   >
                     <InputNumber<number>
                       {...field}
-                      style={{ width: "100%" }}
+                      style={{ width: '100%' }}
                       min={0}
                       placeholder="0,00"
                       formatter={(value) => {
-                        if (!value && value !== 0) return "";
-                        const [intPart, decPart] = `${value}`.split(".");
+                        if (!value && value !== 0) return '';
+                        const [intPart, decPart] = `${value}`.split('.');
                         const formatted = intPart.replace(
                           /\B(?=(\d{3})+(?!\d))/g,
-                          ".",
+                          '.',
                         );
                         return `R$ ${decPart ? `${formatted},${decPart}` : formatted}`;
                       }}
                       parser={(value) =>
                         value
-                          ?.replace(/R\$\s?/g, "")
-                          .replace(/\./g, "")
-                          .replace(",", ".") as unknown as number
+                          ?.replace(/R\$\s?/g, '')
+                          .replace(/\./g, '')
+                          .replace(',', '.') as unknown as number
                       }
                       onBlur={field.onBlur}
                     />
@@ -636,7 +636,7 @@ export default function CreateInscriptionAdmin() {
                       onChange={handleMemberSelected}
                       placeholder="Buscar membro..."
                       disabledValues={fields.map(
-                        (f) => f.accountParticipantId || "",
+                        (f) => f.accountParticipantId || '',
                       )}
                       onRefresh={handleRefreshMembers}
                       onFetchingChange={setIsFetchingMembers}
@@ -668,7 +668,7 @@ export default function CreateInscriptionAdmin() {
 
             {/* Mensagem informativa quando falta selecionar conta */}
             {!isGuest && eventId && !accountId && (
-              <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-yellow-800 dark:text-yellow-200">
+              <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">
                 <p className="text-sm">
                   Selecione uma conta para poder adicionar membros.
                 </p>
@@ -701,21 +701,21 @@ export default function CreateInscriptionAdmin() {
                     <MinusCircle className="h-4 w-4" />
                   </Button>
 
-                  <div className="space-y-4 mt-8">
+                  <div className="mt-8 space-y-4">
                     {/* Tipo de inscrição do participante (obrigatório) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <Controller
                         control={control}
                         name={`participants.${index}.typeInscriptionId`}
                         render={({ field: typeField, fieldState }) => (
                           <Form.Item
                             label="Tipo de inscrição"
-                            validateStatus={fieldState.error ? "error" : ""}
+                            validateStatus={fieldState.error ? 'error' : ''}
                             help={fieldState.error?.message}
                             required
                           >
                             <ComboboxTypeInscription
-                              eventId={eventId || ""}
+                              eventId={eventId || ''}
                               value={typeField.value}
                               onChange={(value, option) => {
                                 typeField.onChange(value);
@@ -730,8 +730,8 @@ export default function CreateInscriptionAdmin() {
 
                     {/* Para inscrições normais com membro existente - mostrar dados como informação */}
                     {!isGuest && hasAccountParticipant && (
-                      <div className="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-200/50 dark:border-blue-800/30">
-                        <div className="flex items-center gap-2 mb-3 text-blue-700 dark:text-blue-300">
+                      <div className="rounded-lg border border-blue-200/50 bg-blue-50/50 p-4 dark:border-blue-800/30 dark:bg-blue-900/10">
+                        <div className="mb-3 flex items-center gap-2 text-blue-700 dark:text-blue-300">
                           <User className="h-4 w-4" />
                           <span className="font-medium">
                             Dados do membro selecionado
@@ -744,7 +744,7 @@ export default function CreateInscriptionAdmin() {
                           className="bg-white/50 dark:bg-gray-800/50"
                         >
                           <Descriptions.Item label="Nome" span={2}>
-                            {field.name || "Não informado"}
+                            {field.name || 'Não informado'}
                           </Descriptions.Item>
 
                           {field.preferredName && (
@@ -764,7 +764,7 @@ export default function CreateInscriptionAdmin() {
                           <Descriptions.Item label="Gênero">
                             <Tag
                               color={
-                                field.gender === "MASCULINO" ? "blue" : "pink"
+                                field.gender === 'MASCULINO' ? 'blue' : 'pink'
                               }
                             >
                               {formatGender(field.gender)}
@@ -772,15 +772,15 @@ export default function CreateInscriptionAdmin() {
                           </Descriptions.Item>
 
                           <Descriptions.Item label="Tamanho">
-                            {field.shirtSize || "Não informado"}
+                            {field.shirtSize || 'Não informado'}
                           </Descriptions.Item>
 
                           <Descriptions.Item label="Tipo de camiseta">
-                            {field.shirtType === "TRADICIONAL"
-                              ? "Tradicional"
-                              : field.shirtType === "BABYLOOK"
-                                ? "Baby Look"
-                                : "Não informado"}
+                            {field.shirtType === 'TRADICIONAL'
+                              ? 'Tradicional'
+                              : field.shirtType === 'BABYLOOK'
+                                ? 'Baby Look'
+                                : 'Não informado'}
                           </Descriptions.Item>
                         </Descriptions>
                       </div>
@@ -788,7 +788,7 @@ export default function CreateInscriptionAdmin() {
 
                     {/* Para inscrições guest ou participantes manuais - mostrar inputs */}
                     {(isGuest || !hasAccountParticipant) && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         {/* Nome */}
                         <Controller
                           control={control}
@@ -796,7 +796,7 @@ export default function CreateInscriptionAdmin() {
                           render={({ field, fieldState }) => (
                             <Form.Item
                               label="Nome"
-                              validateStatus={fieldState.error ? "error" : ""}
+                              validateStatus={fieldState.error ? 'error' : ''}
                               help={fieldState.error?.message}
                             >
                               <Input
@@ -830,7 +830,7 @@ export default function CreateInscriptionAdmin() {
                           render={({ field, fieldState }) => (
                             <Form.Item
                               label="CPF"
-                              validateStatus={fieldState.error ? "error" : ""}
+                              validateStatus={fieldState.error ? 'error' : ''}
                               help={fieldState.error?.message}
                             >
                               <Input
@@ -850,18 +850,18 @@ export default function CreateInscriptionAdmin() {
                           render={({ field, fieldState }) => (
                             <Form.Item
                               label="Data de nascimento"
-                              validateStatus={fieldState.error ? "error" : ""}
+                              validateStatus={fieldState.error ? 'error' : ''}
                               help={fieldState.error?.message}
                             >
                               <DatePicker
                                 {...field}
-                                style={{ width: "100%" }}
+                                style={{ width: '100%' }}
                                 placeholder="Selecione a data de nascimento"
                                 format="DD/MM/YYYY"
                                 value={field.value ? dayjs(field.value) : null}
                                 onChange={(date) => {
                                   field.onChange(
-                                    date ? date.format("YYYY-MM-DD") : "",
+                                    date ? date.format('YYYY-MM-DD') : '',
                                   );
                                 }}
                                 className="w-full"
@@ -877,7 +877,7 @@ export default function CreateInscriptionAdmin() {
                           render={({ field, fieldState }) => (
                             <Form.Item
                               label="Gênero"
-                              validateStatus={fieldState.error ? "error" : ""}
+                              validateStatus={fieldState.error ? 'error' : ''}
                               help={fieldState.error?.message}
                             >
                               <Select
@@ -934,7 +934,7 @@ export default function CreateInscriptionAdmin() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center gap-2"
+              className="flex w-full items-center gap-2"
               onClick={handleAddManualParticipant}
             >
               <Plus className="h-4 w-4" />
@@ -944,7 +944,7 @@ export default function CreateInscriptionAdmin() {
             <Divider>Pagamento (opcional)</Divider>
 
             {/* Toggle para habilitar pagamento */}
-            <div className="flex items-center gap-4 mb-4">
+            <div className="mb-4 flex items-center gap-4">
               <Switch checked={showPayment} onChange={setShowPayment} />
               <span>Incluir dados de pagamento</span>
             </div>
@@ -953,16 +953,16 @@ export default function CreateInscriptionAdmin() {
               <Space
                 orientation="vertical"
                 size="middle"
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Controller
                     control={control}
                     name="payment.status"
                     render={({ field, fieldState }) => (
                       <Form.Item
                         label="Status do pagamento"
-                        validateStatus={fieldState.error ? "error" : ""}
+                        validateStatus={fieldState.error ? 'error' : ''}
                         help={fieldState.error?.message}
                         required
                       >
@@ -982,7 +982,7 @@ export default function CreateInscriptionAdmin() {
                     render={({ field, fieldState }) => (
                       <Form.Item
                         label="Método de pagamento"
-                        validateStatus={fieldState.error ? "error" : ""}
+                        validateStatus={fieldState.error ? 'error' : ''}
                         help={fieldState.error?.message}
                         required
                       >
@@ -997,36 +997,36 @@ export default function CreateInscriptionAdmin() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Controller
                     control={control}
                     name="payment.totalValue"
                     render={({ field, fieldState }) => (
                       <Form.Item
                         label="Valor total do pagamento"
-                        validateStatus={fieldState.error ? "error" : ""}
+                        validateStatus={fieldState.error ? 'error' : ''}
                         help={fieldState.error?.message}
                       >
                         <InputNumber
                           {...field}
-                          style={{ width: "100%" }}
+                          style={{ width: '100%' }}
                           min={0}
                           step={0.01}
                           precision={2}
                           placeholder="0,00"
                           disabled={true}
-                          className="bg-gray-50 cursor-not-allowed w-full"
+                          className="w-full cursor-not-allowed bg-gray-50"
                           formatter={(value) => {
                             const numValue = Number(value);
-                            if (isNaN(numValue)) return "R$ 0,00";
-                            return `R$ ${numValue.toFixed(2).replace(".", ",")}`;
+                            if (isNaN(numValue)) return 'R$ 0,00';
+                            return `R$ ${numValue.toFixed(2).replace('.', ',')}`;
                           }}
                           parser={(value) => {
                             if (!value) return 0;
                             const parsed = value
-                              .replace(/R\$\s?/g, "")
-                              .replace(/\./g, "")
-                              .replace(",", ".");
+                              .replace(/R\$\s?/g, '')
+                              .replace(/\./g, '')
+                              .replace(',', '.');
                             return Number(parsed) || 0;
                           }}
                         />
@@ -1040,28 +1040,28 @@ export default function CreateInscriptionAdmin() {
                     render={({ field, fieldState }) => (
                       <Form.Item
                         label="Valor pago"
-                        validateStatus={fieldState.error ? "error" : ""}
+                        validateStatus={fieldState.error ? 'error' : ''}
                         help={fieldState.error?.message}
                       >
                         <InputNumber<number>
                           {...field}
-                          style={{ width: "100%" }}
+                          style={{ width: '100%' }}
                           min={0}
                           placeholder="0,00"
                           formatter={(value) => {
-                            if (!value && value !== 0) return "";
-                            const [intPart, decPart] = `${value}`.split(".");
+                            if (!value && value !== 0) return '';
+                            const [intPart, decPart] = `${value}`.split('.');
                             const formatted = intPart.replace(
                               /\B(?=(\d{3})+(?!\d))/g,
-                              ".",
+                              '.',
                             );
                             return `R$ ${decPart ? `${formatted},${decPart}` : formatted}`;
                           }}
                           parser={(value) =>
                             value
-                              ?.replace(/R\$\s?/g, "")
-                              .replace(/\./g, "")
-                              .replace(",", ".") as unknown as number
+                              ?.replace(/R\$\s?/g, '')
+                              .replace(/\./g, '')
+                              .replace(',', '.') as unknown as number
                           }
                           onBlur={field.onBlur}
                         />
@@ -1070,20 +1070,20 @@ export default function CreateInscriptionAdmin() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Controller
                     control={control}
                     name="payment.installment"
                     render={({ field, fieldState }) => (
                       <Form.Item
                         label="Número de parcelas"
-                        validateStatus={fieldState.error ? "error" : ""}
+                        validateStatus={fieldState.error ? 'error' : ''}
                         help={fieldState.error?.message}
                       >
                         <InputNumber
                           {...field}
                           min={1}
-                          style={{ width: "100%" }}
+                          style={{ width: '100%' }}
                           placeholder="1"
                         />
                       </Form.Item>
@@ -1095,30 +1095,30 @@ export default function CreateInscriptionAdmin() {
                 <div className="w-full">
                   <Form.Item
                     label="Comprovante de Pagamento"
-                    required={watch("payment.methodPayment") === "PIX"}
+                    required={watch('payment.methodPayment') === 'PIX'}
                     className="w-full"
                     labelCol={{ span: 24 }}
                     wrapperCol={{ span: 24 }}
                   >
-                    <div className="space-y-3 w-full">
+                    <div className="w-full space-y-3">
                       {receiptFile ? (
-                        <div className="space-y-4 w-full">
+                        <div className="w-full space-y-4">
                           {/* Preview da imagem */}
                           {receiptPreview && (
-                            <div className="relative group rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 w-full">
-                              <div className="aspect-video relative">
+                            <div className="group relative w-full overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                              <div className="relative aspect-video">
                                 <img
                                   src={receiptPreview}
                                   alt="Preview do comprovante"
-                                  className="w-full h-full object-contain p-4"
+                                  className="h-full w-full object-contain p-4"
                                 />
                                 {/* Overlay com botão de remover */}
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200 flex items-center justify-center">
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-200 group-hover:bg-black/10">
                                   <Button
                                     type="button"
                                     variant="destructive"
                                     size="icon"
-                                    className="h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                    className="h-9 w-9 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                                     onClick={handleRemoveFile}
                                   >
                                     <X className="h-4 w-4" />
@@ -1127,12 +1127,12 @@ export default function CreateInscriptionAdmin() {
                               </div>
 
                               {/* Informações do arquivo */}
-                              <div className="absolute bottom-3 left-3 right-3">
-                                <div className="bg-black/70 backdrop-blur-sm rounded-lg p-3 text-white">
+                              <div className="absolute right-3 bottom-3 left-3">
+                                <div className="rounded-lg bg-black/70 p-3 text-white backdrop-blur-sm">
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                       <FileText className="h-4 w-4" />
-                                      <span className="text-sm font-medium truncate">
+                                      <span className="truncate text-sm font-medium">
                                         {receiptFile.name}
                                       </span>
                                     </div>
@@ -1140,7 +1140,7 @@ export default function CreateInscriptionAdmin() {
                                       {formatFileSize(receiptFile.size)}
                                     </div>
                                   </div>
-                                  <div className="text-xs text-gray-300 mt-1">
+                                  <div className="mt-1 text-xs text-gray-300">
                                     {getFileTypeName(receiptFile.type)} •
                                     Enviado
                                   </div>
@@ -1176,10 +1176,10 @@ export default function CreateInscriptionAdmin() {
                         </div>
                       ) : (
                         <div
-                          className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer w-full ${
+                          className={`w-full cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-all ${
                             isDragOver
-                              ? "border-primary bg-primary/5 scale-[1.02]"
-                              : "border-gray-300 dark:border-gray-700 hover:border-primary hover:bg-primary/5"
+                              ? 'border-primary bg-primary/5 scale-[1.02]'
+                              : 'hover:border-primary hover:bg-primary/5 border-gray-300 dark:border-gray-700'
                           }`}
                           onDragOver={handleDragOver}
                           onDragLeave={handleDragLeave}
@@ -1190,11 +1190,11 @@ export default function CreateInscriptionAdmin() {
                             {/* Ícone animado para drag and drop */}
                             <div className="relative">
                               <div
-                                className={`p-4 rounded-full transition-all ${isDragOver ? "bg-primary/20 scale-110" : "bg-primary/10"}`}
+                                className={`rounded-full p-4 transition-all ${isDragOver ? 'bg-primary/20 scale-110' : 'bg-primary/10'}`}
                               >
                                 {isDragOver ? (
                                   <svg
-                                    className="h-8 w-8 text-primary animate-bounce"
+                                    className="text-primary h-8 w-8 animate-bounce"
                                     fill="currentColor"
                                     viewBox="0 0 20 20"
                                   >
@@ -1205,19 +1205,19 @@ export default function CreateInscriptionAdmin() {
                                     />
                                   </svg>
                                 ) : (
-                                  <ImageIcon className="h-8 w-8 text-primary" />
+                                  <ImageIcon className="text-primary h-8 w-8" />
                                 )}
                               </div>
                               {isDragOver && (
-                                <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full animate-ping" />
+                                <div className="absolute -top-1 -right-1 h-4 w-4 animate-ping rounded-full bg-green-500" />
                               )}
                             </div>
 
                             <div>
-                              <p className="font-medium text-gray-900 dark:text-white mb-1">
+                              <p className="mb-1 font-medium text-gray-900 dark:text-white">
                                 {isDragOver
-                                  ? "Solte o arquivo aqui"
-                                  : "Clique para fazer upload"}
+                                  ? 'Solte o arquivo aqui'
+                                  : 'Clique para fazer upload'}
                               </p>
                               <p className="text-sm text-gray-500">
                                 ou arraste e solte o arquivo aqui
@@ -1225,27 +1225,27 @@ export default function CreateInscriptionAdmin() {
                             </div>
 
                             {/* Informações de formato */}
-                            <div className="flex items-center gap-4 mt-2">
+                            <div className="mt-2 flex items-center gap-4">
                               <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 bg-blue-500 rounded-full" />
+                                <div className="h-2 w-2 rounded-full bg-blue-500" />
                                 <span className="text-xs text-gray-500">
                                   JPG
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 bg-green-500 rounded-full" />
+                                <div className="h-2 w-2 rounded-full bg-green-500" />
                                 <span className="text-xs text-gray-500">
                                   PNG
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 bg-purple-500 rounded-full" />
+                                <div className="h-2 w-2 rounded-full bg-purple-500" />
                                 <span className="text-xs text-gray-500">
                                   WebP
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
-                                <div className="h-2 w-2 bg-yellow-500 rounded-full" />
+                                <div className="h-2 w-2 rounded-full bg-yellow-500" />
                                 <span className="text-xs text-gray-500">
                                   5MB
                                 </span>
@@ -1254,7 +1254,7 @@ export default function CreateInscriptionAdmin() {
 
                             {/* Dica visual */}
                             {!isDragOver && (
-                              <div className="flex items-center gap-2 mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                              <div className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
                                 <svg
                                   className="h-4 w-4 text-gray-400"
                                   fill="none"
