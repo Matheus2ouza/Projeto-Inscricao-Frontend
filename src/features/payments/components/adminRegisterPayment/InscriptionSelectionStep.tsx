@@ -1,8 +1,9 @@
 import { ListInscriptionsPending } from '@/features/payments/types/adminRegisterPayment/adminRegisterPaymentTypes';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
-import type { Key, TableColumnsType } from 'antd';
+import type { TableColumnsType } from 'antd';
 import { InputNumber } from 'antd';
 import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import type { Key } from 'react';
 import { useMemo } from 'react';
 import { TableTransfer, type DataType } from './TableTransfer';
 
