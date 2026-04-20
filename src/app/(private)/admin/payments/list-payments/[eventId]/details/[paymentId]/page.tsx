@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import PaymentDetailsContent from "@/features/payment/components/adminDetailsPayment/PaymentDetailsContent";
-import { useActionsPayment } from "@/features/payment/hooks/adminDetailsPayment/actions/useActionsPayment";
-import { usePaymentDetail } from "@/features/payment/hooks/adminDetailsPayment/usePaymentdetail";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { useParams, useRouter } from "next/navigation";
+import PaymentDetailsContent from '@/features/payments/components/adminDetailsPayment/PaymentDetailsContent';
+import { useActionsPayment } from '@/features/payments/hooks/adminDetailsPayment/actions/useActionsPayment';
+import { usePaymentDetail } from '@/features/payments/hooks/adminDetailsPayment/usePaymentdetail';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function PaymentDetailsAdminPage() {
   const { user } = useCurrentUser();
@@ -68,8 +68,8 @@ export default function PaymentDetailsAdminPage() {
 
     if (error) {
       return (
-        <div className="p-6 flex items-center justify-center min-h-96">
-          <div className="text-center text-destructive">
+        <div className="flex min-h-96 items-center justify-center p-6">
+          <div className="text-destructive text-center">
             <p className="mb-4">
               Erro ao carregar detalhes do pagamento: {error}
             </p>

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import AnalysisPayments from "@/features/payment/components/adminAnalysisPayment/AnalysisPayments";
-import { useAnalysisPayment } from "@/features/payment/hooks/analysisPayment/analysisPayment";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
+import AnalysisPayments from '@/features/payments/components/adminAnalysisPayment/AnalysisPayments';
+import { useAnalysisPayment } from '@/features/payments/hooks/analysisPayment/analysisPayment';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 10;
 export default function AnalysisPaymentAdminPage() {
@@ -36,8 +36,8 @@ export default function AnalysisPaymentAdminPage() {
 
   const renderSkeletonGrid = () => {
     return (
-      <div className="p-6 space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 bg-muted/30 rounded-lg border">
+      <div className="space-y-6 p-6">
+        <div className="bg-muted/30 mb-6 flex flex-col items-start justify-between gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
           <div className="space-y-1">
             <Skeleton className="h-6 w-40" />
             <Skeleton className="h-4 w-60" />
@@ -56,8 +56,8 @@ export default function AnalysisPaymentAdminPage() {
 
     if (error) {
       return (
-        <div className="p-6 flex items-center justify-center min-h-96">
-          <div className="text-center text-destructive">
+        <div className="flex min-h-96 items-center justify-center p-6">
+          <div className="text-destructive text-center">
             <p className="mb-4">
               Erro ao carregar histórico de pagamentos: {error.message}
             </p>

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import RegisterPaymentPix from "@/features/payment/components/registerPayment/RegisterPaymentPix";
-import { useRegisterPayment } from "@/features/payment/hooks/registerPayment/useRegisterPayment";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import RegisterPaymentPix from '@/features/payments/components/registerPayment/RegisterPaymentPix';
+import { useRegisterPayment } from '@/features/payments/hooks/registerPayment/useRegisterPayment';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 export default function RegisterPaymentPixPage() {
   const { user } = useCurrentUser();
@@ -19,20 +19,20 @@ export default function RegisterPaymentPixPage() {
     return null;
   }
 
-  const totalValueParam = searchParams.get("totalValue");
+  const totalValueParam = searchParams.get('totalValue');
   const totalValue = Number(totalValueParam ?? 0);
   const resolvedTotalValue = Number.isFinite(totalValue) ? totalValue : 0;
 
-  const queryCsv = searchParams.get("inscriptions");
+  const queryCsv = searchParams.get('inscriptions');
   const queryList = queryCsv
     ? queryCsv
-        .split(",")
+        .split(',')
         .map((s) => s.trim())
         .filter(Boolean)
     : [];
   const repeatedParams =
-    typeof searchParams.getAll === "function"
-      ? searchParams.getAll("inscriptionId")
+    typeof searchParams.getAll === 'function'
+      ? searchParams.getAll('inscriptionId')
       : [];
 
   const inscriptionsIds = Array.from(
@@ -41,8 +41,8 @@ export default function RegisterPaymentPixPage() {
 
   const registerPayment = useRegisterPayment();
 
-  const allowCardParam = searchParams.get("allowCard");
-  const allowCard = allowCardParam === "1" || allowCardParam === "true";
+  const allowCardParam = searchParams.get('allowCard');
+  const allowCard = allowCardParam === '1' || allowCardParam === 'true';
 
   const handleBack = () => {
     router.back();
@@ -56,8 +56,8 @@ export default function RegisterPaymentPixPage() {
       backButtonAction={handleBack}
     >
       {inscriptionsIds.length === 0 ? (
-        <div className="p-6 flex items-center justify-center min-h-72">
-          <div className="text-center space-y-4">
+        <div className="flex min-h-72 items-center justify-center p-6">
+          <div className="space-y-4 text-center">
             <p className="text-muted-foreground">
               Nenhuma inscrição selecionada para pagamento.
             </p>

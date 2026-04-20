@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import RegisterPaymentPix from "@/features/payment/components/registerPayment/RegisterPaymentPix";
-import { useRegisterPaymentPix } from "@/features/payment/hooks/registerPayment/useRegisterPaymentPix";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import RegisterPaymentPix from '@/features/payments/components/registerPayment/RegisterPaymentPix';
+import { useRegisterPaymentPix } from '@/features/payments/hooks/registerPayment/useRegisterPaymentPix';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 export default function GuestRegisterPaymentPixPage() {
   const params = useParams();
@@ -16,21 +16,21 @@ export default function GuestRegisterPaymentPixPage() {
     return null;
   }
 
-  const totalValueParam = searchParams.get("totalValue");
+  const totalValueParam = searchParams.get('totalValue');
   const totalValue = Number(totalValueParam ?? 0);
   const resolvedTotalValue = Number.isFinite(totalValue) ? totalValue : 0;
 
   // Pega inscrições do query string
-  const queryCsv = searchParams.get("inscriptions");
+  const queryCsv = searchParams.get('inscriptions');
   const queryList = queryCsv
     ? queryCsv
-        .split(",")
+        .split(',')
         .map((s) => s.trim())
         .filter(Boolean)
     : [];
   const repeatedParams =
-    typeof searchParams.getAll === "function"
-      ? searchParams.getAll("inscriptionId")
+    typeof searchParams.getAll === 'function'
+      ? searchParams.getAll('inscriptionId')
       : [];
 
   const inscriptionsIds = Array.from(
@@ -38,16 +38,16 @@ export default function GuestRegisterPaymentPixPage() {
   );
 
   // Pega nome e email do convidado do query string
-  const guestNameParam = searchParams.get("guestName");
-  const guestName = guestNameParam ?? "";
+  const guestNameParam = searchParams.get('guestName');
+  const guestName = guestNameParam ?? '';
 
-  const guestEmailParam = searchParams.get("guestEmail");
-  const guestEmail = guestEmailParam ?? "";
+  const guestEmailParam = searchParams.get('guestEmail');
+  const guestEmail = guestEmailParam ?? '';
 
   const registerPaymentPix = useRegisterPaymentPix();
 
-  const allowCardParam = searchParams.get("allowCard");
-  const allowCard = allowCardParam === "1" || allowCardParam === "true";
+  const allowCardParam = searchParams.get('allowCard');
+  const allowCard = allowCardParam === '1' || allowCardParam === 'true';
 
   const handleBack = () => {
     router.back();

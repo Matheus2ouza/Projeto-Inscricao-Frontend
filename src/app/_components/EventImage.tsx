@@ -12,14 +12,23 @@ export default function EventImage({ image, name }: EventImageProps) {
   const gradientClass = getGradientClass(name);
 
   return (
-    <div className="relative h-62 w-full overflow-hidden rounded-t-lg">
+    <div className="relative aspect-[16/10] overflow-hidden rounded-t-lg">
       {image ? (
         <Image
           src={image}
           alt={name}
           preview={false}
-          className="h-full w-full object-cover"
-          fallback="" // evita quebrar se a imagem falhar
+          width="100%"
+          height="100%"
+          className="object-cover"
+          fallback="/images/fallback/not-found-01.png"
+          placeholder={
+            <Image
+              preview={false}
+              src={`${image}&width=40&quality=10`}
+              className="scale-110 object-cover blur-md"
+            />
+          }
         />
       ) : (
         <div
