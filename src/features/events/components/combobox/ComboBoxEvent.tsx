@@ -11,22 +11,16 @@ export type ComboboxEventProps = {
   value: string;
   onChange: (value: string) => void;
   options?: EventOption[];
+  statuses?: StatusEvent[];
 };
 
 export function ComboboxEvent({
   value,
   onChange,
   options,
+  statuses = [StatusEvent.OPEN, StatusEvent.CLOSE, StatusEvent.FINALIZED],
 }: ComboboxEventProps) {
-  const {
-    events: fetched,
-    loading,
-    error,
-  } = useEventsCombobox([
-    StatusEvent.OPEN,
-    StatusEvent.CLOSE,
-    StatusEvent.FINALIZED,
-  ]);
+  const { events: fetched, loading, error } = useEventsCombobox(statuses);
 
   // Preferência: props.options > API; fallback: []
   const events = React.useMemo<EventOption[]>(() => {

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { CreateCashRegisterSchema } from "@/features/cashRegister/schema/createCashRegister/createCashRegisterSchema";
+import { CreateCashRegisterSchema } from '@/features/cashRegister/schema/createCashRegister/createCashRegisterSchema';
 import {
   CashRegisterStatus,
   type CreateCashInput,
-} from "@/features/cashRegister/types/createCashRegister/createCashRegisterTypes";
-import { ComboboxEvent } from "@/features/events/components/combobox/ComboBoxEvent";
-import { ComboboxRegion } from "@/features/regions/components/ComboboxRegion";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { zodResolver } from "@hookform/resolvers/zod";
+} from '@/features/cashRegister/types/createCashRegister/createCashRegisterTypes';
+import { ComboboxEvent } from '@/features/events/components/combobox/ComboBoxEvent';
+import { ComboboxRegion } from '@/features/regions/components/ComboboxRegion';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form as AntForm,
   Button,
@@ -16,9 +16,9 @@ import {
   InputNumber,
   Modal,
   Select,
-} from "antd";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+} from 'antd';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 type CreateCashRegisterFormValues = z.infer<typeof CreateCashRegisterSchema>;
 
@@ -39,13 +39,13 @@ export default function CreateCashRegisterDialog({
   const form = useForm<CreateCashRegisterFormValues>({
     resolver: zodResolver(CreateCashRegisterSchema),
     defaultValues: {
-      name: "",
+      name: '',
       regionId: undefined,
       status: CashRegisterStatus.OPEN,
       balance: 0,
-      allocationEvent: "",
+      allocationEvent: '',
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   const handleClose = (nextOpen: boolean) => {
@@ -83,7 +83,7 @@ export default function CreateCashRegisterDialog({
             render={({ field, fieldState }) => (
               <AntForm.Item
                 label="Nome"
-                validateStatus={fieldState.error ? "error" : undefined}
+                validateStatus={fieldState.error ? 'error' : undefined}
                 help={fieldState.error?.message}
               >
                 <Input
@@ -95,18 +95,18 @@ export default function CreateCashRegisterDialog({
             )}
           />
 
-          {user.role === "SUPER" && (
+          {user.role === 'SUPER' && (
             <Controller
               control={form.control}
               name="regionId"
               render={({ field, fieldState }) => (
                 <AntForm.Item
                   label="Região (opcional)"
-                  validateStatus={fieldState.error ? "error" : undefined}
+                  validateStatus={fieldState.error ? 'error' : undefined}
                   help={fieldState.error?.message}
                 >
                   <ComboboxRegion
-                    value={field.value ?? ""}
+                    value={field.value ?? ''}
                     onChange={(nextValue) => {
                       field.onChange(nextValue ? nextValue : undefined);
                     }}
@@ -122,33 +122,34 @@ export default function CreateCashRegisterDialog({
             render={({ field, fieldState }) => (
               <AntForm.Item
                 label="Evento"
-                validateStatus={fieldState.error ? "error" : undefined}
+                validateStatus={fieldState.error ? 'error' : undefined}
                 help={fieldState.error?.message}
               >
                 <ComboboxEvent
                   value={field.value}
                   onChange={(nextValue) => field.onChange(nextValue)}
+                  statuses={[]}
                 />
               </AntForm.Item>
             )}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Controller
               control={form.control}
               name="status"
               render={({ field, fieldState }) => (
                 <AntForm.Item
                   label="Status"
-                  validateStatus={fieldState.error ? "error" : undefined}
+                  validateStatus={fieldState.error ? 'error' : undefined}
                   help={fieldState.error?.message}
                 >
                   <Select
                     value={field.value as CashRegisterStatus}
                     onChange={(value) => field.onChange(value)}
                     options={[
-                      { value: CashRegisterStatus.OPEN, label: "Aberto" },
-                      { value: CashRegisterStatus.CLOSED, label: "Fechado" },
+                      { value: CashRegisterStatus.OPEN, label: 'Aberto' },
+                      { value: CashRegisterStatus.CLOSED, label: 'Fechado' },
                     ]}
                     placeholder="Selecione"
                     disabled={isSubmitting}
@@ -168,7 +169,7 @@ export default function CreateCashRegisterDialog({
               render={({ field, fieldState }) => (
                 <AntForm.Item
                   label="Saldo"
-                  validateStatus={fieldState.error ? "error" : undefined}
+                  validateStatus={fieldState.error ? 'error' : undefined}
                   help={fieldState.error?.message}
                 >
                   <InputNumber
@@ -177,16 +178,16 @@ export default function CreateCashRegisterDialog({
                     value={Number.isFinite(field.value) ? field.value : 0}
                     disabled={isSubmitting}
                     onChange={(value) => {
-                      field.onChange(typeof value === "number" ? value : 0);
+                      field.onChange(typeof value === 'number' ? value : 0);
                     }}
-                    style={{ width: "100%" }}
+                    style={{ width: '100%' }}
                   />
                 </AntForm.Item>
               )}
             />
           </div>
 
-          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3 pt-2">
+          <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end sm:gap-3">
             <Button onClick={() => handleClose(false)} disabled={isSubmitting}>
               Cancelar
             </Button>

@@ -1,28 +1,28 @@
 export enum CashRegisterStatus {
-  OPEN = "OPEN",
-  CLOSED = "CLOSED",
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
 }
 
 export enum CashEntryType {
-  INCOME = "INCOME",
-  EXPENSE = "EXPENSE",
-  WITHDRAWAL = "WITHDRAWAL",
+  INCOME = 'INCOME',
+  EXPENSE = 'EXPENSE',
+  WITHDRAWAL = 'WITHDRAWAL',
 }
 
 export enum PaymentMethod {
-  DINHEIRO = "DINHEIRO",
-  PIX = "PIX",
-  CARTAO = "CARTAO",
+  DINHEIRO = 'DINHEIRO',
+  PIX = 'PIX',
+  CARTAO = 'CARTAO',
 }
 
 export enum CashEntryOrigin {
-  ASAAS = "ASAAS",
-  INTERNAL = "INTERNAL",
-  ONSITE = "ONSITE",
-  EXPENSE = "EXPENSE",
-  TICKET = "TICKET",
-  TRANSFER = "TRANSFER",
-  MANUAL = "MANUAL",
+  ASAAS = 'ASAAS',
+  INTERNAL = 'INTERNAL',
+  ONSITE = 'ONSITE',
+  EXPENSE = 'EXPENSE',
+  TICKET = 'TICKET',
+  TRANSFER = 'TRANSFER',
+  MANUAL = 'MANUAL',
 }
 
 export type AllocationEvent = {
@@ -30,22 +30,7 @@ export type AllocationEvent = {
   name: string;
 };
 
-export type GetCashRegisterResponse = {
-  id: string;
-  name: string;
-  status: CashRegisterStatus;
-  balance: number;
-  allocationEvents: AllocationEvent[];
-  totalIncome: number;
-  totalExpense: number;
-  totalPix: number;
-  totalCard: number;
-  totalCash: number;
-  expectedValues: number;
-  expectedNetValues: number;
-  openedAt: Date;
-  closedAt?: Date;
-};
+export type GetCashRegisterResponse = CashRegister;
 
 export type CashRegister = {
   id: string;
@@ -58,8 +43,10 @@ export type CashRegister = {
   totalPix: number;
   totalCard: number;
   totalCash: number;
-  expectedValues: number;
-  expectedNetValues: number;
+  assasTotalValues: number;
+  assasTotalNetValues: number;
+  assasExpectedValues: number;
+  assasExpectedNetValues: number;
   openedAt: Date;
   closedAt?: Date;
 };
@@ -97,7 +84,7 @@ export type CashRegisterMovimentsParam = {
   cashRegisterId: string;
   type?: CashEntryType[];
   limitTime?: string;
-  orderBy?: "desc" | "asc";
+  orderBy?: 'desc' | 'asc';
   initialPage: number;
   pageSize: number;
 };

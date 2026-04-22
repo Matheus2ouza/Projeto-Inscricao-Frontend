@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import CashRegisterDetails from "@/features/cashRegister/components/cashRegisterDetails/CashRegisterDetetails";
-import { useActionsCashRegister } from "@/features/cashRegister/hook/cashRegisterDetails/actions/useActionsCashRegister";
-import { useCashRegisterDetails } from "@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterDetails";
-import { useCashRegisterMoviments } from "@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterMoviments";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import CashRegisterDetails from '@/features/cashRegister/components/cashRegisterDetails/CashRegisterDetetails';
+import { useActionsCashRegister } from '@/features/cashRegister/hook/cashRegisterDetails/actions/useActionsCashRegister';
+import { useCashRegisterDetails } from '@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterDetails';
+import { useCashRegisterMoviments } from '@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterMoviments';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 export default function CashRegisterDetailsAdminPage() {
   const params = useParams();
@@ -49,7 +49,7 @@ export default function CashRegisterDetailsAdminPage() {
     cashRegisterId,
     type: undefined,
     limitTime: undefined,
-    orderBy: "desc",
+    orderBy: 'desc',
     initialPage: 1,
     pageSize: PAGE_SIZE,
   });
@@ -72,7 +72,7 @@ export default function CashRegisterDetailsAdminPage() {
   }, [cashRegisterId, handleFetchFutureReleases]);
 
   const handleBack = () => {
-    router.push("/admin/cash-register");
+    router.push('/admin/cash-register');
   };
 
   const handleRefetchCashRegisterNumbers = async () => {
@@ -96,17 +96,17 @@ export default function CashRegisterDetailsAdminPage() {
   const renderSkeleton = () => {
     return (
       <div className="space-y-6">
-        <div className="rounded-xl border bg-white dark:bg-zinc-900 p-6">
+        <div className="rounded-xl border bg-white p-6 dark:bg-zinc-900">
           <div className="space-y-4">
             <div className="space-y-2">
               <Skeleton className="h-8 w-64" />
               <Skeleton className="h-4 w-48" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 3 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-gradient-to-br from-slate-50 to-white dark:from-zinc-950/40 dark:to-zinc-950/10 p-5 shadow-sm"
+                  className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm dark:border-zinc-800 dark:from-zinc-950/40 dark:to-zinc-950/10"
                 >
                   <Skeleton className="h-4 w-32" />
                   <Skeleton className="mt-4 h-7 w-40" />
@@ -119,7 +119,7 @@ export default function CashRegisterDetailsAdminPage() {
                 {Array.from({ length: 6 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="rounded-xl border border-slate-200 dark:border-zinc-800 bg-gradient-to-br from-slate-50 to-white dark:from-zinc-950/40 dark:to-zinc-950/10 p-5 shadow-sm"
+                    className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-5 shadow-sm dark:border-zinc-800 dark:from-zinc-950/40 dark:to-zinc-950/10"
                   >
                     <div className="flex items-center justify-between gap-4">
                       <Skeleton className="h-4 w-32" />
@@ -141,8 +141,8 @@ export default function CashRegisterDetailsAdminPage() {
 
   const renderError = (message: string, onRetry: () => void) => {
     return (
-      <div className="p-6 flex items-center justify-center min-h-96">
-        <div className="text-center text-destructive">
+      <div className="flex min-h-96 items-center justify-center p-6">
+        <div className="text-destructive text-center">
           <p className="mb-4">{message}</p>
           <Button onClick={onRetry}>Tentar Novamente</Button>
         </div>
@@ -204,7 +204,7 @@ export default function CashRegisterDetailsAdminPage() {
     <PageContainer
       title="Detalhes do Caixa"
       description={
-        cashRegisterLoading ? "Carregando..." : cashRegister?.name || "Caixa"
+        cashRegisterLoading ? 'Carregando...' : cashRegister?.name || 'Caixa'
       }
       showBackButton
       backButtonAction={handleBack}
