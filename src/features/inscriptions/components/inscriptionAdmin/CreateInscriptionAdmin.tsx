@@ -401,6 +401,7 @@ export default function CreateInscriptionAdmin() {
                     <ComboboxEvent
                       value={field.value}
                       onChange={field.onChange}
+                      statuses={[]}
                     />
                   </Form.Item>
                 )}

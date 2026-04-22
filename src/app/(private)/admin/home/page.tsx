@@ -2,6 +2,7 @@
 
 import { useGlobalLoading } from '@/components/GlobalLoading';
 import { ComboboxEvent } from '@/features/events/components/combobox/ComboBoxEvent';
+import { StatusEvent } from '@/features/events/types/combobox/comboboxEventTypes';
 import AdminManagerHomeDashboard from '@/features/home/components/admin/AdminManagerHomeDashboard';
 import { useAdminDashboard } from '@/features/home/hook/admin/useAdminDashboard';
 import PageContainer from '@/shared/components/layout/PageContainer';
@@ -76,6 +77,11 @@ export default function AdminManagerHome() {
             <ComboboxEvent
               value={selectedEventId}
               onChange={setSelectedEventId}
+              statuses={[
+                StatusEvent.OPEN,
+                StatusEvent.CLOSE,
+                StatusEvent.FINALIZED,
+              ]}
             />
           </div>
           <button
