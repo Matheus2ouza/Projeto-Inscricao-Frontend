@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import type { DashboardAdminResponse } from "@/features/home/api/admin/dashboard";
-import type { DashboardMetric } from "@/features/home/hook/admin/useAdminDashboard";
-import { useDates } from "@/features/home/hook/admin/useDates";
-import { Badge } from "@/shared/components/ui/badge";
+import type { DashboardAdminResponse } from '@/features/home/api/admin/dashboard';
+import type { DashboardMetric } from '@/features/home/hook/admin/useAdminDashboard';
+import { useDates } from '@/features/home/hook/admin/useDates';
+import { Badge } from '@/shared/components/ui/badge';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { getConvertStatusEvent } from "@/shared/utils/getConvertStatus";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+} from '@/shared/components/ui/popover';
+import { getConvertStatusEvent } from '@/shared/utils/getConvertStatus';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import {
   addDays,
   addMonths,
@@ -22,11 +22,11 @@ import {
   isWithinInterval,
   startOfMonth,
   startOfWeek,
-} from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Info, RefreshCcw, X } from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+} from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { CalendarIcon, Info, RefreshCcw, X } from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 type AdminManagerHomeDashboardProps = {
   data?: DashboardAdminResponse;
@@ -50,25 +50,25 @@ export default function AdminManagerHomeDashboard({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const dates = useDates();
   const statusColors: Record<string, string> = {
-    OPEN: "bg-emerald-500",
-    CLOSE: "bg-amber-500",
-    FINALIZED: "bg-slate-400",
-    "EM ANDAMENTO": "bg-blue-500",
+    OPEN: 'bg-emerald-500',
+    CLOSE: 'bg-amber-500',
+    FINALIZED: 'bg-slate-400',
+    'EM ANDAMENTO': 'bg-blue-500',
   };
   const infoTexts: Record<DashboardMetric, string> = {
     totalCollected:
-      "Valor total arrecadado pelas inscrições (inclui somente pagamentos aprovados).",
+      'Valor total arrecadado pelas inscrições (inclui somente pagamentos aprovados).',
 
     totalNetValueCollected:
-      "Valor líquido arrecadado pelas inscrições (após descontos/taxas, inclui somente pagamentos aprovados).",
+      'Valor líquido arrecadado pelas inscrições (após descontos/taxas, inclui somente pagamentos aprovados).',
 
     totalDebt:
-      "Soma de todos os valores pendentes das inscrições ainda não pagas.",
+      'Soma de todos os valores pendentes das inscrições ainda não pagas.',
 
-    totalExpense: "Valor total de gastos registrados.",
+    totalExpense: 'Valor total de gastos registrados.',
 
     activeParticipants:
-      "Número total de participantes confirmados (inclui apenas inscrições pagas).",
+      'Número total de participantes confirmados (inclui apenas inscrições pagas).',
   };
 
   const cards: {
@@ -81,58 +81,58 @@ export default function AdminManagerHomeDashboard({
     detailLabel: string;
   }[] = [
     {
-      title: "Total recebido",
-      subtitle: "Recebimentos confirmados",
+      title: 'Total recebido',
+      subtitle: 'Recebimentos confirmados',
       stripe: {
-        color: "rgba(16, 185, 129, 0.5)",
-        bg: "rgba(16, 185, 129, 0.15)",
-        border: "border-emerald-200",
+        color: 'rgba(16, 185, 129, 0.5)',
+        bg: 'rgba(16, 185, 129, 0.15)',
+        border: 'border-emerald-200',
       },
-      textColor: "text-emerald-600",
-      metric: "totalCollected",
+      textColor: 'text-emerald-600',
+      metric: 'totalCollected',
       value: getFormatCurrency(data?.totalCollected ?? 0),
       detailLabel: `${getFormatCurrency(
         data?.totalNetValueCollected ?? 0,
       )} líquido`,
     },
     {
-      title: "A receber",
-      subtitle: "Inscrições em aberto",
+      title: 'A receber',
+      subtitle: 'Inscrições em aberto',
       stripe: {
-        color: "rgba(248, 113, 113, 0.55)",
-        bg: "rgba(248, 113, 113, 0.16)",
-        border: "border-rose-200",
+        color: 'rgba(248, 113, 113, 0.55)',
+        bg: 'rgba(248, 113, 113, 0.16)',
+        border: 'border-rose-200',
       },
-      textColor: "text-rose-600",
-      metric: "totalDebt",
+      textColor: 'text-rose-600',
+      metric: 'totalDebt',
       value: getFormatCurrency(data?.totalDebt ?? 0),
-      detailLabel: "Em aberto",
+      detailLabel: 'Em aberto',
     },
     {
-      title: "Total gasto",
-      subtitle: "Gastos do evento",
+      title: 'Total gasto',
+      subtitle: 'Gastos do evento',
       stripe: {
-        color: "rgba(245, 158, 11, 0.6)",
-        bg: "rgba(245, 158, 11, 0.18)",
-        border: "border-amber-200",
+        color: 'rgba(245, 158, 11, 0.6)',
+        bg: 'rgba(245, 158, 11, 0.18)',
+        border: 'border-amber-200',
       },
-      textColor: "text-amber-700",
-      metric: "totalExpense",
+      textColor: 'text-amber-700',
+      metric: 'totalExpense',
       value: getFormatCurrency(data?.totalExpense ?? 0),
-      detailLabel: "Gastos",
+      detailLabel: 'Gastos',
     },
     {
-      title: "Participantes",
-      subtitle: "Participantes inscritos",
+      title: 'Participantes',
+      subtitle: 'Participantes inscritos',
       stripe: {
-        color: "rgba(139, 92, 246, 0.55)",
-        bg: "rgba(139, 92, 246, 0.16)",
-        border: "border-violet-200",
+        color: 'rgba(139, 92, 246, 0.55)',
+        bg: 'rgba(139, 92, 246, 0.16)',
+        border: 'border-violet-200',
       },
-      textColor: "text-violet-700",
-      metric: "activeParticipants",
+      textColor: 'text-violet-700',
+      metric: 'activeParticipants',
       value: `${data?.activeParticipants ?? 0} participante(s)`,
-      detailLabel: "Participantes",
+      detailLabel: 'Participantes',
     },
   ];
 
@@ -148,14 +148,14 @@ export default function AdminManagerHomeDashboard({
     events.forEach((evt) => {
       const start = new Date(evt.startDate);
       const end = new Date(evt.endDate);
-      const normalizedStatus = (evt.status ?? "OPEN").toUpperCase();
+      const normalizedStatus = (evt.status ?? 'OPEN').toUpperCase();
       const displayStatus = isWithinInterval(today, { start, end })
-        ? "EM ANDAMENTO"
+        ? 'EM ANDAMENTO'
         : normalizedStatus;
 
       let cursor = start;
       while (cursor <= end) {
-        const key = format(cursor, "yyyy-MM-dd");
+        const key = format(cursor, 'yyyy-MM-dd');
         const list = map.get(key) ?? [];
         list.push({
           id: evt.id,
@@ -192,7 +192,7 @@ export default function AdminManagerHomeDashboard({
         return /^\d{4}-\d{2}-\d{2}$/.test(key) ? key : null;
       }
 
-      if (typeof value === "string") {
+      if (typeof value === 'string') {
         const trimmed = value.trim();
         const match = /^(\d{4}-\d{2}-\d{2})/.exec(trimmed);
         if (match) return match[1];
@@ -253,9 +253,9 @@ export default function AdminManagerHomeDashboard({
   }, [currentMonth]);
 
   const eventsSelectedDay =
-    eventsByDay.get(format(selectedDate, "yyyy-MM-dd")) ?? [];
+    eventsByDay.get(format(selectedDate, 'yyyy-MM-dd')) ?? [];
   const paymentsSelectedDay =
-    paymentsByDay.get(format(selectedDate, "yyyy-MM-dd")) ?? [];
+    paymentsByDay.get(format(selectedDate, 'yyyy-MM-dd')) ?? [];
   const paymentsSelectedDayTotals = useMemo(() => {
     return paymentsSelectedDay.reduce(
       (acc, p) => {
@@ -269,11 +269,11 @@ export default function AdminManagerHomeDashboard({
 
   return (
     <>
-      <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
           Situação das cobranças
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {cards.map((card) => {
             const isRefreshing =
               loading || isFetching || refreshingMetric === card.metric;
@@ -281,7 +281,7 @@ export default function AdminManagerHomeDashboard({
             return (
               <div
                 key={card.metric}
-                className={`relative bg-white dark:bg-gray-950 border rounded-xl p-4 shadow-xs overflow-hidden ${card.stripe.border}`}
+                className={`relative overflow-hidden rounded-xl border bg-white p-4 shadow-xs dark:bg-gray-950 ${card.stripe.border}`}
               >
                 <div
                   className="absolute inset-0 dark:hidden"
@@ -298,7 +298,7 @@ export default function AdminManagerHomeDashboard({
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
                         {card.title}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         {card.subtitle}
                       </p>
                     </div>
@@ -306,14 +306,14 @@ export default function AdminManagerHomeDashboard({
                       <button
                         type="button"
                         aria-label="Atualizar card"
-                        className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                        className="hover:bg-muted rounded-full p-1.5 transition-colors"
                         onClick={() => onRefreshMetric?.(card.metric)}
                         disabled={isRefreshing}
                       >
                         <RefreshCcw
-                          className={`w-4 h-4 ${
+                          className={`h-4 w-4 ${
                             isRefreshing
-                              ? "animate-spin text-primary"
+                              ? 'text-primary animate-spin'
                               : card.textColor
                           }`}
                         />
@@ -328,28 +328,28 @@ export default function AdminManagerHomeDashboard({
                           <button
                             type="button"
                             aria-label="Abrir detalhes do card"
-                            className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                            className="hover:bg-muted rounded-full p-1.5 transition-colors"
                           >
-                            <Info className={`w-4 h-4 ${card.textColor}`} />
+                            <Info className={`h-4 w-4 ${card.textColor}`} />
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-64 rounded-2xl shadow-lg border bg-white dark:bg-gray-900">
+                        <PopoverContent className="w-64 rounded-2xl border bg-white shadow-lg dark:bg-gray-900">
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <p className="text-sm font-semibold text-foreground">
+                              <p className="text-foreground text-sm font-semibold">
                                 {card.title}
                               </p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-muted-foreground text-sm">
                                 {infoTexts[card.metric]}
                               </p>
                             </div>
                             <button
                               type="button"
                               aria-label="Fechar"
-                              className="p-1 rounded-full hover:bg-muted transition-colors"
+                              className="hover:bg-muted rounded-full p-1 transition-colors"
                               onClick={() => setInfoOpen(null)}
                             >
-                              <X className="w-3.5 h-3.5" />
+                              <X className="h-3.5 w-3.5" />
                             </button>
                           </div>
                         </PopoverContent>
@@ -359,14 +359,14 @@ export default function AdminManagerHomeDashboard({
 
                   <div>
                     <p className={`text-2xl font-bold ${card.textColor}`}>
-                      {isRefreshing ? "..." : card.value}
+                      {isRefreshing ? '...' : card.value}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       {card.detailLabel}
                     </p>
                   </div>
                   <div
-                    className={`h-3 w-full rounded-full overflow-hidden border ${card.stripe.border}`}
+                    className={`h-3 w-full overflow-hidden rounded-full border ${card.stripe.border}`}
                     style={{
                       backgroundImage: `repeating-linear-gradient(45deg, ${card.stripe.color}, ${card.stripe.color} 10px, rgba(255, 255, 255, 0) 10px, rgba(255, 255, 255, 0) 20px)`,
                     }}
@@ -378,17 +378,17 @@ export default function AdminManagerHomeDashboard({
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <div className="lg:col-span-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-          <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-8 dark:border-gray-800 dark:bg-gray-900">
+          <div className="mb-4 flex items-start justify-between gap-4">
             <div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Calendário de eventos
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Visualize rapidamente os eventos ativos por período.
               </p>
-              <div className="flex flex-wrap gap-3 mt-3">
+              <div className="mt-3 flex flex-wrap gap-3">
                 <Badge
                   variant="outline"
                   className="gap-2 border-emerald-300 bg-emerald-50 text-emerald-700"
@@ -414,43 +414,43 @@ export default function AdminManagerHomeDashboard({
             </div>
             <button
               type="button"
-              className="p-2 rounded-full hover:bg-muted transition-colors"
+              className="hover:bg-muted rounded-full p-2 transition-colors"
               onClick={() => dates.refetch()}
               aria-label="Atualizar calendário"
             >
               <RefreshCcw
-                className={`w-4 h-4 ${
+                className={`h-4 w-4 ${
                   dates.loading || dates.isFetching
-                    ? "animate-spin text-primary"
-                    : "text-gray-500"
+                    ? 'text-primary animate-spin'
+                    : 'text-gray-500'
                 }`}
               />
             </button>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 p-4">
-            <div className="flex items-center justify-between mb-4">
+          <div className="rounded-2xl border border-gray-200 p-4 dark:border-gray-800">
+            <div className="mb-4 flex items-center justify-between">
               <button
                 type="button"
                 aria-label="Mês anterior"
-                className="p-2 rounded-full hover:bg-muted transition-colors"
+                className="hover:bg-muted rounded-full p-2 transition-colors"
                 onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
               >
                 <span className="text-lg">&lt;</span>
               </button>
               <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                {format(currentMonth, "LLLL yyyy", { locale: ptBR })}
+                {format(currentMonth, 'LLLL yyyy', { locale: ptBR })}
               </div>
               <button
                 type="button"
                 aria-label="Próximo mês"
-                className="p-2 rounded-full hover:bg-muted transition-colors"
+                className="hover:bg-muted rounded-full p-2 transition-colors"
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
               >
                 <span className="text-lg">&gt;</span>
               </button>
             </div>
-            <div className="flex justify-end mb-3">
+            <div className="mb-3 flex justify-end">
               <button
                 type="button"
                 className="inline-flex items-center gap-2 text-sm text-blue-700 hover:underline"
@@ -460,13 +460,13 @@ export default function AdminManagerHomeDashboard({
                   setSelectedDate(today);
                 }}
               >
-                <CalendarIcon className="w-4 h-4" />
+                <CalendarIcon className="h-4 w-4" />
                 Hoje
               </button>
             </div>
 
-            <div className="grid grid-cols-7 text-center text-xs font-semibold text-blue-700 mb-2">
-              {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day) => (
+            <div className="mb-2 grid grid-cols-7 text-center text-xs font-semibold text-blue-700">
+              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
                 <div key={day} className="py-2">
                   {day}
                 </div>
@@ -475,7 +475,7 @@ export default function AdminManagerHomeDashboard({
 
             <div className="grid grid-cols-7 gap-1 text-sm">
               {calendarDays.map((day) => {
-                const key = format(day, "yyyy-MM-dd");
+                const key = format(day, 'yyyy-MM-dd');
                 const eventsDay = eventsByDay.get(key) ?? [];
                 const paymentsDay = paymentsByDay.get(key) ?? [];
                 const isCurrentMonth = isSameMonth(day, currentMonth);
@@ -488,21 +488,21 @@ export default function AdminManagerHomeDashboard({
                     type="button"
                     className={`relative rounded-lg py-2 text-center transition-colors ${
                       isSelected
-                        ? "bg-blue-100 text-blue-700 font-semibold"
-                        : "hover:bg-muted"
-                    } ${!isCurrentMonth ? "text-muted-foreground/70" : ""}`}
+                        ? 'bg-blue-100 font-semibold text-blue-700'
+                        : 'hover:bg-muted'
+                    } ${!isCurrentMonth ? 'text-muted-foreground/70' : ''}`}
                     aria-label={format(day, "dd 'de' LLLL yyyy", {
                       locale: ptBR,
                     })}
                     onClick={() => setSelectedDate(day)}
                   >
-                    <span>{format(day, "d")}</span>
+                    <span>{format(day, 'd')}</span>
                     {hasMarkers && (
-                      <div className="flex items-center justify-center gap-0.5 mt-1">
+                      <div className="mt-1 flex items-center justify-center gap-0.5">
                         {eventsDay.slice(0, 2).map((evt) => (
                           <span
                             key={evt.id}
-                            className={`h-1.5 w-1.5 rounded-full ${statusColors[evt.displayStatus] ?? "bg-emerald-500"}`}
+                            className={`h-1.5 w-1.5 rounded-full ${statusColors[evt.displayStatus] ?? 'bg-emerald-500'}`}
                           />
                         ))}
                         {paymentsDay.length > 0 && (
@@ -516,35 +516,35 @@ export default function AdminManagerHomeDashboard({
             </div>
           </div>
 
-          <div className="mt-4 border-t border-gray-200 dark:border-gray-800 pt-4">
-            <div className="flex items-center gap-2 text-blue-700 font-semibold">
-              <CalendarIcon className="w-4 h-4" />
-              {format(selectedDate, "dd/MM/yyyy")}
+          <div className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-800">
+            <div className="flex items-center gap-2 font-semibold text-blue-700">
+              <CalendarIcon className="h-4 w-4" />
+              {format(selectedDate, 'dd/MM/yyyy')}
             </div>
             <div className="mt-2 space-y-2">
               {eventsSelectedDay.length === 0 &&
                 paymentsSelectedDay.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Nenhum evento ou pagamento agendado para esta data.
                   </p>
                 )}
               {eventsSelectedDay.map((evt) => (
                 <div
                   key={evt.id}
-                  className="rounded-lg border border-gray-200 dark:border-gray-800 px-3 py-2 text-sm flex items-center justify-between"
+                  className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
                 >
                   <Link
                     href={`/admin/events/manager/${evt.id}`}
-                    className="font-semibold text-foreground hover:underline cursor-pointer"
+                    className="text-foreground cursor-pointer font-semibold hover:underline"
                   >
                     {evt.name}
                   </Link>
                   <Badge
                     variant="outline"
-                    className={`text-xs gap-1 border ${statusColors[evt.displayStatus] ? "border-transparent" : ""}`}
+                    className={`gap-1 border text-xs ${statusColors[evt.displayStatus] ? 'border-transparent' : ''}`}
                   >
                     <span
-                      className={`h-2 w-2 rounded-full ${statusColors[evt.displayStatus] ?? "bg-emerald-500"}`}
+                      className={`h-2 w-2 rounded-full ${statusColors[evt.displayStatus] ?? 'bg-emerald-500'}`}
                     />
                     {getConvertStatusEvent(evt.displayStatus)}
                   </Badge>
@@ -553,33 +553,33 @@ export default function AdminManagerHomeDashboard({
 
               {paymentsSelectedDay.length > 0 && (
                 <div className="pt-2">
-                  <div className="rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-                    <div className="flex items-center justify-between gap-3 px-4 py-3 bg-sky-50 dark:bg-sky-950/30">
+                  <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+                    <div className="flex items-center justify-between gap-3 bg-sky-50 px-4 py-3 dark:bg-sky-950/30">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="h-2 w-2 rounded-full bg-sky-600" />
-                          <span className="text-sm font-semibold text-foreground">
+                          <span className="text-foreground text-sm font-semibold">
                             Pagamentos
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-muted-foreground text-xs">
                             • {paymentsSelectedDay.length} parcela(s)
                           </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-8 text-right">
                         <div className="text-sm">
-                          <span className="text-xs text-muted-foreground">
-                            Bruto{" "}
+                          <span className="text-muted-foreground text-xs">
+                            Bruto{' '}
                           </span>
-                          <span className="font-semibold text-foreground">
+                          <span className="text-foreground font-semibold">
                             {getFormatCurrency(paymentsSelectedDayTotals.value)}
                           </span>
                         </div>
                         <div className="text-sm">
-                          <span className="text-xs text-muted-foreground">
-                            Líquido{" "}
+                          <span className="text-muted-foreground text-xs">
+                            Líquido{' '}
                           </span>
-                          <span className="font-semibold text-foreground">
+                          <span className="text-foreground font-semibold">
                             {getFormatCurrency(
                               paymentsSelectedDayTotals.netValue,
                             )}
@@ -592,36 +592,36 @@ export default function AdminManagerHomeDashboard({
                         <button
                           key={`${p.paymentId}-${p.installmentNumber}`}
                           type="button"
-                          className={`w-full text-left px-4 py-3 text-sm flex items-center justify-between transition-colors ${
-                            onViewPayment ? "hover:bg-muted cursor-pointer" : ""
+                          className={`flex w-full items-center justify-between px-4 py-3 text-left text-sm transition-colors ${
+                            onViewPayment ? 'hover:bg-muted cursor-pointer' : ''
                           }`}
                           onClick={() =>
                             onViewPayment?.(p.eventId, p.paymentId)
                           }
                         >
-                          <div className="min-w-0 flex items-center gap-3">
+                          <div className="flex min-w-0 items-center gap-3">
                             <span className="h-2 w-2 rounded-full bg-sky-600" />
-                            <span className="font-semibold text-foreground truncate">
+                            <span className="text-foreground truncate font-semibold">
                               Parcela {p.installmentNumber}
                             </span>
-                            <span className="text-xs text-muted-foreground">
-                              • {p.received ? "Liberada" : "Prevista"}
+                            <span className="text-muted-foreground text-xs">
+                              • {p.received ? 'Liberada' : 'Prevista'}
                             </span>
                           </div>
                           <div className="flex items-center gap-8">
                             <div className="text-sm">
-                              <span className="text-xs text-muted-foreground">
-                                Bruto{" "}
+                              <span className="text-muted-foreground text-xs">
+                                Bruto{' '}
                               </span>
-                              <span className="font-semibold text-foreground">
+                              <span className="text-foreground font-semibold">
                                 {getFormatCurrency(p.value)}
                               </span>
                             </div>
                             <div className="text-sm">
-                              <span className="text-xs text-muted-foreground">
-                                Líquido{" "}
+                              <span className="text-muted-foreground text-xs">
+                                Líquido{' '}
                               </span>
-                              <span className="font-semibold text-foreground">
+                              <span className="text-foreground font-semibold">
                                 {getFormatCurrency(p.netValue)}
                               </span>
                             </div>
@@ -636,14 +636,14 @@ export default function AdminManagerHomeDashboard({
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-4 dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
             Benefícios
           </h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Conteúdos e destaques em breve.
           </p>
-          <div className="mt-4 h-32 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center text-sm text-muted-foreground">
+          <div className="text-muted-foreground mt-4 flex h-32 items-center justify-center rounded-xl border border-dashed border-gray-300 text-sm dark:border-gray-700">
             Em construção
           </div>
         </div>

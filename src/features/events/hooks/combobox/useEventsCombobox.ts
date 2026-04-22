@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import {
   Event,
   StatusEvent,
-} from "@/features/events/types/combobox/comboboxEventTypes";
-import { useCallback } from "react";
-import { useEventsComboboxQuery } from "./useEventsComboboxQuery";
+} from '@/features/events/types/combobox/comboboxEventTypes';
+import { useCallback } from 'react';
+import { useEventsComboboxQuery } from './useEventsComboboxQuery';
 
 type UseEventsResult = {
   events: Event[];
@@ -15,7 +15,7 @@ type UseEventsResult = {
 };
 
 export function useEventsCombobox(
-  status: StatusEvent = StatusEvent.OPEN,
+  status?: StatusEvent | StatusEvent[],
 ): UseEventsResult {
   const { data, isLoading, error, refetch } = useEventsComboboxQuery(status);
 
