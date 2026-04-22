@@ -1,21 +1,35 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import axiosInstance from '@/shared/lib/apiClient';
 
 export type GenerateParticipantsByLocalityPdfParams = {
   eventId: string;
   separate: boolean;
   reduced: boolean;
+  summary: boolean;
+  columns?: ReportColumnPdf[];
 };
+
+export type ReportColumnPdf =
+  | 'name'
+  | 'preferredName'
+  | 'cpf'
+  | 'birthDate'
+  | 'gender'
+  | 'shirtSize'
+  | 'shirtType'
+  | 'typeInscription';
 
 export type GenerateParticipantsByLocalityPdfResponse = {
   fileBase64: string;
   filename: string;
-  contentType: "application/pdf" | "application/zip";
+  contentType: 'application/pdf' | 'application/zip';
 };
 
 export async function generateParticipantsByLocalityPdf({
   eventId,
   separate = false,
   reduced = false,
+  summary = false,
+  columns,
 }: GenerateParticipantsByLocalityPdfParams): Promise<GenerateParticipantsByLocalityPdfResponse> {
   try {
     const { data } = await axiosInstance.get(
@@ -24,6 +38,8 @@ export async function generateParticipantsByLocalityPdf({
         params: {
           separate,
           reduced,
+          summary,
+          columns: columns ? columns.join(',') : undefined,
         },
       },
     );
@@ -37,7 +53,7 @@ export async function generateParticipantsByLocalityPdf({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os participantes",
+        'Não foi possível carregar os participantes',
     );
   }
 }
