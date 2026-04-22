@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { Check, X } from "lucide-react";
-import * as React from "react";
+import { Check, X } from 'lucide-react';
+import * as React from 'react';
 
-import { Button } from "@/shared/components/ui/button";
+import { Button } from '@/shared/components/ui/button';
+import { Checkbox } from '@/shared/components/ui/checkbox';
 import {
   Drawer,
   DrawerClose,
@@ -12,13 +13,19 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from "@/shared/components/ui/drawer";
-import { Label } from "@/shared/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
-import { Separator } from "@/shared/components/ui/separator";
-import { Switch } from "@/shared/components/ui/switch";
-import type { GenerateParticipantsByLocalityPdfResponse } from "../../api/actions/reports/generateListParticipantsByLocalityPdf";
-import type { GenerateParticipantsByLocalityXlsxResponse } from "../../api/actions/reports/generateListParticipantsByLocalityXlsx";
+} from '@/shared/components/ui/drawer';
+import { Label } from '@/shared/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+import { Separator } from '@/shared/components/ui/separator';
+import { Switch } from '@/shared/components/ui/switch';
+import type {
+  GenerateParticipantsByLocalityPdfResponse,
+  ReportColumnPdf,
+} from '../../api/actions/reports/generateListParticipantsByLocalityPdf';
+import type {
+  GenerateParticipantsByLocalityXlsxResponse,
+  ReportColumnXlsx,
+} from '../../api/actions/reports/generateListParticipantsByLocalityXlsx';
 
 type ExportOption = {
   id: string;
@@ -40,9 +47,13 @@ type PdfGeneratorDrawerProps = {
   onGenerateParticipantsByLocalityPdf: (params: {
     separate: boolean;
     reduced: boolean;
+    summary: boolean;
+    columns?: ReportColumnPdf[];
   }) => Promise<GenerateParticipantsByLocalityPdfResponse>;
   onGenerateParticipantsByLocalityXlsx: (params: {
     separate: boolean;
+    summary: boolean;
+    columns?: ReportColumnXlsx[];
   }) => Promise<GenerateParticipantsByLocalityXlsxResponse>;
 
   generatingPdf?: boolean;
@@ -60,7 +71,7 @@ function Stepper({
 }) {
   return (
     <>
-      <div className="hidden sm:flex items-center justify-between">
+      <div className="hidden items-center justify-between sm:flex">
         {steps.map((s, index) => {
           const isActive = index === step;
           const isDone = index < step;
@@ -70,43 +81,43 @@ function Stepper({
               <div className="flex items-center gap-2">
                 <div
                   className={[
-                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold",
+                    'flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold',
                     isActive
-                      ? "bg-primary text-primary-foreground"
+                      ? 'bg-primary text-primary-foreground'
                       : isDone
-                        ? "bg-emerald-600 text-white"
-                        : "bg-muted text-muted-foreground",
-                  ].join(" ")}
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-muted text-muted-foreground',
+                  ].join(' ')}
                 >
                   {isDone ? <Check className="h-4 w-4" /> : index + 1}
                 </div>
                 <span
                   className={[
-                    "text-sm",
-                    isActive ? "font-medium" : "text-muted-foreground",
-                  ].join(" ")}
+                    'text-sm',
+                    isActive ? 'font-medium' : 'text-muted-foreground',
+                  ].join(' ')}
                 >
                   {s.title}
                 </span>
               </div>
 
               {index < steps.length - 1 && (
-                <div className="h-0.5 flex-1 mx-4 bg-muted" />
+                <div className="bg-muted mx-4 h-0.5 flex-1" />
               )}
             </React.Fragment>
           );
         })}
       </div>
 
-      <div className="flex sm:hidden items-center justify-between text-sm font-medium">
-        <span>{`Passo ${step + 1}: ${steps[step]?.title ?? ""}`}</span>
+      <div className="flex items-center justify-between text-sm font-medium sm:hidden">
+        <span>{`Passo ${step + 1}: ${steps[step]?.title ?? ''}`}</span>
         <span className="text-muted-foreground">{`${step + 1}/${
           steps.length
         }`}</span>
       </div>
-      <div className="h-2 bg-muted rounded-full overflow-hidden sm:hidden">
+      <div className="bg-muted h-2 overflow-hidden rounded-full sm:hidden">
         <div
-          className="h-full bg-primary transition-all duration-300 ease-in-out"
+          className="bg-primary h-full transition-all duration-300 ease-in-out"
           style={{ width: `${((step + 1) / steps.length) * 100}%` }}
         />
       </div>
@@ -121,8 +132,8 @@ export default function PdfGeneratorDrawer({
   onGenerateParticipantsByLocalityXlsx,
   generatingPdf = false,
   generatingXlsx = false,
-  title = "Exportar relatório",
-  description = "Selecione o modelo e configure os filtros antes de exportar.",
+  title = 'Exportar relatório',
+  description = 'Selecione o modelo e configure os filtros antes de exportar.',
 }: PdfGeneratorDrawerProps) {
   const generating = generatingPdf || generatingXlsx;
 
@@ -140,7 +151,7 @@ export default function PdfGeneratorDrawer({
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-0.5">
             <div className="text-sm font-medium">Separar por localidade</div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-muted-foreground text-xs">
               Gera um arquivo para cada localidade (zip).
             </div>
           </div>
@@ -151,6 +162,104 @@ export default function PdfGeneratorDrawer({
             }
             disabled={disabled}
           />
+        </div>
+      </div>
+    ),
+    [],
+  );
+
+  const renderSummaryFilter = React.useCallback(
+    ({
+      filters,
+      setFilters,
+      disabled,
+    }: {
+      filters: Record<string, unknown>;
+      setFilters: (next: Record<string, unknown>) => void;
+      disabled?: boolean;
+    }) => (
+      <div className="rounded-lg border p-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <div className="text-sm font-medium">Incluir sumário</div>
+            <div className="text-muted-foreground text-xs">
+              Inclui um sumário no início do relatório com contagem de
+              participantes por localidade.
+            </div>
+          </div>
+          <Switch
+            checked={Boolean(filters.summary)}
+            onCheckedChange={(checked) =>
+              setFilters({ ...filters, summary: checked })
+            }
+            disabled={disabled}
+          />
+        </div>
+      </div>
+    ),
+    [],
+  );
+
+  const AVAILABLE_COLUMNS: Array<{
+    id: ReportColumnPdf | ReportColumnXlsx;
+    label: string;
+  }> = [
+    { id: 'name', label: 'Nome' },
+    { id: 'preferredName', label: 'Nome preferencial' },
+    { id: 'cpf', label: 'CPF' },
+    { id: 'birthDate', label: 'Idade' },
+    { id: 'gender', label: 'Gênero' },
+    { id: 'shirtSize', label: 'Tamanho da camiseta' },
+    { id: 'shirtType', label: 'Tipo de camiseta' },
+    { id: 'typeInscription', label: 'Tipo de inscrição' },
+  ];
+
+  const renderColumnsFilter = React.useCallback(
+    ({
+      filters,
+      setFilters,
+      disabled,
+    }: {
+      filters: Record<string, unknown>;
+      setFilters: (next: Record<string, unknown>) => void;
+      disabled?: boolean;
+    }) => (
+      <div className="rounded-lg border p-3">
+        <div className="mb-3 space-y-0.5">
+          <div className="text-sm font-medium">Colunas a incluir</div>
+          <div className="text-muted-foreground text-xs">
+            Selecione quais dados deseja incluir no relatório.
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {AVAILABLE_COLUMNS.map((col) => (
+            <Label
+              key={col.id}
+              className="hover:bg-muted/40 flex cursor-pointer items-center gap-2 rounded-md p-2"
+            >
+              <Checkbox
+                checked={
+                  (
+                    filters.columns as
+                      | (ReportColumnPdf | ReportColumnXlsx)[]
+                      | undefined
+                  )?.includes(col.id) ?? false
+                }
+                onCheckedChange={(checked) => {
+                  const current =
+                    (filters.columns as
+                      | (ReportColumnPdf | ReportColumnXlsx)[]
+                      | undefined) ?? [];
+                  const next = checked
+                    ? [...current, col.id]
+                    : current.filter((c) => c !== col.id);
+                  setFilters({ ...filters, columns: next });
+                }}
+                disabled={disabled}
+              />
+              <span className="text-sm">{col.label}</span>
+            </Label>
+          ))}
         </div>
       </div>
     ),
@@ -174,7 +283,7 @@ export default function PdfGeneratorDrawer({
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-0.5">
               <div className="text-sm font-medium">Relatório reduzido</div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-muted-foreground text-xs">
                 Se ativado, gera uma versão mais compacta do PDF.
               </div>
             </div>
@@ -187,24 +296,59 @@ export default function PdfGeneratorDrawer({
             />
           </div>
         </div>
+
+        {renderSummaryFilter({ filters, setFilters, disabled })}
+
+        {renderColumnsFilter({ filters, setFilters, disabled })}
       </div>
     ),
-    [renderSeparateFilter],
+    [renderSeparateFilter, renderSummaryFilter, renderColumnsFilter],
+  );
+
+  const renderXlsxFilters = React.useCallback(
+    ({
+      filters,
+      setFilters,
+      disabled,
+    }: {
+      filters: Record<string, unknown>;
+      setFilters: (next: Record<string, unknown>) => void;
+      disabled?: boolean;
+    }) => (
+      <div className="space-y-3">
+        {renderSeparateFilter({ filters, setFilters, disabled })}
+
+        {renderSummaryFilter({ filters, setFilters, disabled })}
+
+        {renderColumnsFilter({ filters, setFilters, disabled })}
+      </div>
+    ),
+    [renderSeparateFilter, renderSummaryFilter, renderColumnsFilter],
   );
 
   const options = React.useMemo<ExportOption[]>(
     () => [
       {
-        id: "participants-by-locality-pdf",
-        title: "Lista de participantes por localidade (PDF)",
+        id: 'participants-by-locality-pdf',
+        title: 'Lista de participantes por localidade (PDF)',
         description:
-          "Gera um PDF com a lista de participantes agrupada por localidade.",
-        defaultFilters: { separate: false, reduced: false },
+          'Gera um PDF com a lista de participantes agrupada por localidade.',
+        defaultFilters: {
+          separate: false,
+          reduced: false,
+          summary: false,
+          columns: [],
+        },
         renderFilters: renderPdfFilters,
         onGenerate: async (filters) => {
           const result = await onGenerateParticipantsByLocalityPdf({
             separate: Boolean(filters.separate),
             reduced: Boolean(filters.reduced),
+            summary: Boolean(filters.summary),
+            columns:
+              (filters.columns as
+                | (ReportColumnPdf | ReportColumnXlsx)[]
+                | undefined) || undefined,
           });
 
           if (
@@ -217,15 +361,24 @@ export default function PdfGeneratorDrawer({
         },
       },
       {
-        id: "participants-by-locality-xlsx",
-        title: "Lista de participantes por localidade (Excel)",
+        id: 'participants-by-locality-xlsx',
+        title: 'Lista de participantes por localidade (Excel)',
         description:
-          "Gera um Excel (.xlsx) com a lista de participantes agrupada por localidade.",
-        defaultFilters: { separate: false },
-        renderFilters: renderSeparateFilter,
+          'Gera um Excel (.xlsx) com a lista de participantes agrupada por localidade.',
+        defaultFilters: {
+          separate: false,
+          summary: false,
+          columns: [],
+        },
+        renderFilters: renderXlsxFilters,
         onGenerate: async (filters) => {
           const result = await onGenerateParticipantsByLocalityXlsx({
             separate: Boolean(filters.separate),
+            summary: Boolean(filters.summary),
+            columns:
+              (filters.columns as
+                | (ReportColumnPdf | ReportColumnXlsx)[]
+                | undefined) || undefined,
           });
 
           if (
@@ -241,18 +394,19 @@ export default function PdfGeneratorDrawer({
     [
       onGenerateParticipantsByLocalityPdf,
       onGenerateParticipantsByLocalityXlsx,
-      renderSeparateFilter,
+      renderPdfFilters,
+      renderXlsxFilters,
     ],
   );
 
   const steps = React.useMemo(
-    () => [{ title: "Selecionar relatório" }, { title: "Filtros" }],
+    () => [{ title: 'Selecionar relatório' }, { title: 'Filtros' }],
     [],
   );
 
   const [step, setStep] = React.useState(0);
   const [selectedOptionId, setSelectedOptionId] = React.useState<string>(() => {
-    return options[0]?.id ?? "";
+    return options[0]?.id ?? '';
   });
   const [filtersByOption, setFiltersByOption] = React.useState<
     Record<string, Record<string, unknown>>
@@ -287,7 +441,7 @@ export default function PdfGeneratorDrawer({
     if (!open) return;
     setStep(0);
 
-    const firstId = options[0]?.id ?? "";
+    const firstId = options[0]?.id ?? '';
     setSelectedOptionId((prev) => prev || firstId);
 
     setFiltersByOption((prev) => {
@@ -348,7 +502,7 @@ export default function PdfGeneratorDrawer({
                 <h3 className="text-sm font-semibold">
                   Relatórios disponíveis
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Escolha qual relatório deseja exportar.
                 </p>
               </div>
@@ -361,15 +515,15 @@ export default function PdfGeneratorDrawer({
                 {options.map((opt) => (
                   <Label
                     key={opt.id}
-                    className="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/40"
+                    className="hover:bg-muted/40 flex cursor-pointer items-start gap-3 rounded-lg border p-3"
                   >
                     <RadioGroupItem value={opt.id} className="mt-1" />
                     <div className="min-w-0">
-                      <div className="text-sm font-medium leading-none">
+                      <div className="text-sm leading-none font-medium">
                         {opt.title}
                       </div>
                       {opt.description && (
-                        <div className="mt-1 text-xs text-muted-foreground">
+                        <div className="text-muted-foreground mt-1 text-xs">
                           {opt.description}
                         </div>
                       )}
@@ -382,7 +536,7 @@ export default function PdfGeneratorDrawer({
             <div className="space-y-4">
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold">Filtros</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Configure como deseja exportar o relatório selecionado.
                 </p>
               </div>
@@ -394,7 +548,7 @@ export default function PdfGeneratorDrawer({
                   disabled: generating,
                 })
               ) : (
-                <div className="rounded-lg border p-3 text-sm text-muted-foreground">
+                <div className="text-muted-foreground rounded-lg border p-3 text-sm">
                   Este modelo não possui filtros.
                 </div>
               )}
@@ -411,7 +565,7 @@ export default function PdfGeneratorDrawer({
             onClick={() => (step === 0 ? onOpenChange(false) : setStep(0))}
             disabled={generating}
           >
-            {step === 0 ? "Cancelar" : "Voltar"}
+            {step === 0 ? 'Cancelar' : 'Voltar'}
           </Button>
 
           {step === 0 ? (
@@ -428,7 +582,7 @@ export default function PdfGeneratorDrawer({
               onClick={handleGenerate}
               disabled={generating}
             >
-              {generating ? "Gerando..." : "Gerar"}
+              {generating ? 'Gerando...' : 'Gerar'}
             </Button>
           )}
         </DrawerFooter>

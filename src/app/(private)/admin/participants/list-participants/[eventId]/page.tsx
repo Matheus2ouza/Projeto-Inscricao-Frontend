@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import ListParticipants from "@/features/participants/components/list-participants/ListParticipants";
-import { useParticipantsReports } from "@/features/participants/hooks/actions/useParticipantsReports";
-import { useListParticipants } from "@/features/participants/hooks/list-participants/useListParticipants";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
+import ListParticipants from '@/features/participants/components/list-participants/ListParticipants';
+import { useParticipantsReports } from '@/features/participants/hooks/actions/useParticipantsReports';
+import { useListParticipants } from '@/features/participants/hooks/list-participants/useListParticipants';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 20;
 export default function ListGuestParticipantsAdminPage() {
@@ -13,7 +13,7 @@ export default function ListGuestParticipantsAdminPage() {
   const params = useParams();
   const rawEventId = params.eventId;
   const eventId =
-    (Array.isArray(rawEventId) ? rawEventId[0] : rawEventId) ?? "";
+    (Array.isArray(rawEventId) ? rawEventId[0] : rawEventId) ?? '';
 
   const {
     participants: guestParticipants,
@@ -45,14 +45,14 @@ export default function ListGuestParticipantsAdminPage() {
   const renderSkeletonGrid = () => {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {Array.from({ length: 3 }).map((_, index) => (
             <div
               key={index}
-              className="rounded-xl border bg-card p-5 shadow-sm"
+              className="bg-card rounded-xl border p-5 shadow-sm"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="space-y-2 w-full">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="w-full space-y-2">
                   <Skeleton className="h-3 w-24" />
                   <Skeleton className="h-8 w-20" />
                 </div>
@@ -63,17 +63,17 @@ export default function ListGuestParticipantsAdminPage() {
           ))}
         </div>
 
-        <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
-          <div className="p-4 border-b">
+        <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
+          <div className="border-b p-4">
             <Skeleton className="h-6 w-56" />
           </div>
-          <div className="p-4 space-y-3">
+          <div className="space-y-3 p-4">
             {Array.from({ length: 8 }).map((_, index) => (
               <div key={index} className="flex items-center gap-4">
                 <Skeleton className="h-8 w-8 rounded-full" />
                 <Skeleton className="h-4 w-1/3" />
                 <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-4 w-16 ml-auto" />
+                <Skeleton className="ml-auto h-4 w-16" />
               </div>
             ))}
           </div>
@@ -89,9 +89,9 @@ export default function ListGuestParticipantsAdminPage() {
 
     if (error) {
       return (
-        <div className="flex justify-center items-center min-h-96">
+        <div className="flex min-h-96 items-center justify-center">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-red-600 mb-2">
+            <h2 className="mb-2 text-xl font-semibold text-red-600">
               Erro ao carregar lista de participantes
             </h2>
             <p className="text-gray-600">{error}</p>
@@ -111,11 +111,31 @@ export default function ListGuestParticipantsAdminPage() {
         pageSize={PAGE_SIZE}
         pageCount={pageCount}
         onPageChange={setPage}
-        onGenerateParticipantsByLocalityPdf={({ separate, reduced }) =>
-          handleGenerateLocalityPdfReport({ eventId, separate, reduced })
+        onGenerateParticipantsByLocalityPdf={({
+          separate,
+          reduced,
+          summary,
+          columns,
+        }) =>
+          handleGenerateLocalityPdfReport({
+            eventId,
+            separate,
+            reduced,
+            summary,
+            columns,
+          })
         }
-        onGenerateParticipantsByLocalityXlsx={({ separate }) =>
-          handleGenerateLocalityXlsxReport({ eventId, separate })
+        onGenerateParticipantsByLocalityXlsx={({
+          separate,
+          summary,
+          columns,
+        }) =>
+          handleGenerateLocalityXlsxReport({
+            eventId,
+            separate,
+            summary,
+            columns,
+          })
         }
         isGeneratingParticipantsByLocalityPdf={isGeneratePdfLocalityMutation}
         isGeneratingParticipantsByLocalityXlsx={isGenerateXlsxLocalityMutation}
@@ -124,7 +144,7 @@ export default function ListGuestParticipantsAdminPage() {
   };
 
   const handleBack = () => {
-    router.push("/admin/participants/list-participants");
+    router.push('/admin/participants/list-participants');
   };
 
   return (

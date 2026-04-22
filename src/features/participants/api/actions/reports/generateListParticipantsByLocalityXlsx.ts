@@ -1,21 +1,35 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import axiosInstance from '@/shared/lib/apiClient';
 
 export type GenerateParticipantsByLocalityXlsxParams = {
   eventId: string;
   separate: boolean;
+  summary: boolean;
+  columns?: ReportColumnXlsx[];
 };
+
+export type ReportColumnXlsx =
+  | 'name'
+  | 'preferredName'
+  | 'cpf'
+  | 'birthDate'
+  | 'gender'
+  | 'shirtSize'
+  | 'shirtType'
+  | 'typeInscription';
 
 export type GenerateParticipantsByLocalityXlsxResponse = {
   fileBase64: string;
   filename: string;
   contentType:
-    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    | "application/zip";
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    | 'application/zip';
 };
 
 export async function generateParticipantsByLocalityXlsx({
   eventId,
   separate = false,
+  summary = false,
+  columns,
 }: GenerateParticipantsByLocalityXlsxParams): Promise<GenerateParticipantsByLocalityXlsxResponse> {
   try {
     const { data } = await axiosInstance.get(
@@ -23,6 +37,8 @@ export async function generateParticipantsByLocalityXlsx({
       {
         params: {
           separate,
+          summary,
+          columns: columns ? columns.join(',') : undefined,
         },
       },
     );
@@ -36,7 +52,7 @@ export async function generateParticipantsByLocalityXlsx({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os participantes",
+        'Não foi possível carregar os participantes',
     );
   }
 }
