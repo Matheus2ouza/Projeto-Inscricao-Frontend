@@ -1,6 +1,6 @@
 import { ComboboxAccountSingle } from '@/features/accounts/components/ComboboxAccount';
-import type { UploadFile } from 'antd';
-import { InputNumber, Radio, Space, Upload } from 'antd';
+import type { InputNumberProps, UploadFile } from 'antd';
+import { InputNumber, Space, Upload } from 'antd';
 import {
   DollarSign,
   Paperclip,
@@ -81,6 +81,13 @@ export default function PaymentDataStep({
     }
   };
 
+  const formatter: InputNumberProps<number>['formatter'] = (value) => {
+    if (value === undefined || value === null) return '';
+    const [start, end] = `${value}`.split('.');
+    const integer = start.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return `R$ ${end ? `${integer},${end}` : integer}`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Valor do Pagamento */}
@@ -99,7 +106,7 @@ export default function PaymentDataStep({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            <label className="mr-2 text-sm font-medium text-slate-700 dark:text-slate-300">
               Valor total (R$)
             </label>
             <InputNumber
@@ -109,10 +116,8 @@ export default function PaymentDataStep({
               onChange={(value) => setPaymentAmount(value || 0)}
               stringMode
               className="w-full"
-              size="large"
-              formatter={(value) =>
-                `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-              }
+              size="medium"
+              formatter={formatter}
               parser={(value) =>
                 Number(value?.replace(/[R$\s.]/g, '').replace(',', '.')) || 0
               }
@@ -145,47 +150,45 @@ export default function PaymentDataStep({
               <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Tipo de pagador
               </label>
-              <Radio.Group
-                value={payerType}
-                onChange={(e) => setPayerType(e.target.value)}
-                className="w-full"
-                size="large"
-              >
+              <div className="w-full">
                 <div className="grid grid-cols-2 gap-4">
+                  {/* ACCOUNT */}
                   <div
-                    className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                    onClick={() => setPayerType('account')}
+                    className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-5 text-center transition-all ${
                       payerType === 'account'
-                        ? 'border-primary bg-primary/5'
+                        ? 'border-primary bg-primary/5 shadow-sm'
                         : 'border-slate-200 hover:border-slate-300 dark:border-zinc-700'
                     }`}
                   >
-                    <Radio value="account" className="hidden" />
-                    <div className="text-center">
-                      <UserRound className="text-primary" />
-                      <div className="font-medium">Conta</div>
-                      <div className="text-muted-foreground text-xs">
-                        Pagamento via conta
-                      </div>
+                    <UserRound className="text-primary h-6 w-6" />
+
+                    <div className="text-sm font-semibold">Conta</div>
+
+                    <div className="text-muted-foreground text-xs leading-tight">
+                      Pagamento via conta
                     </div>
                   </div>
+
+                  {/* GUEST */}
                   <div
-                    className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                    onClick={() => setPayerType('guest')}
+                    className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-5 text-center transition-all ${
                       payerType === 'guest'
-                        ? 'border-primary bg-primary/5'
+                        ? 'border-primary bg-primary/5 shadow-sm'
                         : 'border-slate-200 hover:border-slate-300 dark:border-zinc-700'
                     }`}
                   >
-                    <Radio value="guest" className="hidden" />
-                    <div className="text-center">
-                      <UserStar className="text-primary" />
-                      <div className="font-medium">Guest</div>
-                      <div className="text-muted-foreground text-xs">
-                        Pagamento avulso
-                      </div>
+                    <UserStar className="text-primary h-6 w-6" />
+
+                    <div className="text-sm font-semibold">Guest</div>
+
+                    <div className="text-muted-foreground text-xs leading-tight">
+                      Pagamento avulso
                     </div>
                   </div>
                 </div>
-              </Radio.Group>
+              </div>
             </div>
 
             {payerType === 'account' ? (
@@ -239,7 +242,7 @@ export default function PaymentDataStep({
             onChange={handleUploadChange}
             className="hover:border-primary hover:bg-primary/5 dark:hover:border-primary rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-8 text-center transition-colors dark:border-zinc-700 dark:bg-zinc-900"
           >
-            <Space direction="vertical" size={12} className="w-full">
+            <Space orientation="vertical" size={12} className="w-full">
               <UploadCloud className="mx-auto h-12 w-12 text-slate-400" />
               <div>
                 <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
