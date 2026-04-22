@@ -30,22 +30,7 @@ export type AllocationEvent = {
   name: string;
 };
 
-export type GetCashRegisterResponse = {
-  id: string;
-  name: string;
-  status: CashRegisterStatus;
-  balance: number;
-  allocationEvents: AllocationEvent[];
-  totalIncome: number;
-  totalExpense: number;
-  totalPix: number;
-  totalCard: number;
-  totalCash: number;
-  expectedValues: number;
-  expectedNetValues: number;
-  openedAt: Date;
-  closedAt?: Date;
-};
+export type GetCashRegisterResponse = CashRegister;
 
 export type CashRegister = {
   id: string;

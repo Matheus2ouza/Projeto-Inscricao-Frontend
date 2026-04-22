@@ -1,8 +1,8 @@
 import {
   CashRegisterDetailsParam,
   CashRegisterDetailsResult,
-} from "../../types/cashRegisterDetails/cashRegisterDetailsType";
-import { useCashRegisterDetailsQuery } from "./cashRegisterDetailsQuery";
+} from '../../types/cashRegisterDetails/cashRegisterDetailsType';
+import { useCashRegisterDetailsQuery } from './cashRegisterDetailsQuery';
 
 export function useCashRegisterDetails({
   cashRegisterId,
