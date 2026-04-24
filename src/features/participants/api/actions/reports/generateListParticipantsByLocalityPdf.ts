@@ -1,10 +1,12 @@
 import axiosInstance from '@/shared/lib/apiClient';
+import qs from 'qs';
 
 export type GenerateParticipantsByLocalityPdfParams = {
   eventId: string;
   separate: boolean;
   reduced: boolean;
   summary: boolean;
+  typeInscriptions?: string | string[];
   columns?: ReportColumnPdf[];
 };
 
@@ -29,6 +31,7 @@ export async function generateParticipantsByLocalityPdf({
   separate = false,
   reduced = false,
   summary = false,
+  typeInscriptions,
   columns,
 }: GenerateParticipantsByLocalityPdfParams): Promise<GenerateParticipantsByLocalityPdfResponse> {
   try {
@@ -39,8 +42,11 @@ export async function generateParticipantsByLocalityPdf({
           separate,
           reduced,
           summary,
+          typeInscriptions: typeInscriptions,
           columns: columns ? columns.join(',') : undefined,
         },
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: 'repeat' }),
       },
     );
     return data;

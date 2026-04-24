@@ -1,8 +1,8 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import axiosInstance from '@/shared/lib/apiClient';
 import {
   CreateCashInput,
   CreateCashResponse,
-} from "../../types/createCashRegister/createCashRegisterTypes";
+} from '../../types/createCashRegister/createCashRegisterTypes';
 
 export async function createCashRegister({
   name,
@@ -29,7 +29,7 @@ export async function createCashRegister({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível criar o caixa. Por favor, tente novamente.',
     );
   }
 }

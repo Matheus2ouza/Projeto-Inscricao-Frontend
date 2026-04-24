@@ -24,6 +24,7 @@ import { Participant } from '../../types/list-participants/listParticipantsTypes
 import PdfGeneratorDrawer from './PdfGeneratorDrawer';
 
 interface ListParticipantsProps {
+  eventId: string;
   participants: Participant[];
   countParticipants: number;
   countParticipantsMale: number;
@@ -39,12 +40,14 @@ interface ListParticipantsProps {
     separate: boolean;
     reduced: boolean;
     summary: boolean;
+    typeInscriptions?: string | string[];
     columns?: ReportColumnPdf[];
   }) => Promise<GenerateParticipantsByLocalityPdfResponse>;
 
   onGenerateParticipantsByLocalityXlsx: (params: {
     separate: boolean;
     summary: boolean;
+    typeInscriptions?: string | string[];
     columns?: ReportColumnXlsx[];
   }) => Promise<GenerateParticipantsByLocalityXlsxResponse>;
 
@@ -121,6 +124,7 @@ function PercentCircle({ percent, color }: { percent: number; color: string }) {
 }
 
 export default function ListParticipants({
+  eventId,
   participants,
   countParticipants,
   countParticipantsMale,
@@ -255,6 +259,7 @@ export default function ListParticipants({
       <PdfGeneratorDrawer
         open={pdfDrawerOpen}
         onOpenChange={setPdfDrawerOpen}
+        eventId={eventId}
         generatingPdf={isGeneratingParticipantsByLocalityPdf}
         generatingXlsx={isGeneratingParticipantsByLocalityXlsx}
         onGenerateParticipantsByLocalityPdf={

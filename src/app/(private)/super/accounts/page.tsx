@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import AccountsTable from "@/features/accounts/components/AccountsTable";
-import { useUsers } from "@/features/accounts/hooks/useUsers";
-import { useRegions } from "@/features/regions/hooks/useRegions";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useRouter } from "next/navigation";
+import AccountsTable from '@/features/accounts/components/AccountsTable';
+import { useUsers } from '@/features/accounts/hooks/useUsers';
+import { useRegions } from '@/features/regions/hooks/useRegions';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useRouter } from 'next/navigation';
 
 export default function AccountsPage() {
   const router = useRouter();
@@ -37,8 +37,8 @@ export default function AccountsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
-        <div className="flex justify-between items-center gap-4">
+      <div className="space-y-6 p-6">
+        <div className="flex items-center justify-between gap-4">
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-10 w-40" />
         </div>
@@ -50,7 +50,7 @@ export default function AccountsPage() {
 
   if (errorMessage) {
     return (
-      <div className="p-6 flex flex-col items-center justify-center gap-4 min-h-[60vh] text-center">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
         <p className="text-muted-foreground">
           Erro ao carregar contas: {errorMessage}
         </p>

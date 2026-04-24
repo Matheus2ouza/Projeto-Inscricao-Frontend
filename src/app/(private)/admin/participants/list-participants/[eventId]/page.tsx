@@ -102,6 +102,7 @@ export default function ListGuestParticipantsAdminPage() {
 
     return (
       <ListParticipants
+        eventId={eventId}
         participants={guestParticipants}
         countParticipants={countGuestParticipants}
         countParticipantsMale={countGuestParticipantsMale}
@@ -115,6 +116,7 @@ export default function ListGuestParticipantsAdminPage() {
           separate,
           reduced,
           summary,
+          typeInscriptions,
           columns,
         }) =>
           handleGenerateLocalityPdfReport({
@@ -122,18 +124,21 @@ export default function ListGuestParticipantsAdminPage() {
             separate,
             reduced,
             summary,
+            typeInscriptions,
             columns,
           })
         }
         onGenerateParticipantsByLocalityXlsx={({
           separate,
           summary,
+          typeInscriptions,
           columns,
         }) =>
           handleGenerateLocalityXlsxReport({
             eventId,
             separate,
             summary,
+            typeInscriptions,
             columns,
           })
         }

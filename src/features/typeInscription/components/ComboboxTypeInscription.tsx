@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import type { SelectProps } from "antd";
-import { Select, Space, Spin, Tag } from "antd";
-import * as React from "react";
-import { useTypeInscriptionsQuery } from "../hook/useTypeInscriptionsQuery";
+import type { SelectProps } from 'antd';
+import { Select, Space, Spin, Tag } from 'antd';
+import * as React from 'react';
+import { useTypeInscriptionsQuery } from '../hook/useTypeInscriptionsQuery';
 
 export type TypeInscriptionOption = {
   label: string;
@@ -29,7 +29,7 @@ export function ComboboxTypeInscription({
   options,
   loading: loadingProp,
   disabled = false,
-  placeholder = "Selecione o tipo de inscrição",
+  placeholder = 'Selecione o tipo de inscrição',
 }: ComboboxTypeInscriptionProps) {
   const {
     data: fetched,
@@ -52,7 +52,7 @@ export function ComboboxTypeInscription({
   }, [options, fetched]);
 
   // Configuração das opções para o Select
-  const selectOptions: SelectProps["options"] = typeInscriptions.map(
+  const selectOptions: SelectProps['options'] = typeInscriptions.map(
     (type) => ({
       label: type.label,
       value: type.value,
@@ -79,9 +79,9 @@ export function ComboboxTypeInscription({
 
   // Placeholder baseado no estado
   const getPlaceholder = () => {
-    if (disabled) return "Selecione um evento primeiro";
-    if (loading) return "Carregando tipos...";
-    if (typeInscriptions.length === 0) return "Nenhum tipo encontrado";
+    if (disabled) return 'Selecione um evento primeiro';
+    if (loading) return 'Carregando tipos...';
+    if (typeInscriptions.length === 0) return 'Nenhum tipo encontrado';
     return placeholder;
   };
 
@@ -94,30 +94,30 @@ export function ComboboxTypeInscription({
       onChange={(selectedValue, option) => {
         const selectedOption = Array.isArray(option) ? option[0] : option;
         const type = typeInscriptions.find((t) => t.value === selectedValue);
-        onChange(selectedValue || "", type);
+        onChange(selectedValue || '', type);
       }}
       loading={loading}
       options={selectOptions}
       optionRender={(option) => renderOption(option.data)}
       filterOption={(input, option) =>
-        String(option?.label ?? "")
+        String(option?.label ?? '')
           .toLowerCase()
           .includes(input.toLowerCase())
       }
       disabled={disabled || typeInscriptions.length === 0}
       notFoundContent={
         error ? (
-          <div className="text-center py-2">
-            <p className="text-red-500 text-sm">Falha ao carregar tipos</p>
+          <div className="py-2 text-center">
+            <p className="text-sm text-red-500">Falha ao carregar tipos</p>
           </div>
         ) : loading ? (
           <Spin size="small" />
         ) : (
-          "Nenhum tipo encontrado"
+          'Nenhum tipo encontrado'
         )
       }
       className="w-full"
-      style={{ width: "100%" }}
+      style={{ width: '100%' }}
       virtual={false}
       listHeight={250}
     />

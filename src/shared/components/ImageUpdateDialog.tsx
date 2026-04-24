@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { cn } from "@/shared/lib/utils";
-import { Modal } from "antd";
-import { ImageIcon, X } from "lucide-react";
-import Image from "next/image";
-import { useRef, useState } from "react";
-import { toast } from "sonner";
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { cn } from '@/shared/lib/utils';
+import { Modal } from 'antd';
+import { ImageIcon, X } from 'lucide-react';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
 ];
 
 type ImageUpdateDialogProps = {
@@ -29,23 +29,23 @@ type ImageUpdateDialogProps = {
 const readFileAsDataURL = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ""));
-    reader.onerror = () => reject(new Error("Falha ao ler o arquivo."));
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new Error('Falha ao ler o arquivo.'));
     reader.readAsDataURL(file);
   });
 };
 
 const validateFile = (file: File): boolean => {
   if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-    toast.error("Tipo de arquivo não permitido", {
-      description: "Por favor, selecione uma imagem JPG, PNG ou WebP.",
+    toast.error('Tipo de arquivo não permitido', {
+      description: 'Por favor, selecione uma imagem JPG, PNG ou WebP.',
     });
     return false;
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    toast.error("Arquivo muito grande", {
-      description: "O tamanho máximo permitido é 5MB.",
+    toast.error('Arquivo muito grande', {
+      description: 'O tamanho máximo permitido é 5MB.',
     });
     return false;
   }
@@ -56,8 +56,8 @@ const validateFile = (file: File): boolean => {
 export default function ImageUpdateDialog({
   open,
   onOpenChange,
-  title = "Atualizar imagem",
-  description = "Selecione ou arraste uma imagem para atualizar.",
+  title = 'Atualizar imagem',
+  description = 'Selecione ou arraste uma imagem para atualizar.',
   onSubmit,
   isSubmitting = false,
 }: ImageUpdateDialogProps) {
@@ -71,7 +71,7 @@ export default function ImageUpdateDialog({
     setPreview(null);
     setIsDragOver(false);
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -84,7 +84,7 @@ export default function ImageUpdateDialog({
       const url = await readFileAsDataURL(nextFile);
       setPreview(url);
     } catch {
-      toast.error("Não foi possível ler o arquivo.");
+      toast.error('Não foi possível ler o arquivo.');
       clearFile();
     }
   };
@@ -98,7 +98,7 @@ export default function ImageUpdateDialog({
 
   const handleSend = async () => {
     if (!file) {
-      toast.error("Selecione uma imagem para enviar.");
+      toast.error('Selecione uma imagem para enviar.');
       return;
     }
     const imageData =
@@ -119,11 +119,11 @@ export default function ImageUpdateDialog({
       keyboard={!isSubmitting}
     >
       <div className="space-y-2">
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="text-muted-foreground text-sm">{description}</p>
 
         <div className="space-y-3">
           {preview ? (
-            <div className="relative overflow-hidden rounded-lg border bg-muted/20">
+            <div className="bg-muted/20 relative overflow-hidden rounded-lg border">
               <div className="relative aspect-video w-full">
                 <Image
                   src={preview}
@@ -134,7 +134,7 @@ export default function ImageUpdateDialog({
               </div>
               <button
                 type="button"
-                className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-background/80 border shadow-sm"
+                className="bg-background/80 absolute top-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-md border shadow-sm"
                 onClick={clearFile}
                 aria-label="Remover imagem"
                 disabled={isSubmitting}
@@ -146,10 +146,10 @@ export default function ImageUpdateDialog({
             <button
               type="button"
               className={cn(
-                "w-full rounded-lg border-2 border-dashed p-6 transition-colors",
+                'w-full rounded-lg border-2 border-dashed p-6 transition-colors',
                 isDragOver
-                  ? "border-blue-500 bg-blue-50/60 dark:bg-blue-950/20"
-                  : "border-muted-foreground/30 hover:bg-muted/20",
+                  ? 'border-blue-500 bg-blue-50/60 dark:bg-blue-950/20'
+                  : 'border-muted-foreground/30 hover:bg-muted/20',
               )}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => {
@@ -171,20 +171,20 @@ export default function ImageUpdateDialog({
               disabled={isSubmitting}
             >
               <div className="flex flex-col items-center gap-3 text-center">
-                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-full">
+                  <ImageIcon className="text-muted-foreground h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className="text-foreground text-sm font-semibold">
                     {isDragOver
-                      ? "Solte a imagem aqui"
-                      : "Clique para selecionar"}
+                      ? 'Solte a imagem aqui'
+                      : 'Clique para selecionar'}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     ou arraste e solte a imagem aqui
                   </p>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <div className="text-muted-foreground flex items-center gap-4 text-xs">
                   <span>JPG</span>
                   <span>PNG</span>
                   <span>WebP</span>
@@ -208,7 +208,7 @@ export default function ImageUpdateDialog({
           />
         </div>
 
-        <div className="pt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end">
           <Button
             type="button"
             variant="outline"
@@ -222,7 +222,7 @@ export default function ImageUpdateDialog({
             onClick={handleSend}
             disabled={!file || isSubmitting}
           >
-            {isSubmitting ? "Enviando..." : "Enviar"}
+            {isSubmitting ? 'Enviando...' : 'Enviar'}
           </Button>
         </div>
       </div>
