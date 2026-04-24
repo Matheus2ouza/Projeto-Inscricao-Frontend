@@ -1,22 +1,25 @@
-"use client";
+'use client';
 
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { createCashRegister } from "../../api/createCashRegister/createCashRegister";
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { createCashRegister } from '../../api/createCashRegister/createCashRegister';
 import type {
   CreateCashInput,
   CreateCashResponse,
-} from "../../types/createCashRegister/createCashRegisterTypes";
-import { useInvalidateListCashRegistersQuery } from "../useListCashRegistersQuery";
+} from '../../types/createCashRegister/createCashRegisterTypes';
+import { useInvalidateCashRegisterDetailsQuery } from '../cashRegisterDetails/cashRegisterDetailsQuery';
+import { useInvalidateCashRegisterMovimentsQuery } from '../cashRegisterDetails/cashRegisterMovimentsQuery';
 
 export function useCreateCashRegister() {
-  const { invalidateLists } = useInvalidateListCashRegistersQuery();
+  const { invalidateDetails } = useInvalidateCashRegisterDetailsQuery();
+  const { invalidateLists } = useInvalidateCashRegisterMovimentsQuery();
 
   const { mutateAsync: createCashRegisterMutation, isPending: isCreating } =
     useMutation<CreateCashResponse, Error, CreateCashInput>({
       mutationFn: createCashRegister,
       onSuccess: (data) => {
-        toast.success(data.message ?? "Caixa criado com sucesso!");
+        toast.success(data.message ?? 'Caixa criado com sucesso!');
+        invalidateDetails();
         invalidateLists();
       },
       onError: (error) => {

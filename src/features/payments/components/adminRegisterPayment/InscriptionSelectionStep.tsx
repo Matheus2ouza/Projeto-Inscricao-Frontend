@@ -24,9 +24,7 @@ interface InscriptionSelectionStepProps {
 export default function InscriptionSelectionStep({
   listInscriptions,
   selectedIds,
-  setSelectedIds,
   amounts,
-  setAmounts,
   paymentAmount,
   totalPayment,
   handleTransferChange,
@@ -34,6 +32,8 @@ export default function InscriptionSelectionStep({
   handleMoveInscription,
   handleAmountChange,
 }: InscriptionSelectionStepProps) {
+  const toCents = (value: number) => Math.round(Number(value || 0) * 100);
+
   const transferDataSource = useMemo<DataType[]>(
     () =>
       listInscriptions?.map((inscription) => ({
@@ -94,9 +94,13 @@ export default function InscriptionSelectionStep({
           </div>
           <div className="text-muted-foreground text-sm">
             Total alocado: {getFormatCurrency(totalPayment)}
-            {totalPayment !== paymentAmount && (
+            {toCents(totalPayment) !== toCents(paymentAmount) && (
               <span className="ml-2 text-red-600">
-                (Diferença: {getFormatCurrency(paymentAmount - totalPayment)})
+                (Diferença:{' '}
+                {getFormatCurrency(
+                  (toCents(paymentAmount) - toCents(totalPayment)) / 100,
+                )}
+                )
               </span>
             )}
           </div>

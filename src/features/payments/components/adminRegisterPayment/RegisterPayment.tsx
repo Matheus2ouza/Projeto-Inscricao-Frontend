@@ -8,6 +8,9 @@ import { useMemo, useState, type Key } from 'react';
 import InscriptionSelectionStep from './InscriptionSelectionStep';
 import PaymentDataStep from './PaymentDataStep';
 
+const toCents = (value: number | string) =>
+  Math.round(Number(value || 0) * 100);
+
 interface RegisterPaymentProps {
   listInscriptions: ListInscriptionsPending[] | null;
   loading: boolean;
@@ -47,9 +50,9 @@ export default function RegisterPayment({
   const totalPayment = useMemo(
     () =>
       selectedInscriptions.reduce(
-        (sum: number, item) => sum + (amounts[item.id] ?? 0),
+        (sum: number, item) => sum + toCents(amounts[item.id] ?? 0),
         0,
-      ),
+      ) / 100,
     [amounts, selectedInscriptions],
   );
 
@@ -103,9 +106,10 @@ export default function RegisterPayment({
       (inscription.totalValue - inscription.totalPaid).toFixed(2),
     );
     const normalized = value === null ? 0 : Number(value);
+    const clamped = Math.min(Math.max(normalized, 0), remaining);
     setAmounts((prev) => ({
       ...prev,
-      [id]: Math.min(Math.max(normalized, 0), remaining),
+      [id]: Number(clamped.toFixed(2)),
     }));
   };
 
@@ -143,13 +147,13 @@ export default function RegisterPayment({
     }
 
     const totalAllocated = selectedInscriptions.reduce(
-      (sum: number, item) => sum + (amounts[item.id] ?? 0),
+      (sum: number, item) => sum + toCents(amounts[item.id] ?? 0),
       0,
     );
 
-    if (totalAllocated !== paymentAmount) {
+    if (totalAllocated !== toCents(paymentAmount)) {
       setFormError(
-        `O total alocado (${getFormatCurrency(totalAllocated)}) deve ser igual ao valor do pagamento (${getFormatCurrency(paymentAmount)}).`,
+        `O total alocado (${getFormatCurrency(totalAllocated / 100)}) deve ser igual ao valor do pagamento (${getFormatCurrency(paymentAmount)}).`,
       );
       return false;
     }
@@ -187,8 +191,9 @@ export default function RegisterPayment({
       return;
     }
 
+    const paymentAmountCents = toCents(paymentAmount);
     const requestPayload: RegisterPaymentInput = {
-      amount: Number(paymentAmount.toFixed(2)),
+      amount: paymentAmountCents / 100,
       image: imageData ?? '',
       isGuest: payerType === 'guest',
       guestName: payerType === 'guest' ? payerName.trim() : undefined,
@@ -214,7 +219,7 @@ export default function RegisterPayment({
       setPayerName('');
       setAccountId('');
       message.success('Pagamento enviado com sucesso.');
-    } catch (error) {
+    } catch {
       setFormError(
         'Erro ao registrar pagamento. Verifique os dados e tente novamente.',
       );
@@ -284,12 +289,7 @@ export default function RegisterPayment({
         </div>
       )}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-muted-foreground text-sm">
-          {currentStep === 0
-            ? 'Preencha todos os dados do pagamento para continuar.'
-            : 'A ordem das inscrições acima determina a sequência de alocação do valor.'}
-        </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-end">
         <div className="flex gap-2">
           {currentStep === 1 && (
             <Button

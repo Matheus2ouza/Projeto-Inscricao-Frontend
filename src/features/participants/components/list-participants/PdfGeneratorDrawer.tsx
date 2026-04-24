@@ -3,6 +3,7 @@
 import { Check, X } from 'lucide-react';
 import * as React from 'react';
 
+import { CheckboxGroupTypeInscription } from '@/features/typeInscription/components/CheckboxGroupTypeInscription';
 import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import {
@@ -27,6 +28,20 @@ import type {
   ReportColumnXlsx,
 } from '../../api/actions/reports/generateListParticipantsByLocalityXlsx';
 
+const AVAILABLE_COLUMNS: Array<{
+  id: ReportColumnPdf | ReportColumnXlsx;
+  label: string;
+}> = [
+  { id: 'name', label: 'Nome' },
+  { id: 'preferredName', label: 'Nome preferencial' },
+  { id: 'cpf', label: 'CPF' },
+  { id: 'birthDate', label: 'Idade' },
+  { id: 'gender', label: 'Gênero' },
+  { id: 'shirtSize', label: 'Tamanho da camiseta' },
+  { id: 'shirtType', label: 'Tipo de camiseta' },
+  { id: 'typeInscription', label: 'Tipo de inscrição' },
+];
+
 type ExportOption = {
   id: string;
   title: string;
@@ -43,16 +58,19 @@ type ExportOption = {
 type PdfGeneratorDrawerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  eventId: string;
 
   onGenerateParticipantsByLocalityPdf: (params: {
     separate: boolean;
     reduced: boolean;
     summary: boolean;
+    typeInscriptions?: string | string[];
     columns?: ReportColumnPdf[];
   }) => Promise<GenerateParticipantsByLocalityPdfResponse>;
   onGenerateParticipantsByLocalityXlsx: (params: {
     separate: boolean;
     summary: boolean;
+    typeInscriptions?: string | string[];
     columns?: ReportColumnXlsx[];
   }) => Promise<GenerateParticipantsByLocalityXlsxResponse>;
 
@@ -128,6 +146,7 @@ function Stepper({
 export default function PdfGeneratorDrawer({
   open,
   onOpenChange,
+  eventId,
   onGenerateParticipantsByLocalityPdf,
   onGenerateParticipantsByLocalityXlsx,
   generatingPdf = false,
@@ -200,19 +219,42 @@ export default function PdfGeneratorDrawer({
     [],
   );
 
-  const AVAILABLE_COLUMNS: Array<{
-    id: ReportColumnPdf | ReportColumnXlsx;
-    label: string;
-  }> = [
-    { id: 'name', label: 'Nome' },
-    { id: 'preferredName', label: 'Nome preferencial' },
-    { id: 'cpf', label: 'CPF' },
-    { id: 'birthDate', label: 'Idade' },
-    { id: 'gender', label: 'Gênero' },
-    { id: 'shirtSize', label: 'Tamanho da camiseta' },
-    { id: 'shirtType', label: 'Tipo de camiseta' },
-    { id: 'typeInscription', label: 'Tipo de inscrição' },
-  ];
+  const renderTypeInscriptionsFilter = React.useCallback(
+    ({
+      filters,
+      setFilters,
+      disabled,
+    }: {
+      filters: Record<string, unknown>;
+      setFilters: (next: Record<string, unknown>) => void;
+      disabled?: boolean;
+    }) => {
+      const selected =
+        (filters.typeInscriptions as string[] | undefined) ?? [];
+
+      return (
+        <div className="rounded-lg border p-3">
+          <div className="mb-3 space-y-0.5">
+            <div className="text-sm font-medium">Tipos de inscrição</div>
+            <div className="text-muted-foreground text-xs">
+              Escolha os tipos de inscrição. Se não escolher nenhum, todos serão
+              considerados.
+            </div>
+          </div>
+
+          <CheckboxGroupTypeInscription
+            eventId={eventId}
+            value={selected}
+            onChange={(next) =>
+              setFilters({ ...filters, typeInscriptions: next })
+            }
+            disabled={disabled}
+          />
+        </div>
+      );
+    },
+    [eventId],
+  );
 
   const renderColumnsFilter = React.useCallback(
     ({
@@ -299,10 +341,17 @@ export default function PdfGeneratorDrawer({
 
         {renderSummaryFilter({ filters, setFilters, disabled })}
 
+        {renderTypeInscriptionsFilter({ filters, setFilters, disabled })}
+
         {renderColumnsFilter({ filters, setFilters, disabled })}
       </div>
     ),
-    [renderSeparateFilter, renderSummaryFilter, renderColumnsFilter],
+    [
+      renderSeparateFilter,
+      renderSummaryFilter,
+      renderTypeInscriptionsFilter,
+      renderColumnsFilter,
+    ],
   );
 
   const renderXlsxFilters = React.useCallback(
@@ -320,10 +369,17 @@ export default function PdfGeneratorDrawer({
 
         {renderSummaryFilter({ filters, setFilters, disabled })}
 
+        {renderTypeInscriptionsFilter({ filters, setFilters, disabled })}
+
         {renderColumnsFilter({ filters, setFilters, disabled })}
       </div>
     ),
-    [renderSeparateFilter, renderSummaryFilter, renderColumnsFilter],
+    [
+      renderSeparateFilter,
+      renderSummaryFilter,
+      renderTypeInscriptionsFilter,
+      renderColumnsFilter,
+    ],
   );
 
   const options = React.useMemo<ExportOption[]>(
@@ -337,14 +393,20 @@ export default function PdfGeneratorDrawer({
           separate: false,
           reduced: false,
           summary: false,
+          typeInscriptions: [],
           columns: [],
         },
         renderFilters: renderPdfFilters,
         onGenerate: async (filters) => {
+          const typeInscriptions =
+            (filters.typeInscriptions as string[] | undefined) ?? [];
+
           const result = await onGenerateParticipantsByLocalityPdf({
             separate: Boolean(filters.separate),
             reduced: Boolean(filters.reduced),
             summary: Boolean(filters.summary),
+            typeInscriptions:
+              typeInscriptions.length > 0 ? typeInscriptions : undefined,
             columns:
               (filters.columns as
                 | (ReportColumnPdf | ReportColumnXlsx)[]
@@ -368,13 +430,19 @@ export default function PdfGeneratorDrawer({
         defaultFilters: {
           separate: false,
           summary: false,
+          typeInscriptions: [],
           columns: [],
         },
         renderFilters: renderXlsxFilters,
         onGenerate: async (filters) => {
+          const typeInscriptions =
+            (filters.typeInscriptions as string[] | undefined) ?? [];
+
           const result = await onGenerateParticipantsByLocalityXlsx({
             separate: Boolean(filters.separate),
             summary: Boolean(filters.summary),
+            typeInscriptions:
+              typeInscriptions.length > 0 ? typeInscriptions : undefined,
             columns:
               (filters.columns as
                 | (ReportColumnPdf | ReportColumnXlsx)[]

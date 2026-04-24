@@ -1,9 +1,12 @@
 'use client';
 
 import CashRegisterDetails from '@/features/cashRegister/components/cashRegisterDetails/CashRegisterDetetails';
+import CreateNewRegisterDialog from '@/features/cashRegister/components/cashRegisterDetails/CreateNewRegisterDialog';
 import { useActionsCashRegister } from '@/features/cashRegister/hook/cashRegisterDetails/actions/useActionsCashRegister';
 import { useCashRegisterDetails } from '@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterDetails';
 import { useCashRegisterMoviments } from '@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterMoviments';
+import { useCreateNewRegister } from '@/features/cashRegister/hook/createNewRegister/useCreateNewRegister';
+import type { CreateNewRegisterInput } from '@/features/cashRegister/types/createNewRegister/createNewRegisterTypes';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -67,6 +70,11 @@ export default function CashRegisterDetailsAdminPage() {
     isLoadingFutureReleases,
   } = useActionsCashRegister();
 
+  const { handleCreateNewRegister, isCreatingNewRegister } =
+    useCreateNewRegister();
+
+  const [createNewRegisterOpen, setCreateNewRegisterOpen] = useState(false);
+
   useEffect(() => {
     handleFetchFutureReleases({ cashRegisterId });
   }, [cashRegisterId, handleFetchFutureReleases]);
@@ -91,6 +99,17 @@ export default function CashRegisterDetailsAdminPage() {
     } finally {
       setMovimentsListLoading(false);
     }
+  };
+
+  const handleSubmitCreateNewRegister = async (
+    input: CreateNewRegisterInput,
+  ) => {
+    await handleCreateNewRegister(input);
+    await Promise.all([
+      handleRefetchCashRegisterNumbers(),
+      handleRefetchMovimentsList(),
+      handleFetchFutureReleases({ cashRegisterId }),
+    ]);
   };
 
   const renderSkeleton = () => {
@@ -168,6 +187,7 @@ export default function CashRegisterDetailsAdminPage() {
     return (
       <CashRegisterDetails
         cashRegister={cashRegister}
+        onOpenCreateNewRegister={() => setCreateNewRegisterOpen(true)}
         cashRegisterLoading={cashRegisterNumbersLoading}
         cashRegisterFetching={cashRegisterFetching}
         cashRegisterError={cashRegisterError}
@@ -210,6 +230,14 @@ export default function CashRegisterDetailsAdminPage() {
       backButtonAction={handleBack}
     >
       {renderContent()}
+      <CreateNewRegisterDialog
+        open={createNewRegisterOpen}
+        onOpenChange={setCreateNewRegisterOpen}
+        cashRegisterId={cashRegisterId}
+        allocationEvents={cashRegister?.allocationEvents ?? []}
+        onCreateNewRegister={handleSubmitCreateNewRegister}
+        isSubmitting={isCreatingNewRegister}
+      />
     </PageContainer>
   );
 }

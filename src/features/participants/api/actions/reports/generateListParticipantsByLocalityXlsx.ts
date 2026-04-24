@@ -1,9 +1,11 @@
 import axiosInstance from '@/shared/lib/apiClient';
+import qs from 'qs';
 
 export type GenerateParticipantsByLocalityXlsxParams = {
   eventId: string;
   separate: boolean;
   summary: boolean;
+  typeInscriptions?: string | string[];
   columns?: ReportColumnXlsx[];
 };
 
@@ -29,6 +31,7 @@ export async function generateParticipantsByLocalityXlsx({
   eventId,
   separate = false,
   summary = false,
+  typeInscriptions,
   columns,
 }: GenerateParticipantsByLocalityXlsxParams): Promise<GenerateParticipantsByLocalityXlsxResponse> {
   try {
@@ -38,8 +41,11 @@ export async function generateParticipantsByLocalityXlsx({
         params: {
           separate,
           summary,
+          typeInscriptions: typeInscriptions,
           columns: columns ? columns.join(',') : undefined,
         },
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: 'repeat' }),
       },
     );
     return data;
