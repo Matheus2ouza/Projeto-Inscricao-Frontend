@@ -1,9 +1,9 @@
 export enum InscriptionStatus {
-  PENDING = "PENDING",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  PAID = "PAID",
-  EXPIRED = "EXPIRED",
-  CANCELLED = "CANCELLED",
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
 }
 
 export type Inscription = {
@@ -32,9 +32,9 @@ export type getListInscriptionsParams = {
   eventId: string;
   status?: InscriptionStatus[];
   isGuest?: boolean;
-  orderByCreatedAt?: "asc" | "desc";
-  orderByResponsible?: "asc" | "desc";
-  limitTime?: string;
+  orderByCreatedAt?: 'asc' | 'desc';
+  orderByResponsible?: 'asc' | 'desc';
+  period?: string;
   responsible?: string;
   page: number;
   pageSize: number;
@@ -53,9 +53,9 @@ export type ListInscriptionsParams = {
   pageSize: number;
   status?: InscriptionStatus[];
   isGuest?: boolean;
-  orderByCreatedAt?: "asc" | "desc";
-  orderByResponsible?: "asc" | "desc";
-  limitTime?: string;
+  orderByCreatedAt?: 'asc' | 'desc';
+  orderByResponsible?: 'asc' | 'desc';
+  period?: string;
   responsible?: string;
 };
 

@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import ListInscriptionsTable from "@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable";
-import type { InscriptionsFiltersValue } from "@/features/inscriptions/components/list-inscriptions/filters/InscriptionsFilters";
-import useInscriptionReports from "@/features/inscriptions/hooks/actions/reports/useInscriptionsReports";
-import { useListInscriptions } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptions";
-import { listInscriptionsKeys } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useQueryClient } from "@tanstack/react-query";
-import { useParams, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import ListInscriptionsTable from '@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable';
+import type { InscriptionsFiltersValue } from '@/features/inscriptions/components/list-inscriptions/filters/InscriptionsFilters';
+import useInscriptionReports from '@/features/inscriptions/hooks/actions/reports/useInscriptionsReports';
+import { useListInscriptions } from '@/features/inscriptions/hooks/list-inscriptions/useListInscriptions';
+import { listInscriptionsKeys } from '@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useQueryClient } from '@tanstack/react-query';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const PAGE_SIZE = 10;
 
@@ -29,32 +29,11 @@ export default function ListInscriptionsSuperPage() {
   const [filters, setFilters] = useState<InscriptionsFiltersValue>({
     status: [],
     hideNotAllocated: false,
-    orderByCreatedAt: "asc",
-    orderByResponsible: "asc",
-    limitTime: "all",
+    orderByCreatedAt: 'asc',
+    orderByResponsible: 'asc',
+    period: 'all',
   });
-  const [responsible, setResponsible] = useState<string>("");
-
-  const convertedLimitTime = useMemo(() => {
-    if (filters.limitTime === "all" || !filters.limitTime) {
-      return undefined;
-    }
-
-    const now = new Date();
-    let limitDate: Date;
-
-    if (filters.limitTime.endsWith("h")) {
-      const hours = parseInt(filters.limitTime.replace("h", ""), 10);
-      limitDate = new Date(now.getTime() - hours * 60 * 60 * 1000);
-    } else if (filters.limitTime.endsWith("d")) {
-      const days = parseInt(filters.limitTime.replace("d", ""), 10);
-      limitDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-    } else {
-      return undefined;
-    }
-
-    return limitDate.toISOString();
-  }, [filters.limitTime]);
+  const [responsible, setResponsible] = useState<string>('');
 
   const {
     event,
@@ -76,7 +55,7 @@ export default function ListInscriptionsSuperPage() {
     isGuest: filters.hideNotAllocated ? false : undefined,
     orderByCreatedAt: filters.orderByCreatedAt,
     orderByResponsible: filters.orderByResponsible,
-    limitTime: convertedLimitTime,
+    period: filters.period,
     responsible: responsible.trim() ? responsible.trim() : undefined,
   });
 
@@ -90,10 +69,10 @@ export default function ListInscriptionsSuperPage() {
   const renderSkeletonGrid = () => {
     return (
       <div className="space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
           <div className="p-6">
-            <div className="flex flex-col sm:flex-row gap-6">
-              <Skeleton className="w-full sm:w-48 h-48 rounded-lg flex-shrink-0" />
+            <div className="flex flex-col gap-6 sm:flex-row">
+              <Skeleton className="h-48 w-full flex-shrink-0 rounded-lg sm:w-48" />
 
               <div className="flex-1 space-y-4">
                 <div className="space-y-3">
@@ -101,11 +80,11 @@ export default function ListInscriptionsSuperPage() {
                   <Skeleton className="h-4 w-1/2" />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {Array.from({ length: 4 }).map((_, index) => (
                     <div
                       key={index}
-                      className="bg-muted/30 p-4 rounded-lg space-y-2"
+                      className="bg-muted/30 space-y-2 rounded-lg p-4"
                     >
                       <Skeleton className="h-4 w-2/3" />
                       <Skeleton className="h-7 w-1/3" />
@@ -123,7 +102,7 @@ export default function ListInscriptionsSuperPage() {
 
         <Card className="border-0 shadow-sm">
           <CardContent className="p-0">
-            <div className="p-6 space-y-4">
+            <div className="space-y-4 p-6">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="flex items-center gap-4">
                   <Skeleton className="h-5 w-10" />
@@ -148,13 +127,13 @@ export default function ListInscriptionsSuperPage() {
 
     if (error) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
+        <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
           <div>
-            <p className="text-red-600 dark:text-red-400 font-semibold">
+            <p className="font-semibold text-red-600 dark:text-red-400">
               Não foi possível carregar os eventos.
             </p>
             <p className="text-muted-foreground mt-1 max-w-md">
-              {error.message || "Tente novamente em instantes."}
+              {error.message || 'Tente novamente em instantes.'}
             </p>
           </div>
           <Button onClick={() => refresh()} variant="outline">
@@ -187,18 +166,18 @@ export default function ListInscriptionsSuperPage() {
           setFilters({
             status: [],
             hideNotAllocated: false,
-            orderByCreatedAt: "asc",
-            orderByResponsible: "asc",
-            limitTime: "all",
+            orderByCreatedAt: 'asc',
+            orderByResponsible: 'asc',
+            period: 'all',
           });
-          setResponsible("");
+          setResponsible('');
           setPage(1);
           queryClient.invalidateQueries({
             queryKey: listInscriptionsKeys.lists(),
           });
         }}
         onSearchResponsible={(next) => {
-          setResponsible(next || "");
+          setResponsible(next || '');
           setPage(1);
           queryClient.invalidateQueries({
             queryKey: listInscriptionsKeys.lists(),
@@ -226,12 +205,12 @@ export default function ListInscriptionsSuperPage() {
     <PageContainer
       title={
         loading
-          ? "Carregando..."
+          ? 'Carregando...'
           : `${event?.name.toUpperCase()} - Lista de Inscrições`
       }
       description={
         loading
-          ? "Carregando..."
+          ? 'Carregando...'
           : `Abaixo estão listadas todas as inscrições referentes ao evento: ${event?.name}`
       }
       showBackButton

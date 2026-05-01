@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { InscriptionStatus } from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
-import { Button } from "@/shared/components/ui/button";
-import { Checkbox } from "@/shared/components/ui/checkbox";
-import { Label } from "@/shared/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
-import { Separator } from "@/shared/components/ui/separator";
-import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
-import { useEffect, useMemo, useState } from "react";
+import { InscriptionStatus } from '@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes';
+import { Button } from '@/shared/components/ui/button';
+import { Checkbox } from '@/shared/components/ui/checkbox';
+import { Label } from '@/shared/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+import { Separator } from '@/shared/components/ui/separator';
+import { getConvertStatusInscription } from '@/shared/utils/getConvertStatus';
+import { useEffect, useMemo, useState } from 'react';
 
 export type InscriptionsFiltersValue = {
   status: InscriptionStatus[];
   hideNotAllocated: boolean;
-  orderByCreatedAt: "asc" | "desc";
-  orderByResponsible: "asc" | "desc";
-  limitTime: "all" | "1h" | "24h" | "7d" | "30d";
+  orderByCreatedAt: 'asc' | 'desc';
+  orderByResponsible: 'asc' | 'desc';
+  period: 'all' | '1h' | '24h' | '7d' | '30d';
 };
 
 type InscriptionsFiltersProps = {
@@ -26,9 +26,9 @@ type InscriptionsFiltersProps = {
 const DEFAULT_FILTERS: InscriptionsFiltersValue = {
   status: [],
   hideNotAllocated: false,
-  orderByCreatedAt: "asc",
-  orderByResponsible: "asc",
-  limitTime: "all",
+  orderByCreatedAt: 'asc',
+  orderByResponsible: 'asc',
+  period: 'all',
 };
 
 export default function InscriptionsFilters({
@@ -70,9 +70,9 @@ export default function InscriptionsFilters({
 
   return (
     <div className="w-[980px] max-w-[calc(100vw-2rem)]">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 p-0">
-        <div className="space-y-5 p-6 md:border-r border-border">
-          <h4 className="text-base font-semibold text-foreground">
+      <div className="grid grid-cols-1 gap-0 p-0 md:grid-cols-3">
+        <div className="border-border space-y-5 p-6 md:border-r">
+          <h4 className="text-foreground text-base font-semibold">
             Filtrar por status
           </h4>
           <div className="space-y-3">
@@ -82,12 +82,12 @@ export default function InscriptionsFilters({
               onClick={() => setDraft((prev) => ({ ...prev, status: [] }))}
               aria-pressed={draft.status.length === 0}
             >
-              <span className="relative h-4 w-4 shrink-0 rounded-full border border-input">
+              <span className="border-input relative h-4 w-4 shrink-0 rounded-full border">
                 {draft.status.length === 0 && (
-                  <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" />
+                  <span className="bg-primary absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full" />
                 )}
               </span>
-              <span className="text-sm font-medium text-foreground">Todas</span>
+              <span className="text-foreground text-sm font-medium">Todas</span>
             </button>
             {statusOptions.map((status) => (
               <button
@@ -97,12 +97,12 @@ export default function InscriptionsFilters({
                 onClick={() => toggleStatus(status)}
                 aria-pressed={isStatusSelected(status)}
               >
-                <span className="relative h-4 w-4 shrink-0 rounded-full border border-input">
+                <span className="border-input relative h-4 w-4 shrink-0 rounded-full border">
                   {isStatusSelected(status) && (
-                    <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary" />
+                    <span className="bg-primary absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full" />
                   )}
                 </span>
-                <span className="text-sm text-foreground">
+                <span className="text-foreground text-sm">
                   {getConvertStatusInscription(status)}
                 </span>
               </button>
@@ -110,25 +110,25 @@ export default function InscriptionsFilters({
           </div>
         </div>
 
-        <div className="space-y-5 p-6 md:border-r border-border">
-          <h4 className="text-base font-semibold text-foreground">
+        <div className="border-border space-y-5 p-6 md:border-r">
+          <h4 className="text-foreground text-base font-semibold">
             Filtrar por período
           </h4>
           <RadioGroup
-            value={draft.limitTime}
+            value={draft.period}
             onValueChange={(next) =>
               setDraft((prev) => ({
                 ...prev,
-                limitTime: next as InscriptionsFiltersValue["limitTime"],
+                period: next as InscriptionsFiltersValue['period'],
               }))
             }
           >
             {[
-              { value: "all", label: "Todos" },
-              { value: "1h", label: "Última 1h" },
-              { value: "24h", label: "Últimas 24h" },
-              { value: "7d", label: "Últimos 7 dias" },
-              { value: "30d", label: "Últimos 30 dias" },
+              { value: 'all', label: 'Todos' },
+              { value: '1h', label: 'Última 1h' },
+              { value: '24h', label: 'Últimas 24h' },
+              { value: '7d', label: 'Últimos 7 dias' },
+              { value: '30d', label: 'Últimos 30 dias' },
             ].map((opt) => (
               <div key={opt.value} className="flex items-center gap-3">
                 <RadioGroupItem value={opt.value} id={`limit-${opt.value}`} />
@@ -141,13 +141,13 @@ export default function InscriptionsFilters({
         </div>
 
         <div className="space-y-5 p-6">
-          <h4 className="text-base font-semibold text-foreground">
+          <h4 className="text-foreground text-base font-semibold">
             Outras opções
           </h4>
 
           <div className="space-y-6">
             <div className="space-y-3">
-              <div className="text-sm font-semibold text-foreground">
+              <div className="text-foreground text-sm font-semibold">
                 Ordenar por data
               </div>
               <RadioGroup
@@ -156,13 +156,13 @@ export default function InscriptionsFilters({
                   setDraft((prev) => ({
                     ...prev,
                     orderByCreatedAt:
-                      next as InscriptionsFiltersValue["orderByCreatedAt"],
+                      next as InscriptionsFiltersValue['orderByCreatedAt'],
                   }))
                 }
               >
                 {[
-                  { value: "asc", label: "Do mais Antigo" },
-                  { value: "desc", label: "Do mais Novo" },
+                  { value: 'asc', label: 'Do mais Antigo' },
+                  { value: 'desc', label: 'Do mais Novo' },
                 ].map((opt) => (
                   <div key={opt.value} className="flex items-center gap-3">
                     <RadioGroupItem
@@ -178,7 +178,7 @@ export default function InscriptionsFilters({
             </div>
 
             <div className="space-y-3">
-              <div className="text-sm font-semibold text-foreground">
+              <div className="text-foreground text-sm font-semibold">
                 Ordenar responsável
               </div>
               <RadioGroup
@@ -187,13 +187,13 @@ export default function InscriptionsFilters({
                   setDraft((prev) => ({
                     ...prev,
                     orderByResponsible:
-                      next as InscriptionsFiltersValue["orderByResponsible"],
+                      next as InscriptionsFiltersValue['orderByResponsible'],
                   }))
                 }
               >
                 {[
-                  { value: "asc", label: "A-Z" },
-                  { value: "desc", label: "Z-A" },
+                  { value: 'asc', label: 'A-Z' },
+                  { value: 'desc', label: 'Z-A' },
                 ].map((opt) => (
                   <div key={opt.value} className="flex items-center gap-3">
                     <RadioGroupItem

@@ -1,9 +1,9 @@
 import {
   getListInscriptionsParams,
   ListInscriptionsResponse,
-} from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
+} from '@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes';
+import axiosInstance from '@/shared/lib/apiClient';
+import qs from 'qs';
 
 export async function getListInscriptions({
   eventId,
@@ -11,7 +11,7 @@ export async function getListInscriptions({
   isGuest,
   orderByCreatedAt,
   orderByResponsible,
-  limitTime,
+  period,
   page,
   pageSize,
   responsible,
@@ -25,12 +25,12 @@ export async function getListInscriptions({
           isGuest,
           orderByCreatedAt,
           orderByResponsible,
-          limitTime,
+          period,
           responsible,
           page,
           pageSize,
         },
-        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
       },
     );
     return data;
@@ -42,7 +42,7 @@ export async function getListInscriptions({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar as inscrições.",
+        'Não foi possível buscar as inscrições.',
     );
   }
 }

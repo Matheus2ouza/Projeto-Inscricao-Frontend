@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 import {
   Event,
   Inscription,
-} from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
-import { Badge } from "@/shared/components/ui/badge";
+} from '@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes';
+import { Badge } from '@/shared/components/ui/badge';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+} from '@/shared/components/ui/popover';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -18,13 +18,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { calculateGlobalIndex } from "@/shared/utils/calculateGlobalIndex";
-import { formatDate } from "@/shared/utils/formatDate";
-import { getConvertStatusInscription } from "@/shared/utils/getConvertStatus";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
-import { getStatusColor } from "@/shared/utils/getStatusColor";
-import { Button, Pagination } from "antd";
+} from '@/shared/components/ui/table';
+import { calculateGlobalIndex } from '@/shared/utils/calculateGlobalIndex';
+import { formatDate } from '@/shared/utils/formatDate';
+import { getConvertStatusInscription } from '@/shared/utils/getConvertStatus';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
+import { getStatusColor } from '@/shared/utils/getStatusColor';
+import { Button, Pagination } from 'antd';
 import {
   Calendar,
   Download,
@@ -33,22 +33,22 @@ import {
   Info,
   User,
   Users,
-} from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
+} from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 import {
   GeneratelistInscriptionsPdfInput,
   GeneratelistInscriptionsPdfResponse,
-} from "../../types/actions/reports/generateListInscriptionsPdfTypes";
+} from '../../types/actions/reports/generateListInscriptionsPdfTypes';
 import {
   GeneratelistInscriptionsXlsxInput,
   GeneratelistInscriptionsXlsxResponse,
-} from "../../types/actions/reports/generateListInscriptionsXlsxTypes";
+} from '../../types/actions/reports/generateListInscriptionsXlsxTypes';
 import InscriptionsFilters, {
   InscriptionsFiltersValue,
-} from "./filters/InscriptionsFilters";
-import InscriptionsNameSearch from "./filters/InscriptionsNameSearch";
-import SheetListInscriptions from "./pdf/SheetListInscriptions";
+} from './filters/InscriptionsFilters';
+import InscriptionsNameSearch from './filters/InscriptionsNameSearch';
+import SheetListInscriptions from './pdf/SheetListInscriptions';
 
 interface listInscriptionsTableProps {
   pageSize: number;
@@ -112,11 +112,11 @@ export default function ListInscriptionsTable({
 
   if (!event) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-          <Users className="h-8 w-8 text-muted-foreground" />
+      <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+        <div className="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+          <Users className="text-muted-foreground h-8 w-8" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">Nenhum evento encontrado</h3>
+        <h3 className="mb-2 text-lg font-semibold">Nenhum evento encontrado</h3>
         <p className="text-muted-foreground">
           Não há inscrições disponíveis para visualização.
         </p>
@@ -126,10 +126,10 @@ export default function ListInscriptionsTable({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
+      <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
         <div className="p-6">
-          <div className="flex flex-col sm:flex-row gap-6">
-            <div className="relative w-full sm:w-70 h-48 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+          <div className="flex flex-col gap-6 sm:flex-row">
+            <div className="bg-muted relative h-48 w-full flex-shrink-0 overflow-hidden rounded-lg sm:w-70">
               {event.image && !imageError ? (
                 <Image
                   src={event.image}
@@ -140,33 +140,33 @@ export default function ListInscriptionsTable({
                   sizes="(max-width: 640px) 100vw, 192px"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-muted">
-                  <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                <div className="bg-muted flex h-full w-full items-center justify-center">
+                  <ImageIcon className="text-muted-foreground h-12 w-12" />
                 </div>
               )}
             </div>
 
             <div className="flex-1 space-y-4">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white uppercase">
+                <h1 className="text-2xl font-bold text-gray-900 uppercase dark:text-white">
                   {event.name}
                 </h1>
 
-                <div className="flex flex-wrap gap-4 mt-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="mt-3 flex flex-wrap gap-4">
+                  <div className="text-muted-foreground flex items-center gap-2 text-sm">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {formatDate(event.startDate)} -{" "}
+                      {formatDate(event.startDate)} -{' '}
                       {formatDate(event.endDate)}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <div className="bg-muted/30 p-4 rounded-lg">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="bg-muted/30 rounded-lg p-4">
                   <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-muted-foreground text-sm">
                       Total de Inscrições
                     </span>
                     <span className="text-2xl font-bold">
@@ -175,9 +175,9 @@ export default function ListInscriptionsTable({
                   </div>
                 </div>
 
-                <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="bg-muted/30 rounded-lg p-4">
                   <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-muted-foreground text-sm">
                       Participantes
                     </span>
                     <span className="text-2xl font-bold">
@@ -186,9 +186,9 @@ export default function ListInscriptionsTable({
                   </div>
                 </div>
 
-                <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="bg-muted/30 rounded-lg p-4">
                   <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-muted-foreground text-sm">
                       Total Pago
                     </span>
                     <span className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -197,9 +197,9 @@ export default function ListInscriptionsTable({
                   </div>
                 </div>
 
-                <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="bg-muted/30 rounded-lg p-4">
                   <div className="flex flex-col space-y-1">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-muted-foreground text-sm">
                       Total Pendente
                     </span>
                     <span className="text-2xl font-bold text-red-600 dark:text-red-400">
@@ -213,13 +213,13 @@ export default function ListInscriptionsTable({
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl border shadow-sm overflow-hidden">
-        <div className="p-6 space-y-4">
+      <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
+        <div className="space-y-4 p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Lista de Inscrições
           </h2>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <InscriptionsNameSearch
               eventId={event.id}
               onSearch={onSearchResponsible}
@@ -227,11 +227,11 @@ export default function ListInscriptionsTable({
             <div className="flex items-center gap-2">
               <Button
                 type="primary"
-                icon={<Download className="w-4 h-4" />}
+                icon={<Download className="h-4 w-4" />}
                 onClick={() => setReportsDrawerOpen(true)}
                 disabled={generatingReport}
               >
-                {generatingReport ? "Gerando..." : "Gerar Relatório"}
+                {generatingReport ? 'Gerando...' : 'Gerar Relatório'}
               </Button>
 
               <Popover
@@ -241,13 +241,13 @@ export default function ListInscriptionsTable({
                 }}
               >
                 <PopoverTrigger asChild>
-                  <Button type="primary" icon={<Filter className="w-4 h-4" />}>
+                  <Button type="primary" icon={<Filter className="h-4 w-4" />}>
                     Filtros
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent
                   align="end"
-                  className="w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl shadow-lg border bg-white dark:bg-gray-900 p-0"
+                  className="w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl border bg-white p-0 shadow-lg dark:bg-gray-900"
                 >
                   <InscriptionsFilters
                     value={filters}
@@ -281,7 +281,7 @@ export default function ListInscriptionsTable({
             {loadingInscriptions ? (
               <div className="space-y-3">
                 {Array.from({ length: 6 }).map((_, idx) => (
-                  <div key={idx} className="p-4 border rounded-lg space-y-3">
+                  <div key={idx} className="space-y-3 rounded-lg border p-4">
                     <div className="flex items-center justify-between">
                       <Skeleton className="h-4 w-16" />
                       <Skeleton className="h-6 w-6 rounded-lg" />
@@ -292,7 +292,7 @@ export default function ListInscriptionsTable({
                       <Skeleton className="h-4 w-40" />
                       <Skeleton className="h-4 w-32" />
                     </div>
-                    <div className="pt-3 border-t flex items-center justify-between">
+                    <div className="flex items-center justify-between border-t pt-3">
                       <Skeleton className="h-4 w-28" />
                       <Skeleton className="h-6 w-10" />
                     </div>
@@ -300,7 +300,7 @@ export default function ListInscriptionsTable({
                 ))}
               </div>
             ) : inscriptions.length === 0 ? (
-              <div className="px-4 py-8 text-center text-muted-foreground border rounded-lg">
+              <div className="text-muted-foreground rounded-lg border px-4 py-8 text-center">
                 Nenhuma inscrição encontrada
               </div>
             ) : (
@@ -308,11 +308,11 @@ export default function ListInscriptionsTable({
                 {inscriptions.map((inscription, idx) => (
                   <div
                     key={inscription.id}
-                    className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                    className="hover:bg-muted/30 rounded-lg border p-4 transition-colors"
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="mb-3 flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-muted-foreground">
+                        <span className="text-muted-foreground text-sm font-medium">
                           #
                         </span>
                         <span className="font-semibold">
@@ -322,7 +322,7 @@ export default function ListInscriptionsTable({
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center hover:bg-emerald-600 cursor-pointer"
+                          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg bg-emerald-500 p-0 text-white hover:bg-emerald-600"
                           onClick={() => onSelectInscription(inscription.id)}
                           aria-label="Detalhes"
                         >
@@ -333,7 +333,7 @@ export default function ListInscriptionsTable({
 
                     <div className="mb-3">
                       <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                        className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${getStatusColor(
                           inscription.status,
                         )}`}
                       >
@@ -341,15 +341,15 @@ export default function ListInscriptionsTable({
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3 mb-3">
+                    <div className="mb-3 grid grid-cols-1 gap-3">
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           Responsável
                         </p>
                         <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
+                          <User className="text-muted-foreground h-4 w-4" />
                           <p className="font-medium">
-                            {inscription.responsible || "-"}
+                            {inscription.responsible || '-'}
                           </p>
                           {inscription.isGuest && (
                             <Badge
@@ -362,17 +362,17 @@ export default function ListInscriptionsTable({
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">ID</p>
-                        <code className="font-mono text-xs bg-muted px-2 py-1 rounded">
+                        <p className="text-muted-foreground text-xs">ID</p>
+                        <code className="bg-muted rounded px-2 py-1 font-mono text-xs">
                           {inscription.id.substring(0, 12)}...
                         </code>
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t">
+                    <div className="border-t pt-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <Users className="text-muted-foreground h-4 w-4" />
                           <span className="text-sm font-medium">
                             Participantes
                           </span>
@@ -388,9 +388,9 @@ export default function ListInscriptionsTable({
             )}
           </div>
 
-          <div className="hidden sm:block rounded-md border">
+          <div className="hidden rounded-md border sm:block">
             {loadingInscriptions ? (
-              <div className="p-6 space-y-4">
+              <div className="space-y-4 p-6">
                 {Array.from({ length: 8 }).map((_, idx) => (
                   <div key={idx} className="flex items-center gap-4">
                     <Skeleton className="h-5 w-10" />
@@ -403,7 +403,7 @@ export default function ListInscriptionsTable({
                 ))}
               </div>
             ) : inscriptions.length === 0 ? (
-              <div className="px-6 py-12 text-center text-muted-foreground">
+              <div className="text-muted-foreground px-6 py-12 text-center">
                 Nenhuma inscrição encontrada
               </div>
             ) : (
@@ -436,8 +436,8 @@ export default function ListInscriptionsTable({
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          {inscription.responsible || "-"}
+                          <User className="text-muted-foreground h-4 w-4" />
+                          {inscription.responsible || '-'}
                           {inscription.isGuest && (
                             <Badge
                               variant="secondary"
@@ -450,7 +450,7 @@ export default function ListInscriptionsTable({
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                          className={`rounded-full border px-3 py-1 text-xs font-semibold ${getStatusColor(
                             inscription.status,
                           )}`}
                         >
@@ -459,7 +459,7 @@ export default function ListInscriptionsTable({
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <Users className="text-muted-foreground h-4 w-4" />
                           <span className="font-semibold">
                             {inscription.totalParticipant}
                           </span>
@@ -469,7 +469,7 @@ export default function ListInscriptionsTable({
                         <div className="flex justify-center gap-1">
                           <button
                             type="button"
-                            className="h-6 w-6 rounded-lg bg-emerald-500 text-white p-0 flex items-center justify-center"
+                            className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500 p-0 text-white"
                             onClick={() => onSelectInscription(inscription.id)}
                             aria-label="Detalhes"
                           >
@@ -496,8 +496,8 @@ export default function ListInscriptionsTable({
                   responsive
                   size="small"
                 />
-                <div className="text-sm font-semibold text-foreground">
-                  Página <span className="font-bold">{page}</span> de{" "}
+                <div className="text-foreground text-sm font-semibold">
+                  Página <span className="font-bold">{page}</span> de{' '}
                   <span className="font-bold">{pageCount}</span>
                 </div>
               </div>

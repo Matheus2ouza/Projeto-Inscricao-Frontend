@@ -1,9 +1,9 @@
-import { useListInscritionsQuery } from "@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery";
+import { useListInscritionsQuery } from '@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery';
 import {
   ListInscriptionsParams,
   ListInscriptionsResult,
-} from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
-import { useState } from "react";
+} from '@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes';
+import { useState } from 'react';
 
 export function useListInscriptions({
   eventId,
@@ -13,7 +13,7 @@ export function useListInscriptions({
   isGuest,
   orderByCreatedAt,
   orderByResponsible,
-  limitTime,
+  period,
   responsible,
 }: ListInscriptionsParams): ListInscriptionsResult {
   const [page, setPage] = useState(initialPage);
@@ -27,7 +27,7 @@ export function useListInscriptions({
       isGuest,
       orderByCreatedAt,
       orderByResponsible,
-      limitTime,
+      period,
       responsible,
     );
 

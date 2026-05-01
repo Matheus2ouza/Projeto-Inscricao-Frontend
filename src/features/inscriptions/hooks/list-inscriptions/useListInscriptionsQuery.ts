@@ -1,26 +1,26 @@
-import { getListInscriptions } from "@/features/inscriptions/api/list-inscriptions/getListInscriptions";
+import { getListInscriptions } from '@/features/inscriptions/api/list-inscriptions/getListInscriptions';
 import {
   InscriptionStatus,
   ListInscriptionsResponse,
-} from "@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes";
+} from '@/features/inscriptions/types/list-inscriptions/listInscriptionsTypes';
 import {
   keepPreviousData,
   useQuery,
   useQueryClient,
-} from "@tanstack/react-query";
+} from '@tanstack/react-query';
 
 export const listInscriptionsKeys = {
-  all: ["list-inscriptions"] as const,
-  lists: () => [...listInscriptionsKeys.all, "list"] as const,
+  all: ['list-inscriptions'] as const,
+  lists: () => [...listInscriptionsKeys.all, 'list'] as const,
   list: (
     eventId: string,
     page: number,
     pageSize: number,
     status?: InscriptionStatus[],
     isGuest?: boolean,
-    orderByCreatedAt?: "asc" | "desc",
-    orderByResponsible?: "asc" | "desc",
-    limitTime?: string,
+    orderByCreatedAt?: 'asc' | 'desc',
+    orderByResponsible?: 'asc' | 'desc',
+    period?: string,
     responsible?: string,
   ) =>
     [
@@ -32,7 +32,7 @@ export const listInscriptionsKeys = {
       isGuest,
       orderByCreatedAt,
       orderByResponsible,
-      limitTime,
+      period,
       responsible,
     ] as const,
 };
@@ -43,9 +43,9 @@ export function useListInscritionsQuery(
   pageSize: number,
   status?: InscriptionStatus[],
   isGuest?: boolean,
-  orderByCreatedAt?: "asc" | "desc",
-  orderByResponsible?: "asc" | "desc",
-  limitTime?: string,
+  orderByCreatedAt?: 'asc' | 'desc',
+  orderByResponsible?: 'asc' | 'desc',
+  period?: string,
   responsible?: string,
 ) {
   return useQuery<ListInscriptionsResponse>({
@@ -57,7 +57,7 @@ export function useListInscritionsQuery(
       isGuest,
       orderByCreatedAt,
       orderByResponsible,
-      limitTime,
+      period,
       responsible,
     ),
     queryFn: () =>
@@ -67,7 +67,7 @@ export function useListInscritionsQuery(
         isGuest,
         orderByCreatedAt,
         orderByResponsible,
-        limitTime,
+        period,
         responsible,
         page,
         pageSize,
@@ -94,9 +94,9 @@ export function useInvalidateListInscriptionsQuery() {
       pageSize: number,
       status?: InscriptionStatus[],
       isGuest?: boolean,
-      orderByCreatedAt?: "asc" | "desc",
-      orderByResponsible?: "asc" | "desc",
-      limitTime?: string,
+      orderByCreatedAt?: 'asc' | 'desc',
+      orderByResponsible?: 'asc' | 'desc',
+      period?: string,
       responsible?: string,
     ) => {
       queryClient.invalidateQueries({
@@ -108,7 +108,7 @@ export function useInvalidateListInscriptionsQuery() {
           isGuest,
           orderByCreatedAt,
           orderByResponsible,
-          limitTime,
+          period,
           responsible,
         ),
       });
