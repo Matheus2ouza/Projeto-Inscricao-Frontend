@@ -1,12 +1,23 @@
 import axiosInstance from '@/shared/lib/apiClient';
 import qs from 'qs';
 
+enum InscriptionStatus {
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
+}
+
 export type GenerateParticipantsByLocalityXlsxParams = {
   eventId: string;
   separate: boolean;
   summary: boolean;
   typeInscriptions?: string | string[];
   columns?: ReportColumnXlsx[];
+  startDate?: string;
+  endDate?: string;
+  status?: InscriptionStatus[];
 };
 
 export type ReportColumnXlsx =
@@ -33,6 +44,9 @@ export async function generateParticipantsByLocalityXlsx({
   summary = false,
   typeInscriptions,
   columns,
+  startDate,
+  endDate,
+  status,
 }: GenerateParticipantsByLocalityXlsxParams): Promise<GenerateParticipantsByLocalityXlsxResponse> {
   try {
     const { data } = await axiosInstance.get(
@@ -43,6 +57,9 @@ export async function generateParticipantsByLocalityXlsx({
           summary,
           typeInscriptions: typeInscriptions,
           columns: columns ? columns.join(',') : undefined,
+          startDate,
+          endDate,
+          status,
         },
         paramsSerializer: (params) =>
           qs.stringify(params, { arrayFormat: 'repeat' }),

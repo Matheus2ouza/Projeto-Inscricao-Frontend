@@ -118,6 +118,8 @@ export default function ListGuestParticipantsAdminPage() {
           summary,
           typeInscriptions,
           columns,
+          startDate,
+          endDate,
         }) =>
           handleGenerateLocalityPdfReport({
             eventId,
@@ -126,6 +128,8 @@ export default function ListGuestParticipantsAdminPage() {
             summary,
             typeInscriptions,
             columns,
+            startDate,
+            endDate,
           })
         }
         onGenerateParticipantsByLocalityXlsx={({
@@ -133,6 +137,8 @@ export default function ListGuestParticipantsAdminPage() {
           summary,
           typeInscriptions,
           columns,
+          startDate,
+          endDate,
         }) =>
           handleGenerateLocalityXlsxReport({
             eventId,
@@ -140,6 +146,8 @@ export default function ListGuestParticipantsAdminPage() {
             summary,
             typeInscriptions,
             columns,
+            startDate,
+            endDate,
           })
         }
         isGeneratingParticipantsByLocalityPdf={isGeneratePdfLocalityMutation}
