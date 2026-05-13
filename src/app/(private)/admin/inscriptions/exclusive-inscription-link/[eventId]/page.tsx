@@ -8,7 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 5;
 
-export default function ExclusiveInscriptionLinkPage() {
+export default function ExclusiveInscriptionLinkPageAdmin() {
   const params = useParams();
   const router = useRouter();
   const rawEventId = params.eventId;

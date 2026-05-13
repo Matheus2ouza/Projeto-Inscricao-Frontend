@@ -46,11 +46,11 @@ export default function SelectEventForExclusiveInscriptionLinkPageSuper() {
   ];
 
   const handleSelectEvent = (eventId: string) => {
-    router.push(`/super/inscriptions/exclusive-inscription-link/${eventId}`);
+    router.push(`/Super/inscriptions/exclusive-inscription-link/${eventId}`);
   };
 
   const handleBack = () => {
-    router.push('/super/home');
+    router.push('/Super/home');
   };
 
   const renderSkeletonGrid = () => (
