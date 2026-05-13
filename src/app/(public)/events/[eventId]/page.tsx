@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import PublicEventDetails from '@/features/events/components/publicEvents/PublicEventDetails';
-import { usePublicEvent } from '@/features/events/hooks/publicEvents/usePublicEvent';
-import BackgroundPaths from '@/features/guest/components/guestInscription/background-paths';
-import { useImagePalette } from '@/features/guest/hook/guestInscription/useImagePalette';
-import PageContainer from '@/shared/components/layout/PageContainer';
-import { Button } from '@/shared/components/ui/button';
-import { Skeleton } from '@/shared/components/ui/skeleton';
-import { useParams, useRouter } from 'next/navigation';
+import PublicEventDetails from "@/features/events/components/publicEvents/PublicEventDetails";
+import { usePublicEvent } from "@/features/events/hooks/publicEvents/usePublicEvent";
+import BackgroundPaths from "@/features/guest/components/guestInscription/background-paths";
+import { useImagePalette } from "@/features/guest/hook/guestInscription/useImagePalette";
+import PageContainer from "@/shared/components/layout/PageContainer";
+import { Button } from "@/shared/components/ui/button";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useParams, useRouter } from "next/navigation";
 
 export default function EventPage() {
   const router = useRouter();
@@ -31,10 +31,10 @@ export default function EventPage() {
     swatches.LightMuted;
 
   const titleColor =
-    preferredSwatch?.titleTextColor ?? (isDark ? '#ffffff' : '#111111');
+    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
   const bodyColor =
     preferredSwatch?.bodyTextColor ??
-    (isDark ? 'rgba(255,255,255,0.7)' : '#374151');
+    (isDark ? "rgba(255,255,255,0.7)" : "#374151");
 
   const handleViewSubscription = (eventId: string) => {
     router.push(`/guest/${eventId}/inscription`);
@@ -45,7 +45,7 @@ export default function EventPage() {
   };
 
   const handleLogin = () => {
-    router.push('/login');
+    router.push("/login");
   };
 
   const renderSkeletonGrid = () => {
@@ -56,21 +56,21 @@ export default function EventPage() {
           <Skeleton className="h-5 w-1/4" />
         </div>
 
-        <div className="relative overflow-hidden rounded-xl">
-          <div className="relative aspect-[3/2] max-h-[400px] w-full overflow-hidden">
-            <Skeleton className="h-full w-full" />
+        <div className="relative rounded-xl overflow-hidden">
+          <div className="relative w-full max-h-[400px] aspect-[3/2] overflow-hidden">
+            <Skeleton className="w-full h-full" />
           </div>
         </div>
 
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <Skeleton className="h-12 w-full sm:w-40" />
           <Skeleton className="h-12 w-full sm:w-40" />
           <Skeleton className="h-12 w-full sm:w-40" />
         </div>
 
         <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div className="bg-card rounded-lg border p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="border rounded-lg p-6 bg-card">
               <div className="flex items-center gap-4">
                 <Skeleton className="h-12 w-12 rounded-lg" />
                 <div className="flex-1 space-y-2">
@@ -79,7 +79,7 @@ export default function EventPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card rounded-lg border p-6">
+            <div className="border rounded-lg p-6 bg-card">
               <div className="flex items-center gap-4">
                 <Skeleton className="h-12 w-12 rounded-lg" />
                 <div className="flex-1 space-y-2">
@@ -90,20 +90,20 @@ export default function EventPage() {
             </div>
           </div>
 
-          <div className="bg-card rounded-lg border p-6">
+          <div className="border rounded-lg p-6 bg-card">
             <div className="space-y-6">
               <div className="space-y-2">
                 <Skeleton className="h-5 w-24" />
                 <Skeleton className="h-5 w-64" />
               </div>
-              <div className="h-64 overflow-hidden rounded-lg border">
-                <Skeleton className="h-full w-full" />
+              <div className="h-64 rounded-lg overflow-hidden border">
+                <Skeleton className="w-full h-full" />
               </div>
             </div>
           </div>
 
-          <div className="bg-card rounded-lg border p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="border rounded-lg p-6 bg-card">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-6 w-32" />
                 <Skeleton className="h-5 w-48" />
@@ -123,9 +123,9 @@ export default function EventPage() {
 
     if (error) {
       return (
-        <div className="flex min-h-[400px] items-center justify-center">
+        <div className="min-h-[400px] flex items-center justify-center">
           <div className="text-center">
-            <p className="text-foreground mb-4">{error}</p>
+            <p className="mb-4 text-foreground">{error}</p>
             <Button onClick={() => refetch()}>Tentar Novamente</Button>
           </div>
         </div>
@@ -146,13 +146,13 @@ export default function EventPage() {
   };
 
   return (
-    <div className="relative isolate min-h-screen">
+    <div className="relative min-h-screen isolate">
       <BackgroundPaths palette={palette} />
       <PageContainer
-        title={event?.name.toUpperCase() ?? 'Evento'}
-        description={event?.regionName ?? ''}
+        title={event?.name.toUpperCase() ?? "Evento"}
+        description={event?.regionName ?? ""}
         showTitle={!loading}
-        className="bg-transparent bg-none"
+        className="bg-none bg-transparent"
         titleColor={titleColor}
         descriptionColor={bodyColor}
       >

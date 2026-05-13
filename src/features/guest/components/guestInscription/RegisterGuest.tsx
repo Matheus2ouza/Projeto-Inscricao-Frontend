@@ -1,33 +1,33 @@
-'use client';
+"use client";
 
-import { useFormCreateGuestInscription } from '@/features/guest/hook/guestInscription/useFormCreateGuestInscription';
-import type { ImageSwatches } from '@/features/guest/hook/guestInscription/useImagePalette';
+import { useFormCreateGuestInscription } from "@/features/guest/hook/guestInscription/useFormCreateGuestInscription";
+import type { ImageSwatches } from "@/features/guest/hook/guestInscription/useImagePalette";
 import {
   guestInscriptionSchema,
   GuestInscriptionSchemaType,
-} from '@/features/guest/schema/guestInscription/guestInscriptionSchema';
+} from "@/features/guest/schema/guestInscription/guestInscriptionSchema";
 import {
   Event,
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
-} from '@/features/guest/types/guestInscription/guestInscriptionTypes';
-import { GuestInscriptionAlready } from '@/shared/components/GuestInscriptionAlready';
-import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
-import { Badge } from '@/shared/components/ui/badge';
-import { Button } from '@/shared/components/ui/button';
+} from "@/features/guest/types/guestInscription/guestInscriptionTypes";
+import { GuestInscriptionAlready } from "@/shared/components/GuestInscriptionAlready";
+import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/shared/components/ui/card';
+} from "@/shared/components/ui/card";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
-} from '@/shared/components/ui/command';
+} from "@/shared/components/ui/command";
 import {
   Form,
   FormControl,
@@ -35,20 +35,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/shared/components/ui/form';
+} from "@/shared/components/ui/form";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/shared/components/ui/popover';
-import { cn } from '@/shared/lib/utils';
-import { formatDate } from '@/shared/utils/formatDate';
-import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
-import { getInitial } from '@/shared/utils/getInitials';
-import { getWithExpiry, setWithExpiry } from '@/shared/utils/storageWithExpiry';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { DatePicker, Input } from 'antd';
-import dayjs from 'dayjs';
+} from "@/shared/components/ui/popover";
+import { cn } from "@/shared/lib/utils";
+import { formatDate } from "@/shared/utils/formatDate";
+import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+import { getInitial } from "@/shared/utils/getInitials";
+import { getWithExpiry, setWithExpiry } from "@/shared/utils/storageWithExpiry";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DatePicker, Input } from "antd";
+import dayjs from "dayjs";
 import {
   AlertCircle,
   Calendar,
@@ -56,13 +56,13 @@ import {
   ChevronsUpDown,
   Info,
   User,
-} from 'lucide-react';
-import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import z from 'zod';
-import { InscriptionSuccessModal } from './InscriptionSuccessModal';
-import { InscriptionTypeSelector } from './InscriptionTypeCard';
+} from "lucide-react";
+import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { InscriptionSuccessModal } from "./InscriptionSuccessModal";
+import { InscriptionTypeSelector } from "./InscriptionTypeCard";
 
 interface RegisterGuestProps {
   event: Event | null;
@@ -81,8 +81,8 @@ export function RegisterGuest({
 }: RegisterGuestProps) {
   if (!event) {
     return (
-      <div className="rounded-2xl border border-gray-200/80 bg-white/90 p-10 text-center backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-        <h2 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">
+      <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
+        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
           Evento não encontrado
         </h2>
         <p className="text-muted-foreground">
@@ -92,8 +92,10 @@ export function RegisterGuest({
     );
   }
 
+  const [open, setOpen] = useState(false);
   const [openGender, setOpenGender] = useState(false);
   const [openShirtSize, setOpenShirtSize] = useState(false);
+  const [openShirtType, setOpenShirtType] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [successData, setSuccessData] =
     useState<RegisterGuestInscriptionResponse | null>(null);
@@ -102,8 +104,9 @@ export function RegisterGuest({
   >(null);
   const [alreadyDialogOpen, setAlreadyDialogOpen] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [typeInscriptionId, setTypeInscriptionId] = useState<string>('');
-  const throttleKey = 'guest_inscription_already_throttle_5m';
+  const [typeInscriptionId, setTypeInscriptionId] = useState<string>("");
+  const [infoPopoverOpen, setInfoPopoverOpen] = useState(false);
+  const throttleKey = "guest_inscription_already_throttle_5m";
 
   useEffect(() => {
     if (
@@ -135,7 +138,7 @@ export function RegisterGuest({
       eventId: string;
       confirmationCode: string;
       thereIsPayment?: boolean;
-    }>('guest_inscription');
+    }>("guest_inscription");
 
     if (
       !cached ||
@@ -157,15 +160,15 @@ export function RegisterGuest({
   }, [event.id, successModalOpen, throttleKey]);
 
   const genderOptions = [
-    { value: 'MASCULINO', label: 'Masculino' },
-    { value: 'FEMININO', label: 'Feminino' },
+    { value: "MASCULINO", label: "Masculino" },
+    { value: "FEMININO", label: "Feminino" },
   ];
   const shirtSizeOptions = [
-    { value: 'PP', label: 'PP' },
-    { value: 'P', label: 'P' },
-    { value: 'M', label: 'M' },
-    { value: 'G', label: 'G' },
-    { value: 'GG', label: 'GG' },
+    { value: "PP", label: "PP" },
+    { value: "P", label: "P" },
+    { value: "M", label: "M" },
+    { value: "G", label: "G" },
+    { value: "GG", label: "GG" },
   ];
 
   type GuestFormValues = GuestInscriptionSchemaType & {
@@ -178,7 +181,7 @@ export function RegisterGuest({
         typeInscriptionId: z
           .string()
           .trim()
-          .min(1, 'Selecione o tipo de inscrição'),
+          .min(1, "Selecione o tipo de inscrição"),
       }),
     [],
   );
@@ -192,10 +195,10 @@ export function RegisterGuest({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ...initialValues,
-      birthDate: '',
-      typeInscriptionId: '',
+      birthDate: "",
+      typeInscriptionId: "",
     },
-    mode: 'onSubmit',
+    mode: "onSubmit",
   });
 
   const formData = form.watch();
@@ -203,7 +206,7 @@ export function RegisterGuest({
   const control = form.control;
 
   useEffect(() => {
-    const current = formData.typeInscriptionId?.trim() ?? '';
+    const current = formData.typeInscriptionId?.trim() ?? "";
     if (current === typeInscriptionId) return;
     setTypeInscriptionId(current);
   }, [formData.typeInscriptionId, typeInscriptionId]);
@@ -224,7 +227,7 @@ export function RegisterGuest({
   }, [event.typeInscriptions, formData.birthDate]);
 
   useEffect(() => {
-    const current = form.getValues('typeInscriptionId')?.trim();
+    const current = form.getValues("typeInscriptionId")?.trim();
     if (!current) return;
 
     const stillValid = typeInscriptions.some(
@@ -232,12 +235,12 @@ export function RegisterGuest({
     );
     if (stillValid) return;
 
-    form.setValue('typeInscriptionId', '');
-    setTypeInscriptionId('');
+    form.setValue("typeInscriptionId", "");
+    setTypeInscriptionId("");
   }, [form, typeInscriptions]);
 
   const formatCpf = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
+    const digits = value.replace(/\D/g, "").slice(0, 11);
     const part1 = digits.slice(0, 3);
     const part2 = digits.slice(3, 6);
     const part3 = digits.slice(6, 9);
@@ -251,12 +254,12 @@ export function RegisterGuest({
   };
 
   const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 11);
+    const digits = value.replace(/\D/g, "").slice(0, 11);
     const ddd = digits.slice(0, 2);
     const first = digits.slice(2, 7);
     const last = digits.slice(7, 11);
 
-    if (!ddd) return '';
+    if (!ddd) return "";
     if (digits.length <= 2) return `(${ddd}`;
     if (digits.length <= 7) return `(${ddd}) ${first}`;
     return `(${ddd}) ${first}-${last}`;
@@ -272,7 +275,7 @@ export function RegisterGuest({
     }
 
     if (result.success) {
-      setWithExpiry('guest_inscription', {
+      setWithExpiry("guest_inscription", {
         eventId: event.id,
         confirmationCode: result.success.confirmationCode,
         thereIsPayment: event.paymentEnabled,
@@ -284,7 +287,7 @@ export function RegisterGuest({
   });
 
   const calculateMaxAge = (ruleDate?: Date) => {
-    if (!ruleDate) return '';
+    if (!ruleDate) return "";
 
     const today = new Date();
     const rule = new Date(ruleDate);
@@ -311,15 +314,15 @@ export function RegisterGuest({
   }, [isDark, swatches]);
 
   const recommendedTitleColor =
-    preferredSwatch?.titleTextColor ?? (isDark ? '#ffffff' : '#111111');
+    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
   const recommendedBodyColor =
     preferredSwatch?.bodyTextColor ??
-    (isDark ? 'rgba(255,255,255,0.78)' : '#374151');
+    (isDark ? "rgba(255,255,255,0.78)" : "#374151");
 
   if (!event) {
     return (
-      <div className="rounded-2xl border border-gray-200/80 bg-white/90 p-10 text-center backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-        <h2 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">
+      <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
+        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
           Evento não encontrado
         </h2>
         <p className="text-muted-foreground">
@@ -331,8 +334,8 @@ export function RegisterGuest({
 
   if (!event) {
     return (
-      <div className="rounded-2xl border border-gray-200/80 bg-white/90 p-10 text-center backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-        <h2 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-white">
+      <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
+        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
           Evento não encontrado
         </h2>
         <p className="text-muted-foreground">
@@ -360,10 +363,10 @@ export function RegisterGuest({
       />
       {/* Event Details Card */}
       <Card
-        className={`overflow-hidden border-0 shadow-sm backdrop-blur-md ${isDark ? 'border-white/30 bg-white/20' : 'border-black/10 bg-black/5'}`}
+        className={`border-0 shadow-sm overflow-hidden backdrop-blur-md border ${isDark ? "bg-white/20 border-white/30" : "bg-black/5 border-black/10"}`}
       >
         <CardContent className="p-0">
-          <div className="flex flex-col p-2 lg:flex-row">
+          <div className="flex flex-col lg:flex-row p-2">
             {/* Imagem do Evento */}
             <div className="w-full lg:w-1/3">
               <AspectRatio
@@ -380,16 +383,16 @@ export function RegisterGuest({
                     priority
                   />
                 ) : (
-                  <div className="bg-muted flex h-full w-full items-center justify-center">
+                  <div className="h-full w-full bg-muted flex items-center justify-center">
                     <div className="text-center">
                       <div
-                        className="text-muted-foreground mb-2 text-5xl font-semibold"
+                        className="text-5xl font-semibold text-muted-foreground mb-2"
                         style={{ color: recommendedBodyColor }}
                       >
                         {getInitial(event.name)}
                       </div>
                       <p
-                        className="text-muted-foreground text-sm"
+                        className="text-sm text-muted-foreground"
                         style={{ color: recommendedBodyColor }}
                       >
                         Sem imagem
@@ -410,10 +413,10 @@ export function RegisterGuest({
             </div>
 
             {/* Informações do Evento (Desktop) */}
-            <div className="flex-1 space-y-6 p-6 lg:p-8">
+            <div className="flex-1 p-6 lg:p-8 space-y-6">
               <div className="hidden lg:block">
                 <h1
-                  className="text-foreground text-4xl font-bold tracking-tight uppercase [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
+                  className="text-4xl font-bold tracking-tight uppercase text-foreground [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
                   style={{ color: recommendedTitleColor }}
                 >
                   {event.name}
@@ -421,22 +424,22 @@ export function RegisterGuest({
               </div>
 
               <div
-                className="text-muted-foreground flex flex-wrap items-center gap-6"
+                className="flex flex-wrap items-center gap-6 text-muted-foreground"
                 style={{ color: recommendedBodyColor }}
               >
                 <div className="flex items-center gap-2">
                   <div
-                    className="bg-primary/10 rounded-full p-2"
+                    className="p-2 bg-primary/10 rounded-full"
                     style={{ color: palette[0] }}
                   >
-                    <Calendar className="h-5 w-5" />
+                    <Calendar className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-medium tracking-wider uppercase">
+                    <span className="text-xs font-medium uppercase tracking-wider">
                       Início
                     </span>
                     <span
-                      className="text-foreground text-sm font-semibold"
+                      className="text-sm font-semibold text-foreground"
                       style={{ color: recommendedTitleColor }}
                     >
                       {formatDate(event.startDate)}
@@ -445,17 +448,17 @@ export function RegisterGuest({
                 </div>
                 <div className="flex items-center gap-2">
                   <div
-                    className="bg-primary/10 rounded-full p-2"
+                    className="p-2 bg-primary/10 rounded-full"
                     style={{ color: palette[0] }}
                   >
-                    <Calendar className="h-5 w-5" />
+                    <Calendar className="w-5 h-5" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs font-medium tracking-wider uppercase">
+                    <span className="text-xs font-medium uppercase tracking-wider">
                       Fim
                     </span>
                     <span
-                      className="text-foreground text-sm font-semibold"
+                      className="text-sm font-semibold text-foreground"
                       style={{ color: recommendedTitleColor }}
                     >
                       {formatDate(event.endDate)}
@@ -467,7 +470,7 @@ export function RegisterGuest({
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-4">
                   <div
-                    className="text-muted-foreground text-xs font-medium tracking-wider uppercase"
+                    className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
                     style={{ color: recommendedBodyColor }}
                   >
                     Tipos de inscrição
@@ -477,22 +480,22 @@ export function RegisterGuest({
                 {event.typeInscriptions.length > 0 ? (
                   <>
                     {/* Layout para desktop - Grid lado a lado */}
-                    <div className="hidden grid-cols-1 gap-4 sm:grid-cols-2 lg:grid lg:grid-cols-3">
+                    <div className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {event.typeInscriptions.map((type) => (
                         <div
                           key={type.id || type.description}
                           className={cn(
-                            'rounded-lg border p-4 transition-all hover:shadow-sm',
+                            "rounded-lg border p-4 transition-all hover:shadow-sm",
                             type.specialType
-                              ? 'border-amber-200/30 bg-amber-50/10'
-                              : 'border-white/20 bg-white/5',
+                              ? "border-amber-200/30 bg-amber-50/10"
+                              : "border-white/20 bg-white/5",
                           )}
                         >
-                          <div className="mb-3 flex items-start justify-between gap-2">
+                          <div className="flex items-start justify-between gap-2 mb-3">
                             <div className="min-w-0 flex-1">
-                              <div className="mb-1 flex items-center gap-2">
+                              <div className="flex items-center gap-2 mb-1">
                                 <div
-                                  className="truncate text-sm font-medium"
+                                  className="text-sm font-medium truncate"
                                   style={{ color: recommendedTitleColor }}
                                 >
                                   {type.description}
@@ -501,10 +504,10 @@ export function RegisterGuest({
                                   <Badge
                                     variant="outline"
                                     className={cn(
-                                      'shrink-0 text-xs',
+                                      "shrink-0 text-xs",
                                       type.specialType
-                                        ? 'border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
-                                        : '',
+                                        ? "border-amber-300 bg-amber-100 text-amber-800 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+                                        : "",
                                     )}
                                   >
                                     Especial
@@ -516,7 +519,7 @@ export function RegisterGuest({
                                       <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="text-muted-foreground h-5 w-5 p-0 hover:text-amber-600"
+                                        className="h-5 w-5 p-0 text-muted-foreground hover:text-amber-600"
                                         style={{ color: recommendedBodyColor }}
                                       >
                                         <Info className="h-3.5 w-3.5" />
@@ -526,24 +529,24 @@ export function RegisterGuest({
                                       <div className="space-y-2">
                                         <div className="flex items-center gap-2">
                                           <AlertCircle className="h-4 w-4 text-amber-500" />
-                                          <h4 className="text-sm font-semibold">
+                                          <h4 className="font-semibold text-sm">
                                             Inscrição Especial
                                           </h4>
                                         </div>
                                         <p
-                                          className="text-muted-foreground text-sm"
+                                          className="text-sm text-muted-foreground"
                                           style={{
                                             color: recommendedBodyColor,
                                           }}
                                         >
-                                          Esta é uma inscrição marcada como{' '}
-                                          <strong>&quot;Especial&quot;</strong>{' '}
+                                          Esta é uma inscrição marcada como{" "}
+                                          <strong>&quot;Especial&quot;</strong>{" "}
                                           e necessita de aprovação. Após a
                                           inscrição, os organizadores analisarão
                                           sua solicitação.
                                         </p>
                                         <p
-                                          className="text-muted-foreground mt-2 text-xs"
+                                          className="text-xs text-muted-foreground mt-2"
                                           style={{
                                             color: recommendedBodyColor,
                                           }}
@@ -557,7 +560,7 @@ export function RegisterGuest({
                                 )}
                               </div>
                               <div
-                                className="text-muted-foreground text-xs"
+                                className="text-xs text-muted-foreground"
                                 style={{ color: recommendedBodyColor }}
                               >
                                 {type.rule &&
@@ -565,12 +568,12 @@ export function RegisterGuest({
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between border-t pt-3">
+                          <div className="flex items-center justify-between pt-3 border-t">
                             <div
-                              className="text-muted-foreground text-xs whitespace-nowrap"
+                              className="text-xs text-muted-foreground whitespace-nowrap"
                               style={{ color: recommendedBodyColor }}
                             >
-                              {type.specialType ? 'Necessita aprovação' : ''}
+                              {type.specialType ? "Necessita aprovação" : ""}
                             </div>
                             <div
                               className="text-sm font-semibold whitespace-nowrap"
@@ -584,21 +587,21 @@ export function RegisterGuest({
                     </div>
 
                     {/* Layout para mobile - Lista vertical */}
-                    <div className="bg-muted/20 overflow-hidden rounded-lg border lg:hidden">
+                    <div className="lg:hidden rounded-lg border bg-muted/20 overflow-hidden">
                       {event.typeInscriptions.map((type) => (
                         <div
                           key={type.id || type.description}
                           className={cn(
-                            'flex items-center justify-between gap-4 border-b px-4 py-3 last:border-b-0',
+                            "flex items-center justify-between gap-4 px-4 py-3 border-b last:border-b-0",
                             type.specialType
-                              ? 'bg-amber-50/60 dark:bg-amber-950/30'
-                              : '',
+                              ? "bg-amber-50/60 dark:bg-amber-950/30"
+                              : "",
                           )}
                         >
                           <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex items-center gap-2">
+                            <div className="flex items-center gap-2 mb-1">
                               <div
-                                className="truncate text-sm font-medium"
+                                className="text-sm font-medium truncate"
                                 style={{ color: recommendedTitleColor }}
                               >
                                 {type.description}
@@ -607,10 +610,10 @@ export function RegisterGuest({
                                 <Badge
                                   variant="secondary"
                                   className={cn(
-                                    'shrink-0',
+                                    "shrink-0",
                                     type.specialType
-                                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
-                                      : '',
+                                      ? "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"
+                                      : "",
                                   )}
                                 >
                                   Especial
@@ -631,7 +634,7 @@ export function RegisterGuest({
                                     <div className="space-y-2">
                                       <div className="flex items-center gap-2">
                                         <AlertCircle className="h-4 w-4" />
-                                        <h4 className="text-sm font-semibold">
+                                        <h4 className="font-semibold text-sm">
                                           Inscrição Especial
                                         </h4>
                                       </div>
@@ -639,14 +642,14 @@ export function RegisterGuest({
                                         className="text-sm"
                                         style={{ color: recommendedBodyColor }}
                                       >
-                                        Esta é uma inscrição marcada como{' '}
+                                        Esta é uma inscrição marcada como{" "}
                                         <strong>&quot;Especial&quot;</strong> e
                                         necessita de aprovação. Após a
                                         inscrição, os organizadores analisarão
                                         sua solicitação.
                                       </p>
                                       <p
-                                        className="mt-2 text-xs"
+                                        className="text-xs mt-2"
                                         style={{ color: recommendedBodyColor }}
                                       >
                                         Você receberá uma notificação quando sua
@@ -658,7 +661,7 @@ export function RegisterGuest({
                               )}
                             </div>
                             <div
-                              className="text-muted-foreground text-xs"
+                              className="text-xs text-muted-foreground"
                               style={{ color: recommendedBodyColor }}
                             >
                               {type.rule &&
@@ -667,7 +670,7 @@ export function RegisterGuest({
                           </div>
 
                           <div
-                            className="ml-4 flex-shrink-0 text-sm font-semibold whitespace-nowrap"
+                            className="text-sm font-semibold whitespace-nowrap flex-shrink-0 ml-4"
                             style={{ color: recommendedTitleColor }}
                           >
                             {getFormatCurrency(type.value)}
@@ -678,7 +681,7 @@ export function RegisterGuest({
                   </>
                 ) : (
                   <div
-                    className="text-muted-foreground text-sm"
+                    className="text-sm text-muted-foreground"
                     style={{ color: recommendedBodyColor }}
                   >
                     Nenhum tipo de inscrição disponível.
@@ -694,7 +697,7 @@ export function RegisterGuest({
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-8">
           <Card
-            className={`border backdrop-blur-md ${isDark ? 'border-white/20 bg-white/20' : 'border-black/10 bg-black/5'}`}
+            className={`backdrop-blur-md border ${isDark ? "bg-white/20 border-white/20" : "bg-black/5 border-black/10"}`}
           >
             <CardHeader>
               <CardTitle
@@ -702,18 +705,19 @@ export function RegisterGuest({
                 style={{ color: recommendedTitleColor }}
               >
                 <User
-                  className="h-5 w-5 [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
+                  className="w-5 h-5 [text-shadow:0_1px_4px_rgba(0,0,0,0.4)]"
                   style={{ color: recommendedTitleColor }}
                 />
                 Dados para Inscrição
               </CardTitle>
             </CardHeader>
             <CardContent
-              className={`space-y-6 ${isDark ? 'dark-inputs' : 'light-inputs'} ${
-                isDark
-                  ? '[&_input]:border-white/20 [&_input]:bg-white/20 [&_input]:text-white [&_label]:text-white/80'
-                  : '[&_input]:border-gray-200 [&_input]:bg-white [&_input]:text-gray-900 [&_label]:text-gray-700'
-              }`}
+              className={`space-y-6 ${isDark ? "dark-inputs" : "light-inputs"}
+                ${
+                  isDark
+                    ? "[&_input]:bg-white/20 [&_input]:text-white [&_input]:border-white/20 [&_label]:text-white/80"
+                    : "[&_input]:bg-white [&_input]:text-gray-900 [&_input]:border-gray-200 [&_label]:text-gray-700"
+                }`}
             >
               <FormField
                 control={control}
@@ -824,13 +828,13 @@ export function RegisterGuest({
                           onChange={(date, dateString) => {
                             // Converte para string no formato YYYY-MM-DD
                             const formattedDate = date
-                              ? date.format('YYYY-MM-DD')
-                              : '';
+                              ? date.format("YYYY-MM-DD")
+                              : "";
                             field.onChange(formattedDate);
                           }}
                           format="DD/MM/YYYY"
                           placeholder="Selecione a data"
-                          style={{ width: '100%' }}
+                          style={{ width: "100%" }}
                           className="w-full"
                         />
                       </FormControl>
@@ -854,15 +858,15 @@ export function RegisterGuest({
                               aria-expanded={openGender}
                               type="button"
                               className={cn(
-                                'w-full justify-between',
-                                !field.value && 'text-muted-foreground',
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
                               )}
                             >
                               {field.value
                                 ? genderOptions.find(
                                     (gender) => gender.value === field.value,
                                   )?.label
-                                : 'Selecione'}
+                                : "Selecione"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
@@ -889,10 +893,10 @@ export function RegisterGuest({
                                   >
                                     <Check
                                       className={cn(
-                                        'mr-2 h-4 w-4',
+                                        "mr-2 h-4 w-4",
                                         gender.value === field.value
-                                          ? 'opacity-100'
-                                          : 'opacity-0',
+                                          ? "opacity-100"
+                                          : "opacity-0",
                                       )}
                                     />
                                     {gender.label}
@@ -927,15 +931,15 @@ export function RegisterGuest({
                               aria-expanded={openShirtSize}
                               type="button"
                               className={cn(
-                                'w-full justify-between',
-                                !field.value && 'text-muted-foreground',
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
                               )}
                             >
                               {field.value
                                 ? shirtSizeOptions.find(
                                     (s) => s.value === field.value,
                                   )?.label
-                                : 'Selecione'}
+                                : "Selecione"}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </FormControl>
@@ -962,10 +966,10 @@ export function RegisterGuest({
                                   >
                                     <Check
                                       className={cn(
-                                        'mr-2 h-4 w-4',
+                                        "mr-2 h-4 w-4",
                                         size.value === field.value
-                                          ? 'opacity-100'
-                                          : 'opacity-0',
+                                          ? "opacity-100"
+                                          : "opacity-0",
                                       )}
                                     />
                                     {size.label}
@@ -994,7 +998,7 @@ export function RegisterGuest({
                   selectedTypeId={typeInscriptionId}
                   onSelect={(typeId) => {
                     setTypeInscriptionId(typeId);
-                    form.setValue('typeInscriptionId', typeId);
+                    form.setValue("typeInscriptionId", typeId);
                   }}
                   hasBirthDate={
                     !!(formData.birthDate && formData.birthDate.length === 10)
@@ -1012,7 +1016,7 @@ export function RegisterGuest({
                   }}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Enviando...' : 'Realizar Inscrição'}
+                  {isSubmitting ? "Enviando..." : "Realizar Inscrição"}
                 </Button>
               </div>
             </CardContent>

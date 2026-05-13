@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { cn } from '@/shared/lib/utils';
-import { Badge } from '@shared/components/ui/badge';
-import { Button } from '@shared/components/ui/button';
+import { cn } from "@/shared/lib/utils";
+import { Badge } from "@shared/components/ui/badge";
+import { Button } from "@shared/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@shared/components/ui/popover';
-import { AlertCircle, Check, Info } from 'lucide-react';
-import { useState } from 'react';
+} from "@shared/components/ui/popover";
+import { AlertCircle, Check, Info } from "lucide-react";
+import { useState } from "react";
 
 interface InscriptionType {
   id?: string;
@@ -29,9 +29,9 @@ interface InscriptionTypeSelectorProps {
 }
 
 const defaultFormatCurrency = (value: number) => {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
   }).format(value);
 };
 
@@ -70,7 +70,7 @@ export function InscriptionTypeSelector({
   };
 
   const getDescription = (type: InscriptionType) => {
-    if (!type.rule) return '';
+    if (!type.rule) return "";
 
     return `Disponível para pessoas com idade máxima de ${calculateMaxAge(type.rule)} anos`;
   };
@@ -79,48 +79,48 @@ export function InscriptionTypeSelector({
   const getCardStyles = (type: InscriptionType, isSelected: boolean) => {
     if (type.specialType) {
       return {
-        border: 'border-amber-500',
-        bg: 'bg-amber-50 dark:bg-amber-950/30',
-        selectedBg: 'bg-amber-100 dark:bg-amber-900/60',
-        ring: 'ring-amber-500/50',
-        text: 'text-amber-600 dark:text-amber-400',
-        iconBg: 'bg-amber-500 text-white',
+        border: "border-amber-500",
+        bg: "bg-amber-50 dark:bg-amber-950/30",
+        selectedBg: "bg-amber-100 dark:bg-amber-900/60",
+        ring: "ring-amber-500/50",
+        text: "text-amber-600 dark:text-amber-400",
+        iconBg: "bg-amber-500 text-white",
         iconDefaultBg:
-          'bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400',
+          "bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400",
         badge:
-          'border-amber-500 bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400',
-        actionText: 'text-amber-600 dark:text-amber-400',
+          "border-amber-500 bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400",
+        actionText: "text-amber-600 dark:text-amber-400",
       };
     }
 
     if (isSelected) {
       return {
-        border: 'border-blue-500',
-        bg: 'bg-blue-50 dark:bg-blue-950/30',
-        selectedBg: 'bg-blue-100 dark:bg-blue-900/60',
-        ring: 'ring-blue-500/50',
-        text: 'text-blue-600 dark:text-blue-400',
-        iconBg: 'bg-blue-500 text-white',
+        border: "border-blue-500",
+        bg: "bg-blue-50 dark:bg-blue-950/30",
+        selectedBg: "bg-blue-100 dark:bg-blue-900/60",
+        ring: "ring-blue-500/50",
+        text: "text-blue-600 dark:text-blue-400",
+        iconBg: "bg-blue-500 text-white",
         iconDefaultBg:
-          'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400',
+          "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
         badge:
-          'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400',
-        actionText: 'text-blue-600 dark:text-blue-400',
+          "border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400",
+        actionText: "text-blue-600 dark:text-blue-400",
       };
     }
 
     return {
-      border: 'border-gray-200 dark:border-gray-700',
-      bg: 'bg-white dark:bg-gray-800',
-      selectedBg: 'bg-gray-50 dark:bg-gray-750',
-      ring: 'ring-blue-500/50',
-      text: 'text-gray-600 dark:text-gray-400',
-      iconBg: 'bg-gray-500 text-white',
+      border: "border-gray-200 dark:border-gray-700",
+      bg: "bg-white dark:bg-gray-800",
+      selectedBg: "bg-gray-50 dark:bg-gray-750",
+      ring: "ring-blue-500/50",
+      text: "text-gray-600 dark:text-gray-400",
+      iconBg: "bg-gray-500 text-white",
       iconDefaultBg:
-        'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
+        "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400",
       badge:
-        'border-gray-300 bg-gray-50 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400',
-      actionText: 'text-gray-700 dark:text-gray-300',
+        "border-gray-300 bg-gray-50 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400",
+      actionText: "text-gray-700 dark:text-gray-300",
     };
   };
 
@@ -140,13 +140,13 @@ export function InscriptionTypeSelector({
             <div
               key={typeId}
               className={cn(
-                'relative flex flex-col rounded-xl border p-4 text-left',
-                'cursor-not-allowed opacity-60',
+                "relative flex flex-col rounded-xl border p-4 text-left",
+                "opacity-60 cursor-not-allowed",
                 // Cores
                 styles.bg,
                 styles.border,
                 // Animação de entrada
-                'animate-in fade-in slide-in-from-left duration-500',
+                "animate-in fade-in slide-in-from-left duration-500",
               )}
               style={{
                 animationDelay: `${index * 100}ms`,
@@ -159,7 +159,7 @@ export function InscriptionTypeSelector({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute top-3 right-3 h-8 w-8 shrink-0 p-0 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600"
+                      className="absolute right-3 top-3 h-8 w-8 shrink-0 p-0 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Info className="h-4 w-4" />
@@ -173,12 +173,12 @@ export function InscriptionTypeSelector({
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-amber-500">
                         <AlertCircle className="h-4 w-4" />
-                        <h4 className="text-sm font-semibold">
+                        <h4 className="font-semibold text-sm">
                           Inscrição Especial
                         </h4>
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Esta é uma inscrição marcada como{' '}
+                        Esta é uma inscrição marcada como{" "}
                         <strong>&quot;Especial&quot;</strong> e necessita de
                         aprovação. Após a inscrição, os organizadores analisarão
                         sua solicitação.
@@ -198,11 +198,11 @@ export function InscriptionTypeSelector({
                 <div className="flex items-start gap-3 pr-10">
                   <div
                     className={cn(
-                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-semibold',
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-semibold",
                       isSelected
                         ? styles.iconBg
                         : type.specialType
-                          ? 'bg-amber-500 text-white'
+                          ? "bg-amber-500 text-white"
                           : styles.iconDefaultBg,
                     )}
                   >
@@ -213,15 +213,15 @@ export function InscriptionTypeSelector({
                     )}
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="truncate text-base leading-tight font-semibold text-gray-900 dark:text-white">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-semibold leading-tight text-gray-900 dark:text-white truncate">
                         {type.description}
                       </h3>
                       {type.specialType && (
                         <Badge
                           variant="outline"
-                          className={cn('text-xs', styles.badge)}
+                          className={cn("text-xs", styles.badge)}
                         >
                           Especial
                         </Badge>
@@ -232,7 +232,7 @@ export function InscriptionTypeSelector({
 
                 {/* Valor */}
                 <div className="flex items-end justify-between gap-4">
-                  <span className="text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                  <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                     Valor
                   </span>
                   <span className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -248,7 +248,7 @@ export function InscriptionTypeSelector({
                 )}
 
                 {/* Mensagem de bloqueio */}
-                <div className="border-t border-gray-200 pt-2 dark:border-gray-700">
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                   <div className="inline-flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500">
                     <AlertCircle className="h-4 w-4" />
                     <span>Preencha a data de nascimento</span>
@@ -264,7 +264,7 @@ export function InscriptionTypeSelector({
 
   if (availableTypes.length === 0) {
     return (
-      <div className="animate-in fade-in slide-in-from-left-4 flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4 text-gray-700 duration-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+      <div className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 animate-in fade-in slide-in-from-left-4 duration-300">
         <AlertCircle className="h-5 w-5 shrink-0" />
         <p className="text-sm">Nenhum tipo disponível para esta idade.</p>
       </div>
@@ -293,19 +293,19 @@ export function InscriptionTypeSelector({
               }
             }}
             className={cn(
-              'relative flex flex-col rounded-xl border p-4 text-left transition-all duration-300',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+              "relative flex flex-col rounded-xl border p-4 text-left transition-all duration-300",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
               // Animação de entrada
-              'animate-in fade-in slide-in-from-left duration-500',
+              "animate-in fade-in slide-in-from-left duration-500",
               // Cores
               styles.bg,
               styles.border,
               // Estado selecionado
               isSelected && [styles.selectedBg, `ring-2 ${styles.ring}`],
               // Desabilitado
-              !isSelectable && 'cursor-not-allowed opacity-50',
+              !isSelectable && "cursor-not-allowed opacity-50",
               // Interatividade
-              isSelectable && 'cursor-pointer',
+              isSelectable && "cursor-pointer",
             )}
             style={{
               animationDelay: `${index * 100}ms`,
@@ -313,7 +313,7 @@ export function InscriptionTypeSelector({
             role="button"
             tabIndex={isSelectable ? 0 : -1}
             onKeyDown={(e) => {
-              if (isSelectable && (e.key === 'Enter' || e.key === ' ')) {
+              if (isSelectable && (e.key === "Enter" || e.key === " ")) {
                 e.preventDefault();
                 onSelect(typeId);
               }
@@ -328,7 +328,7 @@ export function InscriptionTypeSelector({
                   <Button
                     type="button"
                     variant="ghost"
-                    className="absolute top-3 right-3 h-8 w-8 shrink-0 p-0 text-amber-500 hover:bg-amber-500/10 hover:text-amber-600"
+                    className="absolute right-3 top-3 h-8 w-8 shrink-0 p-0 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Info className="h-8 w-8" />
@@ -342,12 +342,12 @@ export function InscriptionTypeSelector({
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-amber-500">
                       <AlertCircle className="h-4 w-4" />
-                      <h4 className="text-sm font-semibold">
+                      <h4 className="font-semibold text-sm">
                         Inscrição Especial
                       </h4>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Esta é uma inscrição marcada como{' '}
+                      Esta é uma inscrição marcada como{" "}
                       <strong>&quot;Especial&quot;</strong> e necessita de
                       aprovação. Após a inscrição, os organizadores analisarão
                       sua solicitação.
@@ -367,11 +367,11 @@ export function InscriptionTypeSelector({
               <div className="flex items-start gap-3 pr-10">
                 <div
                   className={cn(
-                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-semibold',
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-semibold",
                     isSelected
                       ? styles.iconBg
                       : type.specialType
-                        ? 'bg-amber-500 text-white'
+                        ? "bg-amber-500 text-white"
                         : styles.iconDefaultBg,
                   )}
                 >
@@ -382,15 +382,15 @@ export function InscriptionTypeSelector({
                   )}
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate text-base leading-tight font-semibold text-gray-900 dark:text-white">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base font-semibold leading-tight text-gray-900 dark:text-white truncate">
                       {type.description}
                     </h3>
                     {type.specialType && (
                       <Badge
                         variant="outline"
-                        className={cn('text-xs', styles.badge)}
+                        className={cn("text-xs", styles.badge)}
                       >
                         Especial
                       </Badge>
@@ -401,7 +401,7 @@ export function InscriptionTypeSelector({
 
               {/* Valor */}
               <div className="flex items-end justify-between gap-4">
-                <span className="text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   Valor
                 </span>
                 <span className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -417,13 +417,13 @@ export function InscriptionTypeSelector({
               )}
 
               {/* Linha divisória e ação */}
-              <div className="border-t border-gray-200 pt-2 dark:border-gray-700">
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                 <div
                   className={cn(
-                    'flex items-center justify-end gap-2 text-sm font-medium transition-colors',
+                    "flex items-center justify-end gap-2 text-sm font-medium transition-colors",
                     isSelected
                       ? styles.actionText
-                      : 'text-gray-500 dark:text-gray-400',
+                      : "text-gray-500 dark:text-gray-400",
                   )}
                 >
                   {isSelected ? (

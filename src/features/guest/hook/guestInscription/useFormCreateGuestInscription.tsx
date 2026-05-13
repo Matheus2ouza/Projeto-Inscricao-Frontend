@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useGlobalLoading } from '@/components/GlobalLoading';
-import { GuestInscriptionSchemaType } from '@/features/guest/schema/guestInscription/guestInscriptionSchema';
-import { InscriptionStatus } from '@/features/guest/types/guestInscription/guestInscriptionTypes';
-import dayjs from 'dayjs';
-import * as React from 'react';
-import { toast } from 'sonner';
-import { registerGuest } from '../../api/guestInscription/registerGuest';
+import { useGlobalLoading } from "@/components/GlobalLoading";
+import { GuestInscriptionSchemaType } from "@/features/guest/schema/guestInscription/guestInscriptionSchema";
+import { InscriptionStatus } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
+import dayjs from "dayjs";
+import * as React from "react";
+import { toast } from "sonner";
+import { registerGuest } from "../../api/guestInscription/registerGuest";
 
 export type UseCreateGuestInscription = {
   initialValues: GuestInscriptionSchemaType;
@@ -25,19 +25,19 @@ export function useFormCreateGuestInscription(
   typeInscriptionId: string,
 ): UseCreateGuestInscription {
   const { setLoading } = useGlobalLoading();
-  const today = dayjs().format('YYYY-MM-DD');
+  const today = dayjs().format("YYYY-MM-DD");
 
   const initialValues: GuestInscriptionSchemaType = React.useMemo(
     () => ({
-      name: '',
-      preferredName: '',
-      email: '',
-      phone: '',
-      cpf: '',
-      gender: 'FEMININO',
-      locality: '',
+      name: "",
+      preferredName: "",
+      email: "",
+      phone: "",
+      cpf: "",
+      gender: "FEMININO",
+      locality: "",
       birthDate: today,
-      shirtSize: 'M',
+      shirtSize: "M",
     }),
     [today],
   );

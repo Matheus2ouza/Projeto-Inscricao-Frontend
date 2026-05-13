@@ -34,9 +34,9 @@ export type UseListPaymentPendingResult = {
 };
 
 export enum StatusPayment {
-  APPROVED = 'approved',
-  UNDER_REVIEW = 'under_review',
-  REFUSED = 'refused',
+  APPROVED = "approved",
+  UNDER_REVIEW = "under_review",
+  REFUSED = "refused",
 }
 
 export type CreatePaymentResponse = {
@@ -48,10 +48,4 @@ export type RegisterPaymentPixResponse = {
   id: string;
   status: StatusPayment;
   confirmationCode: string;
-};
-
-export type RegisterPaymentPixAssasResponse = {
-  id: string;
-  link: string;
-  status: string;
 };

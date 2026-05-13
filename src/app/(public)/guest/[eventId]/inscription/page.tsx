@@ -6,7 +6,6 @@ import { useModifyReceiptPayment } from '@/features/guest/hook/detailsInscriptio
 import { useUpdateGuestInscription } from '@/features/guest/hook/detailsInscription/actions/useUpdateInscription';
 import { useUpdateGuestParticipant } from '@/features/guest/hook/detailsInscription/actions/useUpdateParticipant';
 import { useDetailsInscription } from '@/features/guest/hook/detailsInscription/useDetailsInscription';
-import { useRegisterPaymentPixAssas } from '@/features/payments/hooks/registerPayment/useRegisterPaymentPixAsaas';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { getWithExpiry } from '@/shared/utils/storageWithExpiry';
@@ -188,32 +187,24 @@ export default function GuestInscriptionPage() {
     router.push(`/guest/${eventId}/payment/card?${search.toString()}`);
   };
 
-  // const handleRegisterPaymentPix = () => {
-  //   if (!inscription || !eventId || !participants) return;
-
-  //   const participantsTotal = participants.reduce(
-  //     (total, participant) => total + participant.typeInscription.price,
-  //     0,
-  //   );
-  //   const payment = payments?.[0];
-  //   const totalValue = payment?.totalValue ?? participantsTotal;
-  //   const totalPaid = payment?.totalPaid ?? 0;
-  //   const remainingTotal = Math.max(totalValue - totalPaid, 0);
-  //   const search = new URLSearchParams();
-  //   search.set('inscriptions', inscription.id);
-  //   search.set('confirmationCode', confirmationCode ?? '');
-  //   search.set('guestName', inscription.guestName ?? '');
-  //   search.set('guestEmail', inscription.guestEmail ?? '');
-  //   search.set('totalValue', String(remainingTotal));
-  //   router.push(`/guest/${eventId}/payment/pix?${search.toString()}`);
-  // };
-
-  const { mutate: registerPixAssas, isPending: isRegisteringPix } =
-    useRegisterPaymentPixAssas();
-
   const handleRegisterPaymentPix = () => {
-    if (!inscription) return;
-    registerPixAssas(inscription.id);
+    if (!inscription || !eventId || !participants) return;
+
+    const participantsTotal = participants.reduce(
+      (total, participant) => total + participant.typeInscription.price,
+      0,
+    );
+    const payment = payments?.[0];
+    const totalValue = payment?.totalValue ?? participantsTotal;
+    const totalPaid = payment?.totalPaid ?? 0;
+    const remainingTotal = Math.max(totalValue - totalPaid, 0);
+    const search = new URLSearchParams();
+    search.set('inscriptions', inscription.id);
+    search.set('confirmationCode', confirmationCode ?? '');
+    search.set('guestName', inscription.guestName ?? '');
+    search.set('guestEmail', inscription.guestEmail ?? '');
+    search.set('totalValue', String(remainingTotal));
+    router.push(`/guest/${eventId}/payment/pix?${search.toString()}`);
   };
 
   const { handleModifyReceiptPayment, isModifingReceiptPayment } =
@@ -246,7 +237,6 @@ export default function GuestInscriptionPage() {
           onClear={() => setConfirmationCode(null)}
           onRegisterPaymentCard={handleRegisterPaymentCard}
           onRegisterPaymentPix={handleRegisterPaymentPix}
-          isRegisteringPix={isRegisteringPix}
           onDeletePayment={deletePaymentMutation.mutate}
           onModifyReceipt={handleModifyReceiptPayment}
           isModifingReceipt={isModifingReceiptPayment}

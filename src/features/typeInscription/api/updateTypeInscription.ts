@@ -1,13 +1,11 @@
-import axiosInstance from '@/shared/lib/apiClient';
-import { TypeInscription } from '../types/typesInscriptionsTypes';
+import axiosInstance from "@/shared/lib/apiClient";
+import { TypeInscription } from "../types/typesInscriptionsTypes";
 
 export type UpdateTypeInscriptionInput = {
   description?: string;
   value?: number;
   specialType?: boolean;
   ruleDate?: Date | null;
-  participantLimit?: number;
-  limitIsStrict?: boolean;
 };
 
 export async function updateTypeInscription(
@@ -30,7 +28,7 @@ export async function updateTypeInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        'Não foi possível atualizar este tipo de inscrição',
+        "Não foi possível atualizar este tipo de inscrição",
     );
   }
 }

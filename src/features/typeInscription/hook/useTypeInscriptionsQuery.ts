@@ -1,14 +1,14 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getTypeInscriptionsByEvent } from '../api/getTypeInscriptionsByEvent';
-import { getTypeInscriptionsByEventResponse } from '../types/typesInscriptionsTypes';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getTypeInscriptionsByEvent } from "../api/getTypeInscriptionsByEvent";
+import { getTypeInscriptionsByEventResponse } from "../types/typesInscriptionsTypes";
 
 // Chaves de query para tipos de inscrição
 export const typeInscriptionsKeys = {
-  all: ['typeInscriptions'] as const,
-  lists: () => [...typeInscriptionsKeys.all, 'list'] as const,
+  all: ["typeInscriptions"] as const,
+  lists: () => [...typeInscriptionsKeys.all, "list"] as const,
   list: (eventId: string) =>
     [...typeInscriptionsKeys.lists(), { eventId }] as const,
-  details: () => [...typeInscriptionsKeys.all, 'detail'] as const,
+  details: () => [...typeInscriptionsKeys.all, "detail"] as const,
   detail: (eventId: string) =>
     [...typeInscriptionsKeys.details(), eventId] as const,
 };

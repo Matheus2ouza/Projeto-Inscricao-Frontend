@@ -97,7 +97,6 @@ interface DetailsInscriptionProps {
   onClear: () => void;
   onRegisterPaymentCard: () => void;
   onRegisterPaymentPix: () => void;
-  isRegisteringPix: boolean;
   onDeletePayment: (paymentId: string) => void;
   onModifyReceipt: (
     input: ModifyReceiptPaymentInput,
@@ -117,7 +116,6 @@ export function DetailsInscription({
   onClear,
   onRegisterPaymentCard,
   onRegisterPaymentPix,
-  isRegisteringPix,
   onDeletePayment,
   onModifyReceipt,
   isModifingReceipt,
@@ -939,11 +937,9 @@ export function DetailsInscription({
                       <Button
                         type="button"
                         onClick={onRegisterPaymentPix}
-                        disabled={paymentDebt <= 0 || isRegisteringPix}
+                        disabled={paymentDebt <= 0}
                       >
-                        {isRegisteringPix
-                          ? 'Redirecionando...'
-                          : 'Registrar pagamento Pix'}
+                        Registrar pagamento Pix
                       </Button>
                       <Button
                         type="button"

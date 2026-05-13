@@ -5,8 +5,6 @@ export type TypeInscription = {
   value: number;
   specialType: boolean;
   active: boolean;
-  participantLimit: number;
-  limitIsStrict: boolean;
   createdAt: Date;
 };
 

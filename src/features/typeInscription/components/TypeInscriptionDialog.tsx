@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Button, Input, InputNumber, Modal, Switch, Typography } from 'antd';
-import React, { useEffect } from 'react';
-import { TypeInscription } from '../types/typesInscriptionsTypes';
+import { Button, Input, InputNumber, Modal, Switch, Typography } from "antd";
+import React, { useEffect } from "react";
+import { TypeInscription } from "../types/typesInscriptionsTypes";
 
 interface TypeInscriptionDialogProps {
   open: boolean;
@@ -15,8 +15,6 @@ interface TypeInscriptionDialogProps {
     value: number;
     specialType: boolean;
     rule: Date | null;
-    participantLimit: number;
-    limitIsStrict: boolean;
   }) => Promise<void>;
   loading: boolean;
 }
@@ -29,12 +27,10 @@ export default function TypeInscriptionDialog({
   onSubmit,
   loading,
 }: TypeInscriptionDialogProps) {
-  const [description, setDescription] = React.useState('');
+  const [description, setDescription] = React.useState("");
   const [value, setValue] = React.useState<number | null>(null);
   const [specialType, setSpecialType] = React.useState(false);
   const [maxAge, setMaxAge] = React.useState<number | null>(null);
-  const [participantLimit, setParticipantLimit] = React.useState<number>(0);
-  const [limitIsStrict, setLimitIsStrict] = React.useState<boolean>(false);
 
   const baseDate = React.useMemo(() => {
     if (!eventStartDate) return new Date();
@@ -69,15 +65,11 @@ export default function TypeInscriptionDialog({
       setValue(typeInscription.value);
       setSpecialType(Boolean(typeInscription.specialType));
       setMaxAge(getAgeFromRuleDate(typeInscription.rule));
-      setParticipantLimit(typeInscription.participantLimit);
-      setLimitIsStrict(Boolean(typeInscription.limitIsStrict));
     } else {
-      setDescription('');
+      setDescription("");
       setValue(null);
       setSpecialType(false);
       setMaxAge(null);
-      setParticipantLimit(0);
-      setLimitIsStrict(false);
     }
   }, [typeInscription, open, getAgeFromRuleDate]);
 
@@ -100,8 +92,6 @@ export default function TypeInscriptionDialog({
       value,
       specialType,
       rule,
-      participantLimit,
-      limitIsStrict,
     });
     onOpenChange(false);
   };
@@ -109,12 +99,11 @@ export default function TypeInscriptionDialog({
   return (
     <Modal
       title={
-        typeInscription ? 'Editar Tipo de Inscrição' : 'Novo Tipo de Inscrição'
+        typeInscription ? "Editar Tipo de Inscrição" : "Novo Tipo de Inscrição"
       }
       open={open}
       onCancel={() => onOpenChange(false)}
       footer={null}
-      centered
       destroyOnHidden
       mask={{ closable: !loading }}
       closable={!loading}
@@ -123,8 +112,8 @@ export default function TypeInscriptionDialog({
       <div className="space-y-1">
         <Typography.Text type="secondary">
           {typeInscription
-            ? 'Altere os dados do tipo de inscrição abaixo.'
-            : 'Preencha os dados para criar um novo tipo de inscrição.'}
+            ? "Altere os dados do tipo de inscrição abaixo."
+            : "Preencha os dados para criar um novo tipo de inscrição."}
         </Typography.Text>
       </div>
 
@@ -152,11 +141,11 @@ export default function TypeInscriptionDialog({
             min={0}
             step={0.01}
             value={value}
-            onChange={(v) => setValue(typeof v === 'number' ? v : null)}
+            onChange={(v) => setValue(typeof v === "number" ? v : null)}
             placeholder="0,00"
             required
             disabled={loading}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
         </div>
 
@@ -169,61 +158,25 @@ export default function TypeInscriptionDialog({
             min={0}
             step={1}
             value={maxAge}
-            onChange={(v) => setMaxAge(typeof v === 'number' ? v : null)}
+            onChange={(v) => setMaxAge(typeof v === "number" ? v : null)}
             placeholder="Ex: 12"
             disabled={loading}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
-          <div className="text-muted-foreground text-xs">
+          <div className="text-xs text-muted-foreground">
             Deixe em branco para permitir qualquer idade.
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="participantLimit" className="text-sm font-medium">
-            Quantidade de vagas
-          </label>
-          <InputNumber
-            id="participantLimit"
-            min={0}
-            step={1}
-            value={participantLimit}
-            onChange={(v) => setParticipantLimit(typeof v === 'number' ? v : 0)}
-            placeholder="Ex: 100"
-            disabled={loading}
-            style={{ width: '100%' }}
-          />
-          <div className="text-muted-foreground text-xs">
-            Acrecente a quantidade de vagas disponiveis para essa inscrição
-          </div>
-        </div>
-
-        <div className="border-muted-foreground/20 bg-muted/30 flex items-center justify-between rounded-lg border p-4">
-          <div className="space-y-1 pr-4">
-            <div className="text-sm font-medium">Controle rígido de vagas</div>
-            <div className="text-muted-foreground text-xs">
-              Define se este tipo de inscrição deve respeitar estritamente o
-              limite de vagas.
-            </div>
-          </div>
-
-          <Switch
-            checked={limitIsStrict}
-            onChange={(checked) => setLimitIsStrict(checked)}
-            disabled={loading}
-          />
-        </div>
-
-        <div className="border-muted-foreground/20 bg-muted/30 flex items-center justify-between rounded-lg border p-4">
-          <div className="space-y-1 pr-4">
+        <div className="flex items-center justify-between rounded-md border p-3">
+          <div className="space-y-1">
             <div className="text-sm font-medium">
               Tipo de inscrição especial
             </div>
-            <div className="text-muted-foreground text-xs">
-              Define se este tipo possui validações adicionais na inscrição.
+            <div className="text-xs text-muted-foreground">
+              Define se este tipo possui validação especial para inscrição.
             </div>
           </div>
-
           <Switch
             checked={specialType}
             onChange={(checked) => setSpecialType(checked)}
@@ -231,7 +184,7 @@ export default function TypeInscriptionDialog({
           />
         </div>
 
-        <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end sm:gap-3">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3 pt-2">
           <Button
             type="default"
             onClick={() => onOpenChange(false)}
@@ -240,7 +193,7 @@ export default function TypeInscriptionDialog({
             Cancelar
           </Button>
           <Button type="primary" htmlType="submit" loading={loading}>
-            {typeInscription ? 'Salvar' : 'Criar'}
+            {typeInscription ? "Salvar" : "Criar"}
           </Button>
         </div>
       </form>

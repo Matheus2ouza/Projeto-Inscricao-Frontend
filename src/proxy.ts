@@ -12,7 +12,6 @@ function isPublicPath(pathname: string): boolean {
   if (pathname === '/login') return true; // pública, mas redireciona se autenticado
   if (pathname.startsWith('/events/')) return true; // página pública dinâmica
   if (pathname.startsWith('/guest/')) return true; // página pública dinâmica
-  if (pathname.startsWith('/exclusive/')) return true; // página pública dinâmica
   return false;
 }
 

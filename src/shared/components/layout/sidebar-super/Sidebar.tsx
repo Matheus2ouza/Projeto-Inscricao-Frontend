@@ -161,14 +161,6 @@ export default function AppSidebarSuper({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
-                              href="/admin/inscriptions/exclusive-inscription-link"
-                              className="gap-1"
-                            >
-                              <span>Links de Inscrições</span>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton
                               href="/super/inscriptions/avulsa"
                               className="gap-1"
                             >

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import SelectedEventManager from '@/features/events/components/manager/SelectedEventManager';
-import { useEventsAll } from '@/features/events/hooks/manager/useEventsAll';
-import { StatusEvent } from '@/features/events/types/selectEvent';
-import PageContainer from '@/shared/components/layout/PageContainer';
-import { Button } from '@/shared/components/ui/button';
-import { Skeleton } from '@heroui/react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import SelectedEventManager from "@/features/events/components/manager/SelectedEventManager";
+import { useEventsAll } from "@/features/events/hooks/manager/useEventsAll";
+import { StatusEvent } from "@/features/events/types/selectEvent";
+import PageContainer from "@/shared/components/layout/PageContainer";
+import { Button } from "@/shared/components/ui/button";
+import { Skeleton } from "@heroui/react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SelectEventAdminPage() {
   const router = useRouter();
@@ -35,62 +35,49 @@ export default function SelectEventAdminPage() {
 
   const renderSkeletonGrid = () => {
     return (
-      <div className="relative">
-        {/* Header */}
-        <div className="mb-4 flex flex-col gap-2 sm:gap-4">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-9 w-[220px]" />
-              <Skeleton className="h-9 w-24" />
-            </div>
-
-            <Skeleton className="h-10 w-32" />
+      <div className="p-4 sm:p-6 relative">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <div>
+            <Skeleton className="h-9 w-32 mb-2" />
+            <Skeleton className="h-5 w-64" />
           </div>
+          <Skeleton className="h-10 w-32" />
         </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="bg-card overflow-hidden rounded-xl shadow-sm"
+              className="bg-card text-card-foreground flex flex-col transition-all duration-300 ease-in-out shadow-sm w-full overflow-hidden rounded-xl"
             >
-              {/* Banner */}
-              <Skeleton className="aspect-[16/8] w-full" />
-
-              {/* Content */}
-              <div className="space-y-4 p-4 sm:p-5">
-                {/* Header */}
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10 rounded-lg sm:h-12 sm:w-12" />
-
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-4 w-24" />
+              {/* Imagem do Evento */}
+              <div className="relative w-full aspect-[16/9] overflow-hidden">
+                <Skeleton className="w-full h-full" />
+              </div>
+              {/* Conteúdo do Card */}
+              <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6">
+                {/* Header do Card */}
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-3 sm:gap-4 w-full">
+                    <Skeleton className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex-shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-5 w-24" />
+                    </div>
                   </div>
                 </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-3">
-                  <Skeleton className="h-16 rounded-lg" />
-                  <Skeleton className="h-16 rounded-lg" />
+                {/* Estatísticas */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <Skeleton className="h-20 rounded-lg" />
+                  <Skeleton className="h-20 rounded-lg" />
                 </div>
-
-                {/* URL */}
-                <div className="space-y-2 border-t pt-3">
-                  <Skeleton className="h-4 w-20" />
-
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-8 flex-1 rounded-md" />
-                    <Skeleton className="h-8 w-8 rounded-md" />
-                    <Skeleton className="h-8 w-8 rounded-md" />
-                  </div>
+                {/* Informações Básicas */}
+                <div className="space-y-2 sm:space-y-3">
+                  <Skeleton className="h-10 rounded-lg" />
+                  <Skeleton className="h-10 rounded-lg" />
                 </div>
-
-                {/* Footer */}
-                <div className="flex justify-end gap-2 pt-2">
-                  <Skeleton className="h-9 w-32 rounded-md" />
-                  <Skeleton className="h-9 w-32 rounded-md" />
+                {/* Footer do Card */}
+                <div className="flex justify-between items-center pt-3 sm:pt-4">
+                  <Skeleton className="h-10 w-40" />
                 </div>
               </div>
             </div>
@@ -107,8 +94,8 @@ export default function SelectEventAdminPage() {
 
     if (error) {
       return (
-        <div className="flex min-h-96 items-center justify-center p-6">
-          <div className="text-destructive text-center">
+        <div className="p-6 flex items-center justify-center min-h-96">
+          <div className="text-center text-destructive">
             <p className="mb-4">Erro ao carregar eventos: {error}</p>
             <Button onClick={refetch}>Tentar Novamente</Button>
           </div>

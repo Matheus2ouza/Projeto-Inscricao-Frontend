@@ -1,7 +1,7 @@
 'use client';
 
-import ListInscriptionsTable from '@/features/inscriptions/components/listInscriptions/ListInscriptionsTable';
-import type { InscriptionsFiltersValue } from '@/features/inscriptions/components/listInscriptions/filters/InscriptionsFilters';
+import ListInscriptionsTable from '@/features/inscriptions/components/list-inscriptions/ListInscriptionsTable';
+import type { InscriptionsFiltersValue } from '@/features/inscriptions/components/list-inscriptions/filters/InscriptionsFilters';
 import useInscriptionReports from '@/features/inscriptions/hooks/actions/reports/useInscriptionsReports';
 import { useListInscriptions } from '@/features/inscriptions/hooks/list-inscriptions/useListInscriptions';
 import { listInscriptionsKeys } from '@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery';
