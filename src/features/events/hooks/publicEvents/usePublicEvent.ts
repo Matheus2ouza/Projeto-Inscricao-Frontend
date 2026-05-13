@@ -1,8 +1,8 @@
 import {
   UsePublicEventParams,
   UsePublicEventResult,
-} from "../../types/publicEvents/publicEventsTypes";
-import { usePublicEventQuery } from "./usePublicEventQuery";
+} from '../../types/publicEvents/publicEventsTypes';
+import { usePublicEventQuery } from './usePublicEventQuery';
 
 export function usePublicEvent({
   eventId,

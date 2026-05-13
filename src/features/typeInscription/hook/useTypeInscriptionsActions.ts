@@ -1,17 +1,18 @@
 import {
   updateTypeInscription,
   UpdateTypeInscriptionInput,
-} from "@/features/typeInscription/api/updateTypeInscription";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { createTypeInscription } from "../api/createTypeInscription";
-import { deleteTypeInscription } from "../api/deleteTypeInscription";
-import { updateTypeInscriptionActive } from "../api/updateTypeInscriptionActive";
-import { useInvalidateTypeInscriptionsQuery } from "./useTypeInscriptionsQuery";
+} from '@/features/typeInscription/api/updateTypeInscription';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { createTypeInscription } from '../api/createTypeInscription';
+import { deleteTypeInscription } from '../api/deleteTypeInscription';
+import { updateTypeInscriptionActive } from '../api/updateTypeInscriptionActive';
+import { useInvalidateTypeInscriptionsQuery } from './useTypeInscriptionsQuery';
 
 export function useTypeInscriptionsActions(eventId: string) {
   const { invalidateDetail } = useInvalidateTypeInscriptionsQuery();
 
+  // create
   const {
     mutateAsync: createTypeInscriptionMutation,
     isPending: isCreatingTypeInscription,
@@ -19,15 +20,16 @@ export function useTypeInscriptionsActions(eventId: string) {
     mutationFn: createTypeInscription,
     onSuccess: () => {
       invalidateDetail(eventId);
-      toast.success("Tipo de inscrição criado com sucesso!");
+      toast.success('Tipo de inscrição criado com sucesso!');
     },
     onError: (error: Error) => {
-      toast.error("Erro ao criar tipo de inscrição", {
+      toast.error('Erro ao criar tipo de inscrição', {
         description: error.message,
       });
     },
   });
 
+  // update
   const {
     mutateAsync: updateTypeInscriptionMutation,
     isPending: isUpdatingTypeInscription,
@@ -41,13 +43,14 @@ export function useTypeInscriptionsActions(eventId: string) {
     }) => updateTypeInscription(typeInscriptionId, input),
     onSuccess: () => {
       invalidateDetail(eventId);
-      toast.success("Tipo de inscrição atualizado com sucesso!");
+      toast.success('Tipo de inscrição atualizado com sucesso!');
     },
     onError: (error: Error) => {
-      toast.error("Erro ao atualizar tipo de inscrição");
+      toast.error('Erro ao atualizar tipo de inscrição');
     },
   });
 
+  // detele
   const {
     mutateAsync: deleteTypeInscriptionMutation,
     isPending: isDeletingTypeInscription,
@@ -55,13 +58,14 @@ export function useTypeInscriptionsActions(eventId: string) {
     mutationFn: deleteTypeInscription,
     onSuccess: () => {
       invalidateDetail(eventId);
-      toast.success("Tipo de inscrição excluído com sucesso!");
+      toast.success('Tipo de inscrição excluído com sucesso!');
     },
     onError: () => {
-      toast.error("Erro ao excluir tipo de inscrição");
+      toast.error('Erro ao excluir tipo de inscrição');
     },
   });
 
+  // update active
   const {
     mutateAsync: updateTypeInscriptionActiveMutation,
     isPending: isUpdateTypeInscriptionActive,
@@ -77,15 +81,15 @@ export function useTypeInscriptionsActions(eventId: string) {
       invalidateDetail(eventId);
       toast.success(
         variables.active
-          ? "Tipo de inscrição ativado com sucesso!"
-          : "Tipo de inscrição desabilitado com sucesso!",
+          ? 'Tipo de inscrição ativado com sucesso!'
+          : 'Tipo de inscrição desabilitado com sucesso!',
       );
     },
     onError: (_error, variables) => {
       toast.error(
         variables.active
-          ? "Erro ao ativar tipo de inscrição"
-          : "Erro ao desabilitar tipo de inscrição",
+          ? 'Erro ao ativar tipo de inscrição'
+          : 'Erro ao desabilitar tipo de inscrição',
       );
     },
   });

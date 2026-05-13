@@ -1,8 +1,8 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import axiosInstance from '@/shared/lib/apiClient';
 import {
   RegisterGuestInscriptionInput,
   RegisterGuestInscriptionResponse,
-} from "../../types/guestInscription/guestInscriptionTypes";
+} from '../../types/guestInscription/guestInscriptionTypes';
 
 export async function registerGuest(
   payload: RegisterGuestInscriptionInput,
@@ -22,7 +22,7 @@ export async function registerGuest(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível realizar a inscrição.",
+        'Não foi possível realizar a inscrição.',
     );
   }
 }

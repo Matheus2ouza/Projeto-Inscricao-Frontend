@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { detailsGuestInscriptionKeys } from "@/features/guest/hook/detailsInscription/useDetailsInscriptionQuery";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { detailsGuestInscriptionKeys } from '@/features/guest/hook/detailsInscription/useDetailsInscriptionQuery';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import {
   RegisterPaymentPixRequest,
   registerPaymentPix,
-} from "../../api/registerPayment/registerPaymentPix";
-import { ListPaymentPendingKeys } from "./UseListPaymentPendingQuery";
+} from '../../api/registerPayment/registerPaymentPix';
+import { ListPaymentPendingKeys } from './UseListPaymentPendingQuery';
 
 export function useRegisterPaymentPix() {
   const router = useRouter();
@@ -34,7 +34,7 @@ export function useRegisterPaymentPix() {
       );
     },
     onError: (error) => {
-      toast.error("Erro ao registrar pagamento", {
+      toast.error('Erro ao registrar pagamento', {
         description: error.message,
       });
     },

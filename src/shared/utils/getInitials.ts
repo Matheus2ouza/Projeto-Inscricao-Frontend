@@ -11,21 +11,21 @@
  * @returns Iniciais em maiúsculas
  */
 export function getInitial(name: string): string {
-  if (!name) return "";
+  if (!name) return '';
 
   const STOP = new Set([
-    "de",
-    "da",
-    "das",
-    "des",
-    "dos",
-    "do",
-    "e",
-    "a",
-    "o",
-    "pra",
-    "para",
-    "em",
+    'de',
+    'da',
+    'das',
+    'des',
+    'dos',
+    'do',
+    'e',
+    'a',
+    'o',
+    'pra',
+    'para',
+    'em',
   ]);
 
   // Pega somente palavras compostas por letras Unicode (com acentos)
@@ -34,6 +34,6 @@ export function getInitial(name: string): string {
   return words
     .filter((w) => !STOP.has(w))
     .map((w) => w[0])
-    .join("")
+    .join('')
     .toUpperCase();
 }

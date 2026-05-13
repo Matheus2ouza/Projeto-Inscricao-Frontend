@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,9 +8,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/shared/components/ui/dialog";
-import { cn } from "@/shared/lib/utils";
-import { AlertCircle, Eye } from "lucide-react";
+} from '@/shared/components/ui/dialog';
+import { cn } from '@/shared/lib/utils';
+import { AlertCircle, Eye } from 'lucide-react';
 
 type GuestInscriptionAlreadyProps = {
   open: boolean;
@@ -28,11 +28,11 @@ export function GuestInscriptionAlready({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={cn("sm:max-w-md p-0 overflow-hidden", className)}
+        className={cn('overflow-hidden p-0 sm:max-w-md', className)}
       >
-        <DialogHeader className="p-6 pb-4 sm:p-7 sm:pb-5 text-left">
+        <DialogHeader className="p-6 pb-4 text-left sm:p-7 sm:pb-5">
           <div className="flex items-start gap-4">
-            <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="bg-primary/10 text-primary mt-0.5 flex h-10 w-10 items-center justify-center rounded-full">
               <AlertCircle className="h-5 w-5" />
             </div>
             <div className="space-y-1">
@@ -58,7 +58,7 @@ export function GuestInscriptionAlready({
           </Button>
           <Button
             type="button"
-            className="w-full sm:w-auto gap-2"
+            className="w-full gap-2 sm:w-auto"
             onClick={onView}
           >
             <Eye className="h-4 w-4" />
