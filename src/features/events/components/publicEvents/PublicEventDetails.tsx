@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
 import {
   PublicEventInscriptionCta,
   type SubscriptionStatus,
-} from "@/features/events/components/publicEvents/PublicEventInscriptionCta";
-import { Event } from "@/features/events/types/publicEvents/publicEventsTypes";
-import { ImageSwatches } from "@/features/guest/hook/guestInscription/useImagePalette";
-import EventMap from "@/shared/components/EventMap";
-import { GuestInscriptionAlready } from "@/shared/components/GuestInscriptionAlready";
-import { Button } from "@/shared/components/ui/button";
-import { getGradientClass } from "@/shared/utils/getGenerateGradient";
-import { getWithExpiry, setWithExpiry } from "@/shared/utils/storageWithExpiry";
-import { Calendar, Loader2, MapPin, Share2 } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+} from '@/features/events/components/publicEvents/PublicEventInscriptionCta';
+import { Event } from '@/features/events/types/publicEvents/publicEventsTypes';
+import { ImageSwatches } from '@/features/guest/hook/guestInscription/useImagePalette';
+import EventMap from '@/shared/components/EventMap';
+import { GuestInscriptionAlready } from '@/shared/components/GuestInscriptionAlready';
+import { Button } from '@/shared/components/ui/button';
+import { getGradientClass } from '@/shared/utils/getGenerateGradient';
+import { getWithExpiry, setWithExpiry } from '@/shared/utils/storageWithExpiry';
+import { Calendar, Loader2, MapPin, Share2 } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 type PublicEventDetailsProps = {
   event: Event | null;
@@ -39,7 +39,7 @@ export default function PublicEventDetails({
   const [imageLoading, setImageLoading] = useState(true);
   const [imageFailed, setImageFailed] = useState(false);
   const [alreadyDialogOpen, setAlreadyDialogOpen] = useState(false);
-  const throttleKey = "guest_inscription_already_throttle_5m";
+  const throttleKey = 'guest_inscription_already_throttle_5m';
 
   useEffect(() => {
     if (!event?.id) {
@@ -51,7 +51,7 @@ export default function PublicEventDetails({
       eventId: string;
       confirmationCode: string;
       thereIsPayment?: boolean;
-    }>("guest_inscription");
+    }>('guest_inscription');
 
     if (
       !cached ||
@@ -73,52 +73,52 @@ export default function PublicEventDetails({
   }, [event?.id]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
     });
   };
 
   const getEventStatus = () => {
     if (!event)
       return {
-        status: "loading",
-        label: "Carregando...",
-        color: "bg-gray-500",
+        status: 'loading',
+        label: 'Carregando...',
+        color: 'bg-gray-500',
       };
     const now = new Date();
     const start = new Date(event.startDate);
     const end = new Date(event.endDate);
     if (now < start)
-      return { status: "soon", label: "Em Breve", color: "bg-blue-500" };
+      return { status: 'soon', label: 'Em Breve', color: 'bg-blue-500' };
     if (now > end)
-      return { status: "finalized", label: "Encerrado", color: "bg-gray-500" };
-    return { status: "ongoing", label: "Ao Vivo", color: "bg-green-500" };
+      return { status: 'finalized', label: 'Encerrado', color: 'bg-gray-500' };
+    return { status: 'ongoing', label: 'Ao Vivo', color: 'bg-green-500' };
   };
 
   const getSubscriptionStatus = (): SubscriptionStatus => {
     if (!event)
-      return { status: "loading", label: "Carregando...", description: "" };
+      return { status: 'loading', label: 'Carregando...', description: '' };
     const eventStatus = getEventStatus();
-    if (eventStatus.status === "finalized") {
+    if (eventStatus.status === 'finalized') {
       return {
-        status: "finalized",
-        label: "Inscrições Encerradas",
-        description: "Este evento já foi finalizado",
+        status: 'finalized',
+        label: 'Inscrições Encerradas',
+        description: 'Este evento já foi finalizado',
       };
     }
-    if (event.status === "CLOSE") {
+    if (event.status === 'CLOSE') {
       return {
-        status: "closed",
-        label: "Inscrições Fechadas",
-        description: "As inscrições ainda não foram abertas",
+        status: 'closed',
+        label: 'Inscrições Fechadas',
+        description: 'As inscrições ainda não foram abertas',
       };
     }
     return {
-      status: "open",
-      label: "Inscrições Abertas",
-      description: "Inscreva-se agora para participar",
+      status: 'open',
+      label: 'Inscrições Abertas',
+      description: 'Inscreva-se agora para participar',
     };
   };
 
@@ -131,7 +131,7 @@ export default function PublicEventDetails({
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert("Link copiado para a área de transferência!");
+      alert('Link copiado para a área de transferência!');
     }
   };
 
@@ -139,19 +139,19 @@ export default function PublicEventDetails({
     if (!event) return;
     const startDate = new Date(event.startDate)
       .toISOString()
-      .replace(/-|:|\.\d+/g, "");
+      .replace(/-|:|\.\d+/g, '');
     const endDate = new Date(event.endDate)
       .toISOString()
-      .replace(/-|:|\.\d+/g, "");
-    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.name)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(`Evento: ${event.name}\nLocal: ${event.location || "A definir"}`)}`;
-    window.open(calendarUrl, "_blank");
+      .replace(/-|:|\.\d+/g, '');
+    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.name)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(`Evento: ${event.name}\nLocal: ${event.location || 'A definir'}`)}`;
+    window.open(calendarUrl, '_blank');
   };
 
   const handleOpenRoute = () => {
     if (!event) return;
     const destination = `${event.latitude}, ${event.longitude}`;
     const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`;
-    window.open(mapsUrl, "_blank");
+    window.open(mapsUrl, '_blank');
   };
 
   const preferredSwatch = useMemo(() => {
@@ -167,20 +167,20 @@ export default function PublicEventDetails({
   }, [isDark, swatches]);
 
   const recommendedTitleColor =
-    preferredSwatch?.titleTextColor ?? (isDark ? "#ffffff" : "#111111");
+    preferredSwatch?.titleTextColor ?? (isDark ? '#ffffff' : '#111111');
   const recommendedBodyColor =
     preferredSwatch?.bodyTextColor ??
-    (isDark ? "rgba(255,255,255,0.78)" : "#374151");
+    (isDark ? 'rgba(255,255,255,0.78)' : '#374151');
   const glassSurfaceClass = isDark
-    ? "bg-white/20 border-white/20"
-    : "bg-black/5 border-black/10";
-  const accent = palette?.[0] ?? "hsl(var(--primary))";
+    ? 'bg-white/20 border-white/20'
+    : 'bg-black/5 border-black/10';
+  const accent = palette?.[0] ?? 'hsl(var(--primary))';
 
   if (!event) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
+      <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <p className="mb-4 text-foreground">Evento não encontrado</p>
+          <p className="text-foreground mb-4">Evento não encontrado</p>
           <Button onClick={() => router.back()}>Voltar</Button>
         </div>
       </div>
@@ -191,8 +191,8 @@ export default function PublicEventDetails({
   const subscriptionStatus = getSubscriptionStatus();
   const shouldShowImage = Boolean(event.image && !imageFailed);
   const hasCoordinates =
-    typeof event.latitude === "number" &&
-    typeof event.longitude === "number" &&
+    typeof event.latitude === 'number' &&
+    typeof event.longitude === 'number' &&
     event.latitude !== 0 &&
     event.longitude !== 0;
 
@@ -213,13 +213,13 @@ export default function PublicEventDetails({
         }}
       />
       <div
-        className={`relative w-full aspect-video rounded-2xl overflow-hidden shadow-sm backdrop-blur-md border ${glassSurfaceClass}`}
+        className={`relative aspect-video w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-md ${glassSurfaceClass}`}
       >
         {shouldShowImage ? (
           <>
             {imageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-muted/60 dark:bg-black/40 z-20">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <div className="bg-muted/60 absolute inset-0 z-20 flex items-center justify-center dark:bg-black/40">
+                <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
               </div>
             )}
             <Image
@@ -236,25 +236,25 @@ export default function PublicEventDetails({
               }}
             />
             {/* Gradient Overlay for Text Readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none z-10" />
+            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
           </>
         ) : (
           <div
-            className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+            className={`h-full w-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
           >
             <div className="absolute inset-0 bg-black/20" />
           </div>
         )}
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-10 z-20">
+        <div className="absolute right-0 bottom-0 left-0 z-20 p-4 sm:p-8 md:p-10">
           <p
-            className="text-xs sm:text-xl uppercase tracking-[0.3em] mb-1 sm:mb-2 font-medium drop-shadow-md"
+            className="mb-1 text-xs font-medium tracking-[0.3em] uppercase drop-shadow-md sm:mb-2 sm:text-xl"
             style={{ color: recommendedBodyColor }}
           >
-            {event.regionName || "Evento"}
+            {event.regionName || 'Evento'}
           </p>
           <h1
-            className="text-2xl sm:text-4xl md:text-5xl font-bold uppercase leading-tight break-words drop-shadow-lg"
+            className="text-2xl leading-tight font-bold break-words uppercase drop-shadow-lg sm:text-4xl md:text-5xl"
             style={{ color: recommendedTitleColor }}
           >
             {event.name}
@@ -262,15 +262,15 @@ export default function PublicEventDetails({
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row">
         <Button
           variant="outline"
-          className={`group relative flex-1 justify-center gap-2 py-4 overflow-hidden backdrop-blur-md shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
+          className={`group relative flex-1 justify-center gap-2 overflow-hidden py-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
           onClick={handleShare}
         >
-          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-white/10 via-white/0 to-white/10" />
+          <span className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/0 to-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
           <span
-            className="absolute inset-0 opacity-25 pointer-events-none"
+            className="pointer-events-none absolute inset-0 opacity-25"
             style={{
               background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
             }}
@@ -282,12 +282,12 @@ export default function PublicEventDetails({
         </Button>
         <Button
           variant="outline"
-          className={`group relative flex-1 justify-center gap-2 py-4 overflow-hidden backdrop-blur-md shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
+          className={`group relative flex-1 justify-center gap-2 overflow-hidden py-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
           onClick={handleAddToCalendar}
         >
-          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-white/10 via-white/0 to-white/10" />
+          <span className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/0 to-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
           <span
-            className="absolute inset-0 opacity-25 pointer-events-none"
+            className="pointer-events-none absolute inset-0 opacity-25"
             style={{
               background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
             }}
@@ -302,12 +302,12 @@ export default function PublicEventDetails({
         {hasCoordinates && (
           <Button
             variant="outline"
-            className={`group relative flex-1 justify-center gap-2 py-4 overflow-hidden backdrop-blur-md shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
+            className={`group relative flex-1 justify-center gap-2 overflow-hidden py-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
             onClick={handleOpenRoute}
           >
-            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-white/10 via-white/0 to-white/10" />
+            <span className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/0 to-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
             <span
-              className="absolute inset-0 opacity-25 pointer-events-none"
+              className="pointer-events-none absolute inset-0 opacity-25"
               style={{
                 background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
               }}
@@ -321,32 +321,32 @@ export default function PublicEventDetails({
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div
-            className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur-md shadow-sm transition-shadow hover:shadow-md ${glassSurfaceClass}`}
+            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md ${glassSurfaceClass}`}
           >
             <div
-              className="absolute inset-0 opacity-30 pointer-events-none"
+              className="pointer-events-none absolute inset-0 opacity-30"
               style={{
                 background: `radial-gradient(650px circle at 15% 20%, ${accent} 0%, transparent 58%)`,
               }}
             />
             <div className="relative flex items-center gap-4">
               <div
-                className="p-3 bg-primary/10 rounded-lg"
+                className="bg-primary/10 rounded-lg p-3"
                 style={{ color: accent }}
               >
                 <Calendar className="h-6 w-6" />
               </div>
               <div>
                 <h3
-                  className="font-medium text-card-foreground"
+                  className="text-card-foreground font-medium"
                   style={{ color: recommendedBodyColor }}
                 >
                   Data de Início
                 </h3>
                 <p
-                  className="text-xl font-semibold text-card-foreground mt-1"
+                  className="text-card-foreground mt-1 text-xl font-semibold"
                   style={{ color: recommendedTitleColor }}
                 >
                   {formatDate(event.startDate)}
@@ -355,30 +355,30 @@ export default function PublicEventDetails({
             </div>
           </div>
           <div
-            className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur-md shadow-sm transition-shadow hover:shadow-md ${glassSurfaceClass}`}
+            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md ${glassSurfaceClass}`}
           >
             <div
-              className="absolute inset-0 opacity-30 pointer-events-none"
+              className="pointer-events-none absolute inset-0 opacity-30"
               style={{
                 background: `radial-gradient(650px circle at 15% 20%, ${accent} 0%, transparent 58%)`,
               }}
             />
             <div className="relative flex items-center gap-4">
               <div
-                className="p-3 bg-primary/10 rounded-lg"
+                className="bg-primary/10 rounded-lg p-3"
                 style={{ color: accent }}
               >
                 <Calendar className="h-6 w-6" />
               </div>
               <div>
                 <h3
-                  className="font-medium text-card-foreground"
+                  className="text-card-foreground font-medium"
                   style={{ color: recommendedBodyColor }}
                 >
                   Data de Término
                 </h3>
                 <p
-                  className="text-xl font-semibold text-card-foreground mt-1"
+                  className="text-card-foreground mt-1 text-xl font-semibold"
                   style={{ color: recommendedTitleColor }}
                 >
                   {formatDate(event.endDate)}
@@ -389,18 +389,18 @@ export default function PublicEventDetails({
         </div>
 
         <div
-          className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur-md shadow-sm transition-shadow hover:shadow-md ${glassSurfaceClass}`}
+          className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md ${glassSurfaceClass}`}
         >
           <div
-            className="absolute inset-0 opacity-30 pointer-events-none"
+            className="pointer-events-none absolute inset-0 opacity-30"
             style={{
               background: `radial-gradient(750px circle at 18% 15%, ${accent} 0%, transparent 60%), radial-gradient(900px circle at 85% 45%, ${accent} 0%, transparent 65%)`,
             }}
           />
-          <div className="relative flex items-center gap-4 mb-6">
+          <div className="relative mb-6 flex items-center gap-4">
             <MapPin className="h-6 w-6" style={{ color: accent }} />
             <h3
-              className="font-semibold text-card-foreground text-xl"
+              className="text-card-foreground text-xl font-semibold"
               style={{ color: recommendedTitleColor }}
             >
               Localização
@@ -409,7 +409,7 @@ export default function PublicEventDetails({
           <div className="relative space-y-6">
             <div>
               <p
-                className="text-card-foreground text-lg font-medium mb-2"
+                className="text-card-foreground mb-2 text-lg font-medium"
                 style={{ color: recommendedBodyColor }}
               >
                 Endereço
@@ -418,11 +418,11 @@ export default function PublicEventDetails({
                 className="text-card-foreground/80"
                 style={{ color: recommendedBodyColor }}
               >
-                {event.location || "Local a ser definido"}
+                {event.location || 'Local a ser definido'}
               </p>
             </div>
             {hasCoordinates && (
-              <div className="h-64 rounded-2xl overflow-hidden border border-white/10">
+              <div className="h-64 overflow-hidden rounded-2xl border border-white/10">
                 <EventMap
                   lat={event.latitude}
                   lng={event.longitude}

@@ -1,5 +1,5 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { getTypeInscriptionsByEventResponse } from "../types/typesInscriptionsTypes";
+import axiosInstance from '@/shared/lib/apiClient';
+import { getTypeInscriptionsByEventResponse } from '../types/typesInscriptionsTypes';
 
 export async function getTypeInscriptionsByEvent(
   eventId: string,
@@ -19,7 +19,7 @@ export async function getTypeInscriptionsByEvent(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os tipos de inscrição",
+        'Não foi possível carregar os tipos de inscrição',
     );
   }
 }

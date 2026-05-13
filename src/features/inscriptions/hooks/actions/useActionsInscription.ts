@@ -18,8 +18,8 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useInvalidateDetailsInscriptionQuery } from '../list-inscriptions/inscription/useDetailsInscriptionQuery';
-import { useInvalidateListInscriptionsQuery } from '../list-inscriptions/useListInscriptionsQuery';
+import { useInvalidateDetailsInscriptionQuery } from '../listInscriptions/inscription/useDetailsInscriptionQuery';
+import { useInvalidateListInscriptionsQuery } from '../listInscriptions/useListInscriptionsQuery';
 
 export function useActionsInscription() {
   const router = useRouter();

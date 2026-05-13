@@ -1,8 +1,8 @@
 import {
   useTypeInscriptionParams,
   useTypeInscriptionResult,
-} from "../types/typesInscriptionsTypes";
-import { useTypeInscriptionsQuery } from "./useTypeInscriptionsQuery";
+} from '../types/typesInscriptionsTypes';
+import { useTypeInscriptionsQuery } from './useTypeInscriptionsQuery';
 
 export function useTypeInscriptions({
   eventId,

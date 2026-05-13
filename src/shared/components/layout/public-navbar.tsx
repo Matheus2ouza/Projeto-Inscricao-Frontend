@@ -55,7 +55,7 @@ const PublicNavbar = () => {
 
   return (
     <>
-      <nav className="liquid-panel relative z-2 mx-auto mt-2 flex w-[95%] items-center justify-between overflow-hidden border-x-5 border-t-0 px-2 py-3 sm:px-4 lg:px-6">
+      <nav className="liquid-panel relative z-2 mx-auto mt-2 flex w-[95%] items-center justify-between overflow-hidden rounded-3xl border-x-5 border-t-0 px-2 py-3 sm:px-4 lg:px-6">
         {/* Left Section: Menu + Logo + Título */}
         <div className="flex items-center space-x-3">
           {/* Mobile Menu Toggle - apenas na home */}
@@ -140,7 +140,7 @@ const PublicNavbar = () => {
 
       {/* Mobile Menu - apenas na home */}
       {showNavigationLinks && isMenuOpen && (
-        <div className="liquid-panel-strong mt-1 rounded-t-none border-x-0 lg:hidden">
+        <div className="liquid-panel-strong mt-1 rounded-t-none rounded-b-3xl border-x-0 lg:hidden">
           <div className="space-y-1 px-4 py-2">
             {['Sobre', 'Eventos', 'Documentação', 'Login'].map(
               (item, index) => (
