@@ -291,6 +291,8 @@ export default function EventManagement({
     value: number;
     specialType: boolean;
     rule: Date | null;
+    participantLimit: number;
+    limitIsStrict: boolean;
   }) => {
     try {
       const payload = {
@@ -309,8 +311,8 @@ export default function EventManagement({
       }
       // Invalidar cache do evento para recarregar os tipos de inscrição
       invalidateDetail(event.id);
-      await refreshTypeInscriptions(); // Recarrega os dados do evento
-      await refreshEvent();
+      refreshTypeInscriptions();
+      refreshEvent(); // Recarrega os dados do evento
     } catch (error) {
       // Erro já tratado no hook
     }
@@ -383,7 +385,7 @@ export default function EventManagement({
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen rounded-lg">
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Header com ações principais */}
         <div className="mb-8 flex items-center justify-end">
@@ -391,7 +393,7 @@ export default function EventManagement({
             {!isEditing ? (
               <>
                 <Button
-                  variant={event.status === 'OPEN' ? 'destructive' : 'outline'}
+                  variant={event.status === 'OPEN' ? 'destructive' : 'default'}
                   onClick={() =>
                     handleUpdateInscription(
                       event.status === 'OPEN' ? 'CLOSE' : 'OPEN',
@@ -424,7 +426,7 @@ export default function EventManagement({
                   {event.allowCard ? 'Desabilitar Cartão' : 'Habilitar Cartão'}
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="default"
                   onClick={() => setIsEditing(true)}
                   className="flex items-center gap-2"
                   disabled={loading}
@@ -915,6 +917,14 @@ export default function EventManagement({
                 </div>
               ) : (
                 <div className="space-y-4">
+                  <Button
+                    variant="default"
+                    className="flex w-full items-center gap-2"
+                    onClick={handleCreateType}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Adicionar Novo Tipo
+                  </Button>
                   {typesInscriptions.map((type) => {
                     const isTypeActive = type.active !== false;
 
@@ -982,14 +992,6 @@ export default function EventManagement({
                       </div>
                     );
                   })}
-                  <Button
-                    variant="outline"
-                    className="flex w-full items-center gap-2"
-                    onClick={handleCreateType}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Adicionar Novo Tipo
-                  </Button>
                 </div>
               )}
             </div>

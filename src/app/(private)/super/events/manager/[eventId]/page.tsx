@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import EventManagement from "@/features/events/components/manager/EventManagement";
-import { useEventManager } from "@/features/events/hooks/manager/useEventManager";
-import { useTypeInscriptionsActions } from "@/features/typeInscription/hook/useTypeInscriptionsActions";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import EventManagement from '@/features/events/components/manager/EventManagement';
+import { useEventManager } from '@/features/events/hooks/manager/useEventManager';
+import { useTypeInscriptionsActions } from '@/features/typeInscription/hook/useTypeInscriptionsActions';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function EventManagementSuperPage() {
   const router = useRouter();
@@ -51,13 +51,13 @@ export default function EventManagementSuperPage() {
 
   const renderSkeletonGrid = () => {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between mb-8">
+      <div className="bg-background min-h-screen">
+        <div className="mx-auto max-w-7xl px-6 py-8">
+          <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Skeleton className="h-10 w-10" />
               <div>
-                <Skeleton className="h-9 w-48 mb-2" />
+                <Skeleton className="mb-2 h-9 w-48" />
                 <Skeleton className="h-5 w-64" />
               </div>
             </div>
@@ -68,8 +68,8 @@ export default function EventManagementSuperPage() {
               <Skeleton className="h-10 w-32" />
             </div>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
               <Skeleton className="h-64 rounded-xl" />
               <Skeleton className="h-48 rounded-xl" />
               <Skeleton className="h-64 rounded-xl" />
@@ -92,10 +92,10 @@ export default function EventManagementSuperPage() {
     }
     if (errorEvent) {
       return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="flex min-h-screen items-center justify-center">
           <div className="text-center">
             <p className="mb-4 text-gray-900 dark:text-white">
-              {"Erro ao carregar evento"}
+              {'Erro ao carregar evento'}
             </p>
             <Button asChild>
               <Link href="/super/events/manager">Voltar para Eventos</Link>

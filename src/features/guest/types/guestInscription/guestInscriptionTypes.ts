@@ -4,8 +4,8 @@ import type {
   UseFormRegister,
   UseFormReturn,
   UseFormSetValue,
-} from "react-hook-form";
-import type { GuestInscriptionSchemaType } from "../../schema/guestInscription/guestInscriptionSchema";
+} from 'react-hook-form';
+import type { GuestInscriptionSchemaType } from '../../schema/guestInscription/guestInscriptionSchema';
 
 export type Event = {
   id: string;
@@ -46,17 +46,17 @@ export type UseFormGuestInscriptionProps = {
 export type GuestInscriptionFormInputs = GuestInscriptionSchemaType;
 
 export enum InscriptionStatus {
-  PENDING = "PENDING",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  PAID = "PAID",
-  CANCELLED = "CANCELLED",
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED',
 }
 
-export type GenderType = "MASCULINO" | "FEMININO" | string;
+export type GenderType = 'MASCULINO' | 'FEMININO' | string;
 
-export type ShirtSizeType = "PP" | "P" | "M" | "G" | "GG" | "XG" | string;
+export type ShirtSizeType = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XG' | string;
 
-export type ShirtType = "TRADICIONAL" | "BABYLOOK" | string;
+export type ShirtType = 'TRADICIONAL' | 'BABYLOOK' | string;
 
 export type RegisterGuestInscriptionInput = {
   eventId: string;

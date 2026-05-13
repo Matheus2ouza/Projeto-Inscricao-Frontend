@@ -42,6 +42,8 @@ interface ListParticipantsProps {
     summary: boolean;
     typeInscriptions?: string | string[];
     columns?: ReportColumnPdf[];
+    startDate?: string;
+    endDate?: string;
   }) => Promise<GenerateParticipantsByLocalityPdfResponse>;
 
   onGenerateParticipantsByLocalityXlsx: (params: {
@@ -49,6 +51,8 @@ interface ListParticipantsProps {
     summary: boolean;
     typeInscriptions?: string | string[];
     columns?: ReportColumnXlsx[];
+    startDate?: string;
+    endDate?: string;
   }) => Promise<GenerateParticipantsByLocalityXlsxResponse>;
 
   isGeneratingParticipantsByLocalityPdf: boolean;

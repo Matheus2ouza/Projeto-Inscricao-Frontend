@@ -1,5 +1,8 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { RegisterPaymentPixResponse } from "../../types/registerPayment/registerPaymentTypes";
+import axiosInstance from '@/shared/lib/apiClient';
+import {
+  RegisterPaymentPixAssasResponse,
+  RegisterPaymentPixResponse,
+} from '../../types/registerPayment/registerPaymentTypes';
 
 export type RegisterPaymentPixRequest = {
   eventId: string;
@@ -33,7 +36,29 @@ export async function registerPaymentPix(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi registar o pagamento.',
+    );
+  }
+}
+
+export async function registerPaymentPixAssas(
+  inscriptionId: string,
+): Promise<RegisterPaymentPixAssasResponse> {
+  try {
+    const { data } = await axiosInstance.post(
+      `/payments/${inscriptionId}/register/pix/assas`,
+    );
+    return data;
+  } catch (error) {
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
+
+    throw new Error(
+      axiosError.response?.data?.message ??
+        axiosError.message ??
+        'Não foi registar o pagamento.',
     );
   }
 }

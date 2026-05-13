@@ -1,6 +1,6 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
-import { TypeInscription } from "../types/typesInscriptionsTypes";
+import axiosInstance from '@/shared/lib/apiClient';
+import qs from 'qs';
+import { TypeInscription } from '../types/typesInscriptionsTypes';
 
 export type CreateTypeInscriptionInput = {
   description: string;
@@ -8,6 +8,8 @@ export type CreateTypeInscriptionInput = {
   rule: Date | null;
   eventId: string;
   specialType: boolean;
+  participantLimit: number;
+  limitIsStrict: boolean;
 };
 
 export async function createTypeInscription(
@@ -18,7 +20,7 @@ export async function createTypeInscription(
       `/type-inscription/${input.eventId}/create`,
       input,
       {
-        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
       },
     );
     return response.data;
@@ -31,7 +33,7 @@ export async function createTypeInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível criar o tipo de inscrição",
+        'Não foi possível criar o tipo de inscrição',
     );
   }
 }

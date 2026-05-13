@@ -1,11 +1,11 @@
-import { updateParticipant } from "@/features/participants/api/actions/updateParticipant";
+import { updateParticipant } from '@/features/participants/api/actions/updateParticipant';
 import {
   UpdateParticipantInput,
   UpdateParticipantResponse,
-} from "@/features/participants/types/actions/updateParticipantTypes";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useInvalidateDetailsInscriptionQuery } from "../list-inscriptions/inscription/useDetailsInscriptionQuery";
+} from '@/features/participants/types/actions/updateParticipantTypes';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { useInvalidateDetailsInscriptionQuery } from '../listInscriptions/inscription/useDetailsInscriptionQuery';
 
 export function useUpdateParticipant(inscriptionId: string) {
   const { invalidateDetails } = useInvalidateDetailsInscriptionQuery();

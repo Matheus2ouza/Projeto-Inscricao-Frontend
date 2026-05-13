@@ -1,8 +1,5 @@
 'use client';
 
-import { Check, X } from 'lucide-react';
-import * as React from 'react';
-
 import { CheckboxGroupTypeInscription } from '@/features/typeInscription/components/CheckboxGroupTypeInscription';
 import { Button } from '@/shared/components/ui/button';
 import { Checkbox } from '@/shared/components/ui/checkbox';
@@ -19,6 +16,10 @@ import { Label } from '@/shared/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
 import { Separator } from '@/shared/components/ui/separator';
 import { Switch } from '@/shared/components/ui/switch';
+import { DatePicker } from 'antd';
+import dayjs, { type Dayjs } from 'dayjs';
+import { Check, X } from 'lucide-react';
+import * as React from 'react';
 import type {
   GenerateParticipantsByLocalityPdfResponse,
   ReportColumnPdf,
@@ -27,6 +28,14 @@ import type {
   GenerateParticipantsByLocalityXlsxResponse,
   ReportColumnXlsx,
 } from '../../api/actions/reports/generateListParticipantsByLocalityXlsx';
+
+enum InscriptionStatus {
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
+}
 
 const AVAILABLE_COLUMNS: Array<{
   id: ReportColumnPdf | ReportColumnXlsx;
@@ -66,12 +75,18 @@ type PdfGeneratorDrawerProps = {
     summary: boolean;
     typeInscriptions?: string | string[];
     columns?: ReportColumnPdf[];
+    startDate?: string;
+    endDate?: string;
+    status?: InscriptionStatus[];
   }) => Promise<GenerateParticipantsByLocalityPdfResponse>;
   onGenerateParticipantsByLocalityXlsx: (params: {
     separate: boolean;
     summary: boolean;
     typeInscriptions?: string | string[];
     columns?: ReportColumnXlsx[];
+    startDate?: string;
+    endDate?: string;
+    status?: InscriptionStatus[];
   }) => Promise<GenerateParticipantsByLocalityXlsxResponse>;
 
   generatingPdf?: boolean;
@@ -219,6 +234,14 @@ export default function PdfGeneratorDrawer({
     [],
   );
 
+  const parseDateFilter = (value: unknown) => {
+    if (dayjs.isDayjs(value)) {
+      return value.toISOString();
+    }
+
+    return typeof value === 'string' ? value : undefined;
+  };
+
   const renderTypeInscriptionsFilter = React.useCallback(
     ({
       filters,
@@ -229,8 +252,7 @@ export default function PdfGeneratorDrawer({
       setFilters: (next: Record<string, unknown>) => void;
       disabled?: boolean;
     }) => {
-      const selected =
-        (filters.typeInscriptions as string[] | undefined) ?? [];
+      const selected = (filters.typeInscriptions as string[] | undefined) ?? [];
 
       return (
         <div className="rounded-lg border p-3">
@@ -254,6 +276,52 @@ export default function PdfGeneratorDrawer({
       );
     },
     [eventId],
+  );
+
+  const renderPeriodFilter = React.useCallback(
+    ({
+      filters,
+      setFilters,
+      disabled,
+    }: {
+      filters: Record<string, unknown>;
+      setFilters: (next: Record<string, unknown>) => void;
+      disabled?: boolean;
+    }) => (
+      <div className="rounded-lg border p-3">
+        <div className="text-sm font-medium">Período</div>
+        <div className="text-muted-foreground text-xs">
+          Filtra os participantes pelo intervalo de inscrição.
+        </div>
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <DatePicker
+            className="w-full"
+            value={filters.startDate as Dayjs | null}
+            onChange={(value) => setFilters({ ...filters, startDate: value })}
+            format="DD/MM/YYYY"
+            placeholder="Data inicial"
+            allowClear
+            disabled={disabled}
+            disabledDate={(current) =>
+              current && current > dayjs().endOf('day')
+            }
+          />
+          <DatePicker
+            className="w-full"
+            value={filters.endDate as Dayjs | null}
+            onChange={(value) => setFilters({ ...filters, endDate: value })}
+            format="DD/MM/YYYY"
+            placeholder="Data final"
+            allowClear
+            disabled={disabled}
+            disabledDate={(current) =>
+              current && current > dayjs().endOf('day')
+            }
+          />
+        </div>
+      </div>
+    ),
+    [],
   );
 
   const renderColumnsFilter = React.useCallback(
@@ -341,6 +409,8 @@ export default function PdfGeneratorDrawer({
 
         {renderSummaryFilter({ filters, setFilters, disabled })}
 
+        {renderPeriodFilter({ filters, setFilters, disabled })}
+
         {renderTypeInscriptionsFilter({ filters, setFilters, disabled })}
 
         {renderColumnsFilter({ filters, setFilters, disabled })}
@@ -349,6 +419,7 @@ export default function PdfGeneratorDrawer({
     [
       renderSeparateFilter,
       renderSummaryFilter,
+      renderPeriodFilter,
       renderTypeInscriptionsFilter,
       renderColumnsFilter,
     ],
@@ -369,6 +440,8 @@ export default function PdfGeneratorDrawer({
 
         {renderSummaryFilter({ filters, setFilters, disabled })}
 
+        {renderPeriodFilter({ filters, setFilters, disabled })}
+
         {renderTypeInscriptionsFilter({ filters, setFilters, disabled })}
 
         {renderColumnsFilter({ filters, setFilters, disabled })}
@@ -377,6 +450,7 @@ export default function PdfGeneratorDrawer({
     [
       renderSeparateFilter,
       renderSummaryFilter,
+      renderPeriodFilter,
       renderTypeInscriptionsFilter,
       renderColumnsFilter,
     ],
@@ -393,6 +467,8 @@ export default function PdfGeneratorDrawer({
           separate: false,
           reduced: false,
           summary: false,
+          startDate: null,
+          endDate: null,
           typeInscriptions: [],
           columns: [],
         },
@@ -411,6 +487,8 @@ export default function PdfGeneratorDrawer({
               (filters.columns as
                 | (ReportColumnPdf | ReportColumnXlsx)[]
                 | undefined) || undefined,
+            startDate: parseDateFilter(filters.startDate),
+            endDate: parseDateFilter(filters.endDate),
           });
 
           if (
@@ -430,6 +508,8 @@ export default function PdfGeneratorDrawer({
         defaultFilters: {
           separate: false,
           summary: false,
+          startDate: null,
+          endDate: null,
           typeInscriptions: [],
           columns: [],
         },
@@ -447,6 +527,8 @@ export default function PdfGeneratorDrawer({
               (filters.columns as
                 | (ReportColumnPdf | ReportColumnXlsx)[]
                 | undefined) || undefined,
+            startDate: parseDateFilter(filters.startDate),
+            endDate: parseDateFilter(filters.endDate),
           });
 
           if (

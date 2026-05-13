@@ -1,9 +1,9 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getDetailsInscription } from "../../api/detailsInscription/getDetailsInscription";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getDetailsInscription } from '../../api/detailsInscription/getDetailsInscription';
 
 export const detailsGuestInscriptionKeys = {
-  all: ["details-guest-inscription"] as const,
-  lists: () => [...detailsGuestInscriptionKeys.all, "list"] as const,
+  all: ['details-guest-inscription'] as const,
+  lists: () => [...detailsGuestInscriptionKeys.all, 'list'] as const,
   list: (id: string) => [...detailsGuestInscriptionKeys.lists(), id] as const,
 };
 
