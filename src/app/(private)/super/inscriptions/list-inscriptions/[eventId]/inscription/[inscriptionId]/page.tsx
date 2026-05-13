@@ -7,7 +7,7 @@ import DetailsInscriptionTable, {
 import useInscriptionReports from '@/features/inscriptions/hooks/actions/reports/useInscriptionsReports';
 import { useActionsInscription } from '@/features/inscriptions/hooks/actions/useActionsInscription';
 import { useUpdateParticipant } from '@/features/inscriptions/hooks/actions/useUpdateParticipant';
-import { useDetailsInscription } from '@/features/inscriptions/hooks/list-inscriptions/inscription/useDetailsInscription';
+import { useDetailsInscription } from '@/features/inscriptions/hooks/listInscriptions/inscription/useDetailsInscription';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useListNames } from "@/features/inscriptions/hooks/list-inscriptions/filters/useListNames";
-import type { AutoCompleteProps } from "antd";
-import { AutoComplete, Button } from "antd";
-import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useListNames } from '@/features/inscriptions/hooks/listInscriptions/filters/useListNames';
+import type { AutoCompleteProps } from 'antd';
+import { AutoComplete, Button } from 'antd';
+import { Search } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 type InscriptionsNameSearchProps = {
   eventId: string;
@@ -15,11 +15,11 @@ export default function InscriptionsNameSearch({
   eventId,
   onSearch,
 }: InscriptionsNameSearchProps) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
 
   const { listNames, loading } = useListNames({ eventId });
 
-  const [options, setOptions] = useState<AutoCompleteProps["options"]>([]);
+  const [options, setOptions] = useState<AutoCompleteProps['options']>([]);
 
   const normalized = useMemo(() => {
     return listNames.map((n) => ({
@@ -46,11 +46,11 @@ export default function InscriptionsNameSearch({
   };
 
   return (
-    <div className="flex items-center gap-2 w-full sm:w-[420px]">
+    <div className="flex w-full items-center gap-2 sm:w-[420px]">
       <AutoComplete
         value={value}
         options={options}
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         onSearch={handleSearchText}
         onSelect={(text) => {
           setValue(text);
@@ -60,7 +60,7 @@ export default function InscriptionsNameSearch({
           setValue(text);
           handleSearchText(text);
         }}
-        placeholder={loading ? "Carregando..." : "Buscar por nome"}
+        placeholder={loading ? 'Carregando...' : 'Buscar por nome'}
         allowClear
       />
       <Button

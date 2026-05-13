@@ -3,8 +3,8 @@
 import ListInscriptionsTable from '@/features/inscriptions/components/listInscriptions/ListInscriptionsTable';
 import type { InscriptionsFiltersValue } from '@/features/inscriptions/components/listInscriptions/filters/InscriptionsFilters';
 import useInscriptionReports from '@/features/inscriptions/hooks/actions/reports/useInscriptionsReports';
-import { useListInscriptions } from '@/features/inscriptions/hooks/list-inscriptions/useListInscriptions';
-import { listInscriptionsKeys } from '@/features/inscriptions/hooks/list-inscriptions/useListInscriptionsQuery';
+import { useListInscriptions } from '@/features/inscriptions/hooks/listInscriptions/useListInscriptions';
+import { listInscriptionsKeys } from '@/features/inscriptions/hooks/listInscriptions/useListInscriptionsQuery';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
