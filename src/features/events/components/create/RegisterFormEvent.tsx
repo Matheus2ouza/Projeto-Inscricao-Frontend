@@ -1,54 +1,54 @@
-"use client";
+'use client';
 
-import { useGlobalLoading } from "@/components/GlobalLoading";
-import { ComboboxRegion } from "@/features/regions/components/ComboboxRegion";
-import { useRegions } from "@/features/regions/hooks/useRegions";
-import { Button } from "@/shared/components/ui/button";
+import { useGlobalLoading } from '@/components/GlobalLoading';
+import { ResponsiblesAutocomplete } from '@/features/accounts/components/ResponsiblesAutocomplete';
+import type { AccountRole } from '@/features/accounts/types/accounts.types';
+import { ComboboxRegion } from '@/features/regions/components/ComboboxRegion';
+import { useRegions } from '@/features/regions/hooks/useRegions';
+import { Button } from '@/shared/components/ui/button';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/shared/components/ui/form";
-import { Input } from "@/shared/components/ui/input";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { cn } from "@/shared/lib/utils";
-import type { SelectProps } from "antd";
-import { DatePicker, Select, Space } from "antd";
-import dayjs from "dayjs";
-import { Upload } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+} from '@/shared/components/ui/form';
+import { Input } from '@/shared/components/ui/input';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { cn } from '@/shared/lib/utils';
+import type { SelectProps } from 'antd';
+import { DatePicker, Select, Space } from 'antd';
+import dayjs from 'dayjs';
+import { Upload } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from "react";
-import { FormProvider } from "react-hook-form";
-import { toast } from "sonner";
-import useFormCreateEvent from "../../hooks/create/useFormCreateEvent";
-import { InscriptionMode } from "../../types/create/createEvent";
+} from 'react';
+import { FormProvider } from 'react-hook-form';
+import { toast } from 'sonner';
+import useFormCreateEvent from '../../hooks/create/useFormCreateEvent';
+import { InscriptionMode } from '../../types/create/createEvent';
 
 const { RangePicker } = DatePicker;
 
 interface RegisterFormEventProps {
   onSubmitSuccess?: () => void;
-  roleSegment: "SUPER" | "ADMIN" | "MANAGER";
+  roleSegment: 'SUPER' | 'ADMIN' | 'MANAGER';
 }
 
 // Chave para armazenar o estado no sessionStorage
-const FORM_STORAGE_KEY = "event-form-data";
-let cachedImageFile: File | null = null;
+const FORM_STORAGE_KEY = 'event-form-data';
 let cachedImagePreviewUrl: string | null = null;
 
 const clearCachedImage = () => {
-  if (cachedImagePreviewUrl && cachedImagePreviewUrl.startsWith("blob:")) {
+  if (cachedImagePreviewUrl && cachedImagePreviewUrl.startsWith('blob:')) {
     URL.revokeObjectURL(cachedImagePreviewUrl);
   }
-  cachedImageFile = null;
   cachedImagePreviewUrl = null;
 };
 
@@ -65,30 +65,37 @@ export default function RegisterFormEvent({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resolvedRole = (roleSegment ??
-    (user?.role === "SUPER" ? "SUPER" : "ADMIN")) as
-    | "SUPER"
-    | "ADMIN"
-    | "MANAGER";
+    (user?.role === 'SUPER' ? 'SUPER' : 'ADMIN')) as
+    | 'SUPER'
+    | 'ADMIN'
+    | 'MANAGER';
+  const responsibleRoles = useMemo<AccountRole[]>(
+    () =>
+      resolvedRole === 'SUPER'
+        ? ['SUPER', 'ADMIN', 'MANAGER']
+        : ['ADMIN', 'MANAGER'],
+    [resolvedRole],
+  );
 
   // Opções para o select de modos de inscrição
-  const inscriptionModeOptions: SelectProps["options"] = [
+  const inscriptionModeOptions: SelectProps['options'] = [
     {
-      label: "Com alocação",
+      label: 'Com alocação',
       value: InscriptionMode.NORMAL,
     },
     {
-      label: "Sem alocação",
+      label: 'Sem alocação',
       value: InscriptionMode.GUEST,
     },
   ];
 
   useEffect(() => {
     // Usuários não-super já possuem região definida no contexto
-    if (resolvedRole !== "SUPER" && user?.region?.id) {
-      const currentRegionId = form.getValues("regionId");
+    if (resolvedRole !== 'SUPER' && user?.region?.id) {
+      const currentRegionId = form.getValues('regionId');
 
       if (currentRegionId !== user.region.id) {
-        form.setValue("regionId", user.region.id);
+        form.setValue('regionId', user.region.id);
       }
     }
   }, [resolvedRole, user?.region?.id, form]);
@@ -106,7 +113,7 @@ export default function RegisterFormEvent({
       if (!values.image && previewUrl) {
         // Se não há imagem mas há preview, limpar a preview
         setPreviewUrl(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
+        if (fileInputRef.current) fileInputRef.current.value = '';
         clearCachedImage();
       }
     });
@@ -128,13 +135,13 @@ export default function RegisterFormEvent({
     if (success) {
       // Mostrar toast de sucesso
       const url = `${window.location.origin}/events/${id}`;
-      toast.success("Evento criado!", {
+      toast.success('Evento criado!', {
         description: (
           <div className="space-y-2">
             <div className="text-xs break-all">{url}</div>
             <button
               type="button"
-              className="px-2 py-1 text-xs rounded bg-primary text-primary-foreground"
+              className="bg-primary text-primary-foreground rounded px-2 py-1 text-xs"
               onClick={() => navigator.clipboard.writeText(url)}
             >
               Copiar URL
@@ -150,7 +157,7 @@ export default function RegisterFormEvent({
 
   // Função para validar o tipo de arquivo
   const isValidImageType = (file: File): boolean => {
-    const acceptedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const acceptedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     return acceptedTypes.includes(file.type);
   };
 
@@ -162,17 +169,17 @@ export default function RegisterFormEvent({
 
   // Função para mostrar erro de formato
   const showFormatError = () => {
-    toast.error("Formato não suportado", {
+    toast.error('Formato não suportado', {
       description:
-        "Por favor, selecione uma imagem nos formatos JPG, PNG ou WebP.",
+        'Por favor, selecione uma imagem nos formatos JPG, PNG ou WebP.',
       duration: 5000,
     });
   };
 
   // Função para mostrar erro de tamanho
   const showSizeError = () => {
-    toast.error("Arquivo muito grande", {
-      description: "A imagem deve ter no máximo 5MB.",
+    toast.error('Arquivo muito grande', {
+      description: 'A imagem deve ter no máximo 5MB.',
       duration: 5000,
     });
   };
@@ -187,15 +194,14 @@ export default function RegisterFormEvent({
   // Função para lidar com a seleção de arquivo
   const handleFileSelect = useCallback(
     (file: File) => {
-      form.setValue("image", file);
-      if (cachedImagePreviewUrl && cachedImagePreviewUrl.startsWith("blob:")) {
+      form.setValue('image', file);
+      if (cachedImagePreviewUrl && cachedImagePreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(cachedImagePreviewUrl);
       }
-      cachedImageFile = file;
       const url = URL.createObjectURL(file);
       cachedImagePreviewUrl = url;
       setPreviewUrl(url);
-      toast.success("Imagem carregada com sucesso", {
+      toast.success('Imagem carregada com sucesso', {
         description: `Arquivo: ${file.name}`,
         duration: 3000,
       });
@@ -248,13 +254,13 @@ export default function RegisterFormEvent({
     if (file) {
       if (!isValidImageType(file)) {
         showFormatError();
-        e.target.value = "";
+        e.target.value = '';
         return;
       }
 
       if (!isValidFileSize(file)) {
         showSizeError();
-        e.target.value = "";
+        e.target.value = '';
         return;
       }
 
@@ -264,14 +270,14 @@ export default function RegisterFormEvent({
 
   // Função para remover a imagem
   const handleRemoveImage = () => {
-    form.setValue("image", undefined);
+    form.setValue('image', undefined);
     setPreviewUrl(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
     clearCachedImage();
-    toast.info("Imagem removida", {
-      description: "Você pode adicionar uma nova imagem.",
+    toast.info('Imagem removida', {
+      description: 'Você pode adicionar uma nova imagem.',
       duration: 3000,
     });
   };
@@ -281,13 +287,13 @@ export default function RegisterFormEvent({
     sessionStorage.removeItem(FORM_STORAGE_KEY);
 
     form.reset({
-      name: "",
-      regionId: "",
+      name: '',
+      regionId: '',
       accountIds: [],
       image: undefined,
     });
     setPreviewUrl(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setDateRange({
       from: undefined,
       to: undefined,
@@ -300,7 +306,9 @@ export default function RegisterFormEvent({
   };
 
   // Função para lidar com a mudança no RangePicker
-  const handleDateRangeChange = (dates: any, dateStrings: [string, string]) => {
+  const handleDateRangeChange = (
+    dates: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null,
+  ) => {
     if (dates && dates[0] && dates[1]) {
       setDateRange({
         from: dates[0].toDate(),
@@ -321,18 +329,18 @@ export default function RegisterFormEvent({
       : null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="bg-white/95 dark:bg-white/5 backdrop-blur-md rounded-xl shadow-md border border-gray-200/80 dark:border-white/10">
+    <div className="bg-background min-h-screen">
+      <div className="rounded-xl border border-gray-200/80 bg-white/95 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
         <div className="p-6">
           <FormProvider {...form}>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Seção: Informações Básicas */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-foreground">
+                <h2 className="text-foreground text-xl font-semibold">
                   Informações Básicas
                 </h2>
 
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
                   {/* Coluna 1: Nome do Evento e Região */}
                   <div className="space-y-6 xl:col-span-2">
                     {/* Campo: Nome do Evento */}
@@ -345,7 +353,7 @@ export default function RegisterFormEvent({
                             <FormLabel className="text-base font-medium">
                               Nome do Evento *
                             </FormLabel>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-muted-foreground mt-1 text-sm">
                               Escolha um nome claro e descritivo para o seu
                               evento.
                             </p>
@@ -365,7 +373,7 @@ export default function RegisterFormEvent({
                     </div>
 
                     {/* Campo: Região */}
-                    {resolvedRole === "SUPER" && (
+                    {resolvedRole === 'SUPER' && (
                       <div className="space-y-3">
                         <FormField
                           control={form.control}
@@ -375,7 +383,7 @@ export default function RegisterFormEvent({
                               <FormLabel className="text-base font-medium">
                                 Região do Evento *
                               </FormLabel>
-                              <p className="text-sm text-muted-foreground mt-1">
+                              <p className="text-muted-foreground mt-1 text-sm">
                                 Selecione a região onde o evento será realizado.
                               </p>
                               <FormControl>
@@ -403,10 +411,17 @@ export default function RegisterFormEvent({
                             <FormLabel className="text-base font-medium">
                               Contas responsáveis *
                             </FormLabel>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-muted-foreground mt-1 text-sm">
                               Escolha um ou mais usuários que ficarão
                               responsáveis pelo evento.
                             </p>
+                            <FormControl>
+                              <ResponsiblesAutocomplete
+                                value={field.value}
+                                onChange={field.onChange}
+                                roles={responsibleRoles}
+                              />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -440,7 +455,7 @@ export default function RegisterFormEvent({
                         render={() => (
                           <FormItem>
                             <FormControl>
-                              <div className="flex flex-col items-center justify-center w-full">
+                              <div className="flex w-full flex-col items-center justify-center">
                                 <input
                                   ref={fileInputRef}
                                   type="file"
@@ -452,10 +467,10 @@ export default function RegisterFormEvent({
                                 {!previewUrl ? (
                                   <div
                                     className={cn(
-                                      "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300",
+                                      'flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-300',
                                       isDragging
-                                        ? "border-primary bg-primary/5"
-                                        : "border-border bg-background hover:bg-accent/50",
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-border bg-background hover:bg-accent/50',
                                     )}
                                     onClick={handleAreaClick}
                                     onDragOver={handleDragOver}
@@ -463,28 +478,28 @@ export default function RegisterFormEvent({
                                     onDrop={handleDrop}
                                   >
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                      <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                                      <p className="text-sm text-muted-foreground">
+                                      <Upload className="text-muted-foreground mb-2 h-8 w-8" />
+                                      <p className="text-muted-foreground text-sm">
                                         <span className="font-semibold">
                                           Clique para upload
-                                        </span>{" "}
+                                        </span>{' '}
                                         ou arraste uma imagem
                                       </p>
-                                      <p className="text-xs text-muted-foreground mt-1">
+                                      <p className="text-muted-foreground mt-1 text-xs">
                                         PNG, JPG, WEBP até 5MB
                                       </p>
                                     </div>
                                   </div>
                                 ) : (
                                   <div className="w-full space-y-3">
-                                    <div className="relative w-full h-48 rounded-lg overflow-hidden border">
+                                    <div className="relative h-48 w-full overflow-hidden rounded-lg border">
                                       <Image
                                         src={previewUrl}
                                         alt="Preview"
                                         fill
                                         className="object-cover"
                                       />
-                                      <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-xs">
+                                      <div className="absolute right-0 bottom-0 left-0 bg-black/50 p-2 text-xs text-white">
                                         Imagem selecionada
                                       </div>
                                     </div>
@@ -493,7 +508,7 @@ export default function RegisterFormEvent({
                               </div>
                             </FormControl>
                             <FormMessage />
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-muted-foreground mt-1 text-sm">
                               Formatos recomendados: JPG, PNG ou WebP. Tamanho
                               ideal: 1200x600 pixels.
                             </p>
@@ -507,10 +522,10 @@ export default function RegisterFormEvent({
 
               {/* Seção: Data do Evento */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-foreground">
+                <h2 className="text-foreground text-xl font-semibold">
                   Data do Evento
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Selecione a data inicial e final do evento.
                 </p>
 
@@ -522,8 +537,8 @@ export default function RegisterFormEvent({
                         value={rangePickerValue}
                         onChange={handleDateRangeChange}
                         format="DD/MM/YYYY"
-                        placeholder={["Data inicial", "Data final"]}
-                        style={{ width: "100%" }}
+                        placeholder={['Data inicial', 'Data final']}
+                        style={{ width: '100%' }}
                       />
                     </div>
                   </div>
@@ -532,7 +547,7 @@ export default function RegisterFormEvent({
 
               {/* Seção: Localização */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-foreground">
+                <h2 className="text-foreground text-xl font-semibold">
                   Localização
                 </h2>
 
@@ -546,7 +561,7 @@ export default function RegisterFormEvent({
                         <FormLabel className="text-base font-medium">
                           Localização do Evento
                         </FormLabel>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-muted-foreground mt-1 text-sm">
                           Informe o endereço ou local onde o evento será
                           realizado.
                         </p>
@@ -567,10 +582,10 @@ export default function RegisterFormEvent({
 
               {/* Seção: Configurações de Inscrição */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-foreground">
+                <h2 className="text-foreground text-xl font-semibold">
                   Configurações de Inscrição
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Selecione os modos de inscrição disponíveis para este evento.
                 </p>
 
@@ -586,13 +601,13 @@ export default function RegisterFormEvent({
                         </FormLabel>
                         <FormControl>
                           <Space
-                            style={{ width: "100%" }}
+                            style={{ width: '100%' }}
                             orientation="vertical"
                           >
                             <Select
                               mode="multiple"
                               allowClear
-                              style={{ width: "100%" }}
+                              style={{ width: '100%' }}
                               placeholder="Selecione os modos de inscrição"
                               value={field.value}
                               onChange={(value) => field.onChange(value)}
@@ -602,7 +617,7 @@ export default function RegisterFormEvent({
                           </Space>
                         </FormControl>
                         <FormMessage />
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-muted-foreground mt-1 text-sm">
                           Escolha se o evento aceitará inscrições normais,
                           convidados, ou ambos.
                         </p>
@@ -614,7 +629,7 @@ export default function RegisterFormEvent({
 
               {/* Seção: Configurações */}
               <div className="space-y-6">
-                <h2 className="text-xl font-semibold text-foreground">
+                <h2 className="text-foreground text-xl font-semibold">
                   Configurações
                 </h2>
 
@@ -624,20 +639,20 @@ export default function RegisterFormEvent({
                     control={form.control}
                     name="openImmediately"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
                         <FormControl>
                           <Input
                             type="checkbox"
                             checked={field.value}
                             onChange={(e) => field.onChange(e.target.checked)}
-                            className="h-4 w-4 mt-1"
+                            className="mt-1 h-4 w-4"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel className="text-base font-medium">
                             Abrir inscrições imediatamente
                           </FormLabel>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-muted-foreground text-sm">
                             Se marcado, as inscrições ficarão abertas assim que
                             o evento for criado.
                           </p>
@@ -650,7 +665,7 @@ export default function RegisterFormEvent({
               </div>
 
               {/* Botões de Ação */}
-              <div className="flex gap-4 justify-start pt-6 border-t">
+              <div className="flex justify-start gap-4 border-t pt-6">
                 <Button
                   type="button"
                   variant="outline"
