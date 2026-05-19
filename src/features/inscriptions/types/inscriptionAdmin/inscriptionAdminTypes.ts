@@ -1,25 +1,22 @@
 export type InscriptionStatus =
-  | "PENDING"
-  | "UNDER_REVIEW"
-  | "PAID"
-  | "EXPIRED"
-  | "CANCELLED";
+  | 'PENDING'
+  | 'UNDER_REVIEW'
+  | 'PAID'
+  | 'EXPIRED'
+  | 'CANCELLED';
 
-export type StatusPayment = "APPROVED" | "UNDER_REVIEW" | "REFUSED";
+export type StatusPayment = 'APPROVED' | 'UNDER_REVIEW' | 'REFUSED';
 
-export type PaymentMethod = "DINHEIRO" | "PIX" | "CARTAO";
+export type PaymentMethod = 'DINHEIRO' | 'PIX' | 'CARTAO';
 
-export type genderType = "MASCULINO" | "FEMININO";
+export type genderType = 'MASCULINO' | 'FEMININO';
 
-export type ShirtSize = "PP" | "P" | "M" | "G" | "GG" | "XG";
+export type ShirtSize = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XG';
 
-export type ShirtType = "TRADICIONAL" | "BABYLOOK";
+export type ShirtType = 'TRADICIONAL' | 'BABYLOOK';
 
 export type createInscriptionAdminData = {
   eventId: string;
-
-  // O admin pode setar o status da inscrição
-  status: InscriptionStatus;
 
   // para ver se é inscrição Guest
   isGuest: boolean;
@@ -31,14 +28,9 @@ export type createInscriptionAdminData = {
   phone?: string;
 
   // Dados Guest
-  guestLocality?: string;
-
-  totalValue: number;
-  totalPaid?: number;
+  locality?: string;
 
   participants: ParticipantInscription[];
-  // Pode já vir com o pagamento entao é opcional
-  payment?: PaymentInscription;
 };
 
 export type ParticipantInscription = {
