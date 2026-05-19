@@ -85,8 +85,10 @@
   --liquid-glass-saturation: 160%;
   --liquid-glass-saturation-strong: 180%;
   --liquid-glass-saturation-subtle: 140%;
-  --liquid-glass-shadow: 0 10px 30px oklch(0.15 0.04 260 / 8%), inset 0 1px 0 oklch(1 0 0 / 52%);
-  --liquid-glass-shadow-strong: 0 14px 40px oklch(0.15 0.04 260 / 12%), inset 0 1px 0 oklch(1 0 0 / 60%);
+  --liquid-glass-shadow:
+    0 10px 30px oklch(0.15 0.04 260 / 8%), inset 0 1px 0 oklch(1 0 0 / 52%);
+  --liquid-glass-shadow-strong:
+    0 14px 40px oklch(0.15 0.04 260 / 12%), inset 0 1px 0 oklch(1 0 0 / 60%);
 
   --glass-surface: oklch(1 0 0 / 70%);
   --glass-surface-strong: oklch(1 0 0 / 82%);
@@ -96,6 +98,14 @@
   --glass-shadow-strong: 0 12px 48px rgba(15, 23, 42, 0.15);
   --glass-backdrop: blur(24px);
   --glass-backdrop-soft: blur(16px);
+
+  --outline-button-bg: oklch(1 0 0 / 42%);
+  --outline-button-border: oklch(1 0 0 / 68%);
+  --outline-button-foreground: oklch(0.26 0.03 260);
+  --outline-button-hover-bg: oklch(1 0 0 / 58%);
+  --outline-button-hover-border: oklch(1 0 0 / 82%);
+  --outline-button-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.08), inset 0 1px 0 oklch(1 0 0 / 72%);
 }
 
 .dark {
@@ -131,8 +141,10 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.439 0 0);
 
-  --liquid-glass-shadow: 0 12px 34px oklch(0.02 0.01 260 / 28%), inset 0 1px 0 oklch(1 0 0 / 20%);
-  --liquid-glass-shadow-strong: 0 16px 45px oklch(0.02 0.01 260 / 40%), inset 0 1px 0 oklch(1 0 0 / 26%);
+  --liquid-glass-shadow:
+    0 12px 34px oklch(0.02 0.01 260 / 28%), inset 0 1px 0 oklch(1 0 0 / 20%);
+  --liquid-glass-shadow-strong:
+    0 16px 45px oklch(0.02 0.01 260 / 40%), inset 0 1px 0 oklch(1 0 0 / 26%);
 
   --glass-surface: oklch(1 0 0 / 12%);
   --glass-surface-strong: oklch(1 0 0 / 18%);
@@ -140,6 +152,14 @@
   --glass-border-strong: oklch(1 0 0 / 28%);
   --glass-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
   --glass-shadow-strong: 0 28px 110px rgba(0, 0, 0, 0.48);
+
+  --outline-button-bg: oklch(1 0 0 / 10%);
+  --outline-button-border: oklch(1 0 0 / 22%);
+  --outline-button-foreground: oklch(0.97 0.008 250);
+  --outline-button-hover-bg: oklch(1 0 0 / 16%);
+  --outline-button-hover-border: oklch(1 0 0 / 34%);
+  --outline-button-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.2), inset 0 1px 0 oklch(1 0 0 / 16%);
 }
 
 .toast {
@@ -159,9 +179,21 @@
     min-height: 100vh;
     font-family: var(--font-geist-sans), system-ui, sans-serif;
     background:
-      radial-gradient(circle at 20% 20%, oklch(0.95 0.04 250 / 60%), transparent 40%),
-      radial-gradient(circle at 80% 0%, oklch(0.92 0.05 300 / 50%), transparent 45%),
-      radial-gradient(circle at 50% 100%, oklch(0.93 0.04 200 / 55%), transparent 50%),
+      radial-gradient(
+        circle at 20% 20%,
+        oklch(0.95 0.04 250 / 60%),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 80% 0%,
+        oklch(0.92 0.05 300 / 50%),
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 50% 100%,
+        oklch(0.93 0.04 200 / 55%),
+        transparent 50%
+      ),
       linear-gradient(180deg, var(--background), oklch(0.95 0.02 260));
     color: var(--foreground);
     text-rendering: optimizeLegibility;
@@ -191,33 +223,41 @@
 
 @layer utilities {
   .bg-linear-to-r {
-    background-image: linear-gradient(to right,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to right,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .bg-linear-to-b {
-    background-image: linear-gradient(to bottom,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to bottom,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .before\:bg-linear-to-b::before,
   .after\:bg-linear-to-b::after {
-    background-image: linear-gradient(to bottom,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to bottom,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .before\:bg-linear-to-r::before,
   .after\:bg-linear-to-r::after {
-    background-image: linear-gradient(to right,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to right,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .glass-surface,
@@ -300,8 +340,10 @@
   .liquid-glass-light {
     background: oklch(1 0 0 / 28%);
     border: 1px solid oklch(1 0 0 / 55%);
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
+    backdrop-filter: blur(var(--liquid-glass-blur-subtle))
+      saturate(var(--liquid-glass-saturation-subtle));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle))
+      saturate(var(--liquid-glass-saturation-subtle));
     box-shadow: inset 0 1px 0 oklch(1 0 0 / 60%);
     transition: all 0.25s ease;
   }
@@ -309,7 +351,9 @@
   .liquid-glass-light:hover {
     background: oklch(1 0 0 / 38%);
     border-color: oklch(1 0 0 / 75%);
-    box-shadow: 0 6px 18px oklch(0.15 0.04 260 / 10%), inset 0 1px 0 oklch(1 0 0 / 70%);
+    box-shadow:
+      0 6px 18px oklch(0.15 0.04 260 / 10%),
+      inset 0 1px 0 oklch(1 0 0 / 70%);
   }
 
   .liquid-glass-button-light,
@@ -323,7 +367,9 @@
     border: 1px solid oklch(0.9 0 0 / 80%);
     backdrop-filter: blur(12px) saturate(140%);
     -webkit-backdrop-filter: blur(12px) saturate(140%);
-    box-shadow: 0 4px 12px oklch(0.15 0.04 260 / 10%), inset 0 1px 0 oklch(1 0 0 / 50%);
+    box-shadow:
+      0 4px 12px oklch(0.15 0.04 260 / 10%),
+      inset 0 1px 0 oklch(1 0 0 / 50%);
   }
 
   .liquid-glass-button:hover {
@@ -334,12 +380,21 @@
   .dark .liquid-glass-button {
     background: oklch(0.25 0.02 272 / 65%);
     border: 1px solid oklch(1 0 0 / 25%);
-    box-shadow: 0 6px 16px oklch(0.02 0.01 260 / 35%), inset 0 1px 0 oklch(1 0 0 / 20%);
+    box-shadow:
+      0 6px 16px oklch(0.02 0.01 260 / 35%),
+      inset 0 1px 0 oklch(1 0 0 / 20%);
   }
 
   .dark .liquid-glass-button:hover {
     background: oklch(0.32 0.02 272 / 80%);
     border-color: oklch(1 0 0 / 35%);
+  }
+
+  [data-mobile='true'][data-sidebar='sidebar'] {
+    background: var(--sidebar) !important;
+    border-color: var(--sidebar-border) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -498,7 +553,9 @@ gmp-map {
 .liquid-glass-button-light:hover {
   background: oklch(1 0 0 / 18%) !important;
   border: 1px solid oklch(0.9 0 0 / 80%) !important;
-  box-shadow: 0 4px 12px oklch(0.15 0.04 260 / 10%), inset 0 1px 0 oklch(1 0 0 / 55%);
+  box-shadow:
+    0 4px 12px oklch(0.15 0.04 260 / 10%),
+    inset 0 1px 0 oklch(1 0 0 / 55%);
 }
 
 .dark .liquid-glass-button-light {
@@ -514,7 +571,9 @@ gmp-map {
   border: 1px solid oklch(0.9 0 0 / 80%) !important;
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
-  box-shadow: 0 4px 12px oklch(0.15 0 0 / 10%), inset 0 1px 0 oklch(1 0 0 / 50%);
+  box-shadow:
+    0 4px 12px oklch(0.15 0 0 / 10%),
+    inset 0 1px 0 oklch(1 0 0 / 50%);
   transition: all 0.25s ease;
 }
 
@@ -526,7 +585,9 @@ gmp-map {
 .dark .liquid-glass-button {
   background: oklch(0.25 0.02 272 / 65%) !important;
   border: 1px solid oklch(1 0 0 / 25%) !important;
-  box-shadow: 0 6px 16px oklch(0.02 0.01 260 / 35%), inset 0 1px 0 oklch(1 0 0 / 20%);
+  box-shadow:
+    0 6px 16px oklch(0.02 0.01 260 / 35%),
+    inset 0 1px 0 oklch(1 0 0 / 20%);
 }
 
 .dark .liquid-glass-button:hover {
