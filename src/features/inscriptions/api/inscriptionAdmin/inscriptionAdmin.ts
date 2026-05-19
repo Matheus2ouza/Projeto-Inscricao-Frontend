@@ -1,8 +1,8 @@
-import axiosInstance from "@/shared/lib/apiClient";
 import {
   createInscriptionAdminData,
   createInscriptionAdminResponse,
-} from "../../types/inscriptionAdmin/inscriptionAdminTypes";
+} from '@/features/inscriptions/types/inscriptionAdmin/inscriptionAdminTypes';
+import axiosInstance from '@/shared/lib/apiClient';
 
 export async function createInscriptionAdmin(data: createInscriptionAdminData) {
   try {
@@ -19,7 +19,7 @@ export async function createInscriptionAdmin(data: createInscriptionAdminData) {
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível criar a inscrição.",
+        'Não foi possível criar a inscrição.',
     );
   }
 }
