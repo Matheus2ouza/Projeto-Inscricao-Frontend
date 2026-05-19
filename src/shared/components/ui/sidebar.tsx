@@ -191,7 +191,8 @@ function Sidebar({
           data-slot="sidebar"
           data-mobile="true"
           className={cn(
-            'bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden',
+            'bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 shadow-2xl backdrop-blur-none [&>button]:hidden',
+            '[border-color:var(--sidebar-border)!important] [background:var(--sidebar)!important]',
             sidebarClassName,
           )}
           style={
