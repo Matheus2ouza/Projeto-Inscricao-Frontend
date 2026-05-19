@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAccont } from "../api/getUsersCombobox";
-import { AccountResponse, AccountRole } from "../types/accounts.types";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getAccont } from '../api/getUsersCombobox';
+import { AccountResponse, AccountRole } from '../types/accounts.types';
 
 export const accountsKeys = {
-  all: ["accounts"] as const,
-  lists: () => [...accountsKeys.all, "list"] as const,
-  combobox: () => [...accountsKeys.lists(), "combobox"] as const,
-  details: () => [...accountsKeys.all, "detail"] as const,
+  all: ['accounts'] as const,
+  lists: () => [...accountsKeys.all, 'list'] as const,
+  combobox: () => [...accountsKeys.lists(), 'combobox'] as const,
+  details: () => [...accountsKeys.all, 'detail'] as const,
   detail: (id: string) => [...accountsKeys.details(), id] as const,
 };
 
 export function useAccountsComboboxQuery(
   enabled: boolean = true,
-  roles?: AccountRole[]
+  roles?: AccountRole[],
 ) {
   return useQuery<AccountResponse[]>({
     queryKey: [...accountsKeys.combobox(), { roles }],
-    queryFn: () => getAccont(),
+    queryFn: () => getAccont(roles),
     enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

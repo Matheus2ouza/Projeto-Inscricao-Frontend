@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { AccountResponse } from "../types/accounts.types";
-import { useAccountsComboboxQuery } from "./useAccountsQuery";
+import { AccountResponse, AccountRole } from '../types/accounts.types';
+import { useAccountsComboboxQuery } from './useAccountsQuery';
 
 type UseAccountResult = {
   accounts: AccountResponse[];
@@ -10,9 +10,12 @@ type UseAccountResult = {
   refetch: () => Promise<void>;
 };
 
-export function useAccount(autoFetch: boolean = true): UseAccountResult {
+export function useAccount(
+  autoFetch: boolean = true,
+  roles?: AccountRole[],
+): UseAccountResult {
   const { data, isLoading, isFetching, error, refetch } =
-    useAccountsComboboxQuery(autoFetch);
+    useAccountsComboboxQuery(autoFetch, roles);
 
   return {
     accounts: data ?? [],
@@ -20,7 +23,7 @@ export function useAccount(autoFetch: boolean = true): UseAccountResult {
     error: error
       ? error instanceof Error
         ? error.message
-        : "Falha ao carregar contas"
+        : 'Falha ao carregar contas'
       : null,
     refetch: async () => {
       await refetch();
