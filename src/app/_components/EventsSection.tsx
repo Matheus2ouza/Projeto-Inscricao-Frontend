@@ -138,7 +138,7 @@ export default function EventsSection({ events }: EventsSectionProps) {
             </motion.div>
           ) : (
             <motion.div
-              className="py-12 text-center"
+              className="flex min-h-[320px] flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/40 px-6 py-16 text-center shadow-xl backdrop-blur-xl dark:bg-white/5"
               variants={{
                 hidden: { opacity: 0, y: 30 },
                 visible: {
@@ -148,11 +148,13 @@ export default function EventsSection({ events }: EventsSectionProps) {
                 },
               }}
             >
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Nenhum evento encontrado
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Nenhum evento disponível
               </h3>
-              <p className="mt-2 text-gray-500 dark:text-gray-400">
-                Não há eventos disponíveis no momento.
+
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-gray-600 md:text-base dark:text-gray-400">
+                No momento não há eventos publicados. Em breve novos eventos
+                estarão disponíveis.
               </p>
             </motion.div>
           )}

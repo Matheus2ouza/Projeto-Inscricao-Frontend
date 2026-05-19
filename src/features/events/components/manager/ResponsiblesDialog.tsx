@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useAccount } from "@/features/accounts/hooks/useAccount";
-import { Button } from "@/shared/components/ui/button";
+import { useAccount } from '@/features/accounts/hooks/useAccount';
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/shared/components/ui/dialog";
+} from '@/shared/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -15,8 +15,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { Plus } from "lucide-react";
+} from '@/shared/components/ui/table';
+import { Plus } from 'lucide-react';
 
 interface ResponsiblesDialogProps {
   open: boolean;
@@ -35,20 +35,20 @@ export default function ResponsiblesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[80vw] sm:max-w-[80vw] max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent className="flex max-h-[80vh] max-w-[80vw] flex-col overflow-hidden sm:max-w-[80vw]">
         <DialogHeader>
           <DialogTitle>Gerenciar Responsáveis</DialogTitle>
         </DialogHeader>
 
         <div className="mt-4 flex-1 overflow-y-auto">
           {loading ? (
-            <div className="text-center py-8">
+            <div className="py-8 text-center">
               <p className="text-muted-foreground">
                 Carregando responsáveis...
               </p>
             </div>
           ) : accounts.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="py-8 text-center">
               <p className="text-muted-foreground">
                 Nenhum responsável disponível
               </p>
@@ -72,16 +72,16 @@ export default function ResponsiblesDialog({
 
                     return (
                       <TableRow key={account.id}>
-                        <TableCell className="font-mono text-sm px-4 py-3">
+                        <TableCell className="px-4 py-3 font-mono text-sm">
                           {account.id}
                         </TableCell>
-                        <TableCell className="font-medium px-4 py-3">
+                        <TableCell className="px-4 py-3 font-medium">
                           {account.username.toUpperCase()}
                         </TableCell>
-                        <TableCell className="font-medium px-4 py-3">
+                        <TableCell className="px-4 py-3 font-medium">
                           {account.role.toUpperCase()}
                         </TableCell>
-                        <TableCell className="text-right px-4 py-3">
+                        <TableCell className="px-4 py-3 text-right">
                           <Button
                             type="button"
                             variant="outline"
@@ -91,7 +91,7 @@ export default function ResponsiblesDialog({
                             className="flex items-center gap-2"
                           >
                             <Plus className="h-4 w-4" />
-                            {isAlreadyAdded ? "Adicionado" : "Adicionar"}
+                            {isAlreadyAdded ? 'Adicionado' : 'Adicionar'}
                           </Button>
                         </TableCell>
                       </TableRow>

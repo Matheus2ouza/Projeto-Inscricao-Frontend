@@ -891,10 +891,22 @@ export default function EventManagement({
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Tipos de Inscrição
                 </h2>
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Tag className="h-3 w-3" />
-                  {typesInscriptions.length} tipos
-                </Badge>
+                <div className="flex items-center gap-3">
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <Tag className="h-3 w-3" />
+                    {typesInscriptions.length} tipos
+                  </Badge>
+                  {isEditing && (
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2"
+                      onClick={handleCreateType}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Adicionar Novo Tipo
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {!hasTypeInscriptions ? (
@@ -917,14 +929,6 @@ export default function EventManagement({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <Button
-                    variant="default"
-                    className="flex w-full items-center gap-2"
-                    onClick={handleCreateType}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Adicionar Novo Tipo
-                  </Button>
                   {typesInscriptions.map((type) => {
                     const isTypeActive = type.active !== false;
 
@@ -962,33 +966,35 @@ export default function EventManagement({
                             {calculateMaxAge(type.rule)}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditType(type)}
-                            disabled={typeInscriptionLoading}
-                          >
-                            Editar
-                          </Button>
-                          <Button
-                            variant={isTypeActive ? 'outline' : 'default'}
-                            size="sm"
-                            className="flex items-center gap-1"
-                            onClick={() => handleDisableType(type)}
-                            disabled={typeInscriptionLoading}
-                          >
-                            {isTypeActive ? 'Desabilitar' : 'Ativar'}
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteType(type)}
-                            disabled={typeInscriptionLoading}
-                          >
-                            Excluir
-                          </Button>
-                        </div>
+                        {isEditing && (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditType(type)}
+                              disabled={typeInscriptionLoading}
+                            >
+                              Editar
+                            </Button>
+                            <Button
+                              variant={isTypeActive ? 'outline' : 'default'}
+                              size="sm"
+                              className="flex items-center gap-1"
+                              onClick={() => handleDisableType(type)}
+                              disabled={typeInscriptionLoading}
+                            >
+                              {isTypeActive ? 'Desabilitar' : 'Ativar'}
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteType(type)}
+                              disabled={typeInscriptionLoading}
+                            >
+                              Excluir
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
