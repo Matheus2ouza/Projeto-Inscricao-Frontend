@@ -1,16 +1,21 @@
 'use client';
 
-import { Button } from '@/shared/components/ui/button';
+import { InscriptionsStatus } from '@/features/participants/api/actions/reports/generateListParticipantsByLocalityPdf';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
-import { Table, Tag } from 'antd';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared/components/ui/popover';
+import { Button, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import Pagination from 'antd/lib/pagination';
-import { Download, Users } from 'lucide-react';
+import { Download, Filter, Users } from 'lucide-react';
 import { useState } from 'react';
 import {
   GenerateParticipantsByLocalityPdfResponse,
@@ -20,8 +25,14 @@ import {
   GenerateParticipantsByLocalityXlsxResponse,
   ReportColumnXlsx,
 } from '../../api/actions/reports/generateListParticipantsByLocalityXlsx';
-import { Participant } from '../../types/list-participants/listParticipantsTypes';
+import {
+  Participant,
+  TypeInscription,
+} from '../../types/list-participants/listParticipantsTypes';
 import PdfGeneratorDrawer from './PdfGeneratorDrawer';
+import ListParticipantsFilters, {
+  ListParticipantsFiltersValue,
+} from './filters/ListParticipantsFilters';
 
 interface ListParticipantsProps {
   eventId: string;
@@ -35,6 +46,11 @@ interface ListParticipantsProps {
   pageCount: number;
   onPageChange: (page: number) => void;
 
+  filters: ListParticipantsFiltersValue;
+  typesInscriptionsInUse: TypeInscription[];
+  onApplyFilters: (filters: ListParticipantsFiltersValue) => void;
+  onClearFilters: () => void;
+
   // export
   onGenerateParticipantsByLocalityPdf: (params: {
     separate: boolean;
@@ -44,6 +60,7 @@ interface ListParticipantsProps {
     columns?: ReportColumnPdf[];
     startDate?: string;
     endDate?: string;
+    inscriptionsStatus?: InscriptionsStatus[];
   }) => Promise<GenerateParticipantsByLocalityPdfResponse>;
 
   onGenerateParticipantsByLocalityXlsx: (params: {
@@ -53,6 +70,7 @@ interface ListParticipantsProps {
     columns?: ReportColumnXlsx[];
     startDate?: string;
     endDate?: string;
+    inscriptionsStatus?: InscriptionsStatus[];
   }) => Promise<GenerateParticipantsByLocalityXlsxResponse>;
 
   isGeneratingParticipantsByLocalityPdf: boolean;
@@ -138,12 +156,19 @@ export default function ListParticipants({
   pageSize,
   pageCount,
   onPageChange,
+
+  filters,
+  typesInscriptionsInUse,
+  onApplyFilters,
+  onClearFilters,
+
   onGenerateParticipantsByLocalityPdf,
   onGenerateParticipantsByLocalityXlsx,
   isGeneratingParticipantsByLocalityPdf,
   isGeneratingParticipantsByLocalityXlsx,
 }: ListParticipantsProps) {
   const [pdfDrawerOpen, setPdfDrawerOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const generatingReport =
     isGeneratingParticipantsByLocalityPdf ||
     isGeneratingParticipantsByLocalityXlsx;
@@ -326,29 +351,50 @@ export default function ListParticipants({
         </Card>
       </div>
 
-      <Card className="border-0 bg-gradient-to-br from-white to-gray-50 shadow-md dark:from-gray-800 dark:to-gray-900">
-        <CardHeader className="border-b border-gray-200 pb-4 dark:border-gray-700">
+      <Card className="participants-list-table gap-0 border-0 bg-gradient-to-br from-white to-gray-50 shadow-md dark:from-[oklch(0.24_0.005_260)] dark:to-[oklch(0.2_0.005_260)]">
+        <CardHeader className="space-y-0 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
               Lista de Participantes
             </CardTitle>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-              {total > 0 && (
-                <div className="text-muted-foreground text-sm">
-                  Mostrando {startItem}-{endItem} de {total}
-                </div>
-              )}
               <Button
-                type="button"
-                variant="outline"
-                size="sm"
+                type="primary"
+                icon={<Download className="h-4 w-4" />}
                 onClick={() => setPdfDrawerOpen(true)}
                 disabled={generatingReport}
-                className="flex items-center gap-2"
               >
-                <Download className="h-4 w-4" />
-                {generatingReport ? 'Baixando...' : 'Baixar Lista'}
+                {generatingReport ? 'Gerando...' : 'Gerar Relatório'}
               </Button>
+              <Popover
+                open={filtersOpen}
+                onOpenChange={(open) => {
+                  setFiltersOpen(open);
+                }}
+              >
+                <PopoverTrigger asChild>
+                  <Button type="primary" icon={<Filter className="h-4 w-4" />}>
+                    Filtros
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="end"
+                  className="w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl p-0"
+                >
+                  <ListParticipantsFilters
+                    value={filters}
+                    onApply={(next) => {
+                      onApplyFilters(next);
+                      setFiltersOpen(false);
+                    }}
+                    onClear={() => {
+                      onClearFilters();
+                      setFiltersOpen(false);
+                    }}
+                    typeInscriptionsOptions={typesInscriptionsInUse}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </CardHeader>
@@ -375,7 +421,7 @@ export default function ListParticipants({
           onChange={onPageChange}
           showSizeChanger={false}
           hideOnSinglePage
-          className="mt-4 flex justify-center"
+          className="participants-pagination mt-4 flex justify-center"
         />
       )}
     </>

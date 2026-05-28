@@ -93,6 +93,12 @@ export default async function proxy(request: NextRequest) {
       MANAGER: '/admin/',
       USER: '/user/',
     };
+    const roleHome: Record<string, string> = {
+      SUPER: '/super/home',
+      ADMIN: '/admin/home',
+      MANAGER: '/admin/home',
+      USER: '/user/home',
+    };
     const requiredPrefix = rolePrefix[role] ?? '/user/';
     const normalizedPrefix =
       requiredPrefix.endsWith('/') && requiredPrefix.length > 1
@@ -103,7 +109,7 @@ export default async function proxy(request: NextRequest) {
 
     if (!matchesPrefix) {
       const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = requiredPrefix;
+      redirectUrl.pathname = roleHome[role] ?? '/user/home';
       return NextResponse.redirect(redirectUrl);
     }
   }
@@ -120,6 +126,6 @@ export const config: MiddlewareConfig = {
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      * - xlsx (allow Excel files)
      */
-    '/((?!api|_next/static|_next/image|images/|xlsx/|favicon.ico|sitemap.xml|robots.txt).*)',
+    '/((?!api|web-api|_next/static|_next/image|images/|xlsx/|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 };

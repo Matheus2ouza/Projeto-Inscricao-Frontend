@@ -1,16 +1,14 @@
-"use server";
-
-import axiosInstance from "@/shared/lib/apiClient";
+import axiosInstance from '@/shared/lib/apiClient';
 import {
   CreateEventRequest,
   RegisterEventResponse,
-} from "../../types/create/createEvent";
+} from '../../types/create/createEvent';
 
 export async function registerEvent(
-  data: CreateEventRequest
+  data: CreateEventRequest,
 ): Promise<RegisterEventResponse> {
   try {
-    const response = await axiosInstance.post("/events/create", data);
+    const response = await axiosInstance.post('/events/create', data);
 
     return { id: response.data.id };
   } catch (error: unknown) {
@@ -19,12 +17,12 @@ export async function registerEvent(
       message?: string;
     };
     console.error(
-      "Erro ao registrar evento:",
-      axiosError.response?.data || axiosError.message
+      'Erro ao registrar evento:',
+      axiosError.response?.data || axiosError.message,
     );
     throw new Error(
       axiosError.response?.data?.message ||
-        "Erro inesperado. Por favor, tente novamente mais tarde."
+        'Erro inesperado. Por favor, tente novamente mais tarde.',
     );
   }
 }

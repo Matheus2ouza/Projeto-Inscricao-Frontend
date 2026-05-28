@@ -1,38 +1,38 @@
-"use client";
+'use client';
 
-import { useGlobalLoading } from "@/components/GlobalLoading";
+import { useGlobalLoading } from '@/components/GlobalLoading';
 import {
   accountsKeys,
   useInvalidateAccountsQuery,
-} from "@/features/accounts/hooks/useAccountsQuery";
-import { usersKeys } from "@/features/accounts/hooks/useUsers";
-import { registerAccount } from "@/features/auth/api/registerAccount";
-import { useQueryClient } from "@tanstack/react-query";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
+} from '@/features/accounts/hooks/useAccountsQuery';
+import { usersKeys } from '@/features/accounts/hooks/useUsers';
+import { registerAccount } from '@/features/auth/web-api/registerAccount';
+import { useQueryClient } from '@tanstack/react-query';
+import { ThumbsDown, ThumbsUp } from 'lucide-react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
 export const ROLES = [
   {
-    label: "SUPER",
-    value: "SUPER",
-    color: "bg-gradient-to-r from-purple-500 to-pink-500 text-white",
+    label: 'SUPER',
+    value: 'SUPER',
+    color: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
   },
-  { label: "ADMIN", value: "ADMIN", color: "bg-blue-500 text-white" },
-  { label: "MANAGER", value: "MANAGER", color: "bg-green-500 text-white" },
-  { label: "USER", value: "USER", color: "bg-gray-400 text-white" },
+  { label: 'ADMIN', value: 'ADMIN', color: 'bg-blue-500 text-white' },
+  { label: 'MANAGER', value: 'MANAGER', color: 'bg-green-500 text-white' },
+  { label: 'USER', value: 'USER', color: 'bg-gray-400 text-white' },
 ];
 
 const AccountSchema = z.object({
   username: z
     .string()
-    .min(2, { message: "Usuário deve ter pelo menos 2 caracteres" }),
+    .min(2, { message: 'Usuário deve ter pelo menos 2 caracteres' }),
   password: z
     .string()
-    .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
-  role: z.string().min(1, { message: "Função é obrigatória" }),
+    .min(6, { message: 'Senha deve ter pelo menos 6 caracteres' }),
+  role: z.string().min(1, { message: 'Função é obrigatória' }),
   region: z.string().optional(),
 });
 
@@ -55,17 +55,17 @@ export default function useFormCreateAccount(): useFormCreateAccount {
   } | null>(null);
   const form = useForm<AcccountFormType>({
     defaultValues: {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
       role: ROLES[3].value, // USER como padrão
-      region: "",
+      region: '',
     },
   });
 
   async function onCreateForm(input: AcccountFormType) {
     setLoading(true);
     try {
-      const regionValue = input.region?.trim() === "" ? null : input.region;
+      const regionValue = input.region?.trim() === '' ? null : input.region;
 
       await registerAccount({
         username: input.username,
@@ -86,14 +86,14 @@ export default function useFormCreateAccount(): useFormCreateAccount {
       });
       // reset form to default values after successful creation
       form.reset();
-      toast.success("Usuario criado com sucesso", {
-        description: "Usuario criado com sucesso e já pode ser utilizado",
+      toast.success('Usuario criado com sucesso', {
+        description: 'Usuario criado com sucesso e já pode ser utilizado',
         icon: <ThumbsUp />,
       });
       return true;
     } catch (error) {
       const err = error as Error;
-      toast.error("Erro ao criar usuario", {
+      toast.error('Erro ao criar usuario', {
         description: err.message,
         icon: <ThumbsDown />,
       });

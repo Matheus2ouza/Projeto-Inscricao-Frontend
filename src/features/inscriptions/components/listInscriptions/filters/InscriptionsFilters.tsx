@@ -82,7 +82,7 @@ export default function InscriptionsFilters({
               onClick={() => setDraft((prev) => ({ ...prev, status: [] }))}
               aria-pressed={draft.status.length === 0}
             >
-              <span className="border-input relative h-4 w-4 shrink-0 rounded-full border">
+              <span className="border-primary/55 bg-primary/20 relative h-4 w-4 shrink-0 rounded-full border">
                 {draft.status.length === 0 && (
                   <span className="bg-primary absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full" />
                 )}
@@ -97,7 +97,7 @@ export default function InscriptionsFilters({
                 onClick={() => toggleStatus(status)}
                 aria-pressed={isStatusSelected(status)}
               >
-                <span className="border-input relative h-4 w-4 shrink-0 rounded-full border">
+                <span className="border-primary/55 bg-primary/20 relative h-4 w-4 shrink-0 rounded-full border">
                   {isStatusSelected(status) && (
                     <span className="bg-primary absolute top-1/2 left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full" />
                   )}

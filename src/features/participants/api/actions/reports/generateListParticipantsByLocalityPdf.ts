@@ -1,7 +1,7 @@
 import axiosInstance from '@/shared/lib/apiClient';
 import qs from 'qs';
 
-enum InscriptionStatus {
+export enum InscriptionsStatus {
   PENDING = 'PENDING',
   UNDER_REVIEW = 'UNDER_REVIEW',
   PAID = 'PAID',
@@ -18,7 +18,7 @@ export type GenerateParticipantsByLocalityPdfParams = {
   columns?: ReportColumnPdf[];
   startDate?: string;
   endDate?: string;
-  status?: InscriptionStatus[];
+  inscriptionsStatus?: InscriptionsStatus[];
 };
 
 export type ReportColumnPdf =
@@ -46,7 +46,7 @@ export async function generateParticipantsByLocalityPdf({
   columns,
   startDate,
   endDate,
-  status,
+  inscriptionsStatus,
 }: GenerateParticipantsByLocalityPdfParams): Promise<GenerateParticipantsByLocalityPdfResponse> {
   try {
     const { data } = await axiosInstance.get(
@@ -60,7 +60,7 @@ export async function generateParticipantsByLocalityPdf({
           columns: columns ? columns.join(',') : undefined,
           startDate,
           endDate,
-          status,
+          inscriptionsStatus,
         },
         paramsSerializer: (params) =>
           qs.stringify(params, { arrayFormat: 'repeat' }),

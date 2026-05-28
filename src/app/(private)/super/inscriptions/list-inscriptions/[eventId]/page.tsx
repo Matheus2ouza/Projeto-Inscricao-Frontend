@@ -4,7 +4,7 @@ import ListInscriptionsTable from '@/features/inscriptions/components/listInscri
 import type { InscriptionsFiltersValue } from '@/features/inscriptions/components/listInscriptions/filters/InscriptionsFilters';
 import useInscriptionReports from '@/features/inscriptions/hooks/actions/reports/useInscriptionsReports';
 import { useListInscriptions } from '@/features/inscriptions/hooks/listInscriptions/useListInscriptions';
-import { listInscriptionsKeys } from '@/features/inscriptions/hooks/listInscriptions/useListInscriptionsQuery';
+import { useInvalidateListInscriptionsQuery } from '@/features/inscriptions/hooks/listInscriptions/useListInscriptionsQuery';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
@@ -58,6 +58,8 @@ export default function ListInscriptionsSuperPage() {
     period: filters.period,
     responsible: responsible.trim() ? responsible.trim() : undefined,
   });
+
+  const { invalidateLists } = useInvalidateListInscriptionsQuery();
 
   const {
     handleGeneratePdfReport,
@@ -130,7 +132,7 @@ export default function ListInscriptionsSuperPage() {
         <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
           <div>
             <p className="font-semibold text-red-600 dark:text-red-400">
-              Não foi possível carregar os eventos.
+              Não foi possível carregar as inscrições.
             </p>
             <p className="text-muted-foreground mt-1 max-w-md">
               {error.message || 'Tente novamente em instantes.'}
@@ -158,9 +160,7 @@ export default function ListInscriptionsSuperPage() {
         onApplyFilters={(next) => {
           setFilters(next);
           setPage(1);
-          queryClient.invalidateQueries({
-            queryKey: listInscriptionsKeys.lists(),
-          });
+          invalidateLists();
         }}
         onClearFilters={() => {
           setFilters({
@@ -172,16 +172,12 @@ export default function ListInscriptionsSuperPage() {
           });
           setResponsible('');
           setPage(1);
-          queryClient.invalidateQueries({
-            queryKey: listInscriptionsKeys.lists(),
-          });
+          invalidateLists();
         }}
         onSearchResponsible={(next) => {
           setResponsible(next || '');
           setPage(1);
-          queryClient.invalidateQueries({
-            queryKey: listInscriptionsKeys.lists(),
-          });
+          invalidateLists();
         }}
         onDownloadPdf={handleGeneratePdfReport}
         onDownloadXlsx={handleGenerateXlsxReport}

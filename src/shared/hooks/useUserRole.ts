@@ -31,7 +31,7 @@ export function useUserRole(options?: UseUserRoleOptions): UseUserRoleResult {
     setError(null);
 
     try {
-      const res = await fetch("/api/session", {
+      const res = await fetch("/web-api/session", {
         method: "GET",
         cache: "no-store",
         headers: { Accept: "application/json" },

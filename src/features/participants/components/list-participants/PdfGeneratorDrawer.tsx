@@ -29,13 +29,16 @@ import type {
   ReportColumnXlsx,
 } from '../../api/actions/reports/generateListParticipantsByLocalityXlsx';
 
-enum InscriptionStatus {
+export enum InscriptionsStatus {
   PENDING = 'PENDING',
   UNDER_REVIEW = 'UNDER_REVIEW',
   PAID = 'PAID',
   EXPIRED = 'EXPIRED',
   CANCELLED = 'CANCELLED',
 }
+
+const FILTER_BLOCK_CLASS =
+  'rounded-lg border border-primary/20 bg-primary/5 p-3 backdrop-blur-md';
 
 const AVAILABLE_COLUMNS: Array<{
   id: ReportColumnPdf | ReportColumnXlsx;
@@ -77,7 +80,7 @@ type PdfGeneratorDrawerProps = {
     columns?: ReportColumnPdf[];
     startDate?: string;
     endDate?: string;
-    status?: InscriptionStatus[];
+    inscriptionsStatus?: InscriptionsStatus[];
   }) => Promise<GenerateParticipantsByLocalityPdfResponse>;
   onGenerateParticipantsByLocalityXlsx: (params: {
     separate: boolean;
@@ -86,7 +89,7 @@ type PdfGeneratorDrawerProps = {
     columns?: ReportColumnXlsx[];
     startDate?: string;
     endDate?: string;
-    status?: InscriptionStatus[];
+    inscriptionsStatus?: InscriptionsStatus[];
   }) => Promise<GenerateParticipantsByLocalityXlsxResponse>;
 
   generatingPdf?: boolean;
@@ -181,7 +184,7 @@ export default function PdfGeneratorDrawer({
       setFilters: (next: Record<string, unknown>) => void;
       disabled?: boolean;
     }) => (
-      <div className="rounded-lg border p-3">
+      <div className={FILTER_BLOCK_CLASS}>
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-0.5">
             <div className="text-sm font-medium">Separar por localidade</div>
@@ -212,7 +215,7 @@ export default function PdfGeneratorDrawer({
       setFilters: (next: Record<string, unknown>) => void;
       disabled?: boolean;
     }) => (
-      <div className="rounded-lg border p-3">
+      <div className={FILTER_BLOCK_CLASS}>
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-0.5">
             <div className="text-sm font-medium">Incluir sumário</div>
@@ -255,7 +258,7 @@ export default function PdfGeneratorDrawer({
       const selected = (filters.typeInscriptions as string[] | undefined) ?? [];
 
       return (
-        <div className="rounded-lg border p-3">
+        <div className={FILTER_BLOCK_CLASS}>
           <div className="mb-3 space-y-0.5">
             <div className="text-sm font-medium">Tipos de inscrição</div>
             <div className="text-muted-foreground text-xs">
@@ -288,7 +291,7 @@ export default function PdfGeneratorDrawer({
       setFilters: (next: Record<string, unknown>) => void;
       disabled?: boolean;
     }) => (
-      <div className="rounded-lg border p-3">
+      <div className={FILTER_BLOCK_CLASS}>
         <div className="text-sm font-medium">Período</div>
         <div className="text-muted-foreground text-xs">
           Filtra os participantes pelo intervalo de inscrição.
@@ -334,7 +337,7 @@ export default function PdfGeneratorDrawer({
       setFilters: (next: Record<string, unknown>) => void;
       disabled?: boolean;
     }) => (
-      <div className="rounded-lg border p-3">
+      <div className={FILTER_BLOCK_CLASS}>
         <div className="mb-3 space-y-0.5">
           <div className="text-sm font-medium">Colunas a incluir</div>
           <div className="text-muted-foreground text-xs">
@@ -345,9 +348,10 @@ export default function PdfGeneratorDrawer({
           {AVAILABLE_COLUMNS.map((col) => (
             <Label
               key={col.id}
-              className="hover:bg-muted/40 flex cursor-pointer items-center gap-2 rounded-md p-2"
+              className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-primary/10"
             >
               <Checkbox
+                className="border-foreground/35 bg-background"
                 checked={
                   (
                     filters.columns as
@@ -376,6 +380,61 @@ export default function PdfGeneratorDrawer({
     [],
   );
 
+  const renderInscriptionStatusFilter = React.useCallback(
+    ({
+      filters,
+      setFilters,
+      disabled,
+    }: {
+      filters: Record<string, unknown>;
+      setFilters: (next: Record<string, unknown>) => void;
+      disabled?: boolean;
+    }) => {
+      const selected =
+        (filters.inscriptionsStatus as InscriptionsStatus[] | undefined) ?? [];
+
+      return (
+        <div className={FILTER_BLOCK_CLASS}>
+          <div className="mb-3 space-y-0.5">
+            <div className="text-sm font-medium">Status da inscrição</div>
+            <div className="text-muted-foreground text-xs">
+              Selecione os status das inscrições. Se não escolher nenhum, todos
+              serão considerados.
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {Object.values(InscriptionsStatus).map((status) => (
+              <Label
+                key={status}
+                className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-primary/10"
+              >
+                <Checkbox
+                  className="border-foreground/35 bg-background"
+                  checked={selected.includes(status)}
+                  onCheckedChange={(checked) => {
+                    const next = checked
+                      ? [...selected, status]
+                      : selected.filter((s) => s !== status);
+                    setFilters({ ...filters, inscriptionsStatus: next });
+                  }}
+                  disabled={disabled}
+                />
+                <span className="text-sm">
+                  {status === 'PENDING' && 'Pendente'}
+                  {status === 'UNDER_REVIEW' && 'Em análise'}
+                  {status === 'PAID' && 'Pago'}
+                  {status === 'EXPIRED' && 'Expirado'}
+                  {status === 'CANCELLED' && 'Cancelado'}
+                </span>
+              </Label>
+            ))}
+          </div>
+        </div>
+      );
+    },
+    [],
+  );
+
   const renderPdfFilters = React.useCallback(
     ({
       filters,
@@ -389,7 +448,7 @@ export default function PdfGeneratorDrawer({
       <div className="space-y-3">
         {renderSeparateFilter({ filters, setFilters, disabled })}
 
-        <div className="rounded-lg border p-3">
+        <div className={FILTER_BLOCK_CLASS}>
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-0.5">
               <div className="text-sm font-medium">Relatório reduzido</div>
@@ -413,6 +472,8 @@ export default function PdfGeneratorDrawer({
 
         {renderTypeInscriptionsFilter({ filters, setFilters, disabled })}
 
+        {renderInscriptionStatusFilter({ filters, setFilters, disabled })}
+
         {renderColumnsFilter({ filters, setFilters, disabled })}
       </div>
     ),
@@ -421,6 +482,7 @@ export default function PdfGeneratorDrawer({
       renderSummaryFilter,
       renderPeriodFilter,
       renderTypeInscriptionsFilter,
+      renderInscriptionStatusFilter,
       renderColumnsFilter,
     ],
   );
@@ -444,6 +506,8 @@ export default function PdfGeneratorDrawer({
 
         {renderTypeInscriptionsFilter({ filters, setFilters, disabled })}
 
+        {renderInscriptionStatusFilter({ filters, setFilters, disabled })}
+
         {renderColumnsFilter({ filters, setFilters, disabled })}
       </div>
     ),
@@ -452,6 +516,7 @@ export default function PdfGeneratorDrawer({
       renderSummaryFilter,
       renderPeriodFilter,
       renderTypeInscriptionsFilter,
+      renderInscriptionStatusFilter,
       renderColumnsFilter,
     ],
   );
@@ -470,6 +535,7 @@ export default function PdfGeneratorDrawer({
           startDate: null,
           endDate: null,
           typeInscriptions: [],
+          inscriptionsStatus: [],
           columns: [],
         },
         renderFilters: renderPdfFilters,
@@ -489,6 +555,9 @@ export default function PdfGeneratorDrawer({
                 | undefined) || undefined,
             startDate: parseDateFilter(filters.startDate),
             endDate: parseDateFilter(filters.endDate),
+            inscriptionsStatus: filters.inscriptionsStatus as
+              | InscriptionsStatus[]
+              | undefined,
           });
 
           if (
@@ -511,6 +580,7 @@ export default function PdfGeneratorDrawer({
           startDate: null,
           endDate: null,
           typeInscriptions: [],
+          inscriptionsStatus: [],
           columns: [],
         },
         renderFilters: renderXlsxFilters,
@@ -529,6 +599,9 @@ export default function PdfGeneratorDrawer({
                 | undefined) || undefined,
             startDate: parseDateFilter(filters.startDate),
             endDate: parseDateFilter(filters.endDate),
+            inscriptionsStatus: filters.inscriptionsStatus as
+              | InscriptionsStatus[]
+              | undefined,
           });
 
           if (
@@ -643,7 +716,7 @@ export default function PdfGeneratorDrawer({
           <Stepper step={step} steps={steps} />
         </DrawerHeader>
 
-        <Separator />
+        <Separator className="bg-white/15" />
 
         <div className="flex-1 overflow-auto p-4">
           {step === 0 ? (
@@ -665,7 +738,7 @@ export default function PdfGeneratorDrawer({
                 {options.map((opt) => (
                   <Label
                     key={opt.id}
-                    className="hover:bg-muted/40 flex cursor-pointer items-start gap-3 rounded-lg border p-3"
+                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3 backdrop-blur-md transition-colors hover:bg-primary/10"
                   >
                     <RadioGroupItem value={opt.id} className="mt-1" />
                     <div className="min-w-0">
@@ -698,7 +771,7 @@ export default function PdfGeneratorDrawer({
                   disabled: generating,
                 })
               ) : (
-                <div className="text-muted-foreground rounded-lg border p-3 text-sm">
+                <div className="text-muted-foreground rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm backdrop-blur-md">
                   Este modelo não possui filtros.
                 </div>
               )}
@@ -706,7 +779,7 @@ export default function PdfGeneratorDrawer({
           )}
         </div>
 
-        <Separator />
+        <Separator className="bg-white/15" />
 
         <DrawerFooter className="flex-row justify-between gap-2">
           <Button

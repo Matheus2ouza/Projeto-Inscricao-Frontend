@@ -111,6 +111,7 @@ export function useParticipantsReports() {
     columns,
     startDate,
     endDate,
+    inscriptionsStatus,
   }: GenerateParticipantsByLocalityPdfParams) => {
     return await generatePdfLocalityMutation({
       eventId,
@@ -121,6 +122,7 @@ export function useParticipantsReports() {
       columns,
       startDate,
       endDate,
+      inscriptionsStatus,
     });
   };
 
@@ -132,6 +134,7 @@ export function useParticipantsReports() {
     columns,
     startDate,
     endDate,
+    inscriptionsStatus,
   }: GenerateParticipantsByLocalityXlsxParams) => {
     return await generateXlsxLocalityMutation({
       eventId,
@@ -141,6 +144,7 @@ export function useParticipantsReports() {
       columns,
       startDate,
       endDate,
+      inscriptionsStatus,
     });
   };
 

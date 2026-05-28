@@ -1,4 +1,4 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import axiosInstance from '@/shared/lib/apiClient';
 
 export type RegisterServiceInput = {
   username: string;
@@ -19,7 +19,7 @@ type RequestData = {
 };
 
 export async function registerAccount(
-  input: RegisterServiceInput
+  input: RegisterServiceInput,
 ): Promise<RegisterServiceOutput> {
   const registerData: RequestData = {
     username: input.username,
@@ -29,7 +29,7 @@ export async function registerAccount(
   };
 
   try {
-    const response = await axiosInstance.post("/users/create", registerData);
+    const response = await axiosInstance.post('/users/create', registerData);
     const { data } = response;
 
     return { id: data.id };
@@ -39,12 +39,12 @@ export async function registerAccount(
       message?: string;
     };
     console.error(
-      "Erro ao registrar conta:",
-      axiosError.response?.data || axiosError.message
+      'Erro ao registrar conta:',
+      axiosError.response?.data || axiosError.message,
     );
     throw new Error(
       axiosError.response?.data?.message ||
-        "Erro inesperado. Por favor, tente novamente mais tarde."
+        'Erro inesperado. Por favor, tente novamente mais tarde.',
     );
   }
 }

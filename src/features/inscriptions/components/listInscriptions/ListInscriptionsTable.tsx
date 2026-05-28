@@ -247,7 +247,7 @@ export default function ListInscriptionsTable({
                 </PopoverTrigger>
                 <PopoverContent
                   align="end"
-                  className="glass-surface w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl p-0"
+                  className="w-[980px] max-w-[calc(100vw-2rem)] rounded-2xl p-0"
                 >
                   <InscriptionsFilters
                     value={filters}

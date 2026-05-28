@@ -1,8 +1,25 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
+const baseURL =
+  typeof window === 'undefined'
+    ? (process.env.INTERNAL_API_URL ?? '')
+    : (process.env.NEXT_PUBLIC_API_URL ?? '');
+
+// LOG 1: Ver qual URL está sendo usada
+console.log(
+  '[apiClient] Environment:',
+  typeof window === 'undefined' ? 'SERVER' : 'CLIENT',
+);
+console.log('[apiClient] Base URL:', baseURL);
+console.log('[apiClient] INTERNAL_API_URL:', process.env.INTERNAL_API_URL);
+console.log(
+  '[apiClient] NEXT_PUBLIC_API_URL:',
+  process.env.NEXT_PUBLIC_API_URL,
+);
+
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? '',
+  baseURL,
   // Evita o adapter HTTP do Node (follow-redirects/url.parse) em SSR/RSC.
   // No browser continua usando XHR (default).
   adapter: typeof window === 'undefined' ? ['fetch', 'http'] : ['xhr'],
@@ -26,13 +43,13 @@ async function resolveAuthToken(): Promise<string | null> {
       return decodeURIComponent(match[1]);
     }
     // Fallback: busca do endpoint interno (SSR/CSR)
-    const res = await fetch('/api/token', { cache: 'no-store' });
+    const res = await fetch('/web-api/token', { cache: 'no-store' });
     if (res.ok) {
       const { token } = await res.json();
       return token ?? null;
     }
     console.warn(
-      '[apiClient] resolveAuthToken (client): /api/token request failed',
+      '[apiClient] resolveAuthToken (client): /web-api/token request failed',
       res.status,
     );
     return null;
@@ -97,13 +114,13 @@ axiosInstance.interceptors.response.use(
         originalRequest.__retryCount += 1;
         try {
           // Chama endpoint interno que faz refresh e atualiza cookie httpOnly
-          const res = await fetch('/api/refresh', {
+          const res = await fetch('/web-api/refresh', {
             method: 'POST',
             cache: 'no-store',
           });
           if (!res.ok) {
             console.error(
-              '[apiClient] response interceptor: /api/refresh failed',
+              '[apiClient] response interceptor: /web-api/refresh failed',
               res.status,
             );
             throw new Error('refresh failed');
@@ -116,7 +133,7 @@ axiosInstance.interceptors.response.use(
           );
           // Logout e toast de sessão expirada
           try {
-            await fetch('/api/logout', { method: 'POST' });
+            await fetch('/web-api/logout', { method: 'POST' });
           } catch {}
           toast.error('Sessão expirada. Faça login novamente.');
           if (typeof window !== 'undefined') {

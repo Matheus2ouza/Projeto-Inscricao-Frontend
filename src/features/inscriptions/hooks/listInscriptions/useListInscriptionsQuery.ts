@@ -88,6 +88,13 @@ export function useInvalidateListInscriptionsQuery() {
         queryKey: listInscriptionsKeys.all,
       });
     },
+
+    invalidateLists: () => {
+      queryClient.invalidateQueries({
+        queryKey: listInscriptionsKeys.lists(),
+      });
+    },
+
     invalidateList: (
       eventId: string,
       page: number,

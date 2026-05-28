@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import type {
   UseEventsForInscriptionParams,
   UseEventsForInscriptionResult,
-} from "../types/listEventsTypes";
-import { useEventsForInscriptionQuery } from "./useEventsForInscriptionQuery";
+} from '../types/listEventsTypes';
+import { useEventsForInscriptionQuery } from './useEventsForInscriptionQuery';
 
 export function useEventsForInscription({
   initialPage = 1,

@@ -1,15 +1,13 @@
-export type GetListParticipantsResponse = {
-  participants: Participant[];
-  countParticipants: number;
-  countParticipantsMale: number;
-  countParticipantsFemale: number;
-  total: number;
-  page: number;
-  pageCount: number;
-};
+export enum InscriptionsStatus {
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
+}
 
-export type ShirtSizeType = "PP" | "P" | "M" | "G" | "GG" | "XG";
-export type ShirtType = "TRADICIONAL" | "BABYLOOK";
+export type ShirtSizeType = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XG';
+export type ShirtType = 'TRADICIONAL' | 'BABYLOOK';
 
 export type Participant = {
   id: string;
@@ -23,10 +21,30 @@ export type Participant = {
   guest: boolean;
 };
 
+export type TypeInscription = {
+  id: string;
+  description: string;
+};
+
+export type GetListParticipantsResponse = {
+  participants: Participant[];
+  countParticipants: number;
+  countParticipantsMale: number;
+  countParticipantsFemale: number;
+  typesInscriptionsInUse: TypeInscription[];
+  total: number;
+  page: number;
+  pageCount: number;
+};
+
 export type UseListParticipantsParams = {
   eventId: string;
   initialPage: number;
   pageSize: number;
+
+  inscriptionStatus?: InscriptionsStatus[];
+  typeInscriptions?: string[];
+  orderByName?: 'asc' | 'desc';
 };
 
 export type UseListParticipantsResult = {
@@ -34,11 +52,12 @@ export type UseListParticipantsResult = {
   countParticipants: number;
   countParticipantsMale: number;
   countParticipantsFemale: number;
+  typesInscriptionsInUse: TypeInscription[];
   total: number;
   page: number;
   pageCount: number;
   loading: boolean;
   error: string | null;
   setPage: (p: number) => void;
-  refetch: () => Promise<void>;
+  refresh: () => Promise<void>;
 };

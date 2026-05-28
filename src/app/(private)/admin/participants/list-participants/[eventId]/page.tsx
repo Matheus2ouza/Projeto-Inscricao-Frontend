@@ -1,11 +1,15 @@
 'use client';
 
+import { ListParticipantsFiltersValue } from '@/features/participants/components/list-participants/filters/ListParticipantsFilters';
 import ListParticipants from '@/features/participants/components/list-participants/ListParticipants';
 import { useParticipantsReports } from '@/features/participants/hooks/actions/useParticipantsReports';
 import { useListParticipants } from '@/features/participants/hooks/list-participants/useListParticipants';
+import { useInvalidateParticipants } from '@/features/participants/hooks/list-participants/useListParticipantsQuery';
 import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const PAGE_SIZE = 20;
 export default function ListGuestParticipantsAdminPage() {
@@ -15,22 +19,37 @@ export default function ListGuestParticipantsAdminPage() {
   const eventId =
     (Array.isArray(rawEventId) ? rawEventId[0] : rawEventId) ?? '';
 
+  const [filters, setFilters] = useState<ListParticipantsFiltersValue>({
+    inscriptionStatus: [],
+    typeInscriptions: [],
+    orderByName: 'asc',
+  });
+  const [responsible, setResponsible] = useState<string>('');
+
   const {
-    participants: guestParticipants,
-    countParticipants: countGuestParticipants,
-    countParticipantsMale: countGuestParticipantsMale,
-    countParticipantsFemale: countGuestParticipantsFemale,
+    participants,
+    countParticipants,
+    countParticipantsMale,
+    countParticipantsFemale,
     total,
+    typesInscriptionsInUse,
     page,
     pageCount,
     loading,
     error,
     setPage,
+    refresh,
   } = useListParticipants({
     eventId: eventId,
     initialPage: 1,
     pageSize: PAGE_SIZE,
+
+    inscriptionStatus: filters.inscriptionStatus,
+    typeInscriptions: filters.typeInscriptions,
+    orderByName: filters.orderByName,
   });
+
+  const { invalidateLists } = useInvalidateParticipants();
 
   const {
     // pdf
@@ -89,13 +108,18 @@ export default function ListGuestParticipantsAdminPage() {
 
     if (error) {
       return (
-        <div className="flex min-h-96 items-center justify-center">
-          <div className="text-center">
-            <h2 className="mb-2 text-xl font-semibold text-red-600">
-              Erro ao carregar lista de participantes
-            </h2>
-            <p className="text-gray-600">{error}</p>
+        <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+          <div>
+            <p className="font-semibold text-red-600 dark:text-red-400">
+              Não foi possível carregar os eventos.
+            </p>
+            <p className="text-muted-foreground mt-1 max-w-md">
+              {error || 'Tente novamente em instantes.'}
+            </p>
           </div>
+          <Button onClick={() => refresh()} variant="outline">
+            Tentar novamente
+          </Button>
         </div>
       );
     }
@@ -103,15 +127,32 @@ export default function ListGuestParticipantsAdminPage() {
     return (
       <ListParticipants
         eventId={eventId}
-        participants={guestParticipants}
-        countParticipants={countGuestParticipants}
-        countParticipantsMale={countGuestParticipantsMale}
-        countParticipantsFemale={countGuestParticipantsFemale}
+        participants={participants}
+        countParticipants={countParticipants}
+        countParticipantsMale={countParticipantsMale}
+        countParticipantsFemale={countParticipantsFemale}
         total={total}
         page={page}
         pageSize={PAGE_SIZE}
         pageCount={pageCount}
         onPageChange={setPage}
+        filters={filters}
+        typesInscriptionsInUse={typesInscriptionsInUse}
+        onApplyFilters={(next) => {
+          setFilters(next);
+          setPage(1);
+          invalidateLists();
+        }}
+        onClearFilters={() => {
+          setFilters({
+            inscriptionStatus: [],
+            typeInscriptions: [],
+            orderByName: 'asc',
+          });
+          setResponsible('');
+          setPage(1);
+          invalidateLists();
+        }}
         onGenerateParticipantsByLocalityPdf={({
           separate,
           reduced,
@@ -120,6 +161,7 @@ export default function ListGuestParticipantsAdminPage() {
           columns,
           startDate,
           endDate,
+          inscriptionsStatus,
         }) =>
           handleGenerateLocalityPdfReport({
             eventId,
@@ -130,6 +172,7 @@ export default function ListGuestParticipantsAdminPage() {
             columns,
             startDate,
             endDate,
+            inscriptionsStatus,
           })
         }
         onGenerateParticipantsByLocalityXlsx={({
@@ -139,6 +182,7 @@ export default function ListGuestParticipantsAdminPage() {
           columns,
           startDate,
           endDate,
+          inscriptionsStatus,
         }) =>
           handleGenerateLocalityXlsxReport({
             eventId,
@@ -148,6 +192,7 @@ export default function ListGuestParticipantsAdminPage() {
             columns,
             startDate,
             endDate,
+            inscriptionsStatus,
           })
         }
         isGeneratingParticipantsByLocalityPdf={isGeneratePdfLocalityMutation}
