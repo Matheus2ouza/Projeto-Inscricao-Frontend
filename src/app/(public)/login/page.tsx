@@ -16,7 +16,6 @@ import {
 } from '@/shared/components/ui/form';
 import { Input } from '@/shared/components/ui/input';
 import Logo from '@/shared/components/ui/logo';
-import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useEffect, useState } from 'react';
 import CookieConsent from '../../../components/cookie/CookieConsent';
 import useFormLogin from './hooks/useFormLogin';

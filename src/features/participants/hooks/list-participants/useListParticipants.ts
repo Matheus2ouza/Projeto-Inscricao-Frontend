@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   UseListParticipantsParams,
   UseListParticipantsResult,
-} from "../../types/list-participants/listParticipantsTypes";
+} from '../../types/list-participants/listParticipantsTypes';
 import {
   useListParticipantsQuery,
   usePrefetchListParticipantsQuery,
-} from "./useListParticipantsQuery";
+} from './useListParticipantsQuery';
 
 export function useListParticipants({
   eventId,
   initialPage,
   pageSize,
+
+  // filters
+  inscriptionStatus,
+  typeInscriptions,
+  orderByName,
 }: UseListParticipantsParams): UseListParticipantsResult {
   const [page, setPage] = useState(initialPage);
 
@@ -20,12 +25,26 @@ export function useListParticipants({
     isLoading: loading,
     error,
     refetch,
-  } = useListParticipantsQuery(eventId, page, pageSize);
+  } = useListParticipantsQuery(
+    eventId,
+    page,
+    pageSize,
+    inscriptionStatus,
+    typeInscriptions,
+    orderByName,
+  );
 
   const { prefetchNextPage } = usePrefetchListParticipantsQuery();
 
   if (data && page < data.pageCount) {
-    prefetchNextPage(eventId, page, pageSize);
+    prefetchNextPage(
+      eventId,
+      page,
+      pageSize,
+      inscriptionStatus,
+      typeInscriptions,
+      orderByName,
+    );
   }
 
   return {
@@ -33,13 +52,14 @@ export function useListParticipants({
     countParticipants: data?.countParticipants || 0,
     countParticipantsMale: data?.countParticipantsMale || 0,
     countParticipantsFemale: data?.countParticipantsFemale || 0,
+    typesInscriptionsInUse: data?.typesInscriptionsInUse || [],
     total: data?.total || 0,
     page: data?.page || 0,
     pageCount: data?.pageCount || 0,
     loading,
     error: error?.message || null,
     setPage,
-    refetch: async () => {
+    refresh: async () => {
       await refetch();
     },
   };

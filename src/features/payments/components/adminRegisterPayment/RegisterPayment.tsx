@@ -3,7 +3,7 @@ import { RegisterPaymentInput } from '@/features/payments/types/adminRegisterPay
 import { Button } from '@/shared/components/ui/button';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import type { UploadFile } from 'antd';
-import { message, Steps } from 'antd';
+import { Steps } from 'antd';
 import { useMemo, useState, type Key } from 'react';
 import InscriptionSelectionStep from './InscriptionSelectionStep';
 import PaymentDataStep from './PaymentDataStep';
@@ -218,7 +218,6 @@ export default function RegisterPayment({
       setImageData(null);
       setPayerName('');
       setAccountId('');
-      message.success('Pagamento enviado com sucesso.');
     } catch {
       setFormError(
         'Erro ao registrar pagamento. Verifique os dados e tente novamente.',

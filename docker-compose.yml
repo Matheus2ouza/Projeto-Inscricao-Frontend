@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  frontend:
+    container_name: frontend_event
+    image: frontend-sistema-inscricao:1.0
+    environment:
+      - INTERNAL_API_URL=http://nginx_event:80
+    ports:
+      - '3000:3000'
+    restart: unless-stopped
+    networks:
+      - event_net
+
+networks:
+  event_net:
+    external: true

@@ -1,13 +1,31 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getListParticipants } from "../../api/list-participants/getListParticipants";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getListParticipants } from '../../api/list-participants/getListParticipants';
+import { InscriptionsStatus } from '../../types/list-participants/listParticipantsTypes';
 
 // Chaves de query para organização - específicas para seleção de eventos
 export const listParticipantsKeys = {
-  all: ["list-participants"] as const,
-  lists: () => [...listParticipantsKeys.all, "list"] as const,
-  list: (eventId: string, page: number, pageSize: number) =>
-    [...listParticipantsKeys.lists(), { eventId, page, pageSize }] as const,
-  details: () => [...listParticipantsKeys.all, "detail"] as const,
+  all: ['list-participants'] as const,
+  lists: () => [...listParticipantsKeys.all, 'list'] as const,
+  list: (
+    eventId: string,
+    page: number,
+    pageSize: number,
+    inscriptionStatus?: InscriptionsStatus[],
+    typeInscriptions?: string[],
+    orderByName?: 'asc' | 'desc',
+  ) =>
+    [
+      ...listParticipantsKeys.lists(),
+      {
+        eventId,
+        page,
+        pageSize,
+        inscriptionStatus,
+        typeInscriptions,
+        orderByName,
+      },
+    ] as const,
+  details: () => [...listParticipantsKeys.all, 'detail'] as const,
   detail: (id: string) => [...listParticipantsKeys.details(), id] as const,
 };
 
@@ -15,10 +33,28 @@ export function useListParticipantsQuery(
   eventId: string,
   page: number,
   pageSize: number,
+  inscriptionStatus?: InscriptionsStatus[],
+  typeInscriptions?: string[],
+  orderByName?: 'asc' | 'desc',
 ) {
   return useQuery({
-    queryKey: listParticipantsKeys.list(eventId, page, pageSize),
-    queryFn: () => getListParticipants(eventId, { page, pageSize }),
+    queryKey: listParticipantsKeys.list(
+      eventId,
+      page,
+      pageSize,
+      inscriptionStatus,
+      typeInscriptions,
+      orderByName,
+    ),
+    queryFn: () =>
+      getListParticipants(
+        eventId,
+        page,
+        pageSize,
+        inscriptionStatus,
+        typeInscriptions,
+        orderByName,
+      ),
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
     retry: 2,
@@ -31,11 +67,32 @@ export function usePrefetchListParticipantsQuery() {
   const queryClient = useQueryClient();
 
   return {
-    prefetchNextPage: (eventId: string, page: number, pageSize: number) => {
+    prefetchNextPage: (
+      eventId: string,
+      page: number,
+      pageSize: number,
+      inscriptionStatus?: InscriptionsStatus[],
+      typeInscriptions?: string[],
+      orderByName?: 'asc' | 'desc',
+    ) => {
       queryClient.prefetchQuery({
-        queryKey: listParticipantsKeys.list(eventId, page + 1, pageSize),
+        queryKey: listParticipantsKeys.list(
+          eventId,
+          page + 1,
+          pageSize,
+          inscriptionStatus,
+          typeInscriptions,
+          orderByName,
+        ),
         queryFn: () =>
-          getListParticipants(eventId, { page: page + 1, pageSize }),
+          getListParticipants(
+            eventId,
+            page + 1,
+            pageSize,
+            inscriptionStatus,
+            typeInscriptions,
+            orderByName,
+          ),
         staleTime: 5 * 60 * 1000, // 5 minutos
       });
     },
@@ -52,9 +109,30 @@ export function useInvalidateParticipants() {
         queryKey: listParticipantsKeys.all,
       });
     },
-    invalidateList: (eventId: string) => {
+
+    invalidateLists: () => {
       queryClient.invalidateQueries({
-        queryKey: listParticipantsKeys.list(eventId, 1, 10),
+        queryKey: listParticipantsKeys.lists(),
+      });
+    },
+
+    invalidateList: (
+      eventId: string,
+      page: number,
+      pageSize: number,
+      inscriptionStatus?: InscriptionsStatus[],
+      typeInscriptions?: string[],
+      orderByName?: 'asc' | 'desc',
+    ) => {
+      queryClient.invalidateQueries({
+        queryKey: listParticipantsKeys.list(
+          eventId,
+          page,
+          pageSize,
+          inscriptionStatus,
+          typeInscriptions,
+          orderByName,
+        ),
       });
     },
     invalidateDetail: (id: string) => {

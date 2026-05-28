@@ -1,11 +1,14 @@
 'use client';
 
+import { ListParticipantsFiltersValue } from '@/features/participants/components/list-participants/filters/ListParticipantsFilters';
 import ListParticipants from '@/features/participants/components/list-participants/ListParticipants';
 import { useParticipantsReports } from '@/features/participants/hooks/actions/useParticipantsReports';
 import { useListParticipants } from '@/features/participants/hooks/list-participants/useListParticipants';
+import { useInvalidateParticipants } from '@/features/participants/hooks/list-participants/useListParticipantsQuery';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const PAGE_SIZE = 20;
 export default function ListGuestParticipantsSuperPage() {
@@ -15,22 +18,37 @@ export default function ListGuestParticipantsSuperPage() {
   const eventId =
     (Array.isArray(rawEventId) ? rawEventId[0] : rawEventId) ?? '';
 
+  const [filters, setFilters] = useState<ListParticipantsFiltersValue>({
+    inscriptionStatus: [],
+    typeInscriptions: [],
+    orderByName: 'asc',
+  });
+  const [responsible, setResponsible] = useState<string>('');
+
   const {
-    participants: guestParticipants,
-    countParticipants: countGuestParticipants,
-    countParticipantsMale: countGuestParticipantsMale,
-    countParticipantsFemale: countGuestParticipantsFemale,
+    participants,
+    countParticipants,
+    countParticipantsMale,
+    countParticipantsFemale,
     total,
+    typesInscriptionsInUse,
     page,
     pageCount,
     loading,
     error,
     setPage,
+    refresh,
   } = useListParticipants({
     eventId: eventId,
     initialPage: 1,
     pageSize: PAGE_SIZE,
+
+    inscriptionStatus: filters.inscriptionStatus,
+    typeInscriptions: filters.typeInscriptions,
+    orderByName: filters.orderByName,
   });
+
+  const { invalidateLists } = useInvalidateParticipants();
 
   const {
     // pdf
@@ -103,15 +121,32 @@ export default function ListGuestParticipantsSuperPage() {
     return (
       <ListParticipants
         eventId={eventId}
-        participants={guestParticipants}
-        countParticipants={countGuestParticipants}
-        countParticipantsMale={countGuestParticipantsMale}
-        countParticipantsFemale={countGuestParticipantsFemale}
+        participants={participants}
+        countParticipants={countParticipants}
+        countParticipantsMale={countParticipantsMale}
+        countParticipantsFemale={countParticipantsFemale}
         total={total}
         page={page}
         pageSize={PAGE_SIZE}
         pageCount={pageCount}
         onPageChange={setPage}
+        filters={filters}
+        typesInscriptionsInUse={typesInscriptionsInUse}
+        onApplyFilters={(next) => {
+          setFilters(next);
+          setPage(1);
+          invalidateLists();
+        }}
+        onClearFilters={() => {
+          setFilters({
+            inscriptionStatus: [],
+            typeInscriptions: [],
+            orderByName: 'asc',
+          });
+          setResponsible('');
+          setPage(1);
+          invalidateLists();
+        }}
         onGenerateParticipantsByLocalityPdf={({
           separate,
           reduced,
@@ -120,6 +155,7 @@ export default function ListGuestParticipantsSuperPage() {
           columns,
           startDate,
           endDate,
+          inscriptionsStatus,
         }) =>
           handleGenerateLocalityPdfReport({
             eventId,
@@ -130,6 +166,7 @@ export default function ListGuestParticipantsSuperPage() {
             columns,
             startDate,
             endDate,
+            inscriptionsStatus,
           })
         }
         onGenerateParticipantsByLocalityXlsx={({
@@ -139,6 +176,7 @@ export default function ListGuestParticipantsSuperPage() {
           columns,
           startDate,
           endDate,
+          inscriptionsStatus,
         }) =>
           handleGenerateLocalityXlsxReport({
             eventId,
@@ -148,6 +186,7 @@ export default function ListGuestParticipantsSuperPage() {
             columns,
             startDate,
             endDate,
+            inscriptionsStatus,
           })
         }
         isGeneratingParticipantsByLocalityPdf={isGeneratePdfLocalityMutation}

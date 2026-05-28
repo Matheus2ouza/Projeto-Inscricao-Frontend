@@ -191,7 +191,7 @@ O logout é feito via `POST /api/logout` (arquivo `src/app/api/logout/route.ts`)
 Exemplo de uso em páginas `"use client"`:
 
 ```tsx
-import { useUserRole } from "@/shared/hooks/useUserRole";
+import { useUserRole } from '@/shared/hooks/useUserRole';
 
 export default function AdminSharedPage() {
   const { role, loading } = useUserRole();
@@ -201,7 +201,7 @@ export default function AdminSharedPage() {
   return (
     <div>
       {/* Botão visível apenas para ADMIN (não para MANAGER) */}
-      {role === "ADMIN" && (
+      {role === 'ADMIN' && (
         <button className="btn">Ação exclusiva do Admin</button>
       )}
     </div>

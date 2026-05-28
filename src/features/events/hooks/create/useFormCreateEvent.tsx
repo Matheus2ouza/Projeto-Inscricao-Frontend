@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { useGlobalLoading } from "@/components/GlobalLoading";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ThumbsDown } from "lucide-react";
-import { useState } from "react";
-import { DateRange } from "react-day-picker";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../../expenses/hooks/useSelectEventsQuery";
-import { registerEvent } from "../../api/create/registerEvent";
+import { useGlobalLoading } from '@/components/GlobalLoading';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ThumbsDown } from 'lucide-react';
+import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { useInvalidateEventsQuery } from '../../../expenses/hooks/useSelectEventsQuery';
+import { registerEvent } from '../../api/create/registerEvent';
 import {
   CreateEventSchema,
   type CreateEventFormType,
-} from "../../schema/create/CreateEventSchema";
+} from '../../schema/create/CreateEventSchema';
 import {
   CreateEventRequest,
   EventStatus,
   InscriptionMode,
-} from "../../types/create/createEvent";
+} from '../../types/create/createEvent';
 
 export type useFormCreateEvent = {
   form: ReturnType<typeof useForm<CreateEventFormType>>;
@@ -59,10 +59,10 @@ export default function useFormCreateEvent(): useFormCreateEvent {
   const form = useForm<CreateEventFormType>({
     resolver: zodResolver(CreateEventSchema),
     defaultValues: {
-      name: "",
-      regionId: "",
+      name: '',
+      regionId: '',
       accountIds: [],
-      location: "",
+      location: '',
       openImmediately: false,
       allowedInscriptionModes: [InscriptionMode.NORMAL],
     },
@@ -76,8 +76,8 @@ export default function useFormCreateEvent(): useFormCreateEvent {
 
       // Validar se as datas foram selecionadas
       if (!dateRange?.from || !dateRange?.to) {
-        toast.error("Período inválido", {
-          description: "Selecione as datas de início e término do evento.",
+        toast.error('Período inválido', {
+          description: 'Selecione as datas de início e término do evento.',
           icon: <ThumbsDown />,
         });
         return { success: false };
@@ -85,8 +85,8 @@ export default function useFormCreateEvent(): useFormCreateEvent {
 
       // Validar se a data final é posterior à data inicial
       if (dateRange.to < dateRange.from) {
-        toast.error("Período inválido", {
-          description: "A data de término deve ser posterior à data de início.",
+        toast.error('Período inválido', {
+          description: 'A data de término deve ser posterior à data de início.',
           icon: <ThumbsDown />,
         });
         return { success: false };
@@ -138,7 +138,7 @@ export default function useFormCreateEvent(): useFormCreateEvent {
       return { success: true, id };
     } catch (error) {
       const err = error as Error;
-      toast.error("Erro ao criar evento", {
+      toast.error('Erro ao criar evento', {
         description: err.message,
         icon: <ThumbsDown />,
       });

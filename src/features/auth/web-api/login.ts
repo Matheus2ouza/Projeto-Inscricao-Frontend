@@ -1,9 +1,8 @@
-"use server";
+'use server';
 
-import axiosInstance from "@/shared/lib/apiClient";
-import { isProd } from "@/shared/lib/utils";
-import { jwtVerify } from "jose";
-import { cookies } from "next/headers";
+import axiosInstance from '@/shared/lib/apiClient';
+import { isProd } from '@/shared/lib/utils';
+import { cookies } from 'next/headers';
 import {
   AuthResponse,
   AxiosError,
@@ -11,7 +10,7 @@ import {
   RequestData,
   SessionData,
   User,
-} from "../types/loginTypes";
+} from '../types/loginTypes';
 
 export type LoginServiceResult =
   | { ok: true; user: User }
@@ -19,7 +18,7 @@ export type LoginServiceResult =
 
 // Serviço de login
 export async function loginService(
-  input: LoginServiceInput
+  input: LoginServiceInput,
 ): Promise<LoginServiceResult> {
   const dataToRequest: RequestData = {
     username: input.username,
@@ -28,13 +27,11 @@ export async function loginService(
 
   try {
     const { data } = await axiosInstance.post<AuthResponse>(
-      "/users/",
-      dataToRequest
+      '/users/',
+      dataToRequest,
     );
-    const { authToken, refreshToken, user } = data;
 
-    const secret = new TextEncoder().encode(process.env.JWT_AUTH_SECRET);
-    const { payload } = await jwtVerify(authToken, secret);
+    const { authToken, refreshToken, user } = data;
 
     const sessionData: SessionData = {
       user: {
@@ -42,43 +39,41 @@ export async function loginService(
         username: user.username,
         role: user.role,
         email: user.email,
-        region: user.role === "SUPER" ? null : user.region,
+        region: user.role === 'SUPER' ? null : user.region,
         image: user.image,
       },
-      expires: payload.exp ? new Date(payload.exp * 1000).toISOString() : "",
     };
 
     const cookieStore = await cookies();
 
-    cookieStore.set("session", JSON.stringify(sessionData), {
+    cookieStore.set('session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: isProd,
-      path: "/",
+      path: '/',
       maxAge: 60 * 60 * 7, // 7 horas
     });
 
-    cookieStore.set("authToken", authToken, {
+    cookieStore.set('authToken', authToken, {
       httpOnly: true,
       secure: isProd,
-      path: "/",
-      maxAge: 60 * 60 * 7, // 7 horas
+      path: '/',
+      maxAge: 60 * 60 * 7,
     });
 
-    cookieStore.set("refreshToken", refreshToken, {
+    cookieStore.set('refreshToken', refreshToken, {
       httpOnly: true,
       secure: isProd,
-      path: "/",
-      maxAge: 60 * 60 * 7, // 7 horas
+      path: '/',
+      maxAge: 60 * 60 * 7,
     });
 
     return { ok: true, user: sessionData.user };
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
 
-    // Lança um erro com a mensagem específica da API
     const errorMessage =
       axiosError.response?.data?.message ||
-      "Erro inesperado. Por favor, tente novamente mais tarde.";
+      'Erro inesperado. Por favor, tente novamente mais tarde.';
 
     return { ok: false, errorMessage };
   }

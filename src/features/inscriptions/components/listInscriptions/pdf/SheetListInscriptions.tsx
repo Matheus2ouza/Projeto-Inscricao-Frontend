@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { DatePicker } from "antd";
-import type { Dayjs } from "dayjs";
-import dayjs from "dayjs";
-import { Check, X } from "lucide-react";
-import * as React from "react";
+import { DatePicker } from 'antd';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { Check, X } from 'lucide-react';
+import * as React from 'react';
 
-import { Button } from "@/shared/components/ui/button";
-import { Checkbox } from "@/shared/components/ui/checkbox";
+import { Button } from '@/shared/components/ui/button';
+import { Checkbox } from '@/shared/components/ui/checkbox';
 import {
   Drawer,
   DrawerClose,
@@ -16,20 +16,20 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from "@/shared/components/ui/drawer";
-import { Label } from "@/shared/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
-import { Separator } from "@/shared/components/ui/separator";
-import { Switch } from "@/shared/components/ui/switch";
+} from '@/shared/components/ui/drawer';
+import { Label } from '@/shared/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group';
+import { Separator } from '@/shared/components/ui/separator';
+import { Switch } from '@/shared/components/ui/switch';
 import type {
   GeneratelistInscriptionsPdfInput,
   InscriptionStatus,
   PaymentMethod,
   StatusPayment,
-} from "../../../types/actions/reports/generateListInscriptionsPdfTypes";
-import type { GeneratelistInscriptionsXlsxInput } from "../../../types/actions/reports/generateListInscriptionsXlsxTypes";
+} from '../../../types/actions/reports/generateListInscriptionsPdfTypes';
+import type { GeneratelistInscriptionsXlsxInput } from '../../../types/actions/reports/generateListInscriptionsXlsxTypes';
 
-type DatePreset = "1h" | "24h" | "7d" | null;
+type DatePreset = '1h' | '24h' | '7d' | null;
 
 type ReportFilters = {
   participants: boolean;
@@ -69,6 +69,9 @@ type SheetListInscriptionsProps = {
   generatingXlsx?: boolean;
 };
 
+const FILTER_BLOCK_CLASS =
+  'rounded-lg border border-primary/20 bg-primary/5 p-3 backdrop-blur-md';
+
 function Stepper({
   step,
   steps,
@@ -78,7 +81,7 @@ function Stepper({
 }) {
   return (
     <>
-      <div className="hidden sm:flex items-center justify-between">
+      <div className="hidden items-center justify-between sm:flex">
         {steps.map((s, index) => {
           const isActive = index === step;
           const isDone = index < step;
@@ -88,41 +91,41 @@ function Stepper({
               <div className="flex items-center gap-2">
                 <div
                   className={[
-                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold",
+                    'flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold',
                     isActive
-                      ? "bg-primary text-primary-foreground"
+                      ? 'bg-primary text-primary-foreground'
                       : isDone
-                        ? "bg-emerald-600 text-white"
-                        : "bg-muted text-muted-foreground",
-                  ].join(" ")}
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-muted text-muted-foreground',
+                  ].join(' ')}
                 >
                   {isDone ? <Check className="h-4 w-4" /> : index + 1}
                 </div>
                 <span
                   className={[
-                    "text-sm",
-                    isActive ? "font-medium" : "text-muted-foreground",
-                  ].join(" ")}
+                    'text-sm',
+                    isActive ? 'font-medium' : 'text-muted-foreground',
+                  ].join(' ')}
                 >
                   {s.title}
                 </span>
               </div>
 
               {index < steps.length - 1 && (
-                <div className="h-0.5 flex-1 mx-4 bg-muted" />
+                <div className="bg-muted mx-4 h-0.5 flex-1" />
               )}
             </React.Fragment>
           );
         })}
       </div>
 
-      <div className="flex sm:hidden items-center justify-between text-sm font-medium">
-        <span>{`Passo ${step + 1}: ${steps[step]?.title ?? ""}`}</span>
+      <div className="flex items-center justify-between text-sm font-medium sm:hidden">
+        <span>{`Passo ${step + 1}: ${steps[step]?.title ?? ''}`}</span>
         <span className="text-muted-foreground">{`${step + 1}/${steps.length}`}</span>
       </div>
-      <div className="h-2 bg-muted rounded-full overflow-hidden sm:hidden">
+      <div className="bg-muted h-2 overflow-hidden rounded-full sm:hidden">
         <div
-          className="h-full bg-primary transition-all duration-300 ease-in-out"
+          className="bg-primary h-full transition-all duration-300 ease-in-out"
           style={{ width: `${((step + 1) / steps.length) * 100}%` }}
         />
       </div>
@@ -182,9 +185,9 @@ export default function SheetListInscriptions({
   const options = React.useMemo<ExportOption[]>(
     () => [
       {
-        id: "list-inscriptions-pdf",
-        title: "Lista de inscrições (PDF)",
-        description: "Exporta a lista de inscrições em PDF.",
+        id: 'list-inscriptions-pdf',
+        title: 'Lista de inscrições (PDF)',
+        description: 'Exporta a lista de inscrições em PDF.',
         defaultFilters: baseFilters,
         onGenerate: async (filters) => {
           const result = await onDownloadPdf(buildReportInput(filters));
@@ -198,9 +201,9 @@ export default function SheetListInscriptions({
         },
       },
       {
-        id: "list-inscriptions-xlsx",
-        title: "Lista de inscrições (Excel)",
-        description: "Exporta a lista de inscrições em arquivo .xlsx.",
+        id: 'list-inscriptions-xlsx',
+        title: 'Lista de inscrições (Excel)',
+        description: 'Exporta a lista de inscrições em arquivo .xlsx.',
         defaultFilters: baseFilters,
         onGenerate: async (filters) => {
           const result = await onDownloadXlsx(buildReportInput(filters));
@@ -218,12 +221,12 @@ export default function SheetListInscriptions({
   );
 
   const steps = React.useMemo(
-    () => [{ title: "Selecionar relatório" }, { title: "Filtros" }],
+    () => [{ title: 'Selecionar relatório' }, { title: 'Filtros' }],
     [],
   );
 
   const [step, setStep] = React.useState(0);
-  const [selectedOptionId, setSelectedOptionId] = React.useState<string>("");
+  const [selectedOptionId, setSelectedOptionId] = React.useState<string>('');
   const [filtersByOption, setFiltersByOption] = React.useState<
     Record<string, ReportFilters>
   >({});
@@ -256,7 +259,7 @@ export default function SheetListInscriptions({
 
     setStep(0);
 
-    const firstId = options[0]?.id ?? "";
+    const firstId = options[0]?.id ?? '';
     setSelectedOptionId((prev) => prev || firstId);
 
     setFiltersByOption((prev) => {
@@ -285,11 +288,11 @@ export default function SheetListInscriptions({
   const applyPreset = (preset: Exclude<DatePreset, null>) => {
     const now = dayjs();
     const start =
-      preset === "7d"
-        ? now.subtract(7, "day")
-        : preset === "24h"
-          ? now.subtract(24, "hour")
-          : now.subtract(1, "hour");
+      preset === '7d'
+        ? now.subtract(7, 'day')
+        : preset === '24h'
+          ? now.subtract(24, 'hour')
+          : now.subtract(1, 'hour');
 
     setSelectedFilters({
       ...selectedFilters,
@@ -337,7 +340,7 @@ export default function SheetListInscriptions({
           <Stepper step={step} steps={steps} />
         </DrawerHeader>
 
-        <Separator />
+        <Separator className="bg-white/15" />
 
         <div className="flex-1 overflow-auto p-4">
           {step === 0 ? (
@@ -346,7 +349,7 @@ export default function SheetListInscriptions({
                 <h3 className="text-sm font-semibold">
                   Relatórios disponíveis
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Escolha qual relatório deseja exportar.
                 </p>
               </div>
@@ -359,15 +362,15 @@ export default function SheetListInscriptions({
                 {options.map((option) => (
                   <Label
                     key={option.id}
-                    className="flex items-start gap-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/40"
+                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3 backdrop-blur-md transition-colors hover:bg-primary/10"
                   >
                     <RadioGroupItem value={option.id} className="mt-1" />
                     <div className="min-w-0">
-                      <div className="text-sm font-medium leading-none">
+                      <div className="text-sm leading-none font-medium">
                         {option.title}
                       </div>
                       {option.description && (
-                        <div className="mt-1 text-xs text-muted-foreground">
+                        <div className="text-muted-foreground mt-1 text-xs">
                           {option.description}
                         </div>
                       )}
@@ -380,19 +383,19 @@ export default function SheetListInscriptions({
             <div className="space-y-4">
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold">Filtros</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Configure como deseja exportar o relatório selecionado.
                 </p>
               </div>
 
               <div className="space-y-3">
-                <div className="rounded-lg border p-3">
+                <div className={FILTER_BLOCK_CLASS}>
                   <div className="flex items-center justify-between gap-4">
                     <div className="space-y-0.5">
                       <div className="text-sm font-medium">
                         Incluir participantes
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-muted-foreground text-xs">
                         Inclui a lista de participantes dentro de cada
                         inscrição.
                       </div>
@@ -410,13 +413,13 @@ export default function SheetListInscriptions({
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-3">
+                <div className={FILTER_BLOCK_CLASS}>
                   <div className="flex items-center justify-between gap-4">
                     <div className="space-y-0.5">
                       <div className="text-sm font-medium">
                         Incluir pagamentos
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-muted-foreground text-xs">
                         Inclui informações de pagamento no relatório.
                       </div>
                     </div>
@@ -433,13 +436,13 @@ export default function SheetListInscriptions({
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-3">
+                <div className={FILTER_BLOCK_CLASS}>
                   <div className="flex items-center justify-between gap-4">
                     <div className="space-y-0.5">
                       <div className="text-sm font-medium">
                         Incluir inscrições não alocadas
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-muted-foreground text-xs">
                         Inclui participantes marcados como N/ Alocado.
                       </div>
                     </div>
@@ -456,33 +459,34 @@ export default function SheetListInscriptions({
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-3 space-y-3">
+                <div className={`space-y-3 ${FILTER_BLOCK_CLASS}`}>
                   <div className="text-sm font-medium">Status da inscrição</div>
                   <div className="grid gap-2">
                     {[
                       {
-                        label: "Pendente",
-                        value: "PENDING" as InscriptionStatus,
+                        label: 'Pendente',
+                        value: 'PENDING' as InscriptionStatus,
                       },
                       {
-                        label: "Em análise",
-                        value: "UNDER_REVIEW" as InscriptionStatus,
+                        label: 'Em análise',
+                        value: 'UNDER_REVIEW' as InscriptionStatus,
                       },
-                      { label: "Pago", value: "PAID" as InscriptionStatus },
+                      { label: 'Pago', value: 'PAID' as InscriptionStatus },
                       {
-                        label: "Expirado",
-                        value: "EXPIRED" as InscriptionStatus,
+                        label: 'Expirado',
+                        value: 'EXPIRED' as InscriptionStatus,
                       },
                       {
-                        label: "Cancelado",
-                        value: "CANCELLED" as InscriptionStatus,
+                        label: 'Cancelado',
+                        value: 'CANCELLED' as InscriptionStatus,
                       },
                     ].map((item) => (
                       <Label
                         key={item.value}
-                        className="flex items-center gap-2 text-sm font-normal"
+                        className="flex items-center gap-2 rounded-md p-1 text-sm font-normal transition-colors hover:bg-primary/10"
                       >
                         <Checkbox
+                          className="border-foreground/35 bg-background"
                           checked={selectedFilters.status.includes(item.value)}
                           onCheckedChange={(checked) =>
                             setSelectedFilters({
@@ -502,22 +506,23 @@ export default function SheetListInscriptions({
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-3 space-y-3">
+                <div className={`space-y-3 ${FILTER_BLOCK_CLASS}`}>
                   <div className="text-sm font-medium">Status do pagamento</div>
                   <div className="grid gap-2">
                     {[
-                      { label: "Aprovado", value: "APPROVED" as StatusPayment },
+                      { label: 'Aprovado', value: 'APPROVED' as StatusPayment },
                       {
-                        label: "Em análise",
-                        value: "UNDER_REVIEW" as StatusPayment,
+                        label: 'Em análise',
+                        value: 'UNDER_REVIEW' as StatusPayment,
                       },
-                      { label: "Recusado", value: "REFUSED" as StatusPayment },
+                      { label: 'Recusado', value: 'REFUSED' as StatusPayment },
                     ].map((item) => (
                       <Label
                         key={item.value}
-                        className="flex items-center gap-2 text-sm font-normal"
+                        className="flex items-center gap-2 rounded-md p-1 text-sm font-normal transition-colors hover:bg-primary/10"
                       >
                         <Checkbox
+                          className="border-foreground/35 bg-background"
                           checked={selectedFilters.statusPayment.includes(
                             item.value,
                           )}
@@ -539,19 +544,20 @@ export default function SheetListInscriptions({
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-3 space-y-3">
+                <div className={`space-y-3 ${FILTER_BLOCK_CLASS}`}>
                   <div className="text-sm font-medium">Método de pagamento</div>
                   <div className="grid gap-2">
                     {[
-                      { label: "Dinheiro", value: "DINHEIRO" as PaymentMethod },
-                      { label: "PIX", value: "PIX" as PaymentMethod },
-                      { label: "Cartão", value: "CARTAO" as PaymentMethod },
+                      { label: 'Dinheiro', value: 'DINHEIRO' as PaymentMethod },
+                      { label: 'PIX', value: 'PIX' as PaymentMethod },
+                      { label: 'Cartão', value: 'CARTAO' as PaymentMethod },
                     ].map((item) => (
                       <Label
                         key={item.value}
-                        className="flex items-center gap-2 text-sm font-normal"
+                        className="flex items-center gap-2 rounded-md p-1 text-sm font-normal transition-colors hover:bg-primary/10"
                       >
                         <Checkbox
+                          className="border-foreground/35 bg-background"
                           checked={selectedFilters.methodPayment.includes(
                             item.value,
                           )}
@@ -573,9 +579,9 @@ export default function SheetListInscriptions({
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-3 space-y-3">
+                <div className={`space-y-3 ${FILTER_BLOCK_CLASS}`}>
                   <div className="text-sm font-medium">Período</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <DatePicker
                       className="w-full"
                       value={selectedFilters.startDate}
@@ -586,7 +592,7 @@ export default function SheetListInscriptions({
                           startDate: value,
                         })
                       }
-                      showTime={{ format: "HH:mm" }}
+                      showTime={{ format: 'HH:mm' }}
                       format="DD/MM/YYYY HH:mm"
                       placeholder="Data/hora inicial"
                       allowClear
@@ -602,7 +608,7 @@ export default function SheetListInscriptions({
                           endDate: value,
                         })
                       }
-                      showTime={{ format: "HH:mm" }}
+                      showTime={{ format: 'HH:mm' }}
                       format="DD/MM/YYYY HH:mm"
                       placeholder="Data/hora final"
                       allowClear
@@ -613,12 +619,12 @@ export default function SheetListInscriptions({
                     <Button
                       type="button"
                       variant={
-                        selectedFilters.datePreset === "1h"
-                          ? "default"
-                          : "outline"
+                        selectedFilters.datePreset === '1h'
+                          ? 'default'
+                          : 'outline'
                       }
                       size="sm"
-                      onClick={() => applyPreset("1h")}
+                      onClick={() => applyPreset('1h')}
                       disabled={generating}
                     >
                       Última 1h
@@ -626,12 +632,12 @@ export default function SheetListInscriptions({
                     <Button
                       type="button"
                       variant={
-                        selectedFilters.datePreset === "24h"
-                          ? "default"
-                          : "outline"
+                        selectedFilters.datePreset === '24h'
+                          ? 'default'
+                          : 'outline'
                       }
                       size="sm"
-                      onClick={() => applyPreset("24h")}
+                      onClick={() => applyPreset('24h')}
                       disabled={generating}
                     >
                       Últimas 24h
@@ -639,12 +645,12 @@ export default function SheetListInscriptions({
                     <Button
                       type="button"
                       variant={
-                        selectedFilters.datePreset === "7d"
-                          ? "default"
-                          : "outline"
+                        selectedFilters.datePreset === '7d'
+                          ? 'default'
+                          : 'outline'
                       }
                       size="sm"
-                      onClick={() => applyPreset("7d")}
+                      onClick={() => applyPreset('7d')}
                       disabled={generating}
                     >
                       Últimos 7 dias
@@ -656,7 +662,7 @@ export default function SheetListInscriptions({
           )}
         </div>
 
-        <Separator />
+        <Separator className="bg-white/15" />
 
         <DrawerFooter className="flex-row justify-between gap-2">
           <Button
@@ -665,7 +671,7 @@ export default function SheetListInscriptions({
             onClick={() => (step === 0 ? onOpenChange(false) : setStep(0))}
             disabled={generating}
           >
-            {step === 0 ? "Cancelar" : "Voltar"}
+            {step === 0 ? 'Cancelar' : 'Voltar'}
           </Button>
 
           {step === 0 ? (
@@ -682,7 +688,7 @@ export default function SheetListInscriptions({
               onClick={handleGenerate}
               disabled={generating}
             >
-              {generating ? "Gerando..." : "Gerar"}
+              {generating ? 'Gerando...' : 'Gerar'}
             </Button>
           )}
         </DrawerFooter>

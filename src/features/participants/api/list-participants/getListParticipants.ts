@@ -1,21 +1,31 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { GetListParticipantsResponse } from "../../types/list-participants/listParticipantsTypes";
+import axiosInstance from '@/shared/lib/apiClient';
+import qs from 'qs';
+import {
+  GetListParticipantsResponse,
+  InscriptionsStatus,
+} from '../../types/list-participants/listParticipantsTypes';
 
 export async function getListParticipants(
   eventId: string,
-  param: {
-    page: number;
-    pageSize: number;
-  },
+  page: number,
+  pageSize: number,
+  // filters
+  inscriptionStatus?: InscriptionsStatus[],
+  typeInscriptions?: string[],
+  orderByName?: 'asc' | 'desc',
 ): Promise<GetListParticipantsResponse> {
   try {
     const { data } = await axiosInstance.get<GetListParticipantsResponse>(
       `/participants/${eventId}`,
       {
         params: {
-          page: param.page,
-          pageSize: param.pageSize,
+          page: page,
+          pageSize: pageSize,
+          inscriptionStatus: inscriptionStatus,
+          typeInscriptions: typeInscriptions,
+          orderByName: orderByName,
         },
+        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
       },
     );
     return data;
@@ -28,7 +38,7 @@ export async function getListParticipants(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os participantes",
+        'Não foi possível carregar os participantes',
     );
   }
 }

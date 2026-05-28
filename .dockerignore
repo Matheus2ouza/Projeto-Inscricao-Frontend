@@ -15,11 +15,6 @@ dist
 
 # Envs
 .env
-.env.local
-.env.development
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Logs
 *.log

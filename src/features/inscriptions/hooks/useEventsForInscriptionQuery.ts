@@ -1,10 +1,10 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { getEventsForInscription } from "../api/getEventsForInscription";
-import type { EventsListResponse, StatusEvent } from "../types/listEventsTypes";
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { getEventsForInscription } from '../api/getEventsForInscription';
+import type { EventsListResponse, StatusEvent } from '../types/listEventsTypes';
 
 export const eventsForInscriptionKeys = {
-  all: ["events-for-inscription"] as const,
-  lists: () => [...eventsForInscriptionKeys.all, "list"] as const,
+  all: ['events-for-inscription'] as const,
+  lists: () => [...eventsForInscriptionKeys.all, 'list'] as const,
   list: (page: number, pageSize: number, status?: StatusEvent[]) =>
     [...eventsForInscriptionKeys.lists(), { page, pageSize, status }] as const,
 };

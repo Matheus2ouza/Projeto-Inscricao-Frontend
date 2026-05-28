@@ -3,7 +3,7 @@ export type Region = {
   Name: string;
 };
 
-export type UserRole = "SUPER" | "ADMIN" | "MANAGER" | "USER";
+export type UserRole = 'SUPER' | 'ADMIN' | 'MANAGER' | 'USER';
 
 export type User = {
   id: string;
@@ -30,7 +30,6 @@ export type LoginServiceOutput = {
 
 export type SessionData = {
   user: User;
-  expires: string;
 };
 
 export type AuthResponse = {
