@@ -36,20 +36,19 @@ export function CheckboxGroupTypeInscription({
   } = useTypeInscriptionsQuery(eventId);
   const loading = loadingProp ?? internalLoading;
 
-  const typeInscriptions = React.useMemo<CheckboxGroupTypeInscriptionItem[]>(
-    () => {
-      if (options) return options;
-      if (fetched && fetched.length > 0) {
-        return fetched.map((t) => ({
-          id: t.id,
-          description: t.description,
-          price: t.value,
-        }));
-      }
-      return [];
-    },
-    [options, fetched],
-  );
+  const typeInscriptions = React.useMemo<
+    CheckboxGroupTypeInscriptionItem[]
+  >(() => {
+    if (options) return options;
+    if (fetched && fetched.length > 0) {
+      return fetched.map((t) => ({
+        id: t.id,
+        description: t.description,
+        price: t.value,
+      }));
+    }
+    return [];
+  }, [options, fetched]);
 
   const handleToggle = (id: string, checked: boolean) => {
     if (disabled) return;
@@ -69,9 +68,7 @@ export function CheckboxGroupTypeInscription({
   }
 
   if (error) {
-    return (
-      <div className="text-sm text-red-500">Falha ao carregar tipos.</div>
-    );
+    return <div className="text-sm text-red-500">Falha ao carregar tipos.</div>;
   }
 
   if (loading) {
@@ -97,14 +94,12 @@ export function CheckboxGroupTypeInscription({
           >
             <Checkbox
               checked={checked}
-              onCheckedChange={(ch) =>
-                handleToggle(type.id, Boolean(ch))
-              }
+              onCheckedChange={(ch) => handleToggle(type.id, Boolean(ch))}
               disabled={disabled}
               className="mt-0.5"
             />
             <div className="min-w-0">
-              <div className="text-sm leading-none font-medium">
+              <div className="text-sm leading-none font-medium uppercase">
                 {type.description}
               </div>
               <div className="text-muted-foreground mt-1 text-xs">
@@ -117,4 +112,3 @@ export function CheckboxGroupTypeInscription({
     </div>
   );
 }
-

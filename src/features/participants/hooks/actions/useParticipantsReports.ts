@@ -13,6 +13,11 @@ import {
 } from '@/features/participants/api/actions/reports/generateListParticipantsByLocalityXlsx';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import {
+  generateParticipantsFromRoomPdf,
+  GenerateParticipantsFromRoomPdfParams,
+  GenerateParticipantsFromRoomPdfResponse,
+} from '../../api/actions/reports/generateListParticipantsFromRoom';
 
 function download(
   pdfBase64: string,
@@ -44,6 +49,7 @@ function download(
 export function useParticipantsReports() {
   const { setLoading } = useGlobalLoading();
 
+  // Gera pdf para lista de inscrições com base na localidade
   const {
     mutateAsync: generatePdfLocalityMutation,
     isPending: isGeneratePdfLocalityMutation,
@@ -73,6 +79,7 @@ export function useParticipantsReports() {
     onSettled: () => setLoading(false),
   });
 
+  // Gera xlsx para lista de inscrições com base na localidade
   const {
     mutateAsync: generateXlsxLocalityMutation,
     isPending: isGenerateXlsxLocalityMutation,
@@ -82,6 +89,35 @@ export function useParticipantsReports() {
     GenerateParticipantsByLocalityXlsxParams
   >({
     mutationFn: generateParticipantsByLocalityXlsx,
+    onMutate: () => setLoading(true),
+    onSuccess: (data) => {
+      const fileBase64 = data.fileBase64;
+      const filename = data.filename;
+      const contentType = data.contentType;
+
+      if (!fileBase64 || !filename || !contentType) {
+        toast.error('Não foi possível gerar o relatório.');
+        return;
+      }
+
+      download(fileBase64, filename, contentType);
+      toast.success('Download iniciado.');
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Não foi possível gerar o relatório.');
+    },
+    onSettled: () => setLoading(false),
+  });
+
+  const {
+    mutateAsync: generatePdfRoomMutation,
+    isPending: isGeneratePdfRoomMutation,
+  } = useMutation<
+    GenerateParticipantsFromRoomPdfResponse,
+    Error,
+    GenerateParticipantsFromRoomPdfParams
+  >({
+    mutationFn: generateParticipantsFromRoomPdf,
     onMutate: () => setLoading(true),
     onSuccess: (data) => {
       const fileBase64 = data.fileBase64;
@@ -148,6 +184,18 @@ export function useParticipantsReports() {
     });
   };
 
+  const handleGeneratePdfRoomPdfReport = async ({
+    title,
+    observation,
+    listParticipants,
+  }: GenerateParticipantsFromRoomPdfParams) => {
+    return await generatePdfRoomMutation({
+      title,
+      observation,
+      listParticipants,
+    });
+  };
+
   return {
     // pdf
     handleGenerateLocalityPdfReport,
@@ -156,5 +204,9 @@ export function useParticipantsReports() {
     // xlsx
     handleGenerateLocalityXlsxReport,
     isGenerateXlsxLocalityMutation,
+
+    // pdf
+    handleGeneratePdfRoomPdfReport,
+    isGeneratePdfRoomMutation,
   };
 }

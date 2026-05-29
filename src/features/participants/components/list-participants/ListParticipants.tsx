@@ -202,9 +202,6 @@ export default function ListParticipants({
       ? (countParticipantsFemale / countParticipants) * 100
       : 0;
 
-  const startItem = total > 0 ? (page - 1) * pageSize + 1 : 0;
-  const endItem = total > 0 ? Math.min(page * pageSize, total) : 0;
-
   // Colunas da tabela
   const columns: ColumnsType<Participant> = [
     {
