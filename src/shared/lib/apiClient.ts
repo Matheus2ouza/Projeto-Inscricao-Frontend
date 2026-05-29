@@ -6,18 +6,6 @@ const baseURL =
     ? (process.env.INTERNAL_API_URL ?? '')
     : (process.env.NEXT_PUBLIC_API_URL ?? '');
 
-// LOG 1: Ver qual URL está sendo usada
-console.log(
-  '[apiClient] Environment:',
-  typeof window === 'undefined' ? 'SERVER' : 'CLIENT',
-);
-console.log('[apiClient] Base URL:', baseURL);
-console.log('[apiClient] INTERNAL_API_URL:', process.env.INTERNAL_API_URL);
-console.log(
-  '[apiClient] NEXT_PUBLIC_API_URL:',
-  process.env.NEXT_PUBLIC_API_URL,
-);
-
 const axiosInstance = axios.create({
   baseURL,
   // Evita o adapter HTTP do Node (follow-redirects/url.parse) em SSR/RSC.
