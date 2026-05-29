@@ -348,7 +348,7 @@ export default function PdfGeneratorDrawer({
           {AVAILABLE_COLUMNS.map((col) => (
             <Label
               key={col.id}
-              className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-primary/10"
+              className="hover:bg-primary/10 flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors"
             >
               <Checkbox
                 className="border-foreground/35 bg-background"
@@ -406,7 +406,7 @@ export default function PdfGeneratorDrawer({
             {Object.values(InscriptionsStatus).map((status) => (
               <Label
                 key={status}
-                className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-primary/10"
+                className="hover:bg-primary/10 flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors"
               >
                 <Checkbox
                   className="border-foreground/35 bg-background"
@@ -738,7 +738,7 @@ export default function PdfGeneratorDrawer({
                 {options.map((opt) => (
                   <Label
                     key={opt.id}
-                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3 backdrop-blur-md transition-colors hover:bg-primary/10"
+                    className="border-primary/20 bg-primary/5 hover:bg-primary/10 flex cursor-pointer items-start gap-3 rounded-lg border p-3 backdrop-blur-md transition-colors"
                   >
                     <RadioGroupItem value={opt.id} className="mt-1" />
                     <div className="min-w-0">
@@ -771,7 +771,7 @@ export default function PdfGeneratorDrawer({
                   disabled: generating,
                 })
               ) : (
-                <div className="text-muted-foreground rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm backdrop-blur-md">
+                <div className="text-muted-foreground border-primary/20 bg-primary/5 rounded-lg border p-3 text-sm backdrop-blur-md">
                   Este modelo não possui filtros.
                 </div>
               )}

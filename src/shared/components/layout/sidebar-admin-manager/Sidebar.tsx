@@ -305,6 +305,14 @@ export default function AppSidebarAdminManager({
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
                             <SidebarMenuSubButton
+                              href="/admin/participants/room"
+                              className="gap-1"
+                            >
+                              <span>Lista de Quartos</span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton
                               href="/admin/events/check-in"
                               className="gap-1"
                             >
