@@ -43,24 +43,24 @@
 
 :root {
   --radius: 0.65rem;
-  --background: oklch(0.97 0.01 250);
+  --background: oklch(0.965 0.01 250);
   --foreground: oklch(0.22 0.02 260);
-  --card: oklch(1 0 0 / 58%);
+  --card: oklch(0.99 0.005 250 / 68%);
   --card-foreground: oklch(0.22 0.02 260);
-  --popover: oklch(1 0 0 / 72%);
-  --popover-solid: oklch(0.99 0.005 255 / 100%);
+  --popover: oklch(0.99 0.005 250 / 82%);
+  --popover-solid: oklch(0.995 0.004 255 / 98%);
   --popover-foreground: oklch(0.22 0.02 260);
   --primary: oklch(0.64 0.2 254);
   --primary-foreground: oklch(0.98 0.01 254);
-  --secondary: oklch(1 0 0 / 46%);
+  --secondary: oklch(0.975 0.006 250 / 62%);
   --secondary-foreground: oklch(0.28 0.02 260);
-  --muted: oklch(1 0 0 / 38%);
+  --muted: oklch(0.97 0.006 250 / 58%);
   --muted-foreground: oklch(0.48 0.03 262);
   --accent: oklch(0.94 0.04 220 / 62%);
   --accent-foreground: oklch(0.24 0.03 255);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(1 0 0 / 52%);
-  --input: oklch(1 0 0 / 62%);
+  --border: oklch(0.83 0.012 250 / 38%);
+  --input: oklch(0.8 0.014 250 / 48%);
   --ring: oklch(0.64 0.2 254 / 55%);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -91,23 +91,23 @@
   --liquid-glass-shadow-strong:
     0 14px 40px oklch(0.15 0.04 260 / 12%), inset 0 1px 0 oklch(1 0 0 / 60%);
 
-  --glass-surface: oklch(1 0 0 / 70%);
-  --glass-surface-strong: oklch(1 0 0 / 82%);
-  --glass-surface-solid: oklch(1 0 0 / 100%);
-  --glass-border: oklch(1 0 0 / 60%);
-  --glass-border-strong: oklch(1 0 0 / 75%);
-  --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
-  --glass-shadow-strong: 0 12px 48px rgba(15, 23, 42, 0.15);
+  --glass-surface: oklch(0.99 0.004 250 / 62%);
+  --glass-surface-strong: oklch(0.99 0.004 250 / 74%);
+  --glass-surface-solid: oklch(0.995 0.003 250 / 100%);
+  --glass-border: oklch(0.82 0.01 250 / 40%);
+  --glass-border-strong: oklch(0.79 0.01 250 / 56%);
+  --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.07);
+  --glass-shadow-strong: 0 12px 48px rgba(15, 23, 42, 0.1);
   --glass-backdrop: blur(24px);
   --glass-backdrop-soft: blur(16px);
 
-  --outline-button-bg: oklch(1 0 0 / 42%);
-  --outline-button-border: oklch(1 0 0 / 68%);
+  --outline-button-bg: oklch(0.99 0.004 250 / 46%);
+  --outline-button-border: oklch(0.83 0.01 250 / 54%);
   --outline-button-foreground: oklch(0.26 0.03 260);
-  --outline-button-hover-bg: oklch(1 0 0 / 58%);
-  --outline-button-hover-border: oklch(1 0 0 / 82%);
+  --outline-button-hover-bg: oklch(0.99 0.004 250 / 58%);
+  --outline-button-hover-border: oklch(0.81 0.01 250 / 68%);
   --outline-button-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.08), inset 0 1px 0 oklch(1 0 0 / 72%);
+    0 8px 24px rgba(15, 23, 42, 0.07), inset 0 1px 0 oklch(1 0 0 / 50%);
 }
 
 .dark {
@@ -182,15 +182,21 @@
     min-height: 100vh;
     font-family: var(--font-geist-sans), system-ui, sans-serif;
     background:
-      radial-gradient(circle at 20% 20%,
+      radial-gradient(
+        circle at 20% 20%,
         oklch(0.95 0.04 250 / 60%),
-        transparent 40%),
-      radial-gradient(circle at 80% 0%,
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 80% 0%,
         oklch(0.92 0.05 300 / 50%),
-        transparent 45%),
-      radial-gradient(circle at 50% 100%,
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 50% 100%,
         oklch(0.93 0.04 200 / 55%),
-        transparent 50%),
+        transparent 50%
+      ),
       linear-gradient(180deg, var(--background), oklch(0.95 0.02 260));
     color: var(--foreground);
     text-rendering: optimizeLegibility;
@@ -220,33 +226,41 @@
 
 @layer utilities {
   .bg-linear-to-r {
-    background-image: linear-gradient(to right,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to right,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .bg-linear-to-b {
-    background-image: linear-gradient(to bottom,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to bottom,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .before\:bg-linear-to-b::before,
   .after\:bg-linear-to-b::after {
-    background-image: linear-gradient(to bottom,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to bottom,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .before\:bg-linear-to-r::before,
   .after\:bg-linear-to-r::after {
-    background-image: linear-gradient(to right,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
+    background-image: linear-gradient(
+      to right,
+      var(--tw-gradient-from),
+      var(--tw-gradient-via),
+      var(--tw-gradient-to)
+    );
   }
 
   .glass-surface,
@@ -295,17 +309,45 @@
     -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
   }
 
-  .glass-button {
-    background: oklch(1 0 0 / 18%);
+  .glass-summary-tile {
+    background: var(--glass-surface-strong);
     border: 1px solid var(--glass-border);
-    color: var(--foreground);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-backdrop-soft));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
+  }
+
+  .glass-summary-value {
+    background: var(--glass-surface-solid);
+    border: 1px solid var(--glass-border-strong);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(var(--glass-backdrop-soft));
+    -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
+  }
+
+  .dark .glass-summary-tile {
+    background: oklch(1 0 0 / 10%);
+    border: 1px solid oklch(1 0 0 / 16%);
+    box-shadow: 0 10px 30px oklch(0 0 0 / 24%);
+  }
+
+  .dark .glass-summary-value {
+    background: oklch(1 0 0 / 14%);
+    border: 1px solid oklch(1 0 0 / 22%);
+    box-shadow: 0 10px 30px oklch(0 0 0 / 28%);
+  }
+
+  .glass-button {
+    background: var(--outline-button-bg);
+    border: 1px solid var(--outline-button-border);
+    color: var(--outline-button-foreground);
+    box-shadow: var(--outline-button-shadow);
     backdrop-filter: blur(var(--glass-backdrop-soft));
     -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
   }
 
   .glass-backdrop {
-    background: rgba(255, 255, 255, 0.14);
+    background: color-mix(in oklab, var(--background) 72%, white 28%);
     backdrop-filter: blur(var(--glass-backdrop));
     -webkit-backdrop-filter: blur(var(--glass-backdrop));
   }
@@ -327,20 +369,22 @@
   }
 
   .liquid-glass-light {
-    background: oklch(1 0 0 / 28%);
-    border: 1px solid oklch(1 0 0 / 55%);
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
-    box-shadow: inset 0 1px 0 oklch(1 0 0 / 60%);
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--liquid-glass-blur-subtle))
+      saturate(var(--liquid-glass-saturation-subtle));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle))
+      saturate(var(--liquid-glass-saturation-subtle));
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 35%);
     transition: all 0.25s ease;
   }
 
   .liquid-glass-light:hover {
-    background: oklch(1 0 0 / 38%);
-    border-color: oklch(1 0 0 / 75%);
+    background: var(--glass-surface-strong);
+    border-color: var(--glass-border-strong);
     box-shadow:
       0 6px 18px oklch(0.15 0.04 260 / 10%),
-      inset 0 1px 0 oklch(1 0 0 / 70%);
+      inset 0 1px 0 oklch(1 0 0 / 45%);
   }
 
   .liquid-glass-button-light,
@@ -529,78 +573,72 @@ gmp-map {
 }
 
 .liquid-glass-button-light {
-  background: oklch(1 0 0 / 10%) !important;
-  border: 1px solid oklch(0.85 0 0 / 60%) !important;
+  background: var(--outline-button-bg) !important;
+  border: 1px solid var(--outline-button-border) !important;
   backdrop-filter: blur(10px) saturate(120%);
   -webkit-backdrop-filter: blur(10px) saturate(120%);
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 40%);
+  box-shadow: var(--outline-button-shadow);
   transition: all 0.25s ease;
 }
 
 .liquid-glass-button-light:hover {
-  background: oklch(1 0 0 / 18%) !important;
-  border: 1px solid oklch(0.9 0 0 / 80%) !important;
-  box-shadow:
-    0 4px 12px oklch(0.15 0.04 260 / 10%),
-    inset 0 1px 0 oklch(1 0 0 / 55%);
+  background: var(--outline-button-hover-bg) !important;
+  border: 1px solid var(--outline-button-hover-border) !important;
+  box-shadow: var(--outline-button-shadow);
 }
 
 .dark .liquid-glass-button-light {
-  background: oklch(1 0 0 / 6%) !important;
-  border: 1px solid oklch(1 0 0 / 20%) !important;
+  background: var(--outline-button-bg) !important;
+  border: 1px solid var(--outline-button-border) !important;
   backdrop-filter: blur(10px) saturate(120%);
   -webkit-backdrop-filter: blur(10px) saturate(120%);
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 10%);
+  box-shadow: var(--outline-button-shadow);
 }
 
 .liquid-glass-button {
-  background: oklch(0.9 0 0 / 65%) !important;
-  border: 1px solid oklch(0.9 0 0 / 80%) !important;
+  background: var(--outline-button-bg) !important;
+  border: 1px solid var(--outline-button-border) !important;
   backdrop-filter: blur(12px) saturate(140%);
   -webkit-backdrop-filter: blur(12px) saturate(140%);
-  box-shadow:
-    0 4px 12px oklch(0.15 0 0 / 10%),
-    inset 0 1px 0 oklch(1 0 0 / 50%);
+  box-shadow: var(--outline-button-shadow);
   transition: all 0.25s ease;
 }
 
 .liquid-glass-button:hover {
-  background: oklch(1 0 0 / 70%);
-  border: 1px solid oklch(1 0 0 / 85%);
+  background: var(--outline-button-hover-bg);
+  border: 1px solid var(--outline-button-hover-border);
 }
 
 .dark .liquid-glass-button {
-  background: oklch(0.25 0.02 272 / 65%) !important;
-  border: 1px solid oklch(1 0 0 / 25%) !important;
-  box-shadow:
-    0 6px 16px oklch(0.02 0.01 260 / 35%),
-    inset 0 1px 0 oklch(1 0 0 / 20%);
+  background: var(--outline-button-bg) !important;
+  border: 1px solid var(--outline-button-border) !important;
+  box-shadow: var(--outline-button-shadow);
 }
 
 .dark .liquid-glass-button:hover {
-  background: oklch(0.32 0.02 272 / 80%);
-  border: 1px solid oklch(1 0 0 / 35%);
+  background: var(--outline-button-hover-bg);
+  border: 1px solid var(--outline-button-hover-border);
 }
 
 /* Participants list (Antd) - scoped dark-mode fixes */
 .dark .participants-list-table .ant-table,
 .dark .participants-list-table .ant-table-container,
 .dark .participants-list-table .ant-table-content,
-.dark .participants-list-table .ant-table-thead>tr>th,
-.dark .participants-list-table .ant-table-tbody>tr>td {
+.dark .participants-list-table .ant-table-thead > tr > th,
+.dark .participants-list-table .ant-table-tbody > tr > td {
   background: oklch(0.22 0.005 260) !important;
   color: var(--foreground) !important;
 }
 
-.dark .participants-list-table .ant-table-thead>tr>th {
+.dark .participants-list-table .ant-table-thead > tr > th {
   border-bottom-color: oklch(1 0 0 / 18%) !important;
 }
 
-.dark .participants-list-table .ant-table-tbody>tr>td {
+.dark .participants-list-table .ant-table-tbody > tr > td {
   border-bottom-color: oklch(1 0 0 / 12%) !important;
 }
 
-.dark .participants-list-table .ant-table-tbody>tr.ant-table-row:hover>td {
+.dark .participants-list-table .ant-table-tbody > tr.ant-table-row:hover > td {
   background: oklch(1 0 0 / 10%) !important;
 }
 
@@ -619,8 +657,14 @@ gmp-map {
 }
 
 .dark .participants-pagination .ant-pagination-item:hover,
-.dark .participants-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
-.dark .participants-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+.dark
+  .participants-pagination
+  .ant-pagination-prev:hover
+  .ant-pagination-item-link,
+.dark
+  .participants-pagination
+  .ant-pagination-next:hover
+  .ant-pagination-item-link {
   background: oklch(1 0 0 / 16%) !important;
   border-color: oklch(1 0 0 / 32%) !important;
   color: var(--foreground) !important;
@@ -635,7 +679,10 @@ gmp-map {
   color: var(--foreground) !important;
 }
 
-.dark .participants-pagination .ant-pagination-disabled .ant-pagination-item-link {
+.dark
+  .participants-pagination
+  .ant-pagination-disabled
+  .ant-pagination-item-link {
   color: oklch(0.62 0.01 260) !important;
   border-color: oklch(1 0 0 / 16%) !important;
   background: oklch(1 0 0 / 6%) !important;
