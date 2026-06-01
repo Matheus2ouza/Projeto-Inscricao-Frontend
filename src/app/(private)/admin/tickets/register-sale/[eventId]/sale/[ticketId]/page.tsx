@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import TicketSaleDetailsContent from "@/features/tickets/components/register-sale/sale/TicketSaleDetailsContent";
-import { useTicketSaleCache } from "@/features/tickets/hooks/register-sales/sale/useTicketSaleCache";
-import { useTicketSaleRegister } from "@/features/tickets/hooks/register-sales/sale/useTicketSaleRegister";
-import { SaleGrupRequest } from "@/features/tickets/types/register-sale/ticketSaleRegisterTypes";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
+import TicketSaleDetailsContent from '@/features/tickets/components/register-sale/sale/TicketSaleDetailsContent';
+import { useTicketSaleCache } from '@/features/tickets/hooks/register-sales/sale/useTicketSaleCache';
+import { useTicketSaleRegister } from '@/features/tickets/hooks/register-sales/sale/useTicketSaleRegister';
+import { SaleGrupRequest } from '@/features/tickets/types/register-sale/ticketSaleRegisterTypes';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function RegisterSaleTicketSuperPage() {
   const router = useRouter();
@@ -42,7 +42,7 @@ export default function RegisterSaleTicketSuperPage() {
           <p className="text-sm text-red-600">
             {error instanceof Error
               ? error.message
-              : "Erro ao carregar o ticket."}
+              : 'Erro ao carregar o ticket.'}
           </p>
         </div>
       );
@@ -50,7 +50,7 @@ export default function RegisterSaleTicketSuperPage() {
 
     return (
       <TicketSaleDetailsContent
-        eventId={eventId ?? ""}
+        eventId={eventId ?? ''}
         ticket={data!}
         history={data?.TicketSaleItens ?? []}
         onRegisterSubmit={(payload: SaleGrupRequest) =>

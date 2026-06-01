@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import SelectedEvent from "@/features/tickets/components/SelectedEvent";
-import { useSelectEvents } from "@/features/tickets/hooks/useSelectEvent";
-import type { StatusEvent } from "@/features/tickets/types/selectEvent";
-import { Event } from "@/features/tickets/types/selectEvent";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardBody, CardFooter, Skeleton } from "@heroui/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import SelectedEvent from '@/features/tickets/components/SelectedEvent';
+import { useSelectEvents } from '@/features/tickets/hooks/useSelectEvent';
+import type { StatusEvent } from '@/features/tickets/types/selectEvent';
+import { Event } from '@/features/tickets/types/selectEvent';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardBody, CardFooter, Skeleton } from '@heroui/react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function TicketSalesAdminPage() {
   const router = useRouter();
@@ -32,28 +32,28 @@ export default function TicketSalesAdminPage() {
 
   const getInfoRows = (event: Event) => [
     {
-      label: "Total de tickets",
-      value: event.countTickets
+      label: 'Total de tickets',
+      value: event.countTickets,
     },
     {
-      label: "Total de Vendas",
-      value: event.countSaleTickets
-    }
-  ]
+      label: 'Total de Vendas',
+      value: event.countSaleTickets,
+    },
+  ];
 
   const renderSkeletonGrid = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, index) => (
         <Card
           key={index}
-          className="w-full border border-transparent shadow-md bg-white dark:bg-zinc-900 dark:border-zinc-800"
+          className="w-full border border-transparent bg-white shadow-md dark:border-zinc-800 dark:bg-zinc-900"
         >
           <CardBody className="p-0">
-            <Skeleton className="w-full h-48 rounded-t-xl" />
+            <Skeleton className="h-48 w-full rounded-t-xl" />
           </CardBody>
-          <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800">
-            <Skeleton className="h-6 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2 mb-2" />
+          <CardFooter className="flex flex-col items-start border-t border-gray-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+            <Skeleton className="mb-2 h-6 w-3/4" />
+            <Skeleton className="mb-2 h-4 w-1/2" />
             <Skeleton className="h-4 w-1/2" />
           </CardFooter>
         </Card>
@@ -68,13 +68,13 @@ export default function TicketSalesAdminPage() {
 
     if (error) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
+        <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
           <div>
-            <p className="text-red-600 dark:text-red-400 font-semibold">
+            <p className="font-semibold text-red-600 dark:text-red-400">
               Não foi possível carregar os eventos.
             </p>
             <p className="text-muted-foreground mt-1 max-w-md">
-              {error || "Tente novamente em instantes."}
+              {error || 'Tente novamente em instantes.'}
             </p>
           </div>
           <Button onClick={() => refetch()} variant="outline">
@@ -87,7 +87,7 @@ export default function TicketSalesAdminPage() {
     return (
       <SelectedEvent
         events={events}
-        buttonLabel="Gerenciar Tickets"
+        buttonLabel="Registrar venda"
         page={page}
         pageCount={pageCount}
         onPageChange={setPage}
@@ -105,7 +105,7 @@ export default function TicketSalesAdminPage() {
   };
 
   const handleBack = () => {
-    router.push("/admin/home");
+    router.push('/admin/home');
   };
 
   return (
