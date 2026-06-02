@@ -1,8 +1,8 @@
 'use client';
 
 import type { UploadFile, UploadProps } from 'antd';
-import { message, Upload } from 'antd';
-import { ImageIcon, UploadCloud, X } from 'lucide-react';
+import { Image as AntImage, message, Upload } from 'antd';
+import { Eye, ImageIcon, UploadCloud, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 
@@ -47,6 +47,8 @@ export default function ImageUpload({
   const [previewByUid, setPreviewByUid] = React.useState<
     Record<string, string>
   >({});
+  const [previewOpen, setPreviewOpen] = React.useState(false);
+  const [previewImage, setPreviewImage] = React.useState('');
 
   const fileList = React.useMemo(() => {
     const list = Array.isArray(value) ? value : [];
@@ -89,7 +91,7 @@ export default function ImageUpload({
       }
       return next;
     });
-  }, [fileList]);
+  }, [fileList, previewByUid]);
 
   React.useEffect(() => {
     void updatePreviews();
@@ -139,50 +141,41 @@ export default function ImageUpload({
     onChange(fileList.filter((f) => String(f.uid) !== uid));
   };
 
-  const renderSinglePreview = () => {
-    const first = fileList[0];
-    const url = first
-      ? (previewByUid[String(first.uid)] ?? first.thumbUrl ?? first.url)
-      : null;
+  const handlePreview = async (file: UploadFile) => {
+    const uid = String(file.uid);
+    const existing = previewByUid[uid] ?? file.thumbUrl ?? file.url;
+    let nextPreview = existing ? String(existing) : '';
 
-    if (!first || !url) return null;
+    if (!nextPreview) {
+      const origin = file.originFileObj as File | undefined;
+      if (origin) {
+        try {
+          nextPreview = await fileToDataUrl(origin);
+        } catch {
+          nextPreview = '';
+        }
+      }
+    }
 
-    return (
-      <div className="bg-muted/20 relative overflow-hidden rounded-lg border">
-        <div className="relative aspect-video w-full">
-          <Image
-            src={String(url)}
-            alt="Pré-visualização"
-            fill
-            className="object-contain"
-            unoptimized
-          />
-        </div>
-        <button
-          type="button"
-          className="bg-background/80 absolute top-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-md border shadow-sm"
-          onClick={() => handleRemove(String(first.uid))}
-          aria-label="Remover imagem"
-          disabled={disabled}
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-    );
+    if (!nextPreview) return;
+
+    setPreviewImage(nextPreview);
+    setPreviewOpen(true);
   };
 
-  const renderMultiPreview = () => {
+  const renderPreviewGrid = () => {
     if (fileList.length === 0) return null;
 
     return (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
         {fileList.map((file) => {
           const url =
             previewByUid[String(file.uid)] ?? file.thumbUrl ?? file.url ?? '';
+
           return (
             <div
               key={String(file.uid)}
-              className="group relative overflow-hidden rounded-lg border bg-white dark:bg-zinc-950"
+              className="group border-border/70 bg-background/80 relative overflow-hidden rounded-xl border shadow-sm backdrop-blur-sm"
             >
               <div className="relative aspect-square">
                 {url ? (
@@ -198,23 +191,28 @@ export default function ImageUpload({
                     <ImageIcon className="h-6 w-6" />
                   </div>
                 )}
-              </div>
 
-              <div className="border-t p-2">
-                <div className="truncate text-xs font-medium">
-                  {file.name || 'imagem'}
+                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/20 group-hover:opacity-100">
+                  <button
+                    type="button"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/90 text-zinc-800 shadow-sm transition hover:scale-105 hover:bg-white dark:border-white/10 dark:bg-zinc-950/85 dark:text-white"
+                    onClick={() => handlePreview(file)}
+                    aria-label="Visualizar imagem"
+                    disabled={disabled}
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/90 text-zinc-800 shadow-sm transition hover:scale-105 hover:bg-white dark:border-white/10 dark:bg-zinc-950/85 dark:text-white"
+                    onClick={() => handleRemove(String(file.uid))}
+                    aria-label="Remover imagem"
+                    disabled={disabled}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               </div>
-
-              <button
-                type="button"
-                className="bg-background/80 absolute top-2 right-2 hidden h-8 w-8 items-center justify-center rounded-md border shadow-sm group-hover:inline-flex"
-                onClick={() => handleRemove(String(file.uid))}
-                aria-label="Remover imagem"
-                disabled={disabled}
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
           );
         })}
@@ -252,7 +250,21 @@ export default function ImageUpload({
         </div>
       </Upload.Dragger>
 
-      {resolvedMaxCount === 1 ? renderSinglePreview() : renderMultiPreview()}
+      {renderPreviewGrid()}
+
+      {previewImage ? (
+        <AntImage
+          styles={{ root: { display: 'none' } }}
+          preview={{
+            open: previewOpen,
+            onOpenChange: (visible) => setPreviewOpen(visible),
+            afterOpenChange: (visible) => {
+              if (!visible) setPreviewImage('');
+            },
+          }}
+          src={previewImage}
+        />
+      ) : null}
     </div>
   );
 }

@@ -625,7 +625,7 @@ export default function CashRegisterDetails({
                       </div>
 
                       <div className="flex flex-col gap-1">
-                        <span className="text-xs font-semibold text-slate-500 uppercase">
+                        <span className="font-d text-xs text-slate-500 uppercase">
                           Método
                         </span>
                         <span

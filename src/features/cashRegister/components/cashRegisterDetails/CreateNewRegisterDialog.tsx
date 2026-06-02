@@ -13,17 +13,20 @@ import type { InputNumberProps, UploadFile } from 'antd';
 import {
   Form as AntForm,
   Button,
+  DatePicker,
   Input,
   InputNumber,
   Modal,
   Select,
+  Switch,
 } from 'antd';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { AllocationEvent } from '../../types/cashRegisterDetails/cashRegisterDetailsType';
 
-type CreateNewRegisterFormValues = z.infer<typeof CreateNewRegisterSchema>;
+type CreateNewRegisterFormValues = z.input<typeof CreateNewRegisterSchema>;
 
 interface CreateNewRegisterDialogProps {
   open: boolean;
@@ -64,12 +67,6 @@ export default function CreateNewRegisterDialog({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    if (allocationEvents.length === 1) {
-      form.setValue('eventId', allocationEvents[0].id);
-    }
-  }, [allocationEvents]);
-
   const formatter: InputNumberProps<number>['formatter'] = (value) => {
     if (value === undefined || value === null) return '';
     const [start, end] = `${value}`.split('.');
@@ -92,27 +89,37 @@ export default function CreateNewRegisterDialog({
     defaultValues: {
       type: CashEntryType.INCOME,
       method: PaymentMethod.DINHEIRO,
+      favorite: false,
       value: 0,
       description: '',
       responsible: user.username,
       image: '',
       eventId:
         allocationEvents.length === 1 ? allocationEvents[0].id : undefined,
+      createAt: undefined,
     },
     mode: 'onChange',
   });
+
+  useEffect(() => {
+    if (allocationEvents.length === 1) {
+      form.setValue('eventId', allocationEvents[0].id);
+    }
+  }, [allocationEvents, form]);
 
   const handleClose = (nextOpen: boolean) => {
     if (!nextOpen) {
       form.reset({
         type: CashEntryType.INCOME,
         method: PaymentMethod.DINHEIRO,
+        favorite: false,
         value: 0,
         description: '',
         responsible: user.username,
         image: '',
         eventId:
           allocationEvents.length === 1 ? allocationEvents[0].id : undefined,
+        createAt: undefined,
       });
       setUploadedFiles([]);
     }
@@ -124,11 +131,13 @@ export default function CreateNewRegisterDialog({
       cashRegisterId,
       type: values.type as CashEntryType,
       method: values.method as PaymentMethod,
+      favorite: Boolean(values.favorite),
       value: values.value,
       description: values.description,
       responsible: values.responsible,
       image: values.image ? values.image : undefined,
       eventId: values.eventId ? values.eventId : undefined,
+      createAt: values.createAt ? new Date(values.createAt) : undefined,
     };
 
     await onCreateNewRegister(payload);
@@ -247,6 +256,58 @@ export default function CreateNewRegisterDialog({
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Controller
               control={form.control}
+              name="favorite"
+              render={({ field }) => (
+                <AntForm.Item label="Favoritar registro" className="mb-0">
+                  <div className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-white/80 px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/60">
+                    <Switch
+                      checked={Boolean(field.value)}
+                      onChange={(checked) => field.onChange(checked)}
+                      disabled={isSubmitting}
+                    />
+                    <div>
+                      <p className="text-sm font-medium">
+                        Marcar como favorito
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        Destaque esta movimentação na listagem.
+                      </p>
+                    </div>
+                  </div>
+                </AntForm.Item>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="createAt"
+              render={({ field, fieldState }) => (
+                <AntForm.Item
+                  label="Data do registro"
+                  validateStatus={fieldState.error ? 'error' : undefined}
+                  help={fieldState.error?.message}
+                  className="mb-0"
+                >
+                  <DatePicker
+                    value={field.value ? dayjs(field.value) : null}
+                    onChange={(date) =>
+                      field.onChange(date ? date.toISOString() : undefined)
+                    }
+                    showTime
+                    format="DD/MM/YYYY HH:mm"
+                    placeholder="Selecione a data e hora"
+                    disabled={isSubmitting}
+                    className="w-full"
+                    style={{ width: '100%' }}
+                  />
+                </AntForm.Item>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <Controller
+              control={form.control}
               name="value"
               render={({ field, fieldState }) => (
                 <AntForm.Item
@@ -338,7 +399,6 @@ export default function CreateNewRegisterDialog({
                   onDataUrlChange={(dataUrl) => {
                     field.onChange(dataUrl || '');
                   }}
-                  className="hover:border-primary hover:bg-primary/5 dark:hover:border-primary rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-3 text-center transition-colors dark:border-zinc-700 dark:bg-zinc-900"
                 />
               </AntForm.Item>
             )}
