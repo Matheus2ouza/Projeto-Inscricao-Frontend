@@ -1,6 +1,7 @@
 export type PaymentMethod = 'PIX' | 'CARTAO' | 'DINHEIRO';
 
 export enum CategoryExpense {
+  BRINDES = 'BRINDES',
   COZINHA = 'COZINHA',
   DECORACAO = 'DECORACAO',
   DECORACAO_ESTACAO = 'DECORACAO_ESTACAO',

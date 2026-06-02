@@ -59,6 +59,7 @@ const paymentMethodLabels: Record<PaymentMethod, string> = {
 };
 
 const categoryLabels: Record<CategoryExpense, string> = {
+  BRINDES: 'Brindes',
   COZINHA: 'Cozinha',
   DECORACAO: 'Decoração',
   DECORACAO_ESTACAO: 'Decoração Estação',
