@@ -13,11 +13,13 @@ export async function createNewRegister(
       {
         type: registerData.type,
         method: registerData.method,
+        favorite: registerData.favorite,
         value: registerData.value,
         description: registerData.description,
         eventId: registerData.eventId,
         responsible: registerData.responsible,
         image: registerData.image,
+        createAt: registerData.createAt,
       },
     );
     return data;

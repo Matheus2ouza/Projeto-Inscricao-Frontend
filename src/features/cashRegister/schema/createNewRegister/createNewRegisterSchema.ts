@@ -3,6 +3,7 @@ import z from 'zod';
 export const CreateNewRegisterSchema = z.object({
   type: z.enum(['INCOME', 'EXPENSE']),
   method: z.enum(['DINHEIRO', 'PIX', 'CARTAO']),
+  favorite: z.boolean().default(false),
   value: z
     .number({
       error: 'Valor é obrigatório',
@@ -12,4 +13,5 @@ export const CreateNewRegisterSchema = z.object({
   eventId: z.uuid().optional(),
   responsible: z.string(),
   image: z.string().optional(),
+  createAt: z.iso.datetime().optional(),
 });
