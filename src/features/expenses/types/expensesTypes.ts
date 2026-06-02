@@ -45,6 +45,7 @@ export type CreateExpenseRequest = {
   category: CategoryExpense;
   image: string;
   responsible: string;
+  createAt?: string;
 };
 
 export type CreateExpenseResponse = {

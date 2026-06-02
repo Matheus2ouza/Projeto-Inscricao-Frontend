@@ -23,6 +23,7 @@ const createExpenseSchema = z.object({
   }),
   responsible: z.string().min(1, 'Responsável é obrigatório'),
   image: z.string().default(''),
+  createAt: z.string().datetime().default(new Date().toISOString()),
 });
 
 export type CreateExpenseFormData = z.input<typeof createExpenseSchema>;
@@ -39,6 +40,7 @@ export function useCreateExpense(eventId: string) {
       category: CategoryExpense.OUTROS,
       responsible: '',
       image: '',
+      createAt: new Date().toISOString(),
     },
   });
 
@@ -52,6 +54,7 @@ export function useCreateExpense(eventId: string) {
         category: data.category,
         image: data.image ?? '',
         responsible: data.responsible,
+        createAt: data.createAt,
       };
       return await createExpense(expenseData);
     },

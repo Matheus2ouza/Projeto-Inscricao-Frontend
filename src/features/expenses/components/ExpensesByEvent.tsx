@@ -18,11 +18,13 @@ import type { UploadFile } from 'antd';
 import {
   Button as AntButton,
   Form as AntForm,
+  DatePicker,
   Input,
   InputNumber,
   Modal,
   Select,
 } from 'antd';
+import dayjs from 'dayjs';
 import { Calendar, DollarSign, Plus, User } from 'lucide-react';
 import type { BaseSyntheticEvent } from 'react';
 import { useMemo, useState } from 'react';
@@ -154,12 +156,13 @@ export default function ExpensesByEvent({
         title="Novo Gasto"
         footer={null}
         destroyOnHidden
+        width={760}
         centered
       >
         <AntForm layout="vertical" component={false}>
           <form
             onSubmit={handleFormSubmit}
-            className="grid grid-cols-1 gap-4 md:grid-cols-2"
+            className="grid grid-cols-1 gap-4 md:grid-cols-3"
           >
             <Controller
               control={form.control}
@@ -169,7 +172,7 @@ export default function ExpensesByEvent({
                   label="Descrição"
                   validateStatus={fieldState.error ? 'error' : undefined}
                   help={fieldState.error?.message}
-                  className="mb-0 md:col-span-2"
+                  className="mb-0 md:col-span-3"
                 >
                   <Input placeholder="Descrição do gasto" {...field} />
                 </AntForm.Item>
@@ -240,7 +243,33 @@ export default function ExpensesByEvent({
               )}
             />
 
-            <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-2">
+            <Controller
+              control={form.control}
+              name="createAt"
+              render={({ field, fieldState }) => (
+                <AntForm.Item
+                  label="Data do gasto"
+                  validateStatus={fieldState.error ? 'error' : undefined}
+                  help={fieldState.error?.message}
+                  className="mb-0"
+                >
+                  <DatePicker
+                    value={field.value ? dayjs(field.value) : null}
+                    onChange={(date) =>
+                      field.onChange(date ? date.toISOString() : undefined)
+                    }
+                    showTime
+                    format="DD/MM/YYYY HH:mm"
+                    placeholder="Selecione a data e hora"
+                    disabled={submitting}
+                    className="w-full"
+                    style={{ width: '100%' }}
+                  />
+                </AntForm.Item>
+              )}
+            />
+
+            <div className="grid grid-cols-1 gap-4 md:col-span-3 md:grid-cols-2">
               <Controller
                 control={form.control}
                 name="category"
