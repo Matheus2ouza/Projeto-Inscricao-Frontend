@@ -1,4 +1,16 @@
-export type PaymentMethod = "PIX" | "CARTAO" | "DINHEIRO";
+export type PaymentMethod = 'PIX' | 'CARTAO' | 'DINHEIRO';
+
+export enum CategoryExpense {
+  COZINHA = 'COZINHA',
+  DECORACAO = 'DECORACAO',
+  DECORACAO_ESTACAO = 'DECORACAO_ESTACAO',
+  DECORACAO_COMPERADORES = 'DECORACAO_COMPERADORES',
+  MIDIA = 'MIDIA',
+  SOM = 'SOM',
+  MANUTENCAO = 'MANUTENCAO',
+  SEGURANCA = 'SEGURANCA',
+  OUTROS = 'OUTROS',
+}
 
 export type Expense = {
   id: string;
@@ -6,6 +18,8 @@ export type Expense = {
   description: string;
   value: number;
   paymentMethod: PaymentMethod;
+  category: CategoryExpense;
+  image: string;
   responsible: string;
   createdAt: Date;
   updatedAt: Date;
@@ -28,7 +42,10 @@ export type CreateExpenseRequest = {
   description: string;
   value: number;
   paymentMethod: PaymentMethod;
+  category: CategoryExpense;
+  image: string;
   responsible: string;
+  createAt?: string;
 };
 
 export type CreateExpenseResponse = {
@@ -37,6 +54,8 @@ export type CreateExpenseResponse = {
   description: string;
   value: number;
   paymentMethod: PaymentMethod;
+  category: CategoryExpense;
+  image: string;
   responsible: string;
   createdAt: Date;
   updatedAt: Date;
@@ -44,9 +63,9 @@ export type CreateExpenseResponse = {
 
 // Query keys para React Query
 export const expensesKeys = {
-  all: ["expenses"] as const,
+  all: ['expenses'] as const,
   byEvent: (eventId: string) =>
-    [...expensesKeys.all, "byEvent", eventId] as const,
+    [...expensesKeys.all, 'byEvent', eventId] as const,
   byEventPaginated: (eventId: string, page: number, pageSize: number) =>
-    [...expensesKeys.byEvent(eventId), "paginated", page, pageSize] as const,
+    [...expensesKeys.byEvent(eventId), 'paginated', page, pageSize] as const,
 };

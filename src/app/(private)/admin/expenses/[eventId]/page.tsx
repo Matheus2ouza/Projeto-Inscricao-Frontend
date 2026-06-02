@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import ExpensesByEvent from "@/features/expenses/components/ExpensesByEvent";
-import { useCreateExpense } from "@/features/expenses/hooks/create/useCreateExpense";
-import { useExpensesByEvent } from "@/features/expenses/hooks/useExpensesByEvent";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Card, CardContent, CardFooter } from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import ExpensesByEvent from '@/features/expenses/components/ExpensesByEvent';
+import { useCreateExpense } from '@/features/expenses/hooks/create/useCreateExpense';
+import { useExpensesByEvent } from '@/features/expenses/hooks/useExpensesByEvent';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Card, CardContent, CardFooter } from '@/shared/components/ui/card';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function EventExpensesAdminPage() {
   const [page, setPage] = useState(1);
@@ -34,25 +34,25 @@ export default function EventExpensesAdminPage() {
   const errorMessage =
     error instanceof Error
       ? error
-      : typeof error === "string"
+      : typeof error === 'string'
         ? new Error(error)
         : null;
 
   const handleBack = () => {
-    router.push("/admin/expenses");
+    router.push('/admin/expenses');
   };
 
   const renderSkeletonGrid = () => {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <Card key={index} className="border-0 shadow-sm">
             <CardContent className="p-0">
-              <Skeleton className="w-full h-48 rounded-t-xl" />
+              <Skeleton className="h-48 w-full rounded-t-xl" />
             </CardContent>
             <CardFooter className="flex flex-col items-start p-4">
-              <Skeleton className="h-6 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-1/2 mb-2" />
+              <Skeleton className="mb-2 h-6 w-3/4" />
+              <Skeleton className="mb-2 h-4 w-1/2" />
               <Skeleton className="h-4 w-1/2" />
             </CardFooter>
           </Card>
