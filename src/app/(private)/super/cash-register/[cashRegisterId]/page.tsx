@@ -1,6 +1,7 @@
 "use client";
 
 import CashRegisterDetails from "@/features/cashRegister/components/cashRegisterDetails/CashRegisterDetetails";
+import CashRegisterReportDrawer from "../../../../../../features/cashRegister/components/cashRegisterDetails/CashRegisterReportDrawer";
 import { useActionsCashRegister } from "@/features/cashRegister/hook/cashRegisterDetails/actions/useActionsCashRegister";
 import { useCashRegisterDetails } from "@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterDetails";
 import { useCashRegisterMoviments } from "@/features/cashRegister/hook/cashRegisterDetails/useCashRegisterMoviments";
@@ -70,6 +71,7 @@ export default function CashRegisterDetailsSuperdminPage() {
   const [cashRegisterNumbersLoading, setCashRegisterNumbersLoading] =
     useState(false);
   const [movimentsListLoading, setMovimentsListLoading] = useState(false);
+  const [reportDrawerOpen, setReportDrawerOpen] = useState(false);
 
   const handleBack = () => {
     router.push("/super/cash-register");
@@ -172,9 +174,7 @@ export default function CashRegisterDetailsSuperdminPage() {
         cashRegisterFetching={cashRegisterFetching}
         cashRegisterError={cashRegisterError}
         onRefetchCashRegister={handleRefetchCashRegisterNumbers}
-        onGenerateReport={() =>
-          handleGenerateReport({ cashRegisetrId: cashRegisterId })
-        }
+        onOpenGenerateReport={() => setReportDrawerOpen(true)}
         generatingReport={isGeneratingReport}
         moviments={moviments}
         totalMoviments={totalMoviments}
@@ -191,6 +191,15 @@ export default function CashRegisterDetailsSuperdminPage() {
         futureReleasesError={futureReleasesError}
         onRefetchFutureReleases={() =>
           handleFetchFutureReleases({ cashRegisterId })
+        }
+      />
+      <CashRegisterReportDrawer
+        open={reportDrawerOpen}
+        onOpenChange={setReportDrawerOpen}
+        cashRegisterId={cashRegisterId}
+        generatingReport={isGeneratingReport}
+        onGenerateReport={async (params) =>
+          await handleGenerateReport({ cashRegisterId, ...params })
         }
       />
     );

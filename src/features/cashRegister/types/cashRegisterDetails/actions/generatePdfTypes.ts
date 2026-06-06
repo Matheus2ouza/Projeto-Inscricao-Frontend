@@ -1,8 +1,12 @@
 export type generatePdfParams = {
-  cashRegisetrId: string;
+  cashRegisterId: string;
+  listExpenseCategory: boolean;
+  moviments: boolean;
+  favorite: boolean;
 };
 
 export type generatePdfResponse = {
-  pdfBase64: string;
+  fileBase64: string;
   filename: string;
+  contentType: 'application/pdf' | 'application/zip';
 };
