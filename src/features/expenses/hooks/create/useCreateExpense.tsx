@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -9,8 +9,8 @@ import { createExpense } from '../../api/create/createExpense';
 import {
   CategoryExpense,
   CreateExpenseRequest,
-  expensesKeys,
-} from '../../types/expensesTypes';
+} from '../../types/createExpense/createExpenseTypes';
+import { useInvalidateListExpensesQuery } from '../listExpenses/useListExpensesQuery';
 
 const createExpenseSchema = z.object({
   description: z.string().min(1, 'Descrição é obrigatória'),
@@ -28,8 +28,8 @@ const createExpenseSchema = z.object({
 
 export type CreateExpenseFormData = z.input<typeof createExpenseSchema>;
 
-export function useCreateExpense(eventId: string) {
-  const queryClient = useQueryClient();
+export function useCreateExpense(eventId?: string) {
+  const { invalidateLists } = useInvalidateListExpensesQuery();
 
   const form = useForm<CreateExpenseFormData>({
     resolver: zodResolver(createExpenseSchema),
@@ -61,9 +61,7 @@ export function useCreateExpense(eventId: string) {
       toast.success('Gasto criado com sucesso!');
       form.reset();
       // Invalidar queries relacionadas aos gastos do evento
-      queryClient.invalidateQueries({
-        queryKey: expensesKeys.byEvent(eventId),
-      });
+      invalidateLists();
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Erro ao criar gasto');

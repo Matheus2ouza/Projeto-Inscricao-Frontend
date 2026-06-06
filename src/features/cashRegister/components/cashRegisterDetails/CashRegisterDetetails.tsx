@@ -16,6 +16,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from 'lucide-react';
+import { useState } from 'react';
 import type { FutureRelease } from '../../types/cashRegisterDetails/actions/futureReleasesTypes';
 import type { generatePdfResponse } from '../../types/cashRegisterDetails/actions/generatePdfTypes';
 import {
@@ -24,16 +25,24 @@ import {
   CashRegisterStatus,
   Moviment,
 } from '../../types/cashRegisterDetails/cashRegisterDetailsType';
+import CashRegisterReportDrawer from './CashRegisterReportDrawer';
 import { FutureReleasesChart } from './FutureReleasesChart';
 
 interface CashRegisterDetailsProps {
   cashRegister: CashRegister | null;
+  cashRegisterId: string;
   onOpenCreateNewRegister?: () => void;
   cashRegisterLoading: boolean;
   cashRegisterFetching: boolean;
   cashRegisterError: string | null;
   onRefetchCashRegister: () => void;
-  onGenerateReport: () => Promise<generatePdfResponse>;
+
+  onGenerateReport: (params: {
+    listExpenseCategory: boolean;
+    moviments: boolean;
+    favorite: boolean;
+  }) => Promise<generatePdfResponse>;
+
   generatingReport: boolean;
   moviments: Moviment[] | null;
   totalMoviments: number;
@@ -53,6 +62,7 @@ interface CashRegisterDetailsProps {
 
 export default function CashRegisterDetails({
   cashRegister,
+  cashRegisterId,
   onOpenCreateNewRegister,
   cashRegisterLoading,
   cashRegisterFetching,
@@ -75,6 +85,8 @@ export default function CashRegisterDetails({
   futureReleasesError = null,
   onRefetchFutureReleases,
 }: CashRegisterDetailsProps) {
+  const [reportDrawerOpen, setReportDrawerOpen] = useState(false);
+
   const statusInfo = (status?: CashRegisterStatus | null) => {
     if (status === CashRegisterStatus.OPEN) {
       return {
@@ -191,7 +203,7 @@ export default function CashRegisterDetails({
 
             <Button
               type="primary"
-              onClick={onGenerateReport}
+              onClick={() => setReportDrawerOpen(true)}
               icon={<Download className="h-4 w-4" />}
               loading={generatingReport && { icon: <SyncOutlined spin /> }}
               disabled={!cashRegister}
@@ -675,6 +687,12 @@ export default function CashRegisterDetails({
           </div>
         )}
       </div>
+      <CashRegisterReportDrawer
+        open={reportDrawerOpen}
+        onOpenChange={setReportDrawerOpen}
+        generatingReport={generatingReport}
+        onGenerateReport={onGenerateReport}
+      />
     </div>
   );
 }

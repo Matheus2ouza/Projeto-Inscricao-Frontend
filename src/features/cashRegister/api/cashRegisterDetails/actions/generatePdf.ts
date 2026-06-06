@@ -1,15 +1,28 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import axiosInstance from '@/shared/lib/apiClient';
+import qs from 'qs';
 import {
   generatePdfParams,
   generatePdfResponse,
-} from "../../../types/cashRegisterDetails/actions/generatePdfTypes";
+} from '../../../types/cashRegisterDetails/actions/generatePdfTypes';
 
 export async function generatePdf({
-  cashRegisetrId,
+  cashRegisterId,
+  listExpenseCategory,
+  moviments,
+  favorite,
 }: generatePdfParams): Promise<generatePdfResponse> {
   try {
     const { data } = await axiosInstance.get<generatePdfResponse>(
-      `cash-register/${cashRegisetrId}/pdf`,
+      `cash-register/${cashRegisterId}/pdf`,
+      {
+        params: {
+          listExpenseCategory,
+          moviments,
+          favorite,
+        },
+        paramsSerializer: (params) =>
+          qs.stringify(params, { arrayFormat: 'repeat' }),
+      },
     );
     return data;
   } catch (error) {
@@ -21,7 +34,7 @@ export async function generatePdf({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

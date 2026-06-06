@@ -48,6 +48,7 @@ const AVAILABLE_COLUMNS: Array<{
   { id: 'preferredName', label: 'Nome preferencial' },
   { id: 'cpf', label: 'CPF' },
   { id: 'birthDate', label: 'Idade' },
+  { id: 'phone', label: 'Telefone' },
   { id: 'gender', label: 'Gênero' },
   { id: 'shirtSize', label: 'Tamanho da camiseta' },
   { id: 'shirtType', label: 'Tipo de camiseta' },

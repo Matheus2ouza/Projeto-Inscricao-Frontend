@@ -1,34 +1,33 @@
 'use client';
 
-import ListExpenses from '@/features/expenses/components/listExpense/ListExpenses';
-import { useCreateExpense } from '@/features/expenses/hooks/create/useCreateExpense';
-import { useListExpense } from '@/features/expenses/hooks/listExpenses/useListExpenses';
+import DetailsExpense from '@/features/expenses/components/detailsExpense/DetailsExpense';
+import { useDetailsExpense } from '@/features/expenses/hooks/detailsExpense/useDetailsExpense';
 import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useParams, useRouter } from 'next/navigation';
 
-export default function ListExpensesAdminPage() {
+export default function DetailsExpenseAdminPage() {
   const params = useParams();
   const router = useRouter();
+
+  // pega o id do evento
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
-  const { expense, total, loading, error, page, pageCount, setPage } =
-    useListExpense({
-      eventId,
-      initialPage: 1,
-      pageSize: 12,
+  const rawExpenseId = params.expenseId;
+  const expenseId = Array.isArray(rawExpenseId)
+    ? rawExpenseId[0]
+    : rawExpenseId;
+
+  const { expense, loading, fetched, fetching, error, refresh } =
+    useDetailsExpense({
+      expenseId,
     });
 
-  const createExpenseForm = useCreateExpense(eventId);
-
   const handleBack = () => {
-    router.push('/admin/expenses');
-  };
-
-  const handleViewDetails = (expenseId: string) => {
-    router.push(`/admin/expenses/${eventId}/${expenseId}`);
+    router.back();
   };
 
   const renderSkeletonGrid = () => {
@@ -74,49 +73,31 @@ export default function ListExpensesAdminPage() {
       return renderSkeletonGrid();
     }
 
-    if (error) {
+    if (error || expense === null) {
       return (
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-6 text-center text-red-600">
-            {error.message}
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (expense.length === 0) {
-      return (
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-10 text-center">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Nenhum gasto registrado
-            </h3>
-            <p className="mt-2 text-gray-500 dark:text-gray-400">
-              Registre um gasto para aparecer aqui.
+        <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+          <div>
+            <p className="font-semibold text-red-600 dark:text-red-400">
+              Não foi possível retornar os detalhes deste gasto.
             </p>
-          </CardContent>
-        </Card>
+            <p className="text-muted-foreground mt-1 max-w-md">
+              {error || 'Tente novamente em instantes.'}
+            </p>
+          </div>
+          <Button onClick={() => refresh()} variant="outline">
+            Tentar novamente
+          </Button>
+        </div>
       );
     }
 
-    return (
-      <ListExpenses
-        expenses={expense}
-        total={total}
-        page={page}
-        pageSize={10}
-        pageCount={pageCount}
-        onViewDetails={handleViewDetails}
-        onPageChange={setPage}
-        createForm={createExpenseForm}
-      />
-    );
+    return <DetailsExpense expense={expense} />;
   };
 
   return (
     <PageContainer
-      title="Gastos do Evento"
-      description="Registre e acompanhe os gastos associados ao evento."
+      title="Detalhes do gasto"
+      description="Abaixo verá os detalhes do gasto selecionado"
       showBackButton
       backButtonAction={handleBack}
     >

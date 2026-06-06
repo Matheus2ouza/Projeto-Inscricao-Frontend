@@ -494,7 +494,7 @@ export default function ListInscriptionsTable({
                   showSizeChanger={false}
                   onChange={(next) => onPageChange(next)}
                   responsive
-                  size="small"
+                  size="middle"
                 />
                 <div className="text-foreground text-sm font-semibold">
                   Página <span className="font-bold">{page}</span> de{' '}

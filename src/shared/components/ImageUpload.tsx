@@ -2,7 +2,7 @@
 
 import type { UploadFile, UploadProps } from 'antd';
 import { Image as AntImage, message, Upload } from 'antd';
-import { Eye, ImageIcon, UploadCloud, Trash2 } from 'lucide-react';
+import { Eye, ImageIcon, Trash2, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import * as React from 'react';
 

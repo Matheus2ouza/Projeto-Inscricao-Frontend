@@ -1,7 +1,7 @@
 import {
   CreateExpenseRequest,
   CreateExpenseResponse,
-} from '@/features/expenses/types/expensesTypes';
+} from '@/features/expenses/types/createExpense/createExpenseTypes';
 import axiosInstance from '@/shared/lib/apiClient';
 
 export async function createExpense(
@@ -9,7 +9,7 @@ export async function createExpense(
 ): Promise<CreateExpenseResponse> {
   try {
     const { data } = await axiosInstance.post<CreateExpenseResponse>(
-      '/event-expenses/create',
+      '/expenses/create',
       expenseData,
     );
     return data;

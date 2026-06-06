@@ -192,8 +192,9 @@ export default function CashRegisterDetailsAdminPage() {
         cashRegisterFetching={cashRegisterFetching}
         cashRegisterError={cashRegisterError}
         onRefetchCashRegister={handleRefetchCashRegisterNumbers}
-        onGenerateReport={() =>
-          handleGenerateReport({ cashRegisetrId: cashRegisterId })
+        cashRegisterId={cashRegisterId}
+        onGenerateReport={async (params) =>
+          await handleGenerateReport({ cashRegisterId, ...params })
         }
         generatingReport={isGeneratingReport}
         moviments={moviments}
