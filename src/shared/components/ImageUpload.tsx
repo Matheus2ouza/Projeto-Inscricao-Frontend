@@ -2,8 +2,7 @@
 
 import type { UploadFile, UploadProps } from 'antd';
 import { Image as AntImage, message, Upload } from 'antd';
-import { Eye, ImageIcon, Trash2, UploadCloud } from 'lucide-react';
-import Image from 'next/image';
+import { Eye, ImageIcon, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 
 const fileToDataUrl = (file: File): Promise<string> =>
@@ -21,25 +20,23 @@ export type ImageUploadProps = {
   disabled?: boolean;
   accept?: string;
   title?: string;
-  description?: string;
   onInvalidFile?: (message: string) => void;
-  onDataUrlChange?: (dataUrl: string | null) => void;
-  onDataUrlsChange?: (dataUrls: string[]) => void;
+  onDataUrlsChange?: (dataUrls: string[] | string | null) => void; // Alterado para aceitar string | null também
   className?: string;
+  singleMode?: boolean; // Nova prop para indicar modo single
 };
 
 export default function ImageUpload({
   value,
   onChange,
-  maxCount = 1,
+  maxCount = 10,
   disabled = false,
   accept = 'image/*',
-  title = 'Clique para selecionar',
-  description = 'ou arraste e solte a imagem aqui',
+  title = 'Adicionar imagem',
   onInvalidFile,
-  onDataUrlChange,
   onDataUrlsChange,
   className,
+  singleMode = false, // Default false para manter compatibilidade
 }: ImageUploadProps) {
   const resolvedMaxCount = Math.max(1, maxCount);
   const multiple = resolvedMaxCount > 1;
@@ -47,8 +44,9 @@ export default function ImageUpload({
   const [previewByUid, setPreviewByUid] = React.useState<
     Record<string, string>
   >({});
-  const [previewOpen, setPreviewOpen] = React.useState(false);
-  const [previewImage, setPreviewImage] = React.useState('');
+  const [previewVisible, setPreviewVisible] = React.useState(false);
+  const [previewIndex, setPreviewIndex] = React.useState(0);
+  const [prevUrlsRef, setPrevUrlsRef] = React.useState<string[]>([]);
 
   const fileList = React.useMemo(() => {
     const list = Array.isArray(value) ? value : [];
@@ -97,30 +95,27 @@ export default function ImageUpload({
     void updatePreviews();
   }, [updatePreviews]);
 
+  // Só chama onDataUrlsChange quando as URLs realmente mudarem
   React.useEffect(() => {
-    if (resolvedMaxCount === 1) {
-      const first = fileList[0];
-      const url = first
-        ? (previewByUid[String(first.uid)] ?? first.thumbUrl ?? first.url)
-        : undefined;
-      onDataUrlChange?.(url ? String(url) : null);
-      return;
-    }
+    const urls = fileList
+      .map((f) => previewByUid[String(f.uid)] ?? f.thumbUrl ?? f.url)
+      .filter((u): u is string => Boolean(u))
+      .map(String);
 
-    if (resolvedMaxCount > 1) {
-      const urls = fileList
-        .map((f) => previewByUid[String(f.uid)] ?? f.thumbUrl ?? f.url)
-        .filter((u): u is string => Boolean(u))
-        .map(String);
-      onDataUrlsChange?.(urls);
+    // Compara com as URLs anteriores para evitar loop infinito
+    if (JSON.stringify(urls) !== JSON.stringify(prevUrlsRef)) {
+      setPrevUrlsRef(urls);
+
+      // Se estiver em modo single, retorna string ou null
+      if (singleMode) {
+        const result = urls.length > 0 ? urls[0] : null;
+        onDataUrlsChange?.(result);
+      } else {
+        // Modo multiple, retorna array
+        onDataUrlsChange?.(urls);
+      }
     }
-  }, [
-    fileList,
-    onDataUrlChange,
-    onDataUrlsChange,
-    previewByUid,
-    resolvedMaxCount,
-  ]);
+  }, [fileList, onDataUrlsChange, previewByUid, prevUrlsRef, singleMode]);
 
   const beforeUpload: UploadProps['beforeUpload'] = (file) => {
     if (!file.type.startsWith('image/')) {
@@ -137,134 +132,101 @@ export default function ImageUpload({
     onChange(trimmed);
   };
 
-  const handleRemove = (uid: string) => {
+  const handleRemoveImage = (uid: string) => {
     onChange(fileList.filter((f) => String(f.uid) !== uid));
   };
 
-  const handlePreview = async (file: UploadFile) => {
-    const uid = String(file.uid);
-    const existing = previewByUid[uid] ?? file.thumbUrl ?? file.url;
-    let nextPreview = existing ? String(existing) : '';
-
-    if (!nextPreview) {
-      const origin = file.originFileObj as File | undefined;
-      if (origin) {
-        try {
-          nextPreview = await fileToDataUrl(origin);
-        } catch {
-          nextPreview = '';
-        }
-      }
-    }
-
-    if (!nextPreview) return;
-
-    setPreviewImage(nextPreview);
-    setPreviewOpen(true);
+  const handlePreview = (index: number) => {
+    setPreviewIndex(index);
+    setPreviewVisible(true);
   };
 
-  const renderPreviewGrid = () => {
-    if (fileList.length === 0) return null;
+  const getImageUrl = (file: UploadFile): string => {
+    return previewByUid[String(file.uid)] ?? file.thumbUrl ?? file.url ?? '';
+  };
 
-    return (
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-        {fileList.map((file) => {
-          const url =
-            previewByUid[String(file.uid)] ?? file.thumbUrl ?? file.url ?? '';
-
-          return (
-            <div
-              key={String(file.uid)}
-              className="group border-border/70 bg-background/80 relative overflow-hidden rounded-xl border shadow-sm backdrop-blur-sm"
-            >
-              <div className="relative aspect-square">
-                {url ? (
-                  <Image
-                    src={String(url)}
-                    alt={file.name ?? 'Imagem'}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="text-muted-foreground flex h-full w-full items-center justify-center">
-                    <ImageIcon className="h-6 w-6" />
-                  </div>
-                )}
-
-                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/20 group-hover:opacity-100">
-                  <button
-                    type="button"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/90 text-zinc-800 shadow-sm transition hover:scale-105 hover:bg-white dark:border-white/10 dark:bg-zinc-950/85 dark:text-white"
-                    onClick={() => handlePreview(file)}
-                    aria-label="Visualizar imagem"
-                    disabled={disabled}
-                  >
-                    <Eye className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/90 text-zinc-800 shadow-sm transition hover:scale-105 hover:bg-white dark:border-white/10 dark:bg-zinc-950/85 dark:text-white"
-                    onClick={() => handleRemove(String(file.uid))}
-                    aria-label="Remover imagem"
-                    disabled={disabled}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+  const renderUploadThumbnail = () => (
+    <Upload.Dragger
+      multiple={multiple}
+      maxCount={resolvedMaxCount}
+      beforeUpload={beforeUpload}
+      accept={accept}
+      fileList={fileList}
+      onChange={handleChange}
+      disabled={disabled}
+      showUploadList={false}
+      className="!m-0 h-32 w-32 rounded-lg border-2 border-dashed p-0 transition-colors hover:border-blue-500 hover:bg-blue-50/5 dark:hover:border-blue-500"
+    >
+      <div className="flex h-full w-full flex-col items-center justify-center gap-1">
+        <Plus className="h-6 w-6 text-slate-400 dark:text-slate-500" />
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          {title}
+        </span>
       </div>
-    );
-  };
+    </Upload.Dragger>
+  );
 
   return (
-    <div className="space-y-4">
-      <Upload.Dragger
-        multiple={multiple}
-        maxCount={resolvedMaxCount}
-        beforeUpload={beforeUpload}
-        accept={accept}
-        fileList={fileList}
-        onChange={handleChange}
-        disabled={disabled}
-        showUploadList={false}
-        className={
-          className ??
-          'hover:border-primary hover:bg-primary/5 dark:hover:border-primary rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-8 text-center transition-colors dark:border-zinc-700 dark:bg-zinc-900'
-        }
-      >
-        <div className="flex flex-col items-center gap-3 text-center">
-          <UploadCloud className="text-muted-foreground h-12 w-12" />
-          <div>
-            <p className="text-base font-semibold text-slate-700 dark:text-slate-300">
-              {title}
-            </p>
-            <p className="text-muted-foreground text-sm">{description}</p>
-          </div>
-          <div className="text-muted-foreground text-xs">
-            {multiple ? `Até ${resolvedMaxCount} imagens` : '1 imagem'}
-          </div>
-        </div>
-      </Upload.Dragger>
+    <div className={`flex flex-wrap gap-3 ${className || ''}`}>
+      {fileList.map((file, index) => {
+        const imageUrl = getImageUrl(file);
+        return (
+          <div
+            key={file.uid}
+            className="group relative h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={file.name ?? `Imagem ${index + 1}`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <ImageIcon className="h-8 w-8 text-slate-400" />
+              </div>
+            )}
 
-      {renderPreviewGrid()}
+            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/20 group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={() => handlePreview(index)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/90 text-zinc-800 shadow-sm transition hover:scale-105 hover:bg-white dark:border-white/10 dark:bg-zinc-950/85 dark:text-white"
+                aria-label="Visualizar imagem"
+                disabled={disabled}
+              >
+                <Eye className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(String(file.uid))}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/90 text-zinc-800 shadow-sm transition hover:scale-105 hover:bg-white dark:border-white/10 dark:bg-zinc-950/85 dark:text-white"
+                aria-label="Remover imagem"
+                disabled={disabled}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        );
+      })}
 
-      {previewImage ? (
-        <AntImage
-          styles={{ root: { display: 'none' } }}
-          preview={{
-            open: previewOpen,
-            onOpenChange: (visible) => setPreviewOpen(visible),
-            afterOpenChange: (visible) => {
-              if (!visible) setPreviewImage('');
-            },
-          }}
-          src={previewImage}
-        />
-      ) : null}
+      {!disabled &&
+        fileList.length < resolvedMaxCount &&
+        renderUploadThumbnail()}
+
+      {fileList.length > 0 &&
+        fileList[previewIndex] &&
+        getImageUrl(fileList[previewIndex]) && (
+          <AntImage
+            src={getImageUrl(fileList[previewIndex])}
+            preview={{
+              open: previewVisible,
+              onOpenChange: (visible) => setPreviewVisible(visible),
+            }}
+            style={{ display: 'none' }}
+          />
+        )}
     </div>
   );
 }
