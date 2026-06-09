@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import MovimentDetailsContent from "@/features/cashRegister/components/movimentDetails/MovimentDetails";
-import { useMovimentDetails } from "@/features/cashRegister/hook/movimentDetails/useMovimentDetails";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { useParams, useRouter } from "next/navigation";
+import MovimentDetailsContent from '@/features/cashRegister/components/movimentDetails/MovimentDetails';
+import { useMovimentDetails } from '@/features/cashRegister/hook/movimentDetails/useMovimentDetails';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function MovimentDetailAdminPage() {
   const { user } = useCurrentUser();
@@ -59,8 +59,8 @@ export default function MovimentDetailAdminPage() {
 
     if (error) {
       return (
-        <div className="p-6 flex items-center justify-center min-h-96">
-          <div className="text-center text-destructive">
+        <div className="flex min-h-96 items-center justify-center p-6">
+          <div className="text-destructive text-center">
             <p className="mb-4">
               Erro ao carregar detalhes do pagamento: {error}
             </p>
@@ -87,7 +87,7 @@ export default function MovimentDetailAdminPage() {
     <PageContainer
       title="Detalhes do Movimento"
       description={
-        fetching ? "Carregando..." : movimentDetails?.id || "Movimento"
+        fetching ? 'Carregando...' : movimentDetails?.id || 'Movimento'
       }
       showBackButton
       backButtonAction={handleBack}

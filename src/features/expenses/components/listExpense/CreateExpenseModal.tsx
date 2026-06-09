@@ -1,6 +1,5 @@
 'use client';
 
-import type { CreateExpenseFormData } from '@/features/expenses/hooks/create/useCreateExpense';
 import ImageUpload from '@/shared/components/ImageUpload';
 import type { UploadFile } from 'antd';
 import {
@@ -16,6 +15,7 @@ import dayjs from 'dayjs';
 import type { BaseSyntheticEvent } from 'react';
 import { useState } from 'react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
+import { expenseFormData } from '../../schema/createExpense/createExpenseSchema';
 import {
   CategoryExpense,
   PaymentMethod,
@@ -24,7 +24,7 @@ import {
 interface CreateExpenseModalProps {
   open: boolean;
   onClose: () => void;
-  form: UseFormReturn<CreateExpenseFormData>;
+  form: UseFormReturn<expenseFormData>;
   onSubmit: (
     event?: BaseSyntheticEvent,
   ) => Promise<boolean | void> | boolean | void;
@@ -236,30 +236,28 @@ export default function CreateExpenseModal({
 
           <Controller
             control={form.control}
-            name="image"
+            name="images"
             render={({ field, fieldState }) => (
               <AntForm.Item
                 label="Imagem (opcional)"
                 validateStatus={fieldState.error ? 'error' : undefined}
                 help={fieldState.error?.message}
-                className="mb-0 md:col-span-2"
+                className="mb-0 md:col-span-3"
               >
                 <ImageUpload
                   value={uploadedFiles}
                   onChange={setUploadedFiles}
-                  maxCount={1}
-                  title="Selecione a imagem"
-                  description="ou arraste e solte"
-                  onDataUrlChange={(dataUrl) => {
-                    field.onChange(dataUrl || '');
+                  maxCount={10}
+                  title="Adicionar imagem"
+                  onDataUrlsChange={(dataUrls) => {
+                    field.onChange(dataUrls);
                   }}
-                  className="hover:border-primary hover:bg-primary/5 dark:hover:border-primary rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-3 text-center transition-colors dark:border-zinc-700 dark:bg-zinc-900"
                 />
               </AntForm.Item>
             )}
           />
 
-          <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end sm:gap-3 md:col-span-2">
+          <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:gap-3 md:col-span-3 lg:justify-end">
             <AntButton onClick={handleDialogClose} disabled={submitting}>
               Cancelar
             </AntButton>
