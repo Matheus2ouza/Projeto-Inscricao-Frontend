@@ -4,54 +4,42 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { z } from 'zod';
 import { createExpense } from '../../api/create/createExpense';
+import {
+  expenseSchema,
+  type expenseFormData,
+} from '../../schema/createExpense/createExpenseSchema';
 import {
   CategoryExpense,
   CreateExpenseRequest,
+  PaymentMethod,
 } from '../../types/createExpense/createExpenseTypes';
 import { useInvalidateListExpensesQuery } from '../listExpenses/useListExpensesQuery';
-
-const createExpenseSchema = z.object({
-  description: z.string().min(1, 'Descrição é obrigatória'),
-  value: z.number().min(0.01, 'Valor deve ser maior que zero'),
-  paymentMethod: z.enum(['PIX', 'CARTAO', 'DINHEIRO'], {
-    message: 'Método de pagamento é obrigatório',
-  }),
-  category: z.nativeEnum(CategoryExpense, {
-    message: 'Categoria é obrigatória',
-  }),
-  responsible: z.string().min(1, 'Responsável é obrigatório'),
-  image: z.string().default(''),
-  createAt: z.string().datetime().optional(),
-});
-
-export type CreateExpenseFormData = z.input<typeof createExpenseSchema>;
 
 export function useCreateExpense(eventId?: string) {
   const { invalidateLists } = useInvalidateListExpensesQuery();
 
-  const form = useForm<CreateExpenseFormData>({
-    resolver: zodResolver(createExpenseSchema),
+  const form = useForm<expenseFormData>({
+    resolver: zodResolver(expenseSchema),
     defaultValues: {
       description: '',
       value: 0,
-      paymentMethod: 'PIX',
+      paymentMethod: PaymentMethod.PIX,
       category: CategoryExpense.OUTROS,
       responsible: '',
-      image: '',
+      images: [],
     },
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: CreateExpenseFormData) => {
+    mutationFn: async (data: expenseFormData) => {
       const expenseData: CreateExpenseRequest = {
         eventId,
         description: data.description,
         value: data.value,
         paymentMethod: data.paymentMethod,
         category: data.category,
-        image: data.image ?? '',
+        images: data.images ?? [],
         responsible: data.responsible,
         createAt: data.createAt,
       };

@@ -7,7 +7,7 @@ export type InscriptionStatus =
 
 export type RegisterPaymentInput = {
   amount: number;
-  image: string;
+  image: string | string[] | null;
   isGuest: boolean;
   guestName?: string;
   accountId?: string;
