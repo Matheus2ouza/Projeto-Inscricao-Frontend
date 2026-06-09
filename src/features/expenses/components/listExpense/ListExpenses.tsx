@@ -1,6 +1,5 @@
 'use client';
 
-import type { CreateExpenseFormData } from '@/features/expenses/hooks/create/useCreateExpense';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/shared/components/ui/card';
@@ -9,6 +8,7 @@ import { Calendar, DollarSign, Eye, Plus, User } from 'lucide-react';
 import type { BaseSyntheticEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
+import { expenseFormData } from '../../schema/createExpense/createExpenseSchema';
 import { Expense, PaymentMethod } from '../../types/listExpenses/expensesTypes';
 import CreateExpenseModal from './CreateExpenseModal';
 
@@ -21,7 +21,7 @@ interface ExpensesByEventProps {
   onViewDetails: (expenseId: string) => void;
   onPageChange: (page: number) => void;
   createForm: {
-    form: UseFormReturn<CreateExpenseFormData>;
+    form: UseFormReturn<expenseFormData>;
     onSubmit: (
       event?: BaseSyntheticEvent,
     ) => Promise<boolean | void> | boolean | void;
@@ -86,9 +86,27 @@ export default function ListExpenses({
           onClick={() => setOpenCreate(true)}
           className="flex items-center gap-2"
         >
-          <Plus className="h-4 w-4" /> Novo Gasto
+          <Plus className="h-4 w-4" /> Registrar Gasto
         </Button>
       </div>
+
+      {expenses.length === 0 && (
+        <Card className="border-dashed shadow-none">
+          <CardContent className="flex flex-col items-center justify-center py-14 text-center">
+            <h3 className="text-lg font-semibold"> Nenhum gasto registrado </h3>
+            <p className="text-muted-foreground mt-2 max-w-sm text-sm">
+              Ainda não existem gastos cadastrados para este evento. Deseja
+              registrar o primeiro gasto?
+            </p>
+            <Button
+              onClick={() => setOpenCreate(true)}
+              className="mt-6 flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" /> Registrar primeiro gasto
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       <CreateExpenseModal
         open={openCreate}
