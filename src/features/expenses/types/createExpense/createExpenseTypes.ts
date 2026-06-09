@@ -1,4 +1,8 @@
-export type PaymentMethod = 'PIX' | 'CARTAO' | 'DINHEIRO';
+export enum PaymentMethod {
+  PIX = 'PIX',
+  CARTAO = 'CARTAO',
+  DINHEIRO = 'DINHEIRO',
+}
 
 export enum CategoryExpense {
   BRINDES = 'BRINDES',
@@ -20,7 +24,7 @@ export type Expense = {
   value: number;
   paymentMethod: PaymentMethod;
   category: CategoryExpense;
-  image: string;
+  images: string;
   responsible: string;
   createdAt: Date;
   updatedAt: Date;
@@ -32,20 +36,11 @@ export type CreateExpenseRequest = {
   value: number;
   paymentMethod: PaymentMethod;
   category: CategoryExpense;
-  image: string;
+  images: string[];
   responsible: string;
   createAt?: string;
 };
 
 export type CreateExpenseResponse = {
   id: string;
-  eventId: string;
-  description: string;
-  value: number;
-  paymentMethod: PaymentMethod;
-  category: CategoryExpense;
-  image: string;
-  responsible: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
