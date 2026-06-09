@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DetailsExpenseResponse } from '../../types/detailsExpense/detailsExpenseTypes';
 
 export const detailsExpenseKeys = {
-  all: ['list-inscriptions'] as const,
+  all: ['details-expense'] as const,
   lists: () => [...detailsExpenseKeys.all, 'list'] as const,
   list: (expenseId?: string) =>
     [...detailsExpenseKeys.lists(), expenseId] as const,
@@ -38,6 +38,12 @@ export function useInvalidateDetailsExpenseQuery() {
 
     invalidateList: (expenseId?: string) => {
       queryClient.invalidateQueries({
+        queryKey: detailsExpenseKeys.list(expenseId),
+      });
+    },
+
+    removeList: (expenseId?: string) => {
+      queryClient.removeQueries({
         queryKey: detailsExpenseKeys.list(expenseId),
       });
     },

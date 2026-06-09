@@ -1,20 +1,20 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCashRegisterMoviments } from "../../api/cashRegisterDetails/getCashRegisterMoviments";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getCashRegisterMoviments } from '../../api/cashRegisterDetails/getCashRegisterMoviments';
 import {
   CashEntryType,
   GetCashRegisterMovimentsResponse,
-} from "../../types/cashRegisterDetails/cashRegisterDetailsType";
+} from '../../types/cashRegisterDetails/cashRegisterDetailsType';
 
 export const cashRegisterMovimentsKeys = {
-  all: ["cash-register-moviments"] as const,
-  lists: () => [...cashRegisterMovimentsKeys.all, "list"] as const,
+  all: ['cash-register-moviments'] as const,
+  lists: () => [...cashRegisterMovimentsKeys.all, 'list'] as const,
   list: (
     cashRegisterId: string,
     page: number,
     pageSize: number,
     type?: CashEntryType[],
     limitTime?: string,
-    orderBy?: "asc" | "desc",
+    orderBy?: 'asc' | 'desc',
   ) =>
     [
       ...cashRegisterMovimentsKeys.lists(),
@@ -28,7 +28,7 @@ export function useCashRegisterMovimentsQuery(
   pageSize: number = 10,
   type?: CashEntryType[],
   limitTime?: string,
-  orderBy?: "asc" | "desc",
+  orderBy?: 'asc' | 'desc',
 ) {
   return useQuery<GetCashRegisterMovimentsResponse>({
     queryKey: cashRegisterMovimentsKeys.list(
@@ -76,7 +76,7 @@ export function useInvalidateCashRegisterMovimentsQuery() {
       pageSize: number,
       type?: CashEntryType[],
       limitTime?: string,
-      orderBy?: "asc" | "desc",
+      orderBy?: 'asc' | 'desc',
     ) => {
       queryClient.invalidateQueries({
         queryKey: cashRegisterMovimentsKeys.list(
@@ -98,9 +98,9 @@ export function useInvalidateCashRegisterMovimentsQuery() {
           if (key[0] !== cashRegisterMovimentsKeys.all[0]) return false;
           const last = key[key.length - 1];
           return (
-            typeof last === "object" &&
+            typeof last === 'object' &&
             last !== null &&
-            "cashRegisterId" in last &&
+            'cashRegisterId' in last &&
             (last as { cashRegisterId?: unknown }).cashRegisterId ===
               cashRegisterId
           );
@@ -126,7 +126,7 @@ export function useInvalidateCashRegisterMovimentsQuery() {
       pageSize: number,
       type?: CashEntryType[],
       limitTime?: string,
-      orderBy?: "asc" | "desc",
+      orderBy?: 'asc' | 'desc',
     ) => {
       queryClient.removeQueries({
         queryKey: cashRegisterMovimentsKeys.list(
@@ -148,9 +148,9 @@ export function useInvalidateCashRegisterMovimentsQuery() {
           if (key[0] !== cashRegisterMovimentsKeys.all[0]) return false;
           const last = key[key.length - 1];
           return (
-            typeof last === "object" &&
+            typeof last === 'object' &&
             last !== null &&
-            "cashRegisterId" in last &&
+            'cashRegisterId' in last &&
             (last as { cashRegisterId?: unknown }).cashRegisterId ===
               cashRegisterId
           );
@@ -170,7 +170,7 @@ export function usePrefetchCashRegisterMovimentsQuery() {
       pageSize: number,
       type?: CashEntryType[],
       limitTime?: string,
-      orderBy?: "asc" | "desc",
+      orderBy?: 'asc' | 'desc',
     ) => {
       queryClient.prefetchQuery({
         queryKey: cashRegisterMovimentsKeys.list(

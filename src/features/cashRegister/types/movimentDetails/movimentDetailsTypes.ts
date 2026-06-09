@@ -1,44 +1,44 @@
 export enum CashRegisterStatus {
-  OPEN = "OPEN",
-  CLOSED = "CLOSED",
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
 }
 
 export enum CashEntryType {
-  INCOME = "INCOME",
-  EXPENSE = "EXPENSE",
-  WITHDRAWAL = "WITHDRAWAL",
+  INCOME = 'INCOME',
+  EXPENSE = 'EXPENSE',
+  WITHDRAWAL = 'WITHDRAWAL',
 }
 
 export enum PaymentMethod {
-  DINHEIRO = "DINHEIRO",
-  PIX = "PIX",
-  CARTAO = "CARTAO",
+  DINHEIRO = 'DINHEIRO',
+  PIX = 'PIX',
+  CARTAO = 'CARTAO',
 }
 
 export enum CashEntryOrigin {
-  ASAAS = "ASAAS",
-  INTERNAL = "INTERNAL",
-  ONSITE = "ONSITE",
-  EXPENSE = "EXPENSE",
-  TICKET = "TICKET",
-  TRANSFER = "TRANSFER",
-  MANUAL = "MANUAL",
+  ASAAS = 'ASAAS',
+  INTERNAL = 'INTERNAL',
+  ONSITE = 'ONSITE',
+  EXPENSE = 'EXPENSE',
+  TICKET = 'TICKET',
+  TRANSFER = 'TRANSFER',
+  MANUAL = 'MANUAL',
 }
 
-export type GenderType = "MASCULINO" | "FEMININO";
+export type GenderType = 'MASCULINO' | 'FEMININO';
 
 export type InscriptionStatus =
-  | "PENDING"
-  | "UNDER_REVIEW"
-  | "PAID"
-  | "EXPIRED"
-  | "CANCELLED";
+  | 'PENDING'
+  | 'UNDER_REVIEW'
+  | 'PAID'
+  | 'EXPIRED'
+  | 'CANCELLED';
 
 export type TicketSaleStatus =
-  | "PENDING"
-  | "UNDER_REVIEW"
-  | "PAID"
-  | "CANCELLED";
+  | 'PENDING'
+  | 'UNDER_REVIEW'
+  | 'PAID'
+  | 'CANCELLED';
 
 export type ReferenceParticipant = {
   name: string;
@@ -48,7 +48,7 @@ export type ReferenceParticipant = {
 };
 
 export type InscriptionReference = {
-  kind: "INSCRIPTION";
+  kind: 'INSCRIPTION';
   paymentInstallmentId: string;
   inscription?: {
     id: string;
@@ -65,7 +65,7 @@ export type InscriptionReference = {
 };
 
 export type OnSiteRegistrationReference = {
-  kind: "ONSITE_REGISTRATION";
+  kind: 'ONSITE_REGISTRATION';
   onSiteRegistrationId: string;
   onSiteRegistration?: {
     id: string;
@@ -78,7 +78,7 @@ export type OnSiteRegistrationReference = {
 };
 
 export type EventExpenseReference = {
-  kind: "EVENT_EXPENSE";
+  kind: 'EVENT_EXPENSE';
   eventExpenseId: string;
   eventExpense?: {
     id: string;
@@ -92,7 +92,7 @@ export type EventExpenseReference = {
 };
 
 export type TicketSaleReference = {
-  kind: "TICKET_SALE";
+  kind: 'TICKET_SALE';
   ticketSaleId: string;
   ticketSale?: {
     id: string;
@@ -107,7 +107,7 @@ export type TicketSaleReference = {
 };
 
 export type UnknownReference = {
-  kind: "UNKNOWN";
+  kind: 'UNKNOWN';
   id: string;
 };
 
@@ -131,12 +131,12 @@ export type MovimentDetails = {
   eventExpenseId?: string;
   ticketSaleId?: string;
   responsible?: string;
-  imageUrl?: string;
+  imageUrls: string[];
   createdAt: Date;
   reference: Reference;
 };
 
-export type MovimentDetailsBase = Omit<MovimentDetails, "reference">;
+export type MovimentDetailsBase = Omit<MovimentDetails, 'reference'>;
 
 export type MovimentDetailsParams = {
   movimentId: string;
@@ -145,7 +145,7 @@ export type MovimentDetailsParams = {
 export type MovimentDetailsResult = {
   movimentDetails: MovimentDetailsBase | null;
   reference: Reference | null;
-  referenceKind: Reference["kind"] | null;
+  referenceKind: Reference['kind'] | null;
   referenceId: string | null;
   loading: boolean;
   fetching: boolean;

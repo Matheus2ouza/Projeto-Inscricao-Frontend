@@ -1,10 +1,10 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMovimentDetails } from "../../api/movimentDetails/movimentDetails";
-import { MovimentDetailsResponse } from "../../types/movimentDetails/movimentDetailsTypes";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getMovimentDetails } from '../../api/movimentDetails/movimentDetails';
+import { MovimentDetailsResponse } from '../../types/movimentDetails/movimentDetailsTypes';
 
 export const movimentDetailsKeys = {
-  all: ["moviment-details"] as const,
-  details: () => [...movimentDetailsKeys.all, "detail"] as const,
+  all: ['moviment-details'] as const,
+  details: () => [...movimentDetailsKeys.all, 'detail'] as const,
   detail: (movimentId: string) =>
     [...movimentDetailsKeys.details(), movimentId] as const,
 };
