@@ -32,7 +32,7 @@ export default function RegisterPayment({
   const [payerName, setPayerName] = useState('');
   const [accountId, setAccountId] = useState('');
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [imageData, setImageData] = useState<string | null>(null);
+  const [imageData, setImageData] = useState<string | string[] | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
 
   const selectedInscriptions = useMemo(
@@ -194,7 +194,7 @@ export default function RegisterPayment({
     const paymentAmountCents = toCents(paymentAmount);
     const requestPayload: RegisterPaymentInput = {
       amount: paymentAmountCents / 100,
-      image: imageData ?? '',
+      image: imageData,
       isGuest: payerType === 'guest',
       guestName: payerType === 'guest' ? payerName.trim() : undefined,
       accountId: payerType === 'account' ? accountId : undefined,

@@ -15,8 +15,8 @@ interface PaymentDataStepProps {
   setAccountId: (value: string) => void;
   fileList: UploadFile[];
   setFileList: (value: UploadFile[]) => void;
-  imageData: string | null;
-  setImageData: (value: string | null) => void;
+  imageData: string | string[] | null;
+  setImageData: (value: string | string[] | null) => void;
   setFormError: (value: string | null) => void;
 }
 
@@ -31,6 +31,7 @@ export default function PaymentDataStep({
   setAccountId,
   fileList,
   setFileList,
+  imageData,
   setImageData,
   setFormError,
 }: PaymentDataStepProps) {
@@ -193,26 +194,22 @@ export default function PaymentDataStep({
 
           <ImageUpload
             value={fileList}
-            onChange={(next) => {
-              setFileList(next);
-              if (next.length === 0) {
-                setImageData(null);
-              }
-            }}
+            onChange={setFileList}
             maxCount={1}
-            title="Clique ou arraste o comprovante aqui"
-            description="Apenas arquivos de imagem são aceitos (PNG, JPG, JPEG)"
+            title="Adicionar comprovante"
+            singleMode={true} // Ativa o modo single
             onInvalidFile={(msg) => {
               setFormError(msg);
               setImageData(null);
             }}
-            onDataUrlChange={(dataUrl) => {
+            onDataUrlsChange={(dataUrl) => {
+              // Agora dataUrl pode ser string | null (em singleMode)
               if (!dataUrl) {
                 setImageData(null);
                 return;
               }
               setFormError(null);
-              setImageData(dataUrl);
+              setImageData(dataUrl); // Funciona! É string | null
             }}
           />
         </div>

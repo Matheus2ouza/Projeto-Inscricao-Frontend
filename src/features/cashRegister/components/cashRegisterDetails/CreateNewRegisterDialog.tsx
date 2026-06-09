@@ -395,8 +395,7 @@ export default function CreateNewRegisterDialog({
                   maxCount={1}
                   disabled={isSubmitting}
                   title="Selecione o comprovante"
-                  description="ou arraste e solte"
-                  onDataUrlChange={(dataUrl) => {
+                  onDataUrlsChange={(dataUrl) => {
                     field.onChange(dataUrl || '');
                   }}
                 />
