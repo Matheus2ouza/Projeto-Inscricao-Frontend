@@ -84,21 +84,6 @@ export default function ListExpensesAdminPage() {
       );
     }
 
-    if (expense.length === 0) {
-      return (
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-10 text-center">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              Nenhum gasto registrado
-            </h3>
-            <p className="mt-2 text-gray-500 dark:text-gray-400">
-              Registre um gasto para aparecer aqui.
-            </p>
-          </CardContent>
-        </Card>
-      );
-    }
-
     return (
       <ListExpenses
         expenses={expense}

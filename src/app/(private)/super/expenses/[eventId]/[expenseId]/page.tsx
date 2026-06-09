@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useParams, useRouter } from 'next/navigation';
 
-export default function DetailsExpenseAdminPage() {
+export default function DetailsExpenseSuperPage() {
   const params = useParams();
   const router = useRouter();
 

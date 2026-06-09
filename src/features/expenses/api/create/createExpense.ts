@@ -14,9 +14,14 @@ export async function createExpense(
     );
     return data;
   } catch (error) {
-    const axiosError = error as { response?: { data?: { message?: string } } };
+    const axiosError = error as {
+      response?: { data?: { message?: string } };
+      message?: string;
+    };
     throw new Error(
-      axiosError.response?.data?.message || 'Falha ao criar gasto',
+      axiosError.response?.data?.message ??
+        axiosError.message ??
+        'Não foi possível buscar o detalhe deste gasto',
     );
   }
 }

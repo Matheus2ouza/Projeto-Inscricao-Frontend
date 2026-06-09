@@ -1,5 +1,6 @@
 'use client';
 
+import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import ImageGallery from '@/shared/components/ImageGallery';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
@@ -9,6 +10,7 @@ import {
   CalendarIcon,
   CreditCard,
   DollarSign,
+  ImageIcon,
   Pencil,
   Save,
   Tag,
@@ -16,7 +18,11 @@ import {
   Undo2,
   User,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  UpdateExpenseRequest,
+  UpdateExpenseResponse,
+} from '../../api/actions/updateExpense';
 import { Expense } from '../../types/detailsExpense/detailsExpenseTypes';
 import {
   CategoryExpense,
@@ -25,10 +31,16 @@ import {
 
 interface DetailsExpenseProps {
   expense: Expense;
-  onEdit?: (expenseId: string, data: any) => Promise<void>;
-  onDelete?: (expenseId: string) => Promise<void>;
+  onEditExpense?: (
+    data: UpdateExpenseRequest,
+  ) => Promise<UpdateExpenseResponse>;
+  onDeleteExpense?: (expenseId: string) => Promise<void>;
+  onUpdateReceipt?: (expenseId: string, images: string[]) => Promise<void>;
+  onDeleteReceipt?: (expenseId: string, receiptIndex: number) => Promise<void>;
   isEditing?: boolean;
   isDeleting?: boolean;
+  isUpdatingReceipt?: boolean;
+  isDeletingReceipt?: boolean;
 }
 
 const paymentMethodLabels: Record<PaymentMethod, string> = {
@@ -58,15 +70,20 @@ const paymentMethodColors: Record<PaymentMethod, string> = {
     'bg-purple-100 text-purple-800 hover:bg-purple-100 dark:bg-purple-900 dark:text-purple-300',
 };
 
-export default function ({
+export default function DetailsExpense({
   expense,
-  onEdit,
-  onDelete,
+  onEditExpense,
+  onDeleteExpense,
+  onUpdateReceipt,
+  onDeleteReceipt,
   isEditing: isEditingProp = false,
   isDeleting = false,
+  isUpdatingReceipt = false,
+  isDeletingReceipt = false,
 }: DetailsExpenseProps) {
   const { TextArea } = Input;
   const [isEditing, setIsEditing] = useState(isEditingProp);
+  const [isEditingReceipt, setIsEditingReceipt] = useState(false);
   const [editedExpense, setEditedExpense] = useState({
     description: expense.description,
     value: expense.value,
@@ -74,10 +91,22 @@ export default function ({
     category: expense.category,
     responsible: expense.responsible,
     createdAt: expense.createdAt,
-    images: expense.images || [],
   });
+  const [images, setImages] = useState<string[]>(expense.images || []);
+  const [newBase64Images, setNewBase64Images] = useState<string[]>([]);
 
-  const images = editedExpense.images || [];
+  // Dialog states
+  const [deleteExpenseDialogOpen, setDeleteExpenseDialogOpen] = useState(false);
+  const [deleteReceiptDialogOpen, setDeleteReceiptDialogOpen] = useState(false);
+  const [pendingReceiptIndex, setPendingReceiptIndex] = useState<number | null>(
+    null,
+  );
+
+  // Reset images quando o expense mudar
+  useEffect(() => {
+    setImages(expense.images || []);
+    setNewBase64Images([]);
+  }, [expense.images]);
 
   const currencyFormatter = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -89,25 +118,36 @@ export default function ({
   });
 
   const handleEdit = () => {
-    console.log('Editando gasto:', expense.id);
     setIsEditing(true);
   };
 
-  const handleDelete = () => {
-    console.log('Deletando gasto:', expense.id);
-    onDelete?.(expense.id);
+  const handleDeleteExpenseClick = () => {
+    setDeleteExpenseDialogOpen(true);
+  };
+
+  const handleConfirmDeleteExpense = async () => {
+    if (onDeleteExpense) {
+      await onDeleteExpense(expense.id);
+    }
+    setDeleteExpenseDialogOpen(false);
   };
 
   const handleSave = async () => {
-    console.log('Salvando alterações do gasto:', expense.id, editedExpense);
-    if (onEdit) {
-      await onEdit(expense.id, editedExpense);
+    if (onEditExpense) {
+      await onEditExpense({
+        expenseId: expense.id,
+        description: editedExpense.description,
+        value: editedExpense.value,
+        paymentMethod: editedExpense.paymentMethod,
+        responsible: editedExpense.responsible,
+        category: editedExpense.category,
+        createdAt: editedExpense.createdAt,
+      });
     }
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    console.log('Cancelando edição do gasto:', expense.id);
     setEditedExpense({
       description: expense.description,
       value: expense.value,
@@ -115,9 +155,64 @@ export default function ({
       category: expense.category,
       responsible: expense.responsible,
       createdAt: expense.createdAt,
-      images: expense.images || [],
     });
     setIsEditing(false);
+  };
+
+  const handleEditReceipt = () => {
+    setIsEditingReceipt(true);
+  };
+
+  const handleSaveReceipt = async () => {
+    if (onUpdateReceipt && newBase64Images.length > 0) {
+      await onUpdateReceipt(expense.id, newBase64Images);
+    }
+
+    setIsEditingReceipt(false);
+    setNewBase64Images([]);
+  };
+
+  const handleCancelReceipt = () => {
+    setImages(expense.images || []);
+    setNewBase64Images([]);
+    setIsEditingReceipt(false);
+  };
+
+  const handleAddImages = (files: File[], base64Images: string[]) => {
+    setImages((prev) => [...prev, ...base64Images]);
+    setNewBase64Images((prev) => [...prev, ...base64Images]);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const originalImagesCount = expense.images?.length || 0;
+
+    // Verificar se é uma imagem já existente no backend
+    if (index < originalImagesCount) {
+      // Imagem existente - não faz nada aqui, pois será tratada pelo onDeleteImage
+      return;
+    } else {
+      // É uma imagem nova (base64), remover dos novos arrays
+      const newImageIndex = index - originalImagesCount;
+      setNewBase64Images((prev) =>
+        prev.filter((_, idx) => idx !== newImageIndex),
+      );
+    }
+
+    // Remover da lista visual
+    setImages((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleDeleteImage = (index: number) => {
+    setPendingReceiptIndex(index);
+    setDeleteReceiptDialogOpen(true);
+  };
+
+  const handleConfirmDeleteReceipt = async () => {
+    if (onDeleteReceipt && pendingReceiptIndex !== null) {
+      await onDeleteReceipt(expense.id, pendingReceiptIndex);
+    }
+    setDeleteReceiptDialogOpen(false);
+    setPendingReceiptIndex(null);
   };
 
   const parseValueInput = (value: string) => {
@@ -139,21 +234,6 @@ export default function ({
     }
   };
 
-  const handleAddImages = (files: File[]) => {
-    const fileUrls = files.map((file) => URL.createObjectURL(file));
-    setEditedExpense((prev) => ({
-      ...prev,
-      images: [...(prev.images ?? []), ...fileUrls],
-    }));
-  };
-
-  const handleRemoveImage = (index: number) => {
-    setEditedExpense((prev) => ({
-      ...prev,
-      images: prev.images?.filter((_, idx) => idx !== index) ?? [],
-    }));
-  };
-
   const ActionButtons = () => (
     <>
       {!isEditing ? (
@@ -165,7 +245,7 @@ export default function ({
           onClick={handleEdit}
         >
           <Pencil className="h-4 w-4" />
-          <span className="hidden sm:inline">Editar</span>
+          <span className="hidden sm:inline">Editar gasto</span>
         </Button>
       ) : (
         <>
@@ -187,7 +267,7 @@ export default function ({
             className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-1 text-white transition-colors"
           >
             <Save className="h-4 w-4" />
-            <span className="hidden sm:inline">Salvar</span>
+            <span className="hidden sm:inline">Salvar gasto</span>
           </Button>
         </>
       )}
@@ -197,27 +277,95 @@ export default function ({
           type="button"
           variant="none"
           size="sm"
-          onClick={handleDelete}
+          onClick={handleDeleteExpenseClick}
           disabled={isDeleting}
           className="flex items-center justify-center gap-1 bg-red-500 text-white transition-colors hover:bg-red-600"
         >
           <Trash2 className="h-4 w-4" />
           <span className="hidden sm:inline">
-            {isDeleting ? 'Deletando...' : 'Deletar'}
+            {isDeleting ? 'Deletando...' : 'Deletar gasto'}
           </span>
         </Button>
       )}
     </>
   );
 
+  const ReceiptActionButtons = () => (
+    <div className="flex gap-2">
+      {!isEditingReceipt ? (
+        <Button
+          type="button"
+          variant="none"
+          size="sm"
+          className="flex items-center justify-center gap-1 bg-green-500 p-0 text-white transition-colors hover:bg-green-600"
+          onClick={handleEditReceipt}
+        >
+          <Pencil className="h-4 w-4" />
+          <span className="hidden sm:inline">Editar comprovantes</span>
+        </Button>
+      ) : (
+        <>
+          <Button
+            type="button"
+            size="sm"
+            variant="none"
+            onClick={handleCancelReceipt}
+            className="flex items-center justify-center gap-1 bg-red-500 text-white transition-colors hover:bg-red-600"
+          >
+            <Undo2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Cancelar</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="none"
+            onClick={handleSaveReceipt}
+            disabled={isUpdatingReceipt || newBase64Images.length === 0}
+            className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-1 text-white transition-colors"
+          >
+            <Save className="h-4 w-4" />
+            <span className="hidden sm:inline">
+              {isUpdatingReceipt ? 'Salvando...' : 'Salvar comprovantes'}
+            </span>
+          </Button>
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-8">
+      {/* Confirmation Dialog para deletar gasto */}
+      <ConfirmationDialog
+        open={deleteExpenseDialogOpen}
+        onOpenChange={setDeleteExpenseDialogOpen}
+        onConfirm={handleConfirmDeleteExpense}
+        title="Deletar gasto"
+        message="Tem certeza que deseja deletar este gasto? Esta ação não pode ser desfeita."
+        confirmText={isDeleting ? 'Deletando...' : 'Deletar'}
+        cancelText="Cancelar"
+        isLoading={isDeleting}
+        variant="destructive"
+      />
+
+      {/* Confirmation Dialog para deletar comprovante */}
+      <ConfirmationDialog
+        open={deleteReceiptDialogOpen}
+        onOpenChange={setDeleteReceiptDialogOpen}
+        onConfirm={handleConfirmDeleteReceipt}
+        title="Deletar comprovante"
+        message="Tem certeza que deseja deletar este comprovante? Esta ação não pode ser desfeita."
+        confirmText={isDeletingReceipt ? 'Deletando...' : 'Deletar'}
+        cancelText="Cancelar"
+        isLoading={isDeletingReceipt}
+        variant="destructive"
+      />
+
       {/* Card principal do gasto */}
       <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
         <div className="p-4 sm:p-6">
           <div className="space-y-4">
             <div>
-              {/* Primeira linha: Título à esquerda, botões à direita */}
               <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <h1 className="text-xl font-bold text-gray-900 sm:text-2xl dark:text-white">
                   Detalhes do Gasto
@@ -227,7 +375,6 @@ export default function ({
                 </div>
               </div>
 
-              {/* Segunda linha: ID e botões em telas menores */}
               <div className="text-muted-foreground mt-2 flex items-center justify-between gap-2 text-sm">
                 <div className="flex min-w-0 flex-col gap-1">
                   <code className="bg-muted rounded px-2 py-1 font-mono text-xs sm:text-sm">
@@ -240,8 +387,7 @@ export default function ({
               </div>
             </div>
 
-            {/* Cards de informações - versão responsiva */}
-            {/* Versão para mobile */}
+            {/* Cards de informações - versão mobile */}
             <div className="block space-y-3 sm:hidden">
               <div className="bg-muted/30 rounded-lg p-4">
                 <div className="mb-2 flex items-center gap-2">
@@ -340,6 +486,7 @@ export default function ({
                         responsible: e.target.value,
                       })
                     }
+                    showCount
                   />
                 ) : (
                   <p className="text-sm">{expense.responsible}</p>
@@ -361,7 +508,6 @@ export default function ({
                   />
                 ) : (
                   <div className="flex items-center gap-2">
-                    <CalendarIcon className="text-muted-foreground h-4 w-4" />
                     <p className="text-sm">
                       {dateFormatter.format(new Date(expense.createdAt))}
                     </p>
@@ -370,7 +516,7 @@ export default function ({
               </div>
             </div>
 
-            {/* Versão para desktop (grid) */}
+            {/* Cards de informações - versão desktop */}
             <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
               <div className="bg-muted/30 rounded-lg p-4">
                 <div className="mb-2 flex items-center gap-2">
@@ -492,7 +638,6 @@ export default function ({
                   />
                 ) : (
                   <div className="flex items-center gap-2">
-                    <CalendarIcon className="text-muted-foreground h-4 w-4" />
                     <p className="text-sm font-medium">
                       {dateFormatter.format(new Date(expense.createdAt))}
                     </p>
@@ -504,7 +649,7 @@ export default function ({
         </div>
       </div>
 
-      {/* Card da descrição separado */}
+      {/* Card da descrição */}
       <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
         <div className="p-6">
           <div className="space-y-4">
@@ -540,17 +685,29 @@ export default function ({
       </div>
 
       {/* Seção de Imagens */}
-      {(isEditing || images.length > 0) && (
-        <ImageGallery
-          images={images}
-          editing={isEditing}
-          maxCount={10}
-          onAddImages={handleAddImages}
-          onRemoveImage={handleRemoveImage}
-          size="small"
-          className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800"
-        />
-      )}
+      <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
+        <div className="p-6">
+          <div className="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="text-muted-foreground h-5 w-5" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Comprovantes ({images.length})
+              </h2>
+            </div>
+            <ReceiptActionButtons />
+          </div>
+
+          <ImageGallery
+            images={images}
+            editing={isEditingReceipt}
+            maxCount={3}
+            onAddImages={handleAddImages}
+            onRemoveImage={handleRemoveImage}
+            onDeleteImage={handleDeleteImage}
+            size="small"
+          />
+        </div>
+      </div>
     </div>
   );
 }
