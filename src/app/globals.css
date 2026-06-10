@@ -52,7 +52,7 @@
   --popover-foreground: oklch(0.22 0.02 260);
   --primary: oklch(0.64 0.2 254);
   --primary-foreground: oklch(0.98 0.01 254);
-  --secondary: oklch(0.975 0.006 250 / 62%);
+  --secondary: oklch(0.955 0.006 250 / 65%);
   --secondary-foreground: oklch(0.28 0.02 260);
   --muted: oklch(0.97 0.006 250 / 58%);
   --muted-foreground: oklch(0.48 0.03 262);
@@ -182,21 +182,15 @@
     min-height: 100vh;
     font-family: var(--font-geist-sans), system-ui, sans-serif;
     background:
-      radial-gradient(
-        circle at 20% 20%,
+      radial-gradient(circle at 20% 20%,
         oklch(0.95 0.04 250 / 60%),
-        transparent 40%
-      ),
-      radial-gradient(
-        circle at 80% 0%,
+        transparent 40%),
+      radial-gradient(circle at 80% 0%,
         oklch(0.92 0.05 300 / 50%),
-        transparent 45%
-      ),
-      radial-gradient(
-        circle at 50% 100%,
+        transparent 45%),
+      radial-gradient(circle at 50% 100%,
         oklch(0.93 0.04 200 / 55%),
-        transparent 50%
-      ),
+        transparent 50%),
       linear-gradient(180deg, var(--background), oklch(0.95 0.02 260));
     color: var(--foreground);
     text-rendering: optimizeLegibility;
@@ -226,41 +220,33 @@
 
 @layer utilities {
   .bg-linear-to-r {
-    background-image: linear-gradient(
-      to right,
-      var(--tw-gradient-from),
-      var(--tw-gradient-via),
-      var(--tw-gradient-to)
-    );
+    background-image: linear-gradient(to right,
+        var(--tw-gradient-from),
+        var(--tw-gradient-via),
+        var(--tw-gradient-to));
   }
 
   .bg-linear-to-b {
-    background-image: linear-gradient(
-      to bottom,
-      var(--tw-gradient-from),
-      var(--tw-gradient-via),
-      var(--tw-gradient-to)
-    );
+    background-image: linear-gradient(to bottom,
+        var(--tw-gradient-from),
+        var(--tw-gradient-via),
+        var(--tw-gradient-to));
   }
 
   .before\:bg-linear-to-b::before,
   .after\:bg-linear-to-b::after {
-    background-image: linear-gradient(
-      to bottom,
-      var(--tw-gradient-from),
-      var(--tw-gradient-via),
-      var(--tw-gradient-to)
-    );
+    background-image: linear-gradient(to bottom,
+        var(--tw-gradient-from),
+        var(--tw-gradient-via),
+        var(--tw-gradient-to));
   }
 
   .before\:bg-linear-to-r::before,
   .after\:bg-linear-to-r::after {
-    background-image: linear-gradient(
-      to right,
-      var(--tw-gradient-from),
-      var(--tw-gradient-via),
-      var(--tw-gradient-to)
-    );
+    background-image: linear-gradient(to right,
+        var(--tw-gradient-from),
+        var(--tw-gradient-via),
+        var(--tw-gradient-to));
   }
 
   .glass-surface,
@@ -371,10 +357,8 @@
   .liquid-glass-light {
     background: var(--glass-surface);
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle))
-      saturate(var(--liquid-glass-saturation-subtle));
+    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
+    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
     box-shadow: inset 0 1px 0 oklch(1 0 0 / 35%);
     transition: all 0.25s ease;
   }
@@ -624,21 +608,21 @@ gmp-map {
 .dark .participants-list-table .ant-table,
 .dark .participants-list-table .ant-table-container,
 .dark .participants-list-table .ant-table-content,
-.dark .participants-list-table .ant-table-thead > tr > th,
-.dark .participants-list-table .ant-table-tbody > tr > td {
+.dark .participants-list-table .ant-table-thead>tr>th,
+.dark .participants-list-table .ant-table-tbody>tr>td {
   background: oklch(0.22 0.005 260) !important;
   color: var(--foreground) !important;
 }
 
-.dark .participants-list-table .ant-table-thead > tr > th {
+.dark .participants-list-table .ant-table-thead>tr>th {
   border-bottom-color: oklch(1 0 0 / 18%) !important;
 }
 
-.dark .participants-list-table .ant-table-tbody > tr > td {
+.dark .participants-list-table .ant-table-tbody>tr>td {
   border-bottom-color: oklch(1 0 0 / 12%) !important;
 }
 
-.dark .participants-list-table .ant-table-tbody > tr.ant-table-row:hover > td {
+.dark .participants-list-table .ant-table-tbody>tr.ant-table-row:hover>td {
   background: oklch(1 0 0 / 10%) !important;
 }
 
@@ -657,14 +641,8 @@ gmp-map {
 }
 
 .dark .participants-pagination .ant-pagination-item:hover,
-.dark
-  .participants-pagination
-  .ant-pagination-prev:hover
-  .ant-pagination-item-link,
-.dark
-  .participants-pagination
-  .ant-pagination-next:hover
-  .ant-pagination-item-link {
+.dark .participants-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.dark .participants-pagination .ant-pagination-next:hover .ant-pagination-item-link {
   background: oklch(1 0 0 / 16%) !important;
   border-color: oklch(1 0 0 / 32%) !important;
   color: var(--foreground) !important;
@@ -679,10 +657,7 @@ gmp-map {
   color: var(--foreground) !important;
 }
 
-.dark
-  .participants-pagination
-  .ant-pagination-disabled
-  .ant-pagination-item-link {
+.dark .participants-pagination .ant-pagination-disabled .ant-pagination-item-link {
   color: oklch(0.62 0.01 260) !important;
   border-color: oklch(1 0 0 / 16%) !important;
   background: oklch(1 0 0 / 6%) !important;

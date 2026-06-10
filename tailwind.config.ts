@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -14,7 +14,7 @@ const config: Config = {
         '15': '15px',
       },
       fontFamily: {
-        'roboto': ['var(--font-roboto)', 'sans-serif'],
+        roboto: ['var(--font-roboto)', 'sans-serif'],
       },
       animation: {
         'gradient-x': 'gradient-x 1.5s ease infinite',
@@ -32,6 +32,6 @@ const config: Config = {
     },
   },
   plugins: [],
-}
+};
 
-export default config
+export default config;

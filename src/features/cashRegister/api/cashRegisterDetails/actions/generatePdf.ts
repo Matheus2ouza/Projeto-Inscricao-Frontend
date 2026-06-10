@@ -34,7 +34,7 @@ export async function generatePdf({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        'Não foi possível carregar os membros.',
+        'Não foi possível gerar o relatório.',
     );
   }
 }

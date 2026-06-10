@@ -1,11 +1,13 @@
 'use client';
 
+import { Spinner } from '@/components/ui/shadcn-io/spinner';
+import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { formatDateTime } from '@/shared/utils/formatDate';
 import { getConvertCashEntryOrigin } from '@/shared/utils/getConvertCashEntryOrigin';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
-import { PlusOutlined, SyncOutlined } from '@ant-design/icons';
-import { Button, Pagination } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Pagination } from 'antd';
 import {
   Banknote,
   BarChart3,
@@ -52,7 +54,10 @@ interface CashRegisterDetailsProps {
   onPageChange: (page: number) => void;
   movimentsLoading: boolean;
   movimentsError: string | null;
-  onRefetchMoviments: () => void;
+  onRefetchMoviments: {
+    handler: () => void;
+    isLoading: boolean;
+  };
   onViewMoviment: (movimentId: string) => void;
   futureReleases?: FutureRelease[];
   futureReleasesLoading?: boolean;
@@ -193,23 +198,25 @@ export default function CashRegisterDetails({
 
           <div className="flex w-full justify-end gap-2 sm:w-auto sm:items-center">
             <Button
+              variant="outline"
               onClick={onRefetchCashRegister}
-              icon={<SyncOutlined />}
-              loading={cashRegisterFetching && { icon: <SyncOutlined spin /> }}
               className="w-full sm:w-auto"
+              disabled={cashRegisterFetching}
             >
-              <span className="hidden sm:inline">Recarregar</span>
+              {cashRegisterFetching && (
+                <Spinner data-icon="inline-start" variant="circle" />
+              )}
+              {cashRegisterFetching ? 'Recarregando...' : 'Recarregar'}
             </Button>
 
             <Button
-              type="primary"
+              variant="default"
               onClick={() => setReportDrawerOpen(true)}
-              icon={<Download className="h-4 w-4" />}
-              loading={generatingReport && { icon: <SyncOutlined spin /> }}
-              disabled={!cashRegister}
+              disabled={!cashRegister || generatingReport}
               className="w-full sm:w-auto"
             >
-              <span className="hidden sm:inline">Relatório</span>
+              <Download className="h-4 w-4" />
+              Relatório
             </Button>
           </div>
         </div>
@@ -460,10 +467,20 @@ export default function CashRegisterDetails({
           </div>
 
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <Button
+              variant="outline"
+              onClick={onRefetchMoviments.handler}
+              disabled={onRefetchMoviments.isLoading}
+              className="w-full sm:w-auto"
+            >
+              {onRefetchMoviments.isLoading && (
+                <Spinner data-icon="inline-start" variant="circle" />
+              )}
+              {onRefetchMoviments.isLoading ? 'Recarregando...' : 'Recarregar'}
+            </Button>
             {onOpenCreateNewRegister && (
               <Button
-                type="primary"
-                icon={<PlusOutlined />}
+                variant="default"
                 onClick={onOpenCreateNewRegister}
                 disabled={
                   !cashRegister ||
@@ -471,17 +488,10 @@ export default function CashRegisterDetails({
                 }
                 className="w-full sm:w-auto"
               >
+                <PlusOutlined />
                 Nova movimentação
               </Button>
             )}
-
-            <Button
-              onClick={onRefetchMoviments}
-              icon={<SyncOutlined />}
-              className="w-full sm:w-auto"
-            >
-              Recarregar
-            </Button>
           </div>
         </div>
 
@@ -580,11 +590,7 @@ export default function CashRegisterDetails({
                     </div>
 
                     <div className="flex justify-end border-t border-slate-200 pt-3 dark:border-zinc-700">
-                      <Button
-                        size="small"
-                        className="!text-black hover:!border-slate-300 hover:!bg-slate-50 hover:!text-black active:!bg-slate-100"
-                        onClick={() => onViewMoviment(m.id)}
-                      >
+                      <Button size="sm" onClick={() => onViewMoviment(m.id)}>
                         Detalhes
                       </Button>
                     </div>
@@ -653,8 +659,8 @@ export default function CashRegisterDetails({
 
                     <div className="flex justify-end border-t border-slate-200 pt-3 dark:border-zinc-700">
                       <Button
-                        size="small"
-                        className="!text-black hover:!border-slate-300 hover:!bg-slate-50 hover:!text-black active:!bg-slate-100"
+                        size="sm"
+                        variant="outline"
                         onClick={() => onViewMoviment(m.id)}
                       >
                         Detalhes

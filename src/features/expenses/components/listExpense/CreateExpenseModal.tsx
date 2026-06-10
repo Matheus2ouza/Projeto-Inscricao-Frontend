@@ -262,7 +262,7 @@ export default function CreateExpenseModal({
               Cancelar
             </AntButton>
             <AntButton type="primary" htmlType="submit" loading={submitting}>
-              {submitting ? 'Criando...' : 'Criar Gasto'}
+              {submitting ? 'Registrando...' : 'Registrar Gasto'}
             </AntButton>
           </div>
         </form>

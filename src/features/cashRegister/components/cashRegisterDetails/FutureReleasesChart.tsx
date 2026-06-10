@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/shared/components/ui/button';
 import {
   ChartContainer,
   ChartTooltip,
@@ -9,7 +10,6 @@ import {
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import { SyncOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 import type { FutureRelease } from '../../types/cashRegisterDetails/actions/futureReleasesTypes';
 
@@ -69,13 +69,9 @@ export function FutureReleasesChart({
             Valores previstos por data para repasse no caixa.
           </p>
         </div>
-        <Button
-          onClick={onRefetch}
-          icon={<SyncOutlined />}
-          loading={loading && { icon: <SyncOutlined spin /> }}
-          disabled={!onRefetch}
-        >
-          Recarregar
+        <Button variant="outline" onClick={onRefetch} disabled={!onRefetch}>
+          {loading && <SyncOutlined />}
+          {loading ? 'Recarregando...' : 'Recarregar'}
         </Button>
       </div>
 
@@ -123,4 +119,3 @@ export function FutureReleasesChart({
     </div>
   );
 }
-
