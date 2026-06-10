@@ -52,7 +52,7 @@ export function useCreateExpense(eventId?: string) {
       invalidateLists();
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Erro ao criar gasto');
+      toast.error(error.message || 'Erro ao registrar gasto');
     },
   });
 
