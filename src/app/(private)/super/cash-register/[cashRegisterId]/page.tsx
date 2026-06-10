@@ -205,7 +205,10 @@ export default function CashRegisterDetailsSuperPage() {
         onPageChange={setPage}
         movimentsLoading={movimentsListLoading}
         movimentsError={movimentsError}
-        onRefetchMoviments={handleRefetchMovimentsList}
+        onRefetchMoviments={{
+          handler: handleRefetchMovimentsList,
+          isLoading: movimentsListLoading,
+        }}
         onViewMoviment={handleViewMoviment}
         futureReleases={futureReleases}
         futureReleasesLoading={isLoadingFutureReleases}
