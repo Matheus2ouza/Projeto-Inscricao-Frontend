@@ -15,10 +15,10 @@ export type CreateNewRegisterInput = {
   method: PaymentMethod;
   favorite: boolean;
   value: number;
-  description?: string;
-  eventId?: string;
+  description: string;
+  eventId: string;
   responsible: string;
-  image?: string;
+  images: string[];
   createAt?: Date;
 };
 

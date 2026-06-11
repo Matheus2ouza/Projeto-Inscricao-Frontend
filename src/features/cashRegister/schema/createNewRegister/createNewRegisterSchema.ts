@@ -9,9 +9,20 @@ export const CreateNewRegisterSchema = z.object({
       error: 'Valor é obrigatório',
     })
     .min(0, 'Valor não pode ser negativo'),
-  description: z.string({ error: 'A descrição é obrigatória' }),
-  eventId: z.uuid().optional(),
+  description: z
+    .string({ error: 'A descrição é obrigatório' })
+    .min(5, { error: 'Descrição muito curta' })
+    .max(300, {
+      error: 'Descrição muito longa, tamanho maximo: 300 caractere',
+    }),
+  eventId: z.uuid(),
   responsible: z.string(),
-  image: z.string().optional(),
+  images: z
+    .array(
+      z.string({
+        error: 'Um dos comprovantes enviados é inválido',
+      }),
+    )
+    .default([]),
   createAt: z.iso.datetime().optional(),
 });

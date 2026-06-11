@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
-import { formatDate } from "@/shared/utils/formatDate";
-import { getListCashRegistersStatusInfo } from "@/shared/utils/getCashRegisterStatusInfo";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
-import { getGradientClass } from "@/shared/utils/getGenerateGradient";
-import { getInitial } from "@/shared/utils/getInitials";
-import { Card, CardBody, CardFooter } from "@heroui/react";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { Calendar, DollarSign, Plus, Wallet } from "lucide-react";
-import { useState } from "react";
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
+import { formatDate } from '@/shared/utils/formatDate';
+import { getListCashRegistersStatusInfo } from '@/shared/utils/getCashRegisterStatusInfo';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
+import { getGradientClass } from '@/shared/utils/getGenerateGradient';
+import { getInitial } from '@/shared/utils/getInitials';
+import { Card, CardBody, CardFooter } from '@heroui/react';
+import { AspectRatio } from '@radix-ui/react-aspect-ratio';
+import { Calendar, DollarSign, Plus, Wallet } from 'lucide-react';
+import { useState } from 'react';
 import type {
   CreateCashInput,
   CreateCashResponse,
-} from "../types/createCashRegister/createCashRegisterTypes";
-import { CashRegister, CashRegisterStatus } from "../types/listCashRegisters";
-import CashRegisterStatusFilter from "./CashRegisterStatusFilter";
-import CreateCashRegisterDialog from "./createCashRegister/CreateCashRegisterDialog";
+} from '../types/createCashRegister/createCashRegisterTypes';
+import { CashRegister, CashRegisterStatus } from '../types/listCashRegisters';
+import CashRegisterStatusFilter from './CashRegisterStatusFilter';
+import CreateCashRegisterDialog from './createCashRegister/CreateCashRegisterDialog';
 
 interface LisCashRegistersPros {
   cashRegisters: CashRegister[] | null;
@@ -64,17 +64,17 @@ export function LisCashRegisters({
           className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          {isCreatingCashRegister ? "Criando..." : "Criar caixa"}
+          {isCreatingCashRegister ? 'Criando...' : 'Criar caixa'}
         </Button>
       </div>
 
       {!cashRegisters || cashRegisters.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-2">
-          <Wallet className="w-10 h-10" />
+        <div className="text-muted-foreground flex flex-col items-center gap-2 py-12 text-center">
+          <Wallet className="h-10 w-10" />
           <p>Nenhum caixa encontrado</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {cashRegisters.map((cashRegister) => {
             const statusInfo = getListCashRegistersStatusInfo(
               cashRegister.status,
@@ -84,14 +84,14 @@ export function LisCashRegisters({
             return (
               <Card
                 key={cashRegister.id}
-                className="w-full hover:shadow-xl transition-all duration-300 border border-transparent shadow-md rounded-xl overflow-hidden hover:scale-[1.02] bg-white dark:bg-zinc-900"
+                className="w-full overflow-hidden rounded-xl border border-transparent bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:bg-zinc-900"
               >
-                <CardBody className="p-0 relative overflow-visible">
+                <CardBody className="relative overflow-visible p-0">
                   <AspectRatio ratio={16 / 9} className="w-full">
                     <div
-                      className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+                      className={`h-full w-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
                     >
-                      <h3 className="text-white text-5xl sm:text-6xl md:text-7xl font-semibold tracking-wide text-center px-4">
+                      <h3 className="px-4 text-center text-5xl font-semibold tracking-wide text-white sm:text-6xl md:text-7xl">
                         {getInitial(cashRegister.name)}
                       </h3>
                     </div>
@@ -103,9 +103,9 @@ export function LisCashRegisters({
                   </div>
                 </CardBody>
 
-                <CardFooter className="flex flex-col items-start p-4 gap-3 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
+                <CardFooter className="flex flex-col items-start gap-3 rounded-b-xl border-t border-gray-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
                   <div className="w-full space-y-1">
-                    <h3 className="font-bold text-base line-clamp-2 text-gray-900 dark:text-white uppercase">
+                    <h3 className="line-clamp-2 text-base font-bold text-gray-900 uppercase dark:text-white">
                       {cashRegister.name}
                     </h3>
                   </div>
@@ -133,7 +133,7 @@ export function LisCashRegisters({
                       <span className="font-medium">
                         {cashRegister.closedAt
                           ? formatDate(cashRegister.closedAt)
-                          : "ainda está aberto"}
+                          : 'ainda está aberto'}
                       </span>
                     </div>
                   </div>
@@ -141,7 +141,7 @@ export function LisCashRegisters({
                   <div className="w-full pt-2">
                     <Button
                       size="sm"
-                      className="w-full dark:text-white rounded-lg"
+                      className="w-full rounded-lg dark:text-white"
                       onClick={() => onSelectCashRegister(cashRegister.id)}
                     >
                       Visualizar caixa

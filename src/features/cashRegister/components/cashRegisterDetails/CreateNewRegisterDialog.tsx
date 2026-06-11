@@ -93,7 +93,7 @@ export default function CreateNewRegisterDialog({
       value: 0,
       description: '',
       responsible: user.username,
-      image: '',
+      images: [],
       eventId:
         allocationEvents.length === 1 ? allocationEvents[0].id : undefined,
       createAt: undefined,
@@ -116,7 +116,7 @@ export default function CreateNewRegisterDialog({
         value: 0,
         description: '',
         responsible: user.username,
-        image: '',
+        images: [],
         eventId:
           allocationEvents.length === 1 ? allocationEvents[0].id : undefined,
         createAt: undefined,
@@ -135,8 +135,8 @@ export default function CreateNewRegisterDialog({
       value: values.value,
       description: values.description,
       responsible: values.responsible,
-      image: values.image ? values.image : undefined,
-      eventId: values.eventId ? values.eventId : undefined,
+      images: values.images ? values.images : [],
+      eventId: values.eventId,
       createAt: values.createAt ? new Date(values.createAt) : undefined,
     };
 
@@ -172,6 +172,7 @@ export default function CreateNewRegisterDialog({
                       ? 'Nenhum evento disponível para este caixa.'
                       : fieldState.error?.message
                   }
+                  required
                 >
                   <Select
                     value={field.value}
@@ -187,8 +188,9 @@ export default function CreateNewRegisterDialog({
                       (triggerNode?.parentElement as HTMLElement) ??
                       document.body
                     }
-                    showSearch
-                    optionFilterProp="label"
+                    showSearch={{
+                      optionFilterProp: ['label', 'otherField'],
+                    }}
                   />
                 </AntForm.Item>
               )}
@@ -366,6 +368,7 @@ export default function CreateNewRegisterDialog({
             render={({ field, fieldState }) => (
               <AntForm.Item
                 label="Descrição"
+                required
                 validateStatus={fieldState.error ? 'error' : undefined}
                 help={fieldState.error?.message}
                 className="mb-0"
@@ -376,13 +379,16 @@ export default function CreateNewRegisterDialog({
                   placeholder="Descreva a movimentação"
                   disabled={isSubmitting}
                   style={{ resize: 'none' }}
+                  maxLength={300}
+                  minLength={5}
+                  showCount
                 />
               </AntForm.Item>
             )}
           />
           <Controller
             control={form.control}
-            name="image"
+            name="images"
             render={({ field, fieldState }) => (
               <AntForm.Item
                 label="Comprovante (opcional)"
@@ -392,7 +398,7 @@ export default function CreateNewRegisterDialog({
                 <ImageUpload
                   value={uploadedFiles}
                   onChange={setUploadedFiles}
-                  maxCount={1}
+                  maxCount={3}
                   disabled={isSubmitting}
                   title="Selecione o comprovante"
                   onDataUrlsChange={(dataUrl) => {
