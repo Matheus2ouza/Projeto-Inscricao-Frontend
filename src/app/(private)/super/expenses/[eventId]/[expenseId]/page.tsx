@@ -29,45 +29,25 @@ export default function DetailsExpenseSuperPage() {
 
   const {
     // função para atualizar o gasto
-    handleUpdateExpense,
-    isUpdateExpense,
+    updateExpense,
 
     // função para atualizar o comprovante
-    handleUpdateReceiptExpense,
-    isUpdateReceiptExpense,
+    updateReceipt,
 
     // função para deletar o gasto
-    handleDeleteExpense,
-    isDeleteExpense,
+    deleteExpense,
 
     // função para deletar o comprovante
-    handleDeleteReceiptExpense,
-    isDeleteReceiptExpense,
+    deleteReceipt,
   } = useActionsExpense();
 
-  const handleBack = () => {
+  const handleDeleteExpense = async (expenseId: string) => {
+    await deleteExpense.execute(expenseId);
     router.back();
   };
 
-  const handleUpdateReceipt = async (expenseId: string, images: string[]) => {
-    await handleUpdateReceiptExpense({
-      expenseId,
-      receipts: images,
-    });
-  };
-
-  const handleDeleteReceipt = async (
-    expenseId: string,
-    receiptIndex: number,
-  ) => {
-    await handleDeleteReceiptExpense({
-      id: expenseId,
-      receiptIndex,
-    });
-  };
-
-  const handleDeleteExpenseClick = async (expenseId: string) => {
-    await handleDeleteExpense({ id: expenseId });
+  const handleBack = () => {
+    router.back();
   };
 
   const renderSkeletonGrid = () => {
@@ -134,14 +114,13 @@ export default function DetailsExpenseSuperPage() {
     return (
       <DetailsExpense
         expense={expense}
-        onEditExpense={handleUpdateExpense}
-        onDeleteExpense={handleDeleteExpenseClick}
-        onUpdateReceipt={handleUpdateReceipt}
-        onDeleteReceipt={handleDeleteReceipt}
-        isEditing={isUpdateExpense}
-        isDeleting={isDeleteExpense}
-        isUpdatingReceipt={isUpdateReceiptExpense}
-        isDeletingReceipt={isDeleteReceiptExpense}
+        updateExpense={updateExpense}
+        updateReceipt={updateReceipt}
+        deleteExpense={{
+          execute: handleDeleteExpense,
+          loading: deleteExpense.loading,
+        }}
+        deleteReceipt={deleteReceipt}
       />
     );
   };

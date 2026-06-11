@@ -18,7 +18,7 @@ export async function createNewRegister(
         description: registerData.description,
         eventId: registerData.eventId,
         responsible: registerData.responsible,
-        image: registerData.image,
+        images: registerData.images,
         createAt: registerData.createAt,
       },
     );

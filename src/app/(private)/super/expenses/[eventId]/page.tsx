@@ -1,6 +1,7 @@
 'use client';
 
 import ListExpenses from '@/features/expenses/components/listExpense/ListExpenses';
+import { useActionsExpense } from '@/features/expenses/hooks/actions/useActionsExpense';
 import { useCreateExpense } from '@/features/expenses/hooks/create/useCreateExpense';
 import { useListExpense } from '@/features/expenses/hooks/listExpenses/useListExpenses';
 import PageContainer from '@/shared/components/layout/PageContainer';
@@ -22,6 +23,11 @@ export default function ListExpensesSuperPage() {
     });
 
   const createExpenseForm = useCreateExpense(eventId);
+
+  const {
+    // função para deletar o gasto
+    deleteExpense,
+  } = useActionsExpense();
 
   const handleBack = () => {
     router.push('/super/expenses');
@@ -94,6 +100,7 @@ export default function ListExpensesSuperPage() {
         onViewDetails={handleViewDetails}
         onPageChange={setPage}
         createForm={createExpenseForm}
+        deleteExpense={deleteExpense}
       />
     );
   };

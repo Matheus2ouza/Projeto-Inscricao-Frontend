@@ -1,10 +1,11 @@
 'use client';
 
+import { Spinner } from '@/components/ui/shadcn-io/spinner';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/shared/components/ui/card';
 import { Pagination } from 'antd';
-import { Calendar, DollarSign, Eye, Plus, User } from 'lucide-react';
+import { Calendar, DollarSign, Eye, Plus, Trash, User } from 'lucide-react';
 import type { BaseSyntheticEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
@@ -20,6 +21,7 @@ interface ExpensesByEventProps {
   pageCount: number;
   onViewDetails: (expenseId: string) => void;
   onPageChange: (page: number) => void;
+
   createForm: {
     form: UseFormReturn<expenseFormData>;
     onSubmit: (
@@ -27,8 +29,12 @@ interface ExpensesByEventProps {
     ) => Promise<boolean | void> | boolean | void;
     submitting: boolean;
   };
-}
 
+  deleteExpense: {
+    execute: (expenseId: string) => Promise<void>;
+    loading: boolean;
+  };
+}
 const paymentMethodLabels: Record<PaymentMethod, string> = {
   PIX: 'PIX',
   CARTAO: 'Cartão',
@@ -52,6 +58,7 @@ export default function ListExpenses({
   onViewDetails,
   onPageChange,
   createForm,
+  deleteExpense,
 }: ExpensesByEventProps) {
   const [openCreate, setOpenCreate] = useState(false);
   const { form, onSubmit, submitting } = createForm;
@@ -120,9 +127,10 @@ export default function ListExpenses({
         {expensesList.map((expense) => (
           <Card
             key={expense.id}
-            className="group overflow-hidden rounded-xl border-0 shadow-sm transition-all hover:shadow-md"
+            className="group flex h-full flex-col overflow-hidden rounded-xl border-0 shadow-sm transition-all hover:shadow-md"
           >
-            <CardContent className="space-y-3 p-4 pb-2">
+            <CardContent className="flex-1 space-y-3 p-4 pb-2">
+              {/* Conteúdo existente se mantém igual */}
               {/* Cabeçalho com título e badge */}
               <div className="flex items-start justify-between gap-2">
                 <h3 className="line-clamp-2 flex-1 text-base font-semibold text-gray-900 dark:text-white">
@@ -159,15 +167,32 @@ export default function ListExpenses({
               </div>
             </CardContent>
 
-            <CardFooter className="p-4 pt-0">
+            <CardFooter className="mt-auto flex gap-2 p-4 pt-0">
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full gap-2"
+                className="flex-1 gap-2"
                 onClick={() => onViewDetails(expense.id)}
               >
                 <Eye className="h-4 w-4" />
                 Detalhes
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="aspect-square"
+                onClick={() => deleteExpense.execute(expense.id)}
+                disabled={deleteExpense.loading}
+              >
+                {deleteExpense.loading ? (
+                  <Spinner
+                    data-icon="inline-start"
+                    variant="circle"
+                    className="h-4 w-4"
+                  />
+                ) : (
+                  <Trash className="h-4 w-4" />
+                )}
               </Button>
             </CardFooter>
           </Card>
