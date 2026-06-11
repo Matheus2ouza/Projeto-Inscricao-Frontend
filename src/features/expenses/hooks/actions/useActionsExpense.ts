@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   deleteExpense,
@@ -24,7 +23,6 @@ import { useInvalidateDetailsExpenseQuery } from '../detailsExpense/useDetailsEx
 import { useInvalidateListExpensesQuery } from '../listExpenses/useListExpensesQuery';
 
 export function useActionsExpense() {
-  const router = useRouter();
   const { invalidateLists: invalidateLists } = useInvalidateListExpensesQuery();
   const { invalidateList: invalidateDetail, removeList: removeDetail } =
     useInvalidateDetailsExpenseQuery();
@@ -67,7 +65,6 @@ export function useActionsExpense() {
         toast.success('Gasto deletado com sucesso');
         removeDetail(variables.id);
         invalidateLists();
-        router.back();
       },
       onError: (error) => {
         toast.error(`Erro ao deletar o gasto: ${error.message}`);
@@ -95,20 +92,28 @@ export function useActionsExpense() {
   });
 
   return {
-    // função para atualizar o gasto
-    handleUpdateExpense: updateExpenseMutation,
-    isUpdateExpense,
+    updateExpense: {
+      execute: async (data: UpdateExpenseRequest) =>
+        updateExpenseMutation(data),
+      loading: isUpdateExpense,
+    },
 
-    // função para atualizar o comprovante
-    handleUpdateReceiptExpense: updateReceiptExpenseMutation,
-    isUpdateReceiptExpense,
+    deleteExpense: {
+      execute: async (expenseId: string) =>
+        deleteExpenseMutation({ id: expenseId }),
+      loading: isDeleteExpense,
+    },
 
-    // função para deletar o gasto
-    handleDeleteExpense: deleteExpenseMutation,
-    isDeleteExpense,
+    updateReceipt: {
+      execute: async (data: UpdateReceiptExpenseRequest) =>
+        updateReceiptExpenseMutation(data),
+      loading: isUpdateReceiptExpense,
+    },
 
-    // função para deletar o comprovante
-    handleDeleteReceiptExpense: deleteReceiptExpenseMutation,
-    isDeleteReceiptExpense,
+    deleteReceipt: {
+      execute: async (receiptId: string, receiptIndex: number) =>
+        deleteReceiptExpenseMutation({ id: receiptId, receiptIndex }),
+      loading: isDeleteReceiptExpense,
+    },
   };
 }

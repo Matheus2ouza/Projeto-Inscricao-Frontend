@@ -19,10 +19,15 @@ import {
   User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { DeleteReceiptExpenseReponse } from '../../api/actions/deleteReceiptExpense';
 import {
   UpdateExpenseRequest,
   UpdateExpenseResponse,
 } from '../../api/actions/updateExpense';
+import {
+  UpdateReceiptExpenseRequest,
+  UpdateReceiptExpenseResponse,
+} from '../../api/actions/updateReceiptExpense';
 import { Expense } from '../../types/detailsExpense/detailsExpenseTypes';
 import {
   CategoryExpense,
@@ -31,16 +36,31 @@ import {
 
 interface DetailsExpenseProps {
   expense: Expense;
-  onEditExpense?: (
-    data: UpdateExpenseRequest,
-  ) => Promise<UpdateExpenseResponse>;
-  onDeleteExpense?: (expenseId: string) => Promise<void>;
-  onUpdateReceipt?: (expenseId: string, images: string[]) => Promise<void>;
-  onDeleteReceipt?: (expenseId: string, receiptIndex: number) => Promise<void>;
-  isEditing?: boolean;
-  isDeleting?: boolean;
-  isUpdatingReceipt?: boolean;
-  isDeletingReceipt?: boolean;
+
+  updateExpense?: {
+    execute: (data: UpdateExpenseRequest) => Promise<UpdateExpenseResponse>;
+    loading: boolean;
+  };
+
+  deleteExpense?: {
+    execute: (expenseId: string) => Promise<void>;
+    loading: boolean;
+  };
+
+  updateReceipt?: {
+    execute: (
+      data: UpdateReceiptExpenseRequest,
+    ) => Promise<UpdateReceiptExpenseResponse>;
+    loading: boolean;
+  };
+
+  deleteReceipt?: {
+    execute: (
+      receiptId: string,
+      receiptIndex: number,
+    ) => Promise<DeleteReceiptExpenseReponse>;
+    loading: boolean;
+  };
 }
 
 const paymentMethodLabels: Record<PaymentMethod, string> = {
@@ -72,17 +92,13 @@ const paymentMethodColors: Record<PaymentMethod, string> = {
 
 export default function DetailsExpense({
   expense,
-  onEditExpense,
-  onDeleteExpense,
-  onUpdateReceipt,
-  onDeleteReceipt,
-  isEditing: isEditingProp = false,
-  isDeleting = false,
-  isUpdatingReceipt = false,
-  isDeletingReceipt = false,
+  updateExpense,
+  updateReceipt,
+  deleteExpense,
+  deleteReceipt,
 }: DetailsExpenseProps) {
   const { TextArea } = Input;
-  const [isEditing, setIsEditing] = useState(isEditingProp);
+  const [isEditing, setIsEditing] = useState(false);
   const [isEditingReceipt, setIsEditingReceipt] = useState(false);
   const [editedExpense, setEditedExpense] = useState({
     description: expense.description,
@@ -126,15 +142,15 @@ export default function DetailsExpense({
   };
 
   const handleConfirmDeleteExpense = async () => {
-    if (onDeleteExpense) {
-      await onDeleteExpense(expense.id);
+    if (deleteExpense) {
+      await deleteExpense.execute(expense.id);
     }
     setDeleteExpenseDialogOpen(false);
   };
 
   const handleSave = async () => {
-    if (onEditExpense) {
-      await onEditExpense({
+    if (updateExpense) {
+      await updateExpense.execute({
         expenseId: expense.id,
         description: editedExpense.description,
         value: editedExpense.value,
@@ -164,8 +180,11 @@ export default function DetailsExpense({
   };
 
   const handleSaveReceipt = async () => {
-    if (onUpdateReceipt && newBase64Images.length > 0) {
-      await onUpdateReceipt(expense.id, newBase64Images);
+    if (updateReceipt && newBase64Images.length > 0) {
+      await updateReceipt.execute({
+        expenseId: expense.id,
+        receipts: newBase64Images,
+      });
     }
 
     setIsEditingReceipt(false);
@@ -208,8 +227,8 @@ export default function DetailsExpense({
   };
 
   const handleConfirmDeleteReceipt = async () => {
-    if (onDeleteReceipt && pendingReceiptIndex !== null) {
-      await onDeleteReceipt(expense.id, pendingReceiptIndex);
+    if (deleteReceipt && pendingReceiptIndex !== null) {
+      await deleteReceipt.execute(expense.id, pendingReceiptIndex);
     }
     setDeleteReceiptDialogOpen(false);
     setPendingReceiptIndex(null);
@@ -264,10 +283,13 @@ export default function DetailsExpense({
             size="sm"
             variant="none"
             onClick={handleSave}
+            disabled={updateExpense?.loading}
             className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-1 text-white transition-colors"
           >
             <Save className="h-4 w-4" />
-            <span className="hidden sm:inline">Salvar gasto</span>
+            <span className="hidden sm:inline">
+              {updateExpense?.loading ? 'Salvando...' : 'Salvar gasto'}
+            </span>
           </Button>
         </>
       )}
@@ -278,12 +300,12 @@ export default function DetailsExpense({
           variant="none"
           size="sm"
           onClick={handleDeleteExpenseClick}
-          disabled={isDeleting}
+          disabled={deleteExpense?.loading}
           className="flex items-center justify-center gap-1 bg-red-500 text-white transition-colors hover:bg-red-600"
         >
           <Trash2 className="h-4 w-4" />
           <span className="hidden sm:inline">
-            {isDeleting ? 'Deletando...' : 'Deletar gasto'}
+            {deleteExpense?.loading ? 'Deletando...' : 'Deletar gasto'}
           </span>
         </Button>
       )}
@@ -320,12 +342,12 @@ export default function DetailsExpense({
             size="sm"
             variant="none"
             onClick={handleSaveReceipt}
-            disabled={isUpdatingReceipt || newBase64Images.length === 0}
+            disabled={updateReceipt?.loading || newBase64Images.length === 0}
             className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-1 text-white transition-colors"
           >
             <Save className="h-4 w-4" />
             <span className="hidden sm:inline">
-              {isUpdatingReceipt ? 'Salvando...' : 'Salvar comprovantes'}
+              {updateReceipt?.loading ? 'Salvando...' : 'Salvar comprovantes'}
             </span>
           </Button>
         </>
@@ -342,9 +364,9 @@ export default function DetailsExpense({
         onConfirm={handleConfirmDeleteExpense}
         title="Deletar gasto"
         message="Tem certeza que deseja deletar este gasto? Esta ação não pode ser desfeita."
-        confirmText={isDeleting ? 'Deletando...' : 'Deletar'}
+        confirmText={deleteExpense?.loading ? 'Deletando...' : 'Deletar'}
         cancelText="Cancelar"
-        isLoading={isDeleting}
+        isLoading={deleteExpense?.loading || false}
         variant="destructive"
       />
 
@@ -355,9 +377,9 @@ export default function DetailsExpense({
         onConfirm={handleConfirmDeleteReceipt}
         title="Deletar comprovante"
         message="Tem certeza que deseja deletar este comprovante? Esta ação não pode ser desfeita."
-        confirmText={isDeletingReceipt ? 'Deletando...' : 'Deletar'}
+        confirmText={deleteReceipt?.loading ? 'Deletando...' : 'Deletar'}
         cancelText="Cancelar"
-        isLoading={isDeletingReceipt}
+        isLoading={deleteReceipt?.loading || false}
         variant="destructive"
       />
 
