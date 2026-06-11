@@ -1,6 +1,7 @@
 'use client';
 
 import ListExpenses from '@/features/expenses/components/listExpense/ListExpenses';
+import { useActionsExpense } from '@/features/expenses/hooks/actions/useActionsExpense';
 import { useCreateExpense } from '@/features/expenses/hooks/create/useCreateExpense';
 import { useListExpense } from '@/features/expenses/hooks/listExpenses/useListExpenses';
 import PageContainer from '@/shared/components/layout/PageContainer';
@@ -22,6 +23,16 @@ export default function ListExpensesAdminPage() {
     });
 
   const createExpenseForm = useCreateExpense(eventId);
+
+  const {
+    // função para deletar o gasto
+    deleteExpense,
+  } = useActionsExpense();
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    await deleteExpense.execute(expenseId);
+    router.back();
+  };
 
   const handleBack = () => {
     router.push('/admin/expenses');
@@ -94,6 +105,7 @@ export default function ListExpensesAdminPage() {
         onViewDetails={handleViewDetails}
         onPageChange={setPage}
         createForm={createExpenseForm}
+        deleteExpense={deleteExpense}
       />
     );
   };
