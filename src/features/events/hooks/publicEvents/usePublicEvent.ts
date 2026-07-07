@@ -5,9 +5,9 @@ import {
 import { usePublicEventQuery } from './usePublicEventQuery';
 
 export function usePublicEvent({
-  eventId,
+  slug,
 }: UsePublicEventParams): UsePublicEventResult {
-  const { data, isLoading, error, refetch } = usePublicEventQuery(eventId);
+  const { data, isLoading, error, refetch } = usePublicEventQuery(slug);
 
   return {
     event: data || null,
