@@ -1,6 +1,7 @@
 'use client';
 
 import ListExpenses from '@/features/expenses/components/listExpense/ListExpenses';
+import useExpenseReports from '@/features/expenses/hooks/actions/reports/useExpenseReports';
 import { useActionsExpense } from '@/features/expenses/hooks/actions/useActionsExpense';
 import { useCreateExpense } from '@/features/expenses/hooks/create/useCreateExpense';
 import { useListExpense } from '@/features/expenses/hooks/listExpenses/useListExpenses';
@@ -15,6 +16,43 @@ export default function ListExpensesSuperPage() {
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
+  const handleBack = () => {
+    router.push('/super/expenses');
+  };
+
+  // Early return para quando eventId não está disponível
+  if (!eventId) {
+    return (
+      <PageContainer
+        title="Gastos do Evento"
+        description="Registre e acompanhe os gastos associados ao evento."
+        showBackButton
+        backButtonAction={handleBack}
+      >
+        <div className="space-y-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Skeleton className="h-10 w-32" />
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Card
+                key={index}
+                className="overflow-hidden rounded-xl border-0 shadow-sm"
+              >
+                <CardContent className="space-y-3 p-4">
+                  <Skeleton className="h-5 w-4/5" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-24" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
+
   const { expense, total, loading, error, page, pageCount, setPage } =
     useListExpense({
       eventId,
@@ -24,17 +62,12 @@ export default function ListExpensesSuperPage() {
 
   const createExpenseForm = useCreateExpense(eventId);
 
-  const {
-    // função para deletar o gasto
-    deleteExpense,
-  } = useActionsExpense();
+  const { deleteExpense } = useActionsExpense();
 
-  const handleBack = () => {
-    router.push('/super/expenses');
-  };
+  const { generateListExpensesPdf } = useExpenseReports();
 
   const handleViewDetails = (expenseId: string) => {
-    router.push(`/super/expenses/${expenseId}`);
+    router.push(`/super/expenses/${eventId}/${expenseId}`);
   };
 
   const renderSkeletonGrid = () => {
@@ -97,10 +130,12 @@ export default function ListExpensesSuperPage() {
         page={page}
         pageSize={10}
         pageCount={pageCount}
+        eventId={eventId}
         onViewDetails={handleViewDetails}
         onPageChange={setPage}
         createForm={createExpenseForm}
         deleteExpense={deleteExpense}
+        generateListExpensePdf={generateListExpensesPdf}
       />
     );
   };
