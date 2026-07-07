@@ -9,7 +9,6 @@ import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
-import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -18,7 +17,6 @@ const PAGE_SIZE = 10;
 export default function ListInscriptionsAdminPage() {
   const params = useParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 

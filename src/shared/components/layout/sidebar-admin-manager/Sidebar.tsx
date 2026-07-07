@@ -105,10 +105,7 @@ export default function AppSidebarAdminManager({
   return (
     <SidebarProvider style={sidebarStyle}>
       <div className="flex w-full">
-        <Sidebar
-          className="bg-transparent"
-          sidebarClassName="liquid-panel liquid-panel-no-border"
-        >
+        <Sidebar className="bg-transparent">
           <SidebarHeader className="border-sidebar-border flex items-center justify-center border-b py-4">
             <Logo className="h-10 w-10" showTitle={false} />
           </SidebarHeader>

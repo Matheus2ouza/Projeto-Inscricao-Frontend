@@ -1,9 +1,9 @@
 import {
   GeneratelistInscriptionsPdfInput,
   GeneratelistInscriptionsPdfResponse,
-} from "@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
+} from '@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes';
+import axiosInstance from '@/shared/lib/apiClient';
+import qs from 'qs';
 
 export async function generatelistInscriptionsPdf({
   eventId,
@@ -33,7 +33,7 @@ export async function generatelistInscriptionsPdf({
             startDate,
             endDate,
           },
-          paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+          paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
         },
       );
     return data;
@@ -45,7 +45,7 @@ export async function generatelistInscriptionsPdf({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar as inscrições.",
+        'Não foi possível buscar as inscrições.',
     );
   }
 }

@@ -8,14 +8,14 @@
  * downloadFile(base64String, "planilha.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
  */
 export function downloadFile(
-  pdfBase64: string,
+  fileBase64: string,
   filename: string,
   contentType:
-    | "application/pdf"
-    | "application/zip"
-    | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    | 'application/pdf'
+    | 'application/zip'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ) {
-  const byteCharacters = atob(pdfBase64);
+  const byteCharacters = atob(fileBase64);
   const byteNumbers = new Array(byteCharacters.length);
 
   for (let i = 0; i < byteCharacters.length; i++) {
@@ -25,7 +25,7 @@ export function downloadFile(
   const byteArray = new Uint8Array(byteNumbers);
   const blob = new Blob([byteArray], { type: contentType });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);

@@ -1,21 +1,21 @@
 export enum InscriptionStatus {
-  PENDING = "PENDING",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  PAID = "PAID",
-  EXPIRED = "EXPIRED",
-  CANCELLED = "CANCELLED",
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED',
 }
 
 export enum StatusPayment {
-  APPROVED = "APPROVED",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  REFUSED = "REFUSED",
+  APPROVED = 'APPROVED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  REFUSED = 'REFUSED',
 }
 
 export enum PaymentMethod {
-  DINHEIRO = "DINHEIRO",
-  PIX = "PIX",
-  CARTAO = "CARTAO",
+  DINHEIRO = 'DINHEIRO',
+  PIX = 'PIX',
+  CARTAO = 'CARTAO',
 }
 
 export type GeneratelistInscriptionsPdfInput = {
@@ -33,5 +33,5 @@ export type GeneratelistInscriptionsPdfInput = {
 export type GeneratelistInscriptionsPdfResponse = {
   filename: string;
   fileBase64?: string;
-  contentType: "application/pdf" | "application/zip";
+  contentType: 'application/pdf' | 'application/zip';
 };

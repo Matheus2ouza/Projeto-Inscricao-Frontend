@@ -1,17 +1,28 @@
 'use client';
 
 import { Spinner } from '@/components/ui/shadcn-io/spinner';
+import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/shared/components/ui/card';
 import { Pagination } from 'antd';
-import { Calendar, DollarSign, Eye, Plus, Trash, User } from 'lucide-react';
+import {
+  Calendar,
+  DollarSign,
+  Download,
+  Eye,
+  Plus,
+  Trash,
+  User,
+} from 'lucide-react';
 import type { BaseSyntheticEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import { expenseFormData } from '../../schema/createExpense/createExpenseSchema';
+import { GenerateListeExpensesPdfInput } from '../../types/actions/reports/generateListeExpensesPdfTypes';
 import { Expense, PaymentMethod } from '../../types/listExpenses/expensesTypes';
 import CreateExpenseModal from './CreateExpenseModal';
+import SheetListExpenses from './pdf/SheetListExpenses';
 
 interface ExpensesByEventProps {
   expenses: Expense[];
@@ -19,6 +30,7 @@ interface ExpensesByEventProps {
   page: number;
   pageSize: number;
   pageCount: number;
+  eventId: string;
   onViewDetails: (expenseId: string) => void;
   onPageChange: (page: number) => void;
 
@@ -34,7 +46,13 @@ interface ExpensesByEventProps {
     execute: (expenseId: string) => Promise<void>;
     loading: boolean;
   };
+
+  generateListExpensePdf: {
+    execute: (data: GenerateListeExpensesPdfInput) => Promise<void>;
+    loading: boolean;
+  };
 }
+
 const paymentMethodLabels: Record<PaymentMethod, string> = {
   PIX: 'PIX',
   CARTAO: 'Cartão',
@@ -55,12 +73,22 @@ export default function ListExpenses({
   page,
   pageSize,
   pageCount,
+  eventId,
   onViewDetails,
   onPageChange,
   createForm,
   deleteExpense,
+  generateListExpensePdf,
 }: ExpensesByEventProps) {
   const [openCreate, setOpenCreate] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
+    null,
+  );
+  const [selectedExpenseDescription, setSelectedExpenseDescription] =
+    useState<string>('');
+  const [reportsDrawerOpen, setReportsDrawerOpen] = useState(false);
+
   const { form, onSubmit, submitting } = createForm;
 
   const expensesList = expenses ?? [];
@@ -86,9 +114,32 @@ export default function ListExpenses({
     return `${paymentMethodColors[method]} shrink-0`;
   };
 
+  const handleDeleteClick = (expenseId: string, expenseDescription: string) => {
+    setSelectedExpenseId(expenseId);
+    setSelectedExpenseDescription(expenseDescription);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedExpenseId) {
+      await deleteExpense.execute(selectedExpenseId);
+      setDeleteDialogOpen(false);
+      setSelectedExpenseId(null);
+      setSelectedExpenseDescription('');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <Button
+          onClick={() => setReportsDrawerOpen(true)}
+          className="flex items-center gap-2"
+          disabled={generateListExpensePdf.loading}
+        >
+          <Download className="h-4 w-4" />
+          {generateListExpensePdf.loading ? 'Gerando...' : 'Gerar Relatório'}
+        </Button>
         <Button
           onClick={() => setOpenCreate(true)}
           className="flex items-center gap-2"
@@ -96,6 +147,14 @@ export default function ListExpenses({
           <Plus className="h-4 w-4" /> Registrar Gasto
         </Button>
       </div>
+
+      <SheetListExpenses
+        open={reportsDrawerOpen}
+        onOpenChange={setReportsDrawerOpen}
+        eventId={eventId}
+        onGeneratePdf={generateListExpensePdf.execute}
+        generating={generateListExpensePdf.loading}
+      />
 
       {expenses.length === 0 && (
         <Card className="border-dashed shadow-none">
@@ -123,6 +182,18 @@ export default function ListExpenses({
         submitting={submitting}
       />
 
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Gasto"
+        message={`Tem certeza que deseja excluir o gasto "${selectedExpenseDescription}"? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        isLoading={deleteExpense.loading}
+        variant="destructive"
+      />
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {expensesList.map((expense) => (
           <Card
@@ -130,7 +201,6 @@ export default function ListExpenses({
             className="group flex h-full flex-col overflow-hidden rounded-xl border-0 shadow-sm transition-all hover:shadow-md"
           >
             <CardContent className="flex-1 space-y-3 p-4 pb-2">
-              {/* Conteúdo existente se mantém igual */}
               {/* Cabeçalho com título e badge */}
               <div className="flex items-start justify-between gap-2">
                 <h3 className="line-clamp-2 flex-1 text-base font-semibold text-gray-900 dark:text-white">
@@ -181,10 +251,12 @@ export default function ListExpenses({
                 variant="destructive"
                 size="sm"
                 className="aspect-square"
-                onClick={() => deleteExpense.execute(expense.id)}
+                onClick={() =>
+                  handleDeleteClick(expense.id, expense.description)
+                }
                 disabled={deleteExpense.loading}
               >
-                {deleteExpense.loading ? (
+                {deleteExpense.loading && selectedExpenseId === expense.id ? (
                   <Spinner
                     data-icon="inline-start"
                     variant="circle"

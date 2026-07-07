@@ -301,7 +301,6 @@ export default function DetailsInscriptionTable({
       {!isEditingInscription && (
         <Button
           type="button"
-          variant="none"
           size="sm"
           onClick={async () => {
             await onDownloadInscriptionDetailsPdf(inscription.id);
@@ -319,7 +318,6 @@ export default function DetailsInscriptionTable({
 
       {!isEditingInscription ? (
         <Button
-          variant="none"
           type="button"
           size="sm"
           className="flex items-center justify-center gap-1 bg-green-500 p-0 text-white transition-colors hover:bg-green-600"
@@ -333,7 +331,6 @@ export default function DetailsInscriptionTable({
           <Button
             type="button"
             size="sm"
-            variant="none"
             onClick={handleCancelInscriptionEdit}
             disabled={isSavingInscription}
             className="flex items-center justify-center gap-1 bg-red-500 text-white transition-colors hover:bg-red-600"
@@ -344,7 +341,6 @@ export default function DetailsInscriptionTable({
           <Button
             type="button"
             size="sm"
-            variant="none"
             onClick={handleSaveInscription}
             disabled={isSavingInscription}
             className="bg-primary hover:bg-primary/90 gap-1 text-white transition-colors"
@@ -360,7 +356,6 @@ export default function DetailsInscriptionTable({
       {!isEditingInscription && (
         <Button
           type="button"
-          variant="none"
           size="sm"
           onClick={() => setDeleteDialogOpen(true)}
           disabled={!onDeleteInscription || !!isDeletingInscription}
@@ -719,7 +714,6 @@ export default function DetailsInscriptionTable({
                                   if (!date) return;
                                   setCustomDate(date);
                                 }}
-                                initialFocus
                               />
                             </div>
                             <Input

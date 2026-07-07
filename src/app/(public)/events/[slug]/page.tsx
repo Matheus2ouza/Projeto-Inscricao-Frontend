@@ -12,14 +12,14 @@ import { useParams, useRouter } from 'next/navigation';
 export default function EventPage() {
   const router = useRouter();
   const params = useParams();
-  const rawEventId = params.eventId;
-  const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
+  const rawSlug = params.slug;
+  const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug;
 
-  if (!eventId) {
+  if (!slug) {
     return null;
   }
 
-  const { event, loading, error, refetch } = usePublicEvent({ eventId });
+  const { event, loading, error, refetch } = usePublicEvent({ slug });
 
   const { palette, isDark, swatches, ready } = useImagePalette(event?.image);
 

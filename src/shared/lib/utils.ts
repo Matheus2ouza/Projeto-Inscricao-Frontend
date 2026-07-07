@@ -1,10 +1,9 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+export const isProd = process.env.NODE_ENV === 'production';
 
-export const isProd = process.env.NODE_ENV === "production";
-
-if (!isProd) console.log("Rodando em dev 🛠️");
+if (!isProd) console.log('Rodando em dev 🛠️');

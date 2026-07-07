@@ -93,8 +93,8 @@ export default function SelectedEventManager({
     }
   };
 
-  const openEventPage = (eventId: string) => {
-    window.open(`/events/${eventId}`, '_blank');
+  const openEventPage = (url: string) => {
+    window.open(url, '_blank');
   };
 
   const currentPageSize = 4;
@@ -315,11 +315,7 @@ export default function SelectedEventManager({
                         <input
                           readOnly
                           className="w-full truncate rounded border bg-transparent px-2 py-1 text-xs"
-                          value={`${
-                            typeof window !== 'undefined'
-                              ? window.location.origin
-                              : ''
-                          }/events/${event.id}`}
+                          value={`${event.url}`}
                         />
                       </div>
                       <div className="flex gap-1 sm:gap-2">
@@ -334,10 +330,7 @@ export default function SelectedEventManager({
                               : 'border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100',
                           )}
                           onClick={() =>
-                            copyToClipboard(
-                              `${window.location.origin}/events/${event.id}`,
-                              event.id,
-                            )
+                            copyToClipboard(`${event.url}`, event.url)
                           }
                           title={isCopied ? 'Copiado!' : 'Copiar URL'}
                         >
@@ -352,7 +345,7 @@ export default function SelectedEventManager({
                           size="sm"
                           variant="outline"
                           className="h-7 w-7 border-green-200 bg-green-50 p-1 text-green-600 hover:bg-green-100 sm:h-8 sm:w-8"
-                          onClick={() => openEventPage(event.id)}
+                          onClick={() => openEventPage(event.url)}
                           title="Visualizar Evento"
                         >
                           <ExternalLink className="h-3 w-3" />

@@ -1,8 +1,8 @@
-export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
+export type StatusEvent = 'OPEN' | 'CLOSE' | 'FINALIZED';
 export const STATUS_EVENT_VALUES: StatusEvent[] = [
-  "OPEN",
-  "CLOSE",
-  "FINALIZED",
+  'OPEN',
+  'CLOSE',
+  'FINALIZED',
 ];
 
 export type Responsible = {
@@ -17,6 +17,7 @@ export type Event = {
   endDate: string;
   quantityParticipants: number;
   amountCollected: number;
+  url: string;
   imageUrl?: string;
   logoUrl?: string;
   location?: string;

@@ -1,3 +1,4 @@
+import { TooltipProvider } from '@/providers/TooltipProvider';
 import PrivateNavbar from '@/shared/components/layout/private-navbar';
 import AppSidebarAdminManager from '@/shared/components/layout/sidebar-admin-manager/Sidebar';
 import SessionUserProvider from '@/shared/providers/session-user-provider';
@@ -12,10 +13,12 @@ export default function PrivateLayout({
   return (
     <ConfigProvider locale={ptBR}>
       <SessionUserProvider>
-        <AppSidebarAdminManager>
-          <PrivateNavbar />
-          {children}
-        </AppSidebarAdminManager>
+        <TooltipProvider>
+          <AppSidebarAdminManager>
+            <PrivateNavbar />
+            {children}
+          </AppSidebarAdminManager>
+        </TooltipProvider>
       </SessionUserProvider>
     </ConfigProvider>
   );

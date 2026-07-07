@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { STATUS_EVENT_VALUES, UseEventsParams, UseEventsResult } from "../../types/eventTypes";
+import { useEffect, useState } from 'react';
 import {
-  useEventsQuery,
-  usePrefetchEventsQuery,
-} from "./useEventsQuery";
+  STATUS_EVENT_VALUES,
+  UseEventsParams,
+  UseEventsResult,
+} from '../../types/eventTypes';
+import { useEventsQuery, usePrefetchEventsQuery } from './useEventsQuery';
 
 export function useEventsAll({
   initialPage = 1,
@@ -15,13 +16,14 @@ export function useEventsAll({
   const [page, setPage] = useState(initialPage);
   const statusFilter = status?.length ? status : undefined;
   const queryStatuses = statusFilter ?? STATUS_EVENT_VALUES;
-  const statusKey = status?.join(",") ?? "default";
+  const statusKey = status?.join(',') ?? 'default';
 
-  const { data, isLoading: loading, error, refetch } = useEventsQuery(
-    page,
-    pageSize,
-    queryStatuses
-  );
+  const {
+    data,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useEventsQuery(page, pageSize, queryStatuses);
 
   const { prefetchNextPage } = usePrefetchEventsQuery();
 

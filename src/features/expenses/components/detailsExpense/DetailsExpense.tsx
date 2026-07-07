@@ -258,7 +258,6 @@ export default function DetailsExpense({
       {!isEditing ? (
         <Button
           type="button"
-          variant="none"
           size="sm"
           className="flex items-center justify-center gap-1 bg-green-500 p-0 text-white transition-colors hover:bg-green-600"
           onClick={handleEdit}
@@ -271,7 +270,6 @@ export default function DetailsExpense({
           <Button
             type="button"
             size="sm"
-            variant="none"
             onClick={handleCancel}
             className="flex items-center justify-center gap-1 bg-red-500 text-white transition-colors hover:bg-red-600"
           >
@@ -281,7 +279,6 @@ export default function DetailsExpense({
           <Button
             type="button"
             size="sm"
-            variant="none"
             onClick={handleSave}
             disabled={updateExpense?.loading}
             className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-1 text-white transition-colors"
@@ -297,7 +294,6 @@ export default function DetailsExpense({
       {!isEditing && (
         <Button
           type="button"
-          variant="none"
           size="sm"
           onClick={handleDeleteExpenseClick}
           disabled={deleteExpense?.loading}
@@ -317,7 +313,6 @@ export default function DetailsExpense({
       {!isEditingReceipt ? (
         <Button
           type="button"
-          variant="none"
           size="sm"
           className="flex items-center justify-center gap-1 bg-green-500 p-0 text-white transition-colors hover:bg-green-600"
           onClick={handleEditReceipt}
@@ -330,7 +325,6 @@ export default function DetailsExpense({
           <Button
             type="button"
             size="sm"
-            variant="none"
             onClick={handleCancelReceipt}
             className="flex items-center justify-center gap-1 bg-red-500 text-white transition-colors hover:bg-red-600"
           >
@@ -340,7 +334,6 @@ export default function DetailsExpense({
           <Button
             type="button"
             size="sm"
-            variant="none"
             onClick={handleSaveReceipt}
             disabled={updateReceipt?.loading || newBase64Images.length === 0}
             className="bg-primary hover:bg-primary/90 flex items-center justify-center gap-1 text-white transition-colors"
