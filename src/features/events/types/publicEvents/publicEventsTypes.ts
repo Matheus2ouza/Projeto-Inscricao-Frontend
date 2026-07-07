@@ -1,12 +1,12 @@
 export enum InscriptionMode {
-  NORMAL = "NORMAL",
-  GUEST = "GUEST",
+  NORMAL = 'NORMAL',
+  GUEST = 'GUEST',
 }
 
 export enum EventStatus {
-  OPEN = "OPEN",
-  CLOSE = "CLOSE",
-  FINALIZED = "FINALIZED",
+  OPEN = 'OPEN',
+  CLOSE = 'CLOSE',
+  FINALIZED = 'FINALIZED',
 }
 
 export type Event = {
@@ -25,7 +25,7 @@ export type Event = {
 };
 
 export type UsePublicEventParams = {
-  eventId: string;
+  slug: string;
 };
 
 export type UsePublicEventResult = {

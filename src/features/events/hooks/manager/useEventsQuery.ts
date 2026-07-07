@@ -1,13 +1,13 @@
-import { getEvents } from "@/features/events/api/getEvents";
-import { StatusEvent } from "@/features/events/types/selectEvent";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getEvents } from '@/features/events/api/getEvents';
+import { StatusEvent } from '@/features/events/types/selectEvent';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 // Chaves de query para organização
 export const eventsKeys = {
-  all: ["events"] as const,
-  lists: () => [...eventsKeys.all, "list"] as const,
+  all: ['events'] as const,
+  lists: () => [...eventsKeys.all, 'list'] as const,
   list: (page: number, pageSize: number, status?: StatusEvent[]) =>
     [...eventsKeys.lists(), { page, pageSize, status }] as const,
-  details: () => [...eventsKeys.all, "detail"] as const,
+  details: () => [...eventsKeys.all, 'detail'] as const,
   detail: (id: string) => [...eventsKeys.details(), id] as const,
 };
 
