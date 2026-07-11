@@ -1,8 +1,8 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 import type {
   GenaratePdfReportInput,
   GenaratePdfReportOutput,
-} from "../../types/reportGeral/reportTypes";
+} from '../../types/reportGeral/reportTypes';
 
 type GenaratePdfReportApiResponse = {
   data?: {
@@ -18,7 +18,7 @@ export async function genaratePdfReport({
   eventId,
 }: GenaratePdfReportInput): Promise<GenaratePdfReportOutput> {
   try {
-    const response = await axiosInstance.get<GenaratePdfReportApiResponse>(
+    const response = await axiosClient.get<GenaratePdfReportApiResponse>(
       `/report/${eventId}/general/pdf`,
     );
 
@@ -27,7 +27,7 @@ export async function genaratePdfReport({
     const filename = payload?.filename ?? `relatorio-${eventId}.pdf`;
 
     if (!pdfBase64) {
-      throw new Error("Resposta do servidor não contém o PDF gerado.");
+      throw new Error('Resposta do servidor não contém o PDF gerado.');
     }
 
     return {
@@ -45,7 +45,7 @@ export async function genaratePdfReport({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Falha ao gerar PDF do relatório do evento",
+        'Falha ao gerar PDF do relatório do evento',
     );
   }
 }

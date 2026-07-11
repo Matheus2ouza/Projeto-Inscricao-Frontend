@@ -1,6 +1,6 @@
-import { getListPayments } from '@/features/payments/api/listPayment/getPayments';
-import { ListPaymentsResponse } from '@/features/payments/types/listPayment/listPaymentTypes';
+import { ListPaymentsResponse } from '@/features/payments/types/listPayments/listPaymentsTypes';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { listPaymentsAction } from '../../actions/listPayments/listPaymentsAction';
 
 export const ListPaymentKey = {
   all: ['listPayment'] as const,
@@ -18,7 +18,7 @@ export function useListPaymentQuery(
 ) {
   return useQuery<ListPaymentsResponse>({
     queryKey: ListPaymentKey.list(eventId, page, pageSize),
-    queryFn: () => getListPayments(eventId, page, pageSize),
+    queryFn: () => listPaymentsAction(eventId, page, pageSize),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
@@ -58,7 +58,7 @@ export function usePrefetchListPaymentQuery() {
     prefetchNextPage: (eventId: string, page: number, pageSize: number) => {
       queryClient.prefetchQuery({
         queryKey: ListPaymentKey.list(eventId, page + 1, pageSize),
-        queryFn: () => getListPayments(eventId, page + 1, pageSize),
+        queryFn: () => listPaymentsAction(eventId, page + 1, pageSize),
         staleTime: 5 * 60 * 1000,
       });
     },

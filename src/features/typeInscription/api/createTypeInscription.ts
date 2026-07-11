@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import qs from 'qs';
 import { TypeInscription } from '../types/typesInscriptionsTypes';
 
@@ -16,7 +16,7 @@ export async function createTypeInscription(
   input: CreateTypeInscriptionInput,
 ): Promise<TypeInscription> {
   try {
-    const response = await axiosInstance.post<TypeInscription>(
+    const response = await axiosClient.post<TypeInscription>(
       `/type-inscription/${input.eventId}/create`,
       input,
       {

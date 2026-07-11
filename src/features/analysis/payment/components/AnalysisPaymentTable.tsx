@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
 import {
   Pagination,
   PaginationContent,
@@ -9,17 +9,17 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/shared/components/ui/pagination";
-import { getEventStatusInfo } from "@/shared/utils/getEventStatusInfo";
-import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
-import { getGradientClass } from "@/shared/utils/getGenerateGradient";
-import { getInitial } from "@/shared/utils/getInitials";
-import { Card, CardBody, CardFooter } from "@heroui/react";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { Loader2 } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-import { Event } from "../types/eventTypes";
+} from '@/shared/components/ui/pagination';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
+import { getEventStatusInfo } from '@/shared/utils/getEventStatusInfo';
+import { getFontSizeClass } from '@/shared/utils/getFontSizeClass';
+import { getInitial } from '@/shared/utils/getInitials';
+import { Card, CardBody, CardFooter } from '@heroui/react';
+import { AspectRatio } from '@radix-ui/react-aspect-ratio';
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
+import { Event } from '../types/eventTypes';
 
 interface AnalysisPaymentTableProps {
   events: Event[];
@@ -65,8 +65,8 @@ export default function AnalysisPaymentTable({
 
     if (countPayments === 0) {
       return {
-        label: "Sem Pagamentos",
-        badgeClass: "bg-gray-500",
+        label: 'Sem Pagamentos',
+        badgeClass: 'bg-gray-500',
         disabled: true,
         count: 0,
       };
@@ -74,8 +74,8 @@ export default function AnalysisPaymentTable({
 
     if (inAnalysisCount === 0) {
       return {
-        label: "Análise Completa",
-        badgeClass: "bg-green-500",
+        label: 'Análise Completa',
+        badgeClass: 'bg-green-500',
         disabled: false,
         count: 0,
       };
@@ -85,21 +85,21 @@ export default function AnalysisPaymentTable({
     if (inAnalysisCount <= 5) {
       return {
         label: `${inAnalysisCount} Em Análise`,
-        badgeClass: "bg-blue-500",
+        badgeClass: 'bg-blue-500',
         disabled: false,
         count: inAnalysisCount,
       };
     } else if (inAnalysisCount <= 15) {
       return {
         label: `${inAnalysisCount} Em Análise`,
-        badgeClass: "bg-blue-600",
+        badgeClass: 'bg-blue-600',
         disabled: false,
         count: inAnalysisCount,
       };
     } else {
       return {
         label: `${inAnalysisCount} Em Análise`,
-        badgeClass: "bg-blue-700",
+        badgeClass: 'bg-blue-700',
         disabled: false,
         count: inAnalysisCount,
       };
@@ -108,7 +108,7 @@ export default function AnalysisPaymentTable({
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {events.map((event) => {
           const statusInfo = getAnalysisStatusInfo(
             event.countPayments,
@@ -116,7 +116,7 @@ export default function AnalysisPaymentTable({
           );
 
           const statusEvent = getEventStatusInfo(event.status);
-          const gradientClass = getGradientClass(event.name);
+          const gradientClass = generateGradientClass();
           // Se não há imagem, não está carregando. Se há imagem, verifica o estado
           const isImageLoading = event.imageUrl
             ? imageLoadingStates[event.id] !== false
@@ -125,17 +125,17 @@ export default function AnalysisPaymentTable({
           return (
             <Card
               key={event.id}
-              className="w-full hover:shadow-xl transition-all duration-300 border border-transparent shadow-md rounded-xl hover:scale-[1.02] overflow-visible bg-white dark:bg-zinc-900 dark:border-zinc-800"
+              className="w-full overflow-visible rounded-xl border border-transparent bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
             >
-              <CardBody className="p-0 relative overflow-visible">
-                <div className="w-full relative">
+              <CardBody className="relative overflow-visible p-0">
+                <div className="relative w-full">
                   <AspectRatio ratio={16 / 9} className="w-full">
                     {event.imageUrl ? (
                       <>
                         {/* Loading overlay para a imagem */}
                         {isImageLoading && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-muted/80 dark:bg-muted/40 z-10">
-                            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                          <div className="bg-muted/80 dark:bg-muted/40 absolute inset-0 z-10 flex items-center justify-center">
+                            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
                           </div>
                         )}
                         <Image
@@ -148,12 +148,12 @@ export default function AnalysisPaymentTable({
                           priority={true}
                           loading="eager"
                           decoding="async"
-                          className="object-cover rounded-t-xl"
+                          className="rounded-t-xl object-cover"
                           onLoad={() => handleImageLoad(event.id)}
                           onLoadStart={() => initializeImageLoading(event.id)}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.style.display = "none";
+                            target.style.display = 'none';
                             const parent = target.parentElement;
                             if (parent) {
                               parent.innerHTML = `
@@ -170,9 +170,9 @@ export default function AnalysisPaymentTable({
                     ) : (
                       // Gradiente quando não há imagem
                       <div
-                        className={`w-full h-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+                        className={`h-full w-full rounded-t-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
                       >
-                        <h3 className="text-white text-5xl sm:text-6xl md:text-7xl font-semibold tracking-wide text-center px-4">
+                        <h3 className="px-4 text-center text-5xl font-semibold tracking-wide text-white sm:text-6xl md:text-7xl">
                           {getInitial(event.name)}
                         </h3>
                       </div>
@@ -186,20 +186,20 @@ export default function AnalysisPaymentTable({
                 </div>
                 {/* Badge de status - só aparece após a imagem carregar */}
                 {!isImageLoading && (
-                  <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 select-none pointer-events-none">
+                  <div className="pointer-events-none absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 select-none">
                     <div
-                      className={`w-8 h-8 rounded-full ${statusInfo.badgeClass} border-2 border-white dark:border-zinc-900 shadow-lg flex items-center justify-center text-white font-bold text-xs`}
+                      className={`h-8 w-8 rounded-full ${statusInfo.badgeClass} flex items-center justify-center border-2 border-white text-xs font-bold text-white shadow-lg dark:border-zinc-900`}
                     >
                       {event.countPayments === 0
-                        ? "0"
+                        ? '0'
                         : statusInfo.count === 0
-                          ? "✓"
+                          ? '✓'
                           : statusInfo.count}
                     </div>
                   </div>
                 )}
               </CardBody>
-              <CardFooter className="flex flex-col items-start p-4 gap-3 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800">
+              <CardFooter className="flex flex-col items-start gap-3 border-t border-gray-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
                 <h3
                   className={`font-bold ${getFontSizeClass(
                     event.name,
@@ -209,15 +209,15 @@ export default function AnalysisPaymentTable({
                 </h3>
 
                 {/* Informações sobre pagamentos */}
-                <div className="flex flex-col gap-2 w-full">
-                  <div className="flex justify-between items-center text-sm dark:text-white">
+                <div className="flex w-full flex-col gap-2">
+                  <div className="flex items-center justify-between text-sm dark:text-white">
                     <span className="text-gray-600 dark:text-gray-400">
                       Total de Pagamentos:
                     </span>
                     <span className="font-semibold">{event.countPayments}</span>
                   </div>
 
-                  <div className="flex justify-between items-center text-sm dark:text-white">
+                  <div className="flex items-center justify-between text-sm dark:text-white">
                     <span className="text-gray-600 dark:text-gray-400">
                       Pendentes:
                     </span>
@@ -228,7 +228,7 @@ export default function AnalysisPaymentTable({
                 </div>
 
                 {/* Botão de Análise */}
-                <div className="flex flex-col w-full gap-2 mt-2 ">
+                <div className="mt-2 flex w-full flex-col gap-2">
                   <Button
                     variant="default"
                     size="sm"
@@ -244,25 +244,25 @@ export default function AnalysisPaymentTable({
       </div>
 
       {events.length === 0 && (
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Nenhum evento encontrado
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
             Não há eventos disponíveis no momento.
           </p>
         </div>
       )}
 
       {pageCount > 1 && (
-        <div className="flex justify-center mt-8">
+        <div className="mt-8 flex justify-center">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
                   onClick={() => page > 1 && onPageChange(page - 1)}
-                  href={page > 1 ? "#" : undefined}
-                  className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                  href={page > 1 ? '#' : undefined}
+                  className={page === 1 ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
 
@@ -281,9 +281,9 @@ export default function AnalysisPaymentTable({
               <PaginationItem>
                 <PaginationNext
                   onClick={() => page < pageCount && onPageChange(page + 1)}
-                  href={page < pageCount ? "#" : undefined}
+                  href={page < pageCount ? '#' : undefined}
                   className={
-                    page === pageCount ? "pointer-events-none opacity-50" : ""
+                    page === pageCount ? 'pointer-events-none opacity-50' : ''
                   }
                 />
               </PaginationItem>

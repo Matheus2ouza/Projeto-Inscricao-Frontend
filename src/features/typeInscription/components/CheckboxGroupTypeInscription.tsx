@@ -1,10 +1,9 @@
 'use client';
 
-import * as React from 'react';
-
+import { useListTypeInscriptionsToManager } from '@/features/typeInscription/hook/listTypeInscriptionsToManager/useListTypeInscriptionsToManager';
 import { Checkbox } from '@/shared/components/ui/checkbox';
 import { Label } from '@/shared/components/ui/label';
-import { useTypeInscriptionsQuery } from '../hook/useTypeInscriptionsQuery';
+import * as React from 'react';
 
 export type CheckboxGroupTypeInscriptionItem = {
   id: string;
@@ -30,10 +29,12 @@ export function CheckboxGroupTypeInscription({
   disabled = false,
 }: CheckboxGroupTypeInscriptionProps) {
   const {
-    data: fetched,
-    isLoading: internalLoading,
+    typeInscriptions: fetched,
+    loading: internalLoading,
     error,
-  } = useTypeInscriptionsQuery(eventId);
+    fetched: isFetched,
+  } = useListTypeInscriptionsToManager({ eventId });
+
   const loading = loadingProp ?? internalLoading;
 
   const typeInscriptions = React.useMemo<

@@ -1,4 +1,4 @@
-import { deletePayment } from '@/features/payments/api/listPayment/deletePayment';
+import { deletePaymentAction } from '@/features/payments/actions/deletePayment/deletePaymentAction';
 import { useInvalidateListPaymentQuery } from '@/features/payments/hooks/listPayment/useListPaymentQuery';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -10,7 +10,7 @@ export function useActionsPayments() {
     useInvalidateListPaymentPendingQuery();
 
   const { mutateAsync: removePayment, isPending: isDeleting } = useMutation({
-    mutationFn: deletePayment,
+    mutationFn: deletePaymentAction,
     onSuccess: () => {
       toast.success('Pagamento removido com sucesso!');
       invalidateLists();

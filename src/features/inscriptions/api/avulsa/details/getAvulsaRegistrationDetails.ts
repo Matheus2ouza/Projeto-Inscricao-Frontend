@@ -1,22 +1,22 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 import {
   AvulsaRegistrationDetails,
   GetAvulsaRegistrationDetailsRequest,
-} from "../../../types/avulsa/avulsaTypes";
+} from '../../../types/avulsa/avulsaTypes';
 
 export async function getAvulsaRegistrationDetails({
   registrationId,
 }: GetAvulsaRegistrationDetailsRequest): Promise<AvulsaRegistrationDetails> {
   try {
-    const { data } = await axiosInstance.get<AvulsaRegistrationDetails>(
-      `inscriptions/avul/${registrationId}/details`
+    const { data } = await axiosClient.get<AvulsaRegistrationDetails>(
+      `inscriptions/avul/${registrationId}/details`,
     );
     return data;
   } catch (error) {
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao carregar detalhes da inscrição avulsa"
+        'Falha ao carregar detalhes da inscrição avulsa',
     );
   }
 }

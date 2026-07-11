@@ -1,9 +1,8 @@
 import {
   UpdateInscriptionParams,
   UpdateInscriptionResponse,
-} from "@/features/inscriptions/types/actions/updeteInscriptionType";
-import axiosInstance from "@/shared/lib/apiClient";
-
+} from '@/features/inscriptions/types/actions/updeteInscriptionType';
+import { axiosClient } from '@/lib/axios';
 export async function updateInscription({
   id,
   responsible,
@@ -12,7 +11,7 @@ export async function updateInscription({
   observation,
 }: UpdateInscriptionParams): Promise<UpdateInscriptionResponse> {
   try {
-    const response = await axiosInstance.put<UpdateInscriptionResponse>(
+    const response = await axiosClient.put<UpdateInscriptionResponse>(
       `inscriptions/${id}`,
       {
         responsible,
@@ -30,7 +29,7 @@ export async function updateInscription({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível atualizar os dados da inscrição.",
+        'Não foi possível atualizar os dados da inscrição.',
     );
   }
 }

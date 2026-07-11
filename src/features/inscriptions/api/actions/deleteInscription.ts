@@ -1,11 +1,10 @@
-import { deleteInscriptionParams } from "@/features/inscriptions/types/actions/deleteInscriptionTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-
+import { deleteInscriptionParams } from '@/features/inscriptions/types/actions/deleteInscriptionTypes';
+import { axiosClient } from '@/lib/axios';
 export async function deleteInscription({
   inscriptionId,
 }: deleteInscriptionParams) {
   try {
-    await axiosInstance.delete(`inscriptions/${inscriptionId}`);
+    await axiosClient.delete(`inscriptions/${inscriptionId}`);
   } catch (error) {
     const axiosError = error as {
       response?: { data?: { message?: string } };
@@ -14,7 +13,7 @@ export async function deleteInscription({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar os detalhes da inscrição.",
+        'Não foi possível buscar os detalhes da inscrição.',
     );
   }
 }

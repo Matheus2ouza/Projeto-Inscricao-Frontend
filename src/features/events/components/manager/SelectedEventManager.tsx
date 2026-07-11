@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import EventStatusFilter from '@/shared/components/EventStatusFilter';
 import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
 import { Badge } from '@/shared/components/ui/badge';
@@ -12,7 +13,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/shared/components/ui/pagination';
-import { cn } from '@/shared/lib/utils';
 import { getEventStatusInfo } from '@/shared/utils/getEventStatusInfo';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import { getInitialFormat } from '@/shared/utils/getInitialsFormat';

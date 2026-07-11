@@ -1,5 +1,4 @@
-import axiosInstance from "@/shared/lib/apiClient";
-
+import { axiosClient } from '@/lib/axios';
 type DownloadParticipantsPdfApiResponse = {
   data?: {
     pdfBase64?: string;
@@ -20,10 +19,9 @@ export async function downloadParticipantsPdf(
   inscriptionId: string,
 ): Promise<DownloadParticipantsPdfOutput> {
   try {
-    const response =
-      await axiosInstance.get<DownloadParticipantsPdfApiResponse>(
-        `/inscriptions/${inscriptionId}/pdf`,
-      );
+    const response = await axiosClient.get<DownloadParticipantsPdfApiResponse>(
+      `/inscriptions/${inscriptionId}/pdf`,
+    );
 
     const payload = response.data?.data ?? response.data;
     const pdfBase64 = payload?.pdfBase64;
@@ -31,7 +29,7 @@ export async function downloadParticipantsPdf(
       payload?.filename ?? `participantes-${inscriptionId.slice(0, 8)}.pdf`;
 
     if (!pdfBase64) {
-      throw new Error("Resposta do servidor não retornou o PDF da lista.");
+      throw new Error('Resposta do servidor não retornou o PDF da lista.');
     }
 
     return { pdfBase64, filename };
@@ -44,7 +42,7 @@ export async function downloadParticipantsPdf(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível gerar o PDF da lista de participantes.",
+        'Não foi possível gerar o PDF da lista de participantes.',
     );
   }
 }

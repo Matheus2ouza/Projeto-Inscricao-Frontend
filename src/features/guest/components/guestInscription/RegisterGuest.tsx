@@ -1,7 +1,6 @@
 'use client';
 
 import { useFormCreateGuestInscription } from '@/features/guest/hook/guestInscription/useFormCreateGuestInscription';
-import type { ImageSwatches } from '@/features/guest/hook/guestInscription/useImagePalette';
 import {
   guestInscriptionSchema,
   GuestInscriptionSchemaType,
@@ -11,6 +10,7 @@ import {
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
 } from '@/features/guest/types/guestInscription/guestInscriptionTypes';
+import { cn } from '@/lib/utils';
 import { GuestInscriptionAlready } from '@/shared/components/GuestInscriptionAlready';
 import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
 import { Badge } from '@/shared/components/ui/badge';
@@ -41,7 +41,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover';
-import { cn } from '@/shared/lib/utils';
+import type { ImageSwatches } from '@/shared/hooks/useImagePalette';
 import { formatDate } from '@/shared/utils/formatDate';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import { getInitial } from '@/shared/utils/getInitials';

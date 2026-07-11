@@ -1,15 +1,15 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 import {
   ModifyReceiptPaymentInput,
   ModifyReceiptPaymentResponse,
-} from "../../../types/analysisPayment/actions/modifyReceiptPaymentTypes";
+} from '../../../types/analysisPayment/actions/modifyReceiptPaymentTypes';
 
 export async function modifyReceiptPayment({
   paymentId,
   image,
 }: ModifyReceiptPaymentInput): Promise<ModifyReceiptPaymentResponse> {
   try {
-    const { data } = await axiosInstance.patch<ModifyReceiptPaymentResponse>(
+    const { data } = await axiosClient.patch<ModifyReceiptPaymentResponse>(
       `payments/${paymentId}/receipt`,
       { image },
     );
@@ -23,7 +23,7 @@ export async function modifyReceiptPayment({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

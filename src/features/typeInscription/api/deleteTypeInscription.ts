@@ -1,10 +1,10 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios/';
 
 export async function deleteTypeInscription(
   typeInscriptionId: string,
 ): Promise<void> {
   try {
-    await axiosInstance.delete(`/type-inscription/${typeInscriptionId}`);
+    await axiosClient.delete(`/type-inscription/${typeInscriptionId}`);
   } catch (error) {
     const axiosError = error as {
       response?: { data?: { message?: string } };
@@ -14,7 +14,7 @@ export async function deleteTypeInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível deletar o tipo de inscrição",
+        'Não foi possível deletar o tipo de inscrição',
     );
   }
 }

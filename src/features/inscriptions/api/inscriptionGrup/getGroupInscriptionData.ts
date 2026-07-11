@@ -1,4 +1,4 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios/';
 
 export interface GroupInscriptionDataResponse {
   cacheKey: string;
@@ -14,10 +14,10 @@ export interface GroupInscriptionDataResponse {
 }
 
 export async function getGroupInscriptionData(
-  cacheKey: string
+  cacheKey: string,
 ): Promise<GroupInscriptionDataResponse> {
-  const response = await axiosInstance.get(
-    `inscriptions/group/confirmation/${encodeURIComponent(cacheKey)}`
+  const response = await axiosClient.get(
+    `inscriptions/group/confirmation/${encodeURIComponent(cacheKey)}`,
   );
   return response.data;
 }

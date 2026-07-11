@@ -1,6 +1,6 @@
 'use client';
 
-import { Inscription } from '@/features/payments/types/registerPayment/registerPaymentTypes';
+import { Inscription } from '@/features/payments/types/registerPayment/registerPaymentTypesOld';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Checkbox } from '@/shared/components/ui/checkbox';
@@ -100,42 +100,42 @@ export default function RegisterPaymentTable({
   };
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto px-4 sm:px-6">
-        {/* Card de Ajuda para Desktop */}
-        <div className="mb-6 hidden md:block">
-          <Card className="dark:to-background w-full border-blue-100 bg-gradient-to-r from-blue-50 to-white dark:border-blue-900 dark:from-blue-950/30">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900/50">
-                    <HelpCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-300">
-                      Precisa de ajuda com registro de pagamentos?
-                    </h3>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                      Aprenda a gerenciar pagamentos de inscrições de forma
-                      eficiente.
-                    </p>
-                  </div>
+    <div className="min-h-screen">
+      {/* Card de Ajuda para Desktop */}
+      <div className="mb-6 hidden md:block">
+        <Card className="dark:to-background w-full border-blue-100 bg-gradient-to-r from-blue-50 to-white dark:border-blue-900 dark:from-blue-950/30">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900/50">
+                  <HelpCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-950/50"
-                >
-                  <Link href="/documentation/payment/register">
-                    Ver Documentação
-                  </Link>
-                </Button>
+                <div>
+                  <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-300">
+                    Precisa de ajuda com registro de pagamentos?
+                  </h3>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Aprenda a gerenciar pagamentos de inscrições de forma
+                    eficiente.
+                  </p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-950/50"
+              >
+                <Link href="/documentation/payment/register">
+                  Ver Documentação
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
+      <div className="mx-auto px-4 sm:px-6">
         {/* Card de Ajuda para Mobile */}
         <div className="mb-6 md:hidden">
           <Card className="w-full border-blue-100 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
@@ -294,7 +294,7 @@ export default function RegisterPaymentTable({
                 return (
                   <div
                     key={inscription.id}
-                    className={`rounded-lg border p-4 transition-colors ${
+                    className={`liquid-card rounded-lg border p-4 transition-colors ${
                       isSelected ? 'bg-primary/5 border-primary/20' : ''
                     } ${!inscription.canPay ? 'bg-muted/20 opacity-50' : ''}`}
                   >
@@ -382,7 +382,7 @@ export default function RegisterPaymentTable({
         </div>
 
         {/* Tabela de inscrições - Versão desktop usando ShadCN Table */}
-        <div className="hidden rounded-lg border sm:block">
+        <div className="liquid-card hidden rounded-lg border sm:block">
           <Table>
             <TableHeader>
               <TableRow>

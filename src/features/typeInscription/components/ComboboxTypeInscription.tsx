@@ -3,7 +3,7 @@
 import type { SelectProps } from 'antd';
 import { Select, Space, Spin, Tag } from 'antd';
 import * as React from 'react';
-import { useTypeInscriptionsQuery } from '../hook/useTypeInscriptionsQuery';
+import { useListTypeInscriptions } from '../hook/listTypeInscriptions/useListTypeInscriptions';
 
 export type TypeInscriptionOption = {
   label: string;
@@ -15,7 +15,7 @@ export type TypeInscriptionOption = {
 export type ComboboxTypeInscriptionProps = {
   eventId: string;
   value: string;
-  onChange: (value: string, option?: TypeInscriptionOption) => void; // Modificado para retornar o option completo
+  onChange: (value: string, option?: TypeInscriptionOption) => void;
   options?: TypeInscriptionOption[];
   loading?: boolean;
   disabled?: boolean;
@@ -32,11 +32,10 @@ export function ComboboxTypeInscription({
   placeholder = 'Selecione o tipo de inscrição',
 }: ComboboxTypeInscriptionProps) {
   const {
-    data: fetched,
-    isLoading: internalLoading,
+    typeInscriptions: fetched,
+    loading,
     error,
-  } = useTypeInscriptionsQuery(eventId);
-  const loading = loadingProp ?? internalLoading;
+  } = useListTypeInscriptions({ eventId });
 
   const typeInscriptions = React.useMemo<TypeInscriptionOption[]>(() => {
     if (options) return options;

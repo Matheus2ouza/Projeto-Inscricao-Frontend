@@ -1,13 +1,13 @@
 'use client';
 
-import BackgroundPaths from '@/features/guest/components/guestInscription/background-paths';
 import { RegisterGuest } from '@/features/guest/components/guestInscription/RegisterGuest';
 import { useDetailsEvent } from '@/features/guest/hook/guestInscription/useDetailsEvent';
-import { useImagePalette } from '@/features/guest/hook/guestInscription/useImagePalette';
+import BackgroundPaths from '@/shared/components/BackgroundPaths';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useImagePalette } from '@/shared/hooks/useImagePalette';
 import { useParams, useRouter } from 'next/navigation';
 
 export default function RegisterGuestInscription() {

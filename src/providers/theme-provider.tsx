@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import * as React from "react";
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import * as React from 'react';
 
 export function ThemeProvider({
   children,
   ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
   const [mounted, setMounted] = React.useState(false);
-  const [defaultTheme, setDefaultTheme] = React.useState<"light" | "dark">(
-    "light"
+  const [defaultTheme, setDefaultTheme] = React.useState<'light' | 'dark'>(
+    'light',
   );
 
   React.useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     if (savedTheme) setDefaultTheme(savedTheme);
     setMounted(true);
   }, []);

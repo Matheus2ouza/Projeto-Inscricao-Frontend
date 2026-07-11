@@ -1,16 +1,14 @@
-"use server";
-
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios/';
 import {
   FindAllPaginatedInscriptionRequest,
-  FindAllPaginatedInscriptionResponse
-} from "../types/InscriptionsTypes";
+  FindAllPaginatedInscriptionResponse,
+} from '../types/InscriptionsTypes';
 
 export async function getAllInscriptions(
   eventId: string,
-  params: FindAllPaginatedInscriptionRequest
+  params: FindAllPaginatedInscriptionRequest,
 ): Promise<FindAllPaginatedInscriptionResponse> {
-  const { data } = await axiosInstance.get<FindAllPaginatedInscriptionResponse>(
+  const { data } = await axiosClient.get<FindAllPaginatedInscriptionResponse>(
     `/inscriptions/${eventId}`,
     {
       params: {
@@ -18,7 +16,7 @@ export async function getAllInscriptions(
         pageSize: params.pageSize,
         limitTime: params.limitTime,
       },
-    }
+    },
   );
   return data;
 }

@@ -1,11 +1,9 @@
-import { Event } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+import { Event } from '@/features/guest/types/guestInscription/guestInscriptionTypes';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function getDetailsEvent(eventId: string): Promise<Event> {
   try {
-    const { data } = await axiosInstance.get<Event>(
-      `/events/${eventId}/details`,
-    );
+    const { data } = await axiosClient.get<Event>(`/events/${eventId}/details`);
     return data;
   } catch (error) {
     const axiosError = error as {
@@ -16,7 +14,7 @@ export async function getDetailsEvent(eventId: string): Promise<Event> {
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

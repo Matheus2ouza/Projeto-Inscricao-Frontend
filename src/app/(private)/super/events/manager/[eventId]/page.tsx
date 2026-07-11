@@ -1,8 +1,7 @@
 'use client';
 
 import EventManagement from '@/features/events/components/manager/EventManagement';
-import { useEventManager } from '@/features/events/hooks/manager/useEventManager';
-import { useTypeInscriptionsActions } from '@/features/typeInscription/hook/useTypeInscriptionsActions';
+import { useEventManagerData } from '@/features/events/hooks/manager/useEventManager';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -19,31 +18,9 @@ export default function EventManagementSuperPage() {
     return null;
   }
 
-  const {
-    event,
-    loadingEvent,
-    fetchingEvent,
-    fetchedEvent,
-    errorEvent,
-    refetchEvent,
-    typeInscriptions,
-    loadingTypeInscriptions,
-    fetchingTypeInscriptions,
-    fetchedTypeInscriptions,
-    errorTypeInscriptions,
-    refetchTypeInscriptions,
-  } = useEventManager({ eventId });
-
-  const {
-    handleCreateTypeInscription,
-    isCreatingTypeInscription,
-    handleUpdateTypeInscription,
-    isUpdatingTypeInscription,
-    handleDeleteTypeInscription,
-    isDeletingTypeInscription,
-    handleDisableTypeInscription,
-    isDisablingTypeInscription,
-  } = useTypeInscriptionsActions(eventId);
+  // Hook combinado para buscar evento e tipos de inscrição
+  const { event, typeInscriptions, loading, fetching, error, refresh } =
+    useEventManagerData(eventId);
 
   const handleBack = () => {
     router.replace(`/super/events/manager`);
@@ -51,7 +28,7 @@ export default function EventManagementSuperPage() {
 
   const renderSkeletonGrid = () => {
     return (
-      <div className="bg-background min-h-screen">
+      <div className="bg-background min-h-screen rounded-sm">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -87,19 +64,25 @@ export default function EventManagementSuperPage() {
   };
 
   const renderContent = () => {
-    if (loadingEvent) {
-      renderSkeletonGrid();
+    // Verifica se está carregando
+    if (loading) {
+      return renderSkeletonGrid();
     }
-    if (errorEvent) {
+
+    // Verifica se houve erro
+    if (error) {
       return (
         <div className="flex min-h-screen items-center justify-center">
           <div className="text-center">
             <p className="mb-4 text-gray-900 dark:text-white">
-              {'Erro ao carregar evento'}
+              {error.message || 'Erro ao carregar dados'}
             </p>
-            <Button asChild>
-              <Link href="/super/events/manager">Voltar para Eventos</Link>
-            </Button>
+            <div className="flex justify-center gap-4">
+              <Button variant="outline" asChild>
+                <Link href="/admin/events/manager">Voltar</Link>
+              </Button>
+              <Button onClick={refresh}>Tentar Novamente</Button>
+            </div>
           </div>
         </div>
       );
@@ -109,16 +92,8 @@ export default function EventManagementSuperPage() {
       <EventManagement
         event={event}
         typeInscriptions={typeInscriptions}
-        refreshEvent={refetchEvent}
-        refreshTypeInscriptions={refetchTypeInscriptions}
-        onCreateTypeInscription={handleCreateTypeInscription}
-        isCreatingTypeInscription={isCreatingTypeInscription}
-        onUpdateTypeInscription={handleUpdateTypeInscription}
-        isUpdatingTypeInscription={isUpdatingTypeInscription}
-        onDeleteTypeInscription={handleDeleteTypeInscription}
-        isDeletingTypeInscription={isDeletingTypeInscription}
-        onDisableTypeInscription={handleDisableTypeInscription}
-        isDisablingTypeInscription={isDisablingTypeInscription}
+        refreshEvent={refresh}
+        refreshTypeInscriptions={refresh}
       />
     );
   };

@@ -1,23 +1,21 @@
-"use client";
+'use client';
 
-import { useGlobalLoading } from "@/components/GlobalLoading";
-import UserHomeDashboard from "@/features/home/components/user/UserHomeDashboard";
-import { useUserDashboard } from "@/features/home/hook/user/useUserDashboard";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { useUserRole } from "@/shared/hooks/useUserRole";
-import { RotateCw } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useGlobalLoading } from '@/components/GlobalLoading';
+import UserHomeDashboard from '@/features/home/components/user/UserHomeDashboard';
+import { useDashboardUser } from '@/features/home/hooks/user/useDashboardUser';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { RotateCw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function UserHomePage() {
   const router = useRouter();
   const { setLoading } = useGlobalLoading();
-  const { loading } = useUserRole();
   const { user } = useCurrentUser();
   const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date());
-  const [relativeTime, setRelativeTime] = useState("há instantes");
-  const dashboard = useUserDashboard();
+  const [relativeTime, setRelativeTime] = useState('há instantes');
+  const dashboard = useDashboardUser();
   const [refreshingAll, setRefreshingAll] = useState(false);
 
   const refreshDashboard = async () => {
@@ -34,9 +32,9 @@ export default function UserHomePage() {
       const minutes = Math.floor(diffMs / 60000);
 
       if (minutes <= 0) {
-        setRelativeTime("há instantes");
+        setRelativeTime('há instantes');
       } else if (minutes === 1) {
-        setRelativeTime("há 1min");
+        setRelativeTime('há 1min');
       } else {
         setRelativeTime(`há ${minutes}min`);
       }
@@ -47,14 +45,16 @@ export default function UserHomePage() {
     return () => clearInterval(intervalId);
   }, [lastUpdated]);
 
+  // Atualiza timestamp quando os dados são carregados
   useEffect(() => {
-    setLoading(loading);
-    return () => setLoading(false);
-  }, [loading, setLoading]);
+    if (!dashboard.isFetching && !dashboard.loading) {
+      setLastUpdated(new Date());
+    }
+  }, [dashboard.isFetching, dashboard.loading]);
 
   return (
     <PageContainer
-      title={user?.username ? `Olá, ${user.username}` : "Bem-vindo!"}
+      title={user?.username ? `Olá, ${user.username}` : 'Bem-vindo!'}
       description="Gerencie suas inscrições e acompanhe os eventos disponíveis."
       showBackButton={false}
       maxWidth="2xl"
@@ -63,11 +63,11 @@ export default function UserHomePage() {
           type="button"
           onClick={refreshDashboard}
           disabled={refreshingAll || dashboard.loading || dashboard.isFetching}
-          className="group inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60 dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
+          className="group focus-visible:ring-offset-background inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
         >
           <RotateCw
             className={`h-4 w-4 text-[#0C3DAD] transition-colors group-hover:text-white dark:text-[#9CC3FF] ${
-              refreshingAll || dashboard.isFetching ? "animate-spin" : ""
+              refreshingAll || dashboard.isFetching ? 'animate-spin' : ''
             }`}
           />
           <span>Atualizado {relativeTime}</span>

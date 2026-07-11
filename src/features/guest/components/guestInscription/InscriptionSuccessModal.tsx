@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
 import {
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
-} from "@/features/guest/types/guestInscription/guestInscriptionTypes";
-import { cn } from "@/shared/lib/utils";
-import { Check, Copy, CreditCard } from "lucide-react";
-import { useState } from "react";
+} from '@/features/guest/types/guestInscription/guestInscriptionTypes';
+import { cn } from '@/lib/utils';
+import { Check, Copy, CreditCard } from 'lucide-react';
+import { useState } from 'react';
 
 interface InscriptionSuccessModalProps {
   isOpen: boolean;
@@ -32,12 +32,12 @@ export function InscriptionSuccessModal({
   const formatCountdown = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
   const isUrgent =
     paymentCountdownSeconds !== null && paymentCountdownSeconds <= 300;
-  const accentColor = primaryColor || "#d97706";
+  const accentColor = primaryColor || '#d97706';
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(successData.confirmationCode);
@@ -56,8 +56,8 @@ export function InscriptionSuccessModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full animate-in slide-in-from-bottom-4 sm:max-w-md sm:animate-in sm:fade-in-0 sm:zoom-in-95 duration-200">
-        <div className="overflow-hidden rounded-t-3xl bg-white shadow-2xl dark:bg-gray-950 sm:rounded-2xl">
+      <div className="animate-in slide-in-from-bottom-4 sm:animate-in sm:fade-in-0 sm:zoom-in-95 relative w-full duration-200 sm:max-w-md">
+        <div className="overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-2xl dark:bg-gray-950">
           {/* Alert Banner — só para PENDING */}
           {isPending ? (
             <div
@@ -85,7 +85,7 @@ export function InscriptionSuccessModal({
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-white">
+                <p className="text-xs font-bold tracking-widest text-white uppercase">
                   Ação necessária
                 </p>
                 <p className="text-xs text-white/80">
@@ -109,7 +109,7 @@ export function InscriptionSuccessModal({
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-white">
+                <p className="text-xs font-bold tracking-widest text-white uppercase">
                   Em análise
                 </p>
                 <p className="text-xs text-white/80">
@@ -119,7 +119,7 @@ export function InscriptionSuccessModal({
             </div>
           )}
 
-          <div className="px-5 pb-8 pt-6 space-y-4">
+          <div className="space-y-4 px-5 pt-6 pb-8">
             {/* Warning box — só para PENDING */}
             {isPending && (
               <div className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20">
@@ -148,7 +148,7 @@ export function InscriptionSuccessModal({
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-amber-800 dark:text-amber-400">
                     Sua inscrição foi <strong>reservada temporariamente</strong>
-                    . Sem o pagamento dentro do prazo, ela será{" "}
+                    . Sem o pagamento dentro do prazo, ela será{' '}
                     <strong>cancelada automaticamente</strong> e a vaga liberada
                     para outra pessoa.
                   </p>
@@ -188,20 +188,20 @@ export function InscriptionSuccessModal({
                 <div className="mb-2 flex items-center gap-2">
                   <span
                     className={cn(
-                      "inline-block h-2 w-2 rounded-full",
-                      isUrgent ? "animate-pulse bg-red-500" : "bg-amber-500",
+                      'inline-block h-2 w-2 rounded-full',
+                      isUrgent ? 'animate-pulse bg-red-500' : 'bg-amber-500',
                     )}
                   />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-semibold tracking-widest text-gray-500 uppercase dark:text-gray-400">
                     Tempo restante para pagar
                   </span>
                 </div>
                 <p
                   className={cn(
-                    "text-center font-mono text-5xl font-semibold tabular-nums tracking-tight",
+                    'text-center font-mono text-5xl font-semibold tracking-tight tabular-nums',
                     isUrgent
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-gray-900 dark:text-white",
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-gray-900 dark:text-white',
                   )}
                 >
                   {formatCountdown(paymentCountdownSeconds)}
@@ -215,16 +215,16 @@ export function InscriptionSuccessModal({
             {/* Código de inscrição */}
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                <span className="text-xs font-semibold tracking-widest text-gray-500 uppercase dark:text-gray-400">
                   Código de inscrição
                 </span>
                 <button
                   onClick={handleCopyCode}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors",
+                    'flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors',
                     isCopied
-                      ? "border-green-300 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400"
-                      : "border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700",
+                      ? 'border-green-300 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400'
+                      : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700',
                   )}
                 >
                   {isCopied ? (
@@ -232,7 +232,7 @@ export function InscriptionSuccessModal({
                   ) : (
                     <Copy className="h-3 w-3" />
                   )}
-                  {isCopied ? "Copiado!" : "Copiar"}
+                  {isCopied ? 'Copiado!' : 'Copiar'}
                 </button>
               </div>
               <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-center font-mono text-xl font-bold tracking-widest text-gray-900 dark:border-gray-700 dark:bg-gray-950 dark:text-white">
@@ -248,25 +248,25 @@ export function InscriptionSuccessModal({
             <button
               onClick={onViewInscription}
               className={cn(
-                "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]",
+                'flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]',
                 isPending
-                  ? ""
-                  : "bg-gray-800 hover:bg-gray-900 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-white",
+                  ? ''
+                  : 'bg-gray-800 hover:bg-gray-900 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-white',
               )}
               style={isPending ? { backgroundColor: accentColor } : undefined}
             >
               {isPending && <CreditCard className="h-4 w-4" />}
               {isPending
-                ? "Pagar agora e confirmar vaga"
-                : "Visualizar inscrição"}
+                ? 'Pagar agora e confirmar vaga'
+                : 'Visualizar inscrição'}
             </button>
 
             {/* Dismiss */}
             <button
               onClick={onClose}
-              className="w-full py-2 text-sm text text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
+              className="text w-full py-2 text-sm text-gray-400 transition-colors hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
             >
-              {isPending ? "Voltar e pagar depois" : "Fechar"}
+              {isPending ? 'Voltar e pagar depois' : 'Fechar'}
             </button>
           </div>
         </div>

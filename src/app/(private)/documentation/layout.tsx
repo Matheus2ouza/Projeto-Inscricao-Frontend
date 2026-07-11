@@ -1,8 +1,8 @@
-import PrivateNavbar from "@/shared/components/layout/private-navbar";
-import SidebarDocumentation from "@/shared/components/layout/sidebar-documentation/SidebarDocumentation";
-import { verifySession } from "@/shared/lib/session";
-import SessionUserProvider from "@/shared/providers/session-user-provider";
-import { redirect } from "next/navigation";
+import { verifySession } from '@/lib/auth';
+import { PrivateNavbar } from '@/shared/components/layout/private-navbar';
+import SidebarDocumentation from '@/shared/components/layout/sidebar-documentation/SidebarDocumentation';
+import SessionUserProvider from '@/shared/providers/session-user-provider';
+import { redirect } from 'next/navigation';
 
 export default async function DocumentationLayout({
   children,
@@ -12,7 +12,7 @@ export default async function DocumentationLayout({
   const session = await verifySession();
 
   if (!session?.user) {
-    redirect("/login");
+    redirect('/login');
   }
 
   return (

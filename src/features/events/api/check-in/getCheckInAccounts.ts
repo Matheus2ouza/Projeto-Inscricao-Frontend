@@ -1,14 +1,14 @@
-import { AccountsPaginatedResponse } from "@/features/events/types/check-in/checkInTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+import { AccountsPaginatedResponse } from '@/features/events/types/check-in/checkInTypes';
+import { axiosClient } from '@/lib/axios';
 
 export async function getCheckInAccounts(
   eventId: string,
   page: number,
   pageSize: number,
-  onlyWithDebt?: boolean
+  onlyWithDebt?: boolean,
 ) {
   try {
-    const { data } = await axiosInstance.get<AccountsPaginatedResponse>(
+    const { data } = await axiosClient.get<AccountsPaginatedResponse>(
       `/events/${eventId}/check-in/accounts`,
       {
         params: {
@@ -16,7 +16,7 @@ export async function getCheckInAccounts(
           pageSize,
           withDebt: onlyWithDebt,
         },
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -26,8 +26,8 @@ export async function getCheckInAccounts(
     };
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível carregar as contas para check-in"
+        axiosError.message ??
+        'Não foi possível carregar as contas para check-in',
     );
   }
 }

@@ -1,10 +1,10 @@
-import { CheckInEventInfo } from "@/features/events/types/check-in/checkInTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+import { CheckInEventInfo } from '@/features/events/types/check-in/checkInTypes';
+import { axiosClient } from '@/lib/axios';
 
 export async function getCheckInEventInfo(eventId: string) {
   try {
-    const { data } = await axiosInstance.get<CheckInEventInfo>(
-      `/events/${eventId}/check-in`
+    const { data } = await axiosClient.get<CheckInEventInfo>(
+      `/events/${eventId}/check-in`,
     );
     return data;
   } catch (error) {
@@ -14,8 +14,8 @@ export async function getCheckInEventInfo(eventId: string) {
     };
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível carregar as informações do evento"
+        axiosError.message ??
+        'Não foi possível carregar as informações do evento',
     );
   }
 }

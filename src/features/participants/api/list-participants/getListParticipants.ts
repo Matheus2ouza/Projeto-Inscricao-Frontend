@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import qs from 'qs';
 import {
   GetListParticipantsResponse,
@@ -15,7 +15,7 @@ export async function getListParticipants(
   orderByName?: 'asc' | 'desc',
 ): Promise<GetListParticipantsResponse> {
   try {
-    const { data } = await axiosInstance.get<GetListParticipantsResponse>(
+    const { data } = await axiosClient.get<GetListParticipantsResponse>(
       `/participants/${eventId}`,
       {
         params: {

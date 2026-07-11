@@ -5,55 +5,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: var(--font-sans);
-  --font-heading: var(--font-heading);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-
 :root {
-  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
-  --popover-solid: oklch(0.995 0.004 255 / 98%);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
@@ -72,6 +29,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -81,40 +39,39 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  --liquid-glass-bg: var(--card);
-  --liquid-glass-bg-strong: var(--popover);
-  --liquid-glass-border: var(--border);
-  --liquid-glass-border-strong: var(--input);
-  --liquid-glass-blur: 16px;
-  --liquid-glass-blur-strong: 24px;
-  --liquid-glass-blur-subtle: 10px;
-  --liquid-glass-saturation: 160%;
-  --liquid-glass-saturation-strong: 180%;
-  --liquid-glass-saturation-subtle: 140%;
-  --liquid-glass-shadow:
-    0 10px 30px oklch(0.15 0.04 260 / 8%), inset 0 1px 0 oklch(1 0 0 / 52%);
-  --liquid-glass-shadow-strong:
-    0 14px 40px oklch(0.15 0.04 260 / 12%), inset 0 1px 0 oklch(1 0 0 / 60%);
-
-  --glass-surface: oklch(0.99 0.004 250 / 62%);
-  --glass-surface-strong: oklch(0.99 0.004 250 / 74%);
-  --glass-surface-solid: oklch(0.995 0.003 250 / 100%);
-  --glass-border: oklch(0.82 0.01 250 / 40%);
-  --glass-border-strong: oklch(0.79 0.01 250 / 56%);
+  /* Glassmorphism - Light mode */
+  --glass-surface: oklch(1 0 0 / 10%);
+  --border-rgb: 46 63 85;
   --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.07);
-  --glass-shadow-strong: 0 12px 48px rgba(15, 23, 42, 0.1);
-  --glass-backdrop: blur(24px);
-  --glass-backdrop-soft: blur(16px);
+  --glass-backdrop: blur(8px);
+  --glass-border-opacity: 0.10;
 
-  --outline-button-bg: oklch(0.99 0.004 250 / 46%);
-  --outline-button-border: oklch(0.83 0.01 250 / 54%);
-  --outline-button-foreground: oklch(0.26 0.03 260);
-  --outline-button-hover-bg: oklch(0.99 0.004 250 / 58%);
-  --outline-button-hover-border: oklch(0.81 0.01 250 / 68%);
-  --outline-button-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.07), inset 0 1px 0 oklch(1 0 0 / 50%);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --card-bg-rgb: 248 250 252;
+
+  /* ============================================
+     RIODAVIDA PALETTE - LIGHT MODE
+     ============================================ */
+
+  /* Cores Principais */
+  --riodavida-primary: #3FB5AE;
+  /* Turquesa/Teal */
+  --riodavida-secondary: #A8BE3C;
+  /* Verde-oliva/Lima */
+
+  /* Variações */
+  --riodavida-dark: #2E8F8A;
+  /* Teal escuro */
+  --riodavida-light: #5FCFC7;
+  /* Teal claro */
+  --riodavida-muted-dark: #8AA02E;
+  /* Oliva escuro */
+  --riodavida-muted-light: #C4D766;
+  /* Oliva claro */
+
+  /* Neutros */
+  --riodavida-white: #FFFFFF;
+  --riodavida-gray-light: #E5E7EB;
+  --riodavida-gray-dark: #1F2937;
 }
 
 .dark {
@@ -123,7 +80,6 @@
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
-  --popover-solid: oklch(0.22 0.005 260 / 100%);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -151,526 +107,265 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  --liquid-glass-shadow:
-    0 12px 34px oklch(0.02 0.01 260 / 28%), inset 0 1px 0 oklch(1 0 0 / 20%);
-  --liquid-glass-shadow-strong:
-    0 16px 45px oklch(0.02 0.01 260 / 40%), inset 0 1px 0 oklch(1 0 0 / 26%);
+  /* Glassmorphism */
+  --glass-surface: oklch(0.25 0.02 240 / 35%);
+  --glass-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  --glass-backdrop: blur(60px);
+  --glass-border-opacity: 0.12;
 
-  --glass-surface: oklch(1 0 0 / 12%);
-  --glass-surface-strong: oklch(1 0 0 / 18%);
-  --glass-border: oklch(1 0 0 / 18%);
-  --glass-border-strong: oklch(1 0 0 / 28%);
-  --glass-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-  --glass-shadow-strong: 0 28px 110px rgba(0, 0, 0, 0.48);
+  --card-bg-rgb: 31 45 61;
 
-  --outline-button-bg: oklch(1 0 0 / 10%);
-  --outline-button-border: oklch(1 0 0 / 22%);
-  --outline-button-foreground: oklch(0.97 0.008 250);
-  --outline-button-hover-bg: oklch(1 0 0 / 16%);
-  --outline-button-hover-border: oklch(1 0 0 / 34%);
-  --outline-button-shadow:
-    0 10px 28px rgba(0, 0, 0, 0.2), inset 0 1px 0 oklch(1 0 0 / 16%);
+  /* ============================================
+     RIODAVIDA PALETTE - DARK MODE
+     ============================================ */
+
+  /* Cores Principais (escurecidas) */
+  --riodavida-primary: #2A8A85;
+  /* Turquesa/Teal escuro */
+  --riodavida-secondary: #8A9E2E;
+  /* Verde-oliva/Lima escuro */
+
+  /* Variações (escurecidas) */
+  --riodavida-dark: #1F6B66;
+  /* Teal escuro (mais escuro) */
+  --riodavida-light: #4AB0A8;
+  /* Teal claro (escurecido) */
+  --riodavida-muted-dark: #6E821E;
+  /* Oliva escuro (mais escuro) */
+  --riodavida-muted-light: #B0C44E;
+  /* Oliva claro (escurecido) */
+
+  /* Neutros (mantidos) */
+  --riodavida-white: #FFFFFF;
+  --riodavida-gray-light: #B0BEC5;
+  --riodavida-gray-dark: #E5E7EB;
 }
 
-.toast {
-  --success: oklch(0.696 0.17 162.42);
-  --success-light: oklch(0.85 0.15 162.42);
-  --error: oklch(0.6 0.25 29);
-  --error-light: oklch(0.8 0.18 29);
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ============================================
+     RIODAVIDA PALETTE - TAILWIND COLORS
+     ============================================ */
+
+  /* Cores Principais */
+  --color-riodavida: var(--riodavida-primary);
+  --color-riodavida-secondary: var(--riodavida-secondary);
+
+  /* Variações */
+  --color-riodavida-dark: var(--riodavida-dark);
+  --color-riodavida-light: var(--riodavida-light);
+  --color-riodavida-muted-dark: var(--riodavida-muted-dark);
+  --color-riodavida-muted-light: var(--riodavida-muted-light);
+
+  /* Neutros */
+  --color-riodavida-white: var(--riodavida-white);
+  --color-riodavida-gray: var(--riodavida-gray-light);
+  --color-riodavida-gray-dark: var(--riodavida-gray-dark);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  html,
-  body {
-    min-height: 100vh;
-    font-family: var(--font-geist-sans), system-ui, sans-serif;
-    background:
-      radial-gradient(circle at 20% 20%,
-        oklch(0.95 0.04 250 / 60%),
-        transparent 40%),
-      radial-gradient(circle at 80% 0%,
-        oklch(0.92 0.05 300 / 50%),
-        transparent 45%),
-      radial-gradient(circle at 50% 100%,
-        oklch(0.93 0.04 200 / 55%),
-        transparent 50%),
-      linear-gradient(180deg, var(--background), oklch(0.95 0.02 260));
-    color: var(--foreground);
-    text-rendering: optimizeLegibility;
-  }
-
-  body {
-    min-height: 100vh;
-    @apply bg-background text-foreground;
-  }
-
-  html {
-    @apply font-sans;
-  }
+/* Glassmorphism suave - estilo footer/navbar */
+.liquid-panel {
+  background: var(--glass-surface);
+  border: 1px solid rgb(var(--border-rgb) / var(--glass-border-opacity));
+  backdrop-filter: blur(var(--glass-backdrop));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop));
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-@keyframes liquid-bg-drift {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: hue-rotate(0deg);
-  }
-
-  50% {
-    transform: translate3d(0, -1.5%, 0) scale(1.02);
-    filter: hue-rotate(6deg);
-  }
-
-  100% {
-    transform: translate3d(-1%, 1%, 0) scale(1.01);
-    filter: hue-rotate(-4deg);
-  }
+/* Versão mais opaca para elementos que precisam de mais contraste (cards) */
+.liquid-panel-solid {
+  background: oklch(1 0 0 / 90%);
+  /* Light: bg-white/90 */
+  border: 1px solid rgb(var(--border-rgb) / 0.15);
+  backdrop-filter: blur(var(--glass-backdrop));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop));
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-@layer utilities {
-  .bg-linear-to-r {
-    background-image: linear-gradient(to right,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
-  }
-
-  .bg-linear-to-b {
-    background-image: linear-gradient(to bottom,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
-  }
-
-  .before\:bg-linear-to-b::before,
-  .after\:bg-linear-to-b::after {
-    background-image: linear-gradient(to bottom,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
-  }
-
-  .before\:bg-linear-to-r::before,
-  .after\:bg-linear-to-r::after {
-    background-image: linear-gradient(to right,
-        var(--tw-gradient-from),
-        var(--tw-gradient-via),
-        var(--tw-gradient-to));
-  }
-
-  .glass-surface,
-  .glass-card,
-  .glass-panel {
-    background: var(--glass-surface);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(var(--glass-backdrop));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop));
-    box-shadow: var(--glass-shadow);
-  }
-
-  .liquid-panel {
-    background: var(--glass-surface);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(var(--glass-backdrop));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop));
-    box-shadow: var(--glass-shadow);
-  }
-
-  .liquid-panel-strong {
-    background: var(--glass-surface-strong);
-    border: 1px solid var(--glass-border-strong);
-    backdrop-filter: blur(var(--glass-backdrop));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop));
-    box-shadow: var(--glass-shadow-strong);
-  }
-
-  .liquid-panel-no-border {
-    border-color: transparent !important;
-  }
-
-  .glass-surface-strong {
-    background: var(--glass-surface-strong);
-    border: 1px solid var(--glass-border-strong);
-    backdrop-filter: blur(var(--glass-backdrop));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop));
-    box-shadow: var(--glass-shadow-strong);
-  }
-
-  .glass-input {
-    background: var(--glass-surface);
-    border: 1px solid var(--glass-border);
-    border-radius: 1rem;
-    backdrop-filter: blur(var(--glass-backdrop-soft));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
-  }
-
-  .glass-summary-tile {
-    background: var(--glass-surface-strong);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    backdrop-filter: blur(var(--glass-backdrop-soft));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
-  }
-
-  .glass-summary-value {
-    background: var(--glass-surface-solid);
-    border: 1px solid var(--glass-border-strong);
-    box-shadow: var(--glass-shadow);
-    backdrop-filter: blur(var(--glass-backdrop-soft));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
-  }
-
-  .dark .glass-summary-tile {
-    background: oklch(1 0 0 / 10%);
-    border: 1px solid oklch(1 0 0 / 16%);
-    box-shadow: 0 10px 30px oklch(0 0 0 / 24%);
-  }
-
-  .dark .glass-summary-value {
-    background: oklch(1 0 0 / 14%);
-    border: 1px solid oklch(1 0 0 / 22%);
-    box-shadow: 0 10px 30px oklch(0 0 0 / 28%);
-  }
-
-  .glass-button {
-    background: var(--outline-button-bg);
-    border: 1px solid var(--outline-button-border);
-    color: var(--outline-button-foreground);
-    box-shadow: var(--outline-button-shadow);
-    backdrop-filter: blur(var(--glass-backdrop-soft));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop-soft));
-  }
-
-  .glass-backdrop {
-    background: color-mix(in oklab, var(--background) 72%, white 28%);
-    backdrop-filter: blur(var(--glass-backdrop));
-    -webkit-backdrop-filter: blur(var(--glass-backdrop));
-  }
-
-  .liquid-glass {
-    background: var(--liquid-glass-bg);
-    border: 1px solid var(--liquid-glass-border);
-    backdrop-filter: blur(var(--liquid-glass-blur));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur));
-    box-shadow: var(--liquid-glass-shadow);
-  }
-
-  .liquid-glass-strong {
-    background: var(--liquid-glass-bg-strong);
-    border: 1px solid var(--liquid-glass-border-strong);
-    backdrop-filter: blur(var(--liquid-glass-blur-strong));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-strong));
-    box-shadow: var(--liquid-glass-shadow-strong);
-  }
-
-  .liquid-glass-light {
-    background: var(--glass-surface);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
-    -webkit-backdrop-filter: blur(var(--liquid-glass-blur-subtle)) saturate(var(--liquid-glass-saturation-subtle));
-    box-shadow: inset 0 1px 0 oklch(1 0 0 / 35%);
-    transition: all 0.25s ease;
-  }
-
-  .liquid-glass-light:hover {
-    background: var(--glass-surface-strong);
-    border-color: var(--glass-border-strong);
-    box-shadow:
-      0 6px 18px oklch(0.15 0.04 260 / 10%),
-      inset 0 1px 0 oklch(1 0 0 / 45%);
-  }
-
-  .liquid-glass-button-light,
-  .liquid-glass-button {
-    border-radius: 1rem;
-    transition: all 0.25s ease;
-  }
-
-  .liquid-glass-button {
-    background: oklch(0.9 0 0 / 65%);
-    border: 1px solid oklch(0.9 0 0 / 80%);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
-    box-shadow:
-      0 4px 12px oklch(0.15 0.04 260 / 10%),
-      inset 0 1px 0 oklch(1 0 0 / 50%);
-  }
-
-  .liquid-glass-button:hover {
-    background: oklch(1 0 0 / 70%);
-    border-color: oklch(1 0 0 / 85%);
-  }
-
-  .dark .liquid-glass-button {
-    background: oklch(0.25 0.02 272 / 65%);
-    border: 1px solid oklch(1 0 0 / 25%);
-    box-shadow:
-      0 6px 16px oklch(0.02 0.01 260 / 35%),
-      inset 0 1px 0 oklch(1 0 0 / 20%);
-  }
-
-  .dark .liquid-glass-button:hover {
-    background: oklch(0.32 0.02 272 / 80%);
-    border-color: oklch(1 0 0 / 35%);
-  }
-
-  [data-mobile='true'][data-sidebar='sidebar'] {
-    background: var(--sidebar) !important;
-    border-color: var(--sidebar-border) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
+.dark .liquid-panel-solid {
+  background: oklch(0.22 0.02 240 / 60%);
+  /* Dark: tom mais equilibrado */
 }
 
-/* Animações personalizadas para o componente Background */
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+.liquid-border {
+  border-color: rgb(var(--border-rgb) / 0.08) !important;
 }
 
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+/* Hover effects para glassmorphism */
+.liquid-panel:hover {
+  background: oklch(1 0 0 / 30%);
+  /* Light: bg-white/30 */
+  border-color: rgb(var(--border-rgb) / 0.20);
+  box-shadow: 0 12px 48px rgba(15, 23, 42, 0.12);
 }
 
-.animate-blob {
-  animation: blob 7s infinite;
+.dark .liquid-panel:hover {
+  background: oklch(0.28 0.02 240 / 45%);
+  border-color: rgb(var(--border-rgb) / 0.20);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
 }
 
-.animate-spin-slow {
-  animation: spin-slow 20s linear infinite;
+.liquid-panel-solid:hover {
+  background: oklch(1 0 0 / 95%);
+  border-color: rgb(var(--border-rgb) / 0.25);
+  box-shadow: 0 12px 48px rgba(15, 23, 42, 0.15);
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
+.dark .liquid-panel-solid:hover {
+  background: oklch(0.25 0.02 240 / 70%);
+  border-color: rgb(var(--border-rgb) / 0.25);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.60);
 }
 
-.animation-delay-4000 {
-  animation-delay: 4s;
+.navbar-glass {
+  background: var(--glass-surface);
+  border: 1px solid rgb(var(--border-rgb) / var(--glass-border-opacity));
+  backdrop-filter: blur(var(--glass-backdrop));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop));
+  box-shadow: var(--glass-shadow);
+  transition: none;
 }
 
-/* Estilos para os componentes do Google Maps Extended */
-gmpx-place-picker {
-  --gmpx-color-surface: #ffffff;
-  --gmpx-color-on-surface: #1f2937;
-  --gmpx-color-on-surface-variant: #6b7280;
-  --gmpx-color-primary: #3b82f6;
-  --gmpx-color-outline: #d1d5db;
+.navbar-glass-solid {
+  background: oklch(1 0 0 / 90%);
+  border: 1px solid rgb(var(--border-rgb) / 0.15);
+  backdrop-filter: blur(var(--glass-backdrop));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop));
+  box-shadow: var(--glass-shadow);
+  transition: none;
 }
 
-gmp-map {
-  border-radius: 12px;
-  overflow: hidden;
+.dark .navbar-glass-solid {
+  background: oklch(0.22 0.02 240 / 60%);
+  border: 1px solid rgb(var(--border-rgb) / 0.15);
 }
 
-.place-picker-container {
-  padding: 12px;
+/* Remove qualquer efeito de hover */
+.navbar-glass:hover {
+  background: var(--glass-surface);
+  border-color: rgb(var(--border-rgb) / var(--glass-border-opacity));
+  box-shadow: var(--glass-shadow);
 }
 
-/* No seu arquivo global CSS */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
-
-@media (prefers-color-scheme: dark) {
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #4b5563;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
-  }
-}
-
-/* Dark inputs - Ant Design */
-.dark-inputs .ant-input::placeholder {
-  color: #d6d6d6 !important;
-}
-
-.dark-inputs .ant-input {
-  color: white !important;
-  background: oklch(1 0 0 / 10%) !important;
-  border-color: oklch(1 0 0 / 20%) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* Light inputs - Ant Design */
-.light-inputs .ant-input::placeholder {
-  color: #9ca3af !important;
-}
-
-.light-inputs .ant-input {
-  color: #111827 !important;
-  background: oklch(1 0 0 / 72%) !important;
-  border-color: oklch(1 0 0 / 55%) !important;
+.bg-glass {
+  background: rgb(var(--card-bg-rgb) / 0.16);
+  border: 1px solid rgb(var(--border-rgb) / 0.12);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
-/* DatePicker - tema claro */
-.ant-picker-input input::placeholder {
-  color: #6f6f6f !important;
+.border-glass {
+  border-color: rgb(var(--border-rgb) / 0.12) !important;
 }
 
-/* DatePicker - tema escuro (quando isDark) */
-.dark-datepicker .ant-picker-input input::placeholder {
-  color: rgba(255, 255, 255, 0.4) !important;
+/* Adicione no final do globals.css */
+
+/* Cards - versão com opacidade média (para elementos que precisam de contraste) */
+.liquid-card {
+  background: oklch(1 0 0 / 40%);
+  border: 1px solid rgb(var(--border-rgb) / 0.12);
+  backdrop-filter: blur(var(--glass-backdrop));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop));
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-.dark-datepicker .ant-picker-input input {
-  color: white !important;
+.dark .liquid-card {
+  background: oklch(0.18 0.02 240 / 75%);
+  border-color: rgb(var(--border-rgb) / 0.10);
 }
 
-.dark-datepicker {
-  background: oklch(1 0 0 / 12%) !important;
-  border-color: oklch(1 0 0 / 22%) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+/* Cards - versão mais opaca (para conteúdo principal) */
+.liquid-card-solid {
+  background: oklch(1 0 0 / 95%);
+  border: 1px solid rgb(var(--border-rgb) / 0.15);
+  backdrop-filter: blur(var(--glass-backdrop));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop));
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-.dark-datepicker .ant-picker-suffix,
-.dark-datepicker .ant-picker-clear {
-  color: rgba(255, 255, 255, 0.5) !important;
+.dark .liquid-card-solid {
+  background: oklch(0.18 0.02 240 / 85%);
+  border-color: rgb(var(--border-rgb) / 0.12);
 }
 
-.liquid-glass-button-light {
-  background: var(--outline-button-bg) !important;
-  border: 1px solid var(--outline-button-border) !important;
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  box-shadow: var(--outline-button-shadow);
-  transition: all 0.25s ease;
+/* Cards - hover effects */
+.liquid-card:hover,
+.liquid-card-solid:hover {
+  box-shadow: 0 12px 48px rgba(15, 23, 42, 0.15);
+  border-color: rgb(var(--border-rgb) / 0.20);
 }
 
-.liquid-glass-button-light:hover {
-  background: var(--outline-button-hover-bg) !important;
-  border: 1px solid var(--outline-button-hover-border) !important;
-  box-shadow: var(--outline-button-shadow);
+.dark .liquid-card:hover,
+.dark .liquid-card-solid:hover {
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  border-color: rgb(var(--border-rgb) / 0.18);
 }
 
-.dark .liquid-glass-button-light {
-  background: var(--outline-button-bg) !important;
-  border: 1px solid var(--outline-button-border) !important;
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
-  box-shadow: var(--outline-button-shadow);
+/* Variação com fundo branco sólido (sem transparência) */
+.liquid-card-white {
+  background: #FFFFFF;
+  border: 1px solid rgb(var(--border-rgb) / 0.12);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-.liquid-glass-button {
-  background: var(--outline-button-bg) !important;
-  border: 1px solid var(--outline-button-border) !important;
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  box-shadow: var(--outline-button-shadow);
-  transition: all 0.25s ease;
+.dark .liquid-card-white {
+  background: oklch(0.18 0.02 240 / 90%);
+  border-color: rgb(var(--border-rgb) / 0.10);
 }
 
-.liquid-glass-button:hover {
-  background: var(--outline-button-hover-bg);
-  border: 1px solid var(--outline-button-hover-border);
+/* Variação com gradiente sutil (para cards de destaque) */
+.liquid-card-gradient {
+  background: linear-gradient(135deg, oklch(1 0 0 / 92%), oklch(0.98 0.01 180 / 88%));
+  border: 1px solid rgb(var(--border-rgb) / 0.12);
+  backdrop-filter: blur(var(--glass-backdrop));
+  -webkit-backdrop-filter: blur(var(--glass-backdrop));
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-.dark .liquid-glass-button {
-  background: var(--outline-button-bg) !important;
-  border: 1px solid var(--outline-button-border) !important;
-  box-shadow: var(--outline-button-shadow);
-}
-
-.dark .liquid-glass-button:hover {
-  background: var(--outline-button-hover-bg);
-  border: 1px solid var(--outline-button-hover-border);
-}
-
-/* Participants list (Antd) - scoped dark-mode fixes */
-.dark .participants-list-table .ant-table,
-.dark .participants-list-table .ant-table-container,
-.dark .participants-list-table .ant-table-content,
-.dark .participants-list-table .ant-table-thead>tr>th,
-.dark .participants-list-table .ant-table-tbody>tr>td {
-  background: oklch(0.22 0.005 260) !important;
-  color: var(--foreground) !important;
-}
-
-.dark .participants-list-table .ant-table-thead>tr>th {
-  border-bottom-color: oklch(1 0 0 / 18%) !important;
-}
-
-.dark .participants-list-table .ant-table-tbody>tr>td {
-  border-bottom-color: oklch(1 0 0 / 12%) !important;
-}
-
-.dark .participants-list-table .ant-table-tbody>tr.ant-table-row:hover>td {
-  background: oklch(1 0 0 / 10%) !important;
-}
-
-.dark .participants-pagination .ant-pagination-item,
-.dark .participants-pagination .ant-pagination-prev .ant-pagination-item-link,
-.dark .participants-pagination .ant-pagination-next .ant-pagination-item-link {
-  background: oklch(1 0 0 / 10%) !important;
-  border-color: oklch(1 0 0 / 24%) !important;
-  color: var(--foreground) !important;
-}
-
-.dark .participants-pagination .ant-pagination-item a,
-.dark .participants-pagination .ant-pagination-prev .ant-pagination-item-link,
-.dark .participants-pagination .ant-pagination-next .ant-pagination-item-link {
-  color: var(--foreground) !important;
-}
-
-.dark .participants-pagination .ant-pagination-item:hover,
-.dark .participants-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
-.dark .participants-pagination .ant-pagination-next:hover .ant-pagination-item-link {
-  background: oklch(1 0 0 / 16%) !important;
-  border-color: oklch(1 0 0 / 32%) !important;
-  color: var(--foreground) !important;
-}
-
-.dark .participants-pagination .ant-pagination-item-active {
-  background: oklch(1 0 0 / 20%) !important;
-  border-color: oklch(1 0 0 / 34%) !important;
-}
-
-.dark .participants-pagination .ant-pagination-item-active a {
-  color: var(--foreground) !important;
-}
-
-.dark .participants-pagination .ant-pagination-disabled .ant-pagination-item-link {
-  color: oklch(0.62 0.01 260) !important;
-  border-color: oklch(1 0 0 / 16%) !important;
-  background: oklch(1 0 0 / 6%) !important;
+.dark .liquid-card-gradient {
+  background: linear-gradient(135deg, oklch(0.18 0.02 240 / 82%), oklch(0.15 0.02 240 / 78%));
+  border-color: rgb(var(--border-rgb) / 0.10);
 }

@@ -1,8 +1,7 @@
-"use client";
+'use client';
 
-import React from "react";
-
-import type { User } from "@/features/auth/types/loginTypes";
+import type { User } from '@/features/auth/types/loginTypes';
+import React from 'react';
 
 type UserContextValue = {
   user: User;
@@ -34,7 +33,7 @@ export function useCurrentUser() {
 
   if (!context) {
     throw new Error(
-      "useCurrentUser deve ser usado dentro de UserContextProvider",
+      'useCurrentUser deve ser usado dentro de UserContextProvider',
     );
   }
 

@@ -1,15 +1,15 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 
 export async function updateStatusTicket(
   eventId: string,
-  saleTicketsEnabled: boolean
+  saleTicketsEnabled: boolean,
 ) {
   try {
-    const { data } = await axiosInstance.patch(
+    const { data } = await axiosClient.patch(
       `/events/${eventId}/update/tickets`,
       {
         saleTicketsStatus: saleTicketsEnabled,
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -20,8 +20,8 @@ export async function updateStatusTicket(
 
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível atualizar o status dos tickets."
+        axiosError.message ??
+        'Não foi possível atualizar o status dos tickets.',
     );
   }
 }

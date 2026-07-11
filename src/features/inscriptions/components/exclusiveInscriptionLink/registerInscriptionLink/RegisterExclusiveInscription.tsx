@@ -2,7 +2,6 @@
 
 import { InscriptionSuccessModal } from '@/features/guest/components/guestInscription/InscriptionSuccessModal';
 import { InscriptionTypeSelector } from '@/features/guest/components/guestInscription/InscriptionTypeCard';
-import { ImageSwatches } from '@/features/guest/hook/guestInscription/useImagePalette';
 import { ExclusiveInscriptionTerms } from '@/features/inscriptions/components/exclusiveInscriptionLink/registerInscriptionLink/ExclusiveInscriptionTerms';
 import { useFormCreateExclusiveInscriptionLink } from '@/features/inscriptions/hooks/exclusiveInscriptionLink/registerInscriptionLink/useFormCreateExclusiveInscriptionLink';
 import {
@@ -14,6 +13,7 @@ import {
   Event,
   ExclusiveInscriptionLink,
 } from '@/features/inscriptions/types/exclusiveInscriptionLink/validateExclusiveInscriptionLink/validateExclusiveInscriptionLinkTypes';
+import { cn } from '@/lib/utils';
 import { GuestInscriptionAlready } from '@/shared/components/GuestInscriptionAlready';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -42,7 +42,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/shared/components/ui/popover';
-import { cn } from '@/shared/lib/utils';
+import { ImageSwatches } from '@/shared/hooks/useImagePalette';
 import { formatInput } from '@/shared/utils/format';
 import { setWithExpiry } from '@/shared/utils/storageWithExpiry';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -117,6 +117,9 @@ export function RegisterExclusiveInscription({
 
     return hasHadBirthday ? age : age - 1;
   };
+
+  const formatPhone = (value: string) => formatInput(value, 'phone');
+  const formatCpf = (value: string) => formatInput(value, 'cpf');
 
   const { initialValues, submit } = useFormCreateExclusiveInscriptionLink(
     event?.id ?? '',
@@ -248,9 +251,7 @@ export function RegisterExclusiveInscription({
                           {...field}
                           placeholder="(99) 99999-9999"
                           onChange={(event) =>
-                            field.onChange(
-                              formatInput('phone', event.target.value),
-                            )
+                            field.onChange(formatPhone(event.target.value))
                           }
                         />
                       </FormControl>
@@ -272,9 +273,7 @@ export function RegisterExclusiveInscription({
                           {...field}
                           placeholder="000.000.000-00"
                           onChange={(event) =>
-                            field.onChange(
-                              formatInput('cpf', event.target.value),
-                            )
+                            field.onChange(formatCpf(event.target.value))
                           }
                         />
                       </FormControl>

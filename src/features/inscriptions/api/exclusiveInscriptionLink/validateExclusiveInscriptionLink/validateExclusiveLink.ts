@@ -1,8 +1,8 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function validateExclusiveLink(token: string): Promise<boolean> {
   try {
-    await axiosInstance.get(`exclusive-inscription/${token}/validate`);
+    await axiosClient.get(`exclusive-inscription/${token}/validate`);
     return true;
   } catch (error) {
     const axiosError = error as {

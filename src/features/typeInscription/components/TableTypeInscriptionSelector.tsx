@@ -1,7 +1,7 @@
 'use client';
 
-import { useTypeInscriptions } from '@/features/typeInscription/hook/useTypeInscriptions';
-import { TypeInscription } from '@/features/typeInscription/types/typesInscriptionsTypes';
+import { useListTypeInscriptionsToManager } from '@/features/typeInscription/hook/listTypeInscriptionsToManager/useListTypeInscriptionsToManager';
+import { TypeInscription } from '@/features/typeInscription/types/listTypeInscriptionsToManager/listTypeInscriptionsManagerTypes';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import { Checkbox, Empty, Spin, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
@@ -19,7 +19,8 @@ export function TableTypeInscriptionSelector({
   onChange,
   disabled = false,
 }: TableTypeInscriptionSelectorProps) {
-  const { typeInscriptions, loading, error } = useTypeInscriptions({ eventId });
+  const { typeInscriptions, loading, error, fetched, refresh } =
+    useListTypeInscriptionsToManager({ eventId });
 
   const handleToggle = (id: string, checked: boolean) => {
     if (disabled) return;

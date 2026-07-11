@@ -2,7 +2,7 @@
 
 import { useFormCreateInscriptionAdmin } from '@/features/inscriptions/hooks/inscriptionAdmin/useFormCreateInscriptionAdmin';
 import type { CreateInscriptionAdminForm } from '@/features/inscriptions/schema/inscriptionAdmin/createInscriptionAdminSchema';
-import type { Member } from '@/features/members/types/combobox/membersComboboxType';
+import type { Member } from '@/features/members/types/membersCombobox/membersComboboxTypes';
 import type { TypeInscriptionOption } from '@/features/typeInscription/components/ComboboxTypeInscription';
 import { Button } from '@/shared/components/ui/button';
 import { Steps } from 'antd';

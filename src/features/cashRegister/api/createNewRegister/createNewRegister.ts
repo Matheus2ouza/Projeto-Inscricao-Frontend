@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import {
   CreateNewRegisterInput,
   CreateNewRegisterResponse,
@@ -8,7 +8,7 @@ export async function createNewRegister(
   registerData: CreateNewRegisterInput,
 ): Promise<CreateNewRegisterResponse> {
   try {
-    const { data } = await axiosInstance.post(
+    const { data } = await axiosClient.post(
       `cash-register/${registerData.cashRegisterId}/register`,
       {
         type: registerData.type,

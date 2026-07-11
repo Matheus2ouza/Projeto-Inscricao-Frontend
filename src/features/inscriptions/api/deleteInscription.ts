@@ -1,8 +1,7 @@
-import axiosInstance from "@/shared/lib/apiClient";
-
+import { axiosClient } from '@/lib/axios';
 export async function deleteInscription(inscriptionId: string) {
   try {
-    await axiosInstance.delete(`/inscriptions/${inscriptionId}/delete`)
+    await axiosClient.delete(`/inscriptions/${inscriptionId}/delete`);
   } catch (error) {
     const axiosError = error as {
       response?: { data?: { message?: string } };
@@ -11,8 +10,8 @@ export async function deleteInscription(inscriptionId: string) {
 
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível atualizar os dados da inscrição."
+        axiosError.message ??
+        'Não foi possível atualizar os dados da inscrição.',
     );
   }
 }

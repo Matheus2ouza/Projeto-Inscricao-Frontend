@@ -5,7 +5,7 @@ import {
 import {
   UseListPaymentParams,
   UseListPaymentResult,
-} from '@/features/payments/types/listPayment/listPaymentTypes';
+} from '@/features/payments/types/listPayments/listPaymentsTypes';
 import { useState } from 'react';
 
 export function useListPayment({

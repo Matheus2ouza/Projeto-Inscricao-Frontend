@@ -1,4 +1,4 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 
 export type GenerateSelectedInscriptionsPdfResponse = {
   data?: {
@@ -22,23 +22,22 @@ export async function generateSelectedInscriptionsPdf({
 }: GenerateSelectedInscriptionsPdfInput) {
   try {
     const { data } =
-      await axiosInstance.post<GenerateSelectedInscriptionsPdfResponse>(
+      await axiosClient.post<GenerateSelectedInscriptionsPdfResponse>(
         `/events/pdf/${eventId}/list-inscription`,
         {
           inscriptionIds,
-        }
+        },
       );
 
     return data;
   } catch (error) {
-    console.error("Error while trying to generate the report: ", error);
+    console.error('Error while trying to generate the report: ', error);
     const axiosError = error as {
       response?: { data?: { message?: string } };
       message?: string;
     };
     throw new Error(
-      axiosError.response?.data?.message ||
-      "Falha ao tentar gerar o PDF"
+      axiosError.response?.data?.message || 'Falha ao tentar gerar o PDF',
     );
   }
 }

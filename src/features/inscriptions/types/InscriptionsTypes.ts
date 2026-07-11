@@ -67,5 +67,5 @@ export type UsePaymentsResult = {
 export type UpdateInscriptionInput = {
   responsible: string;
   phone: string;
-  email: string;
+  email?: string;
 };

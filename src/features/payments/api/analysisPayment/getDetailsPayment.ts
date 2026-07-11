@@ -1,11 +1,11 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { AnalysisPaymentsDetailsResponse } from "../../types/analysisPayment/analysisPaymentDetails";
+import { axiosClient } from '@/lib/axios';
+import { AnalysisPaymentsDetailsResponse } from '../../types/analysisPayment/analysisPaymentDetails';
 
 export async function getDetailsPayment(
   paymentId: string,
 ): Promise<AnalysisPaymentsDetailsResponse> {
   try {
-    const { data } = await axiosInstance.get<AnalysisPaymentsDetailsResponse>(
+    const { data } = await axiosClient.get<AnalysisPaymentsDetailsResponse>(
       `/payments/${paymentId}/details`,
     );
     return data;
@@ -18,7 +18,7 @@ export async function getDetailsPayment(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

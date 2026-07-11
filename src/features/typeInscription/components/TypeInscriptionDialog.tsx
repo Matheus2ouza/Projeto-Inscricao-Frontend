@@ -1,8 +1,8 @@
 'use client';
 
+import { TypeInscription } from '@/features/typeInscription/types/listTypeInscriptionsToManager/listTypeInscriptionsManagerTypes';
 import { Button, Input, InputNumber, Modal, Switch, Typography } from 'antd';
 import React, { useEffect } from 'react';
-import { TypeInscription } from '../types/typesInscriptionsTypes';
 
 interface TypeInscriptionDialogProps {
   open: boolean;
@@ -14,7 +14,7 @@ interface TypeInscriptionDialogProps {
     description: string;
     value: number;
     specialType: boolean;
-    rule: Date | null;
+    rule: number | null; // Agora é number (idade em anos)
     participantLimit: number;
     limitIsStrict: boolean;
   }) => Promise<void>;
@@ -45,11 +45,13 @@ export default function TypeInscriptionDialog({
     return isNaN(parsed.getTime()) ? new Date() : parsed;
   }, [eventStartDate]);
 
+  // Converte a data de nascimento (rule) para idade em anos
   const getAgeFromRuleDate = React.useCallback(
     (ruleDate: Date | string | null) => {
       if (!ruleDate) return null;
       const rule = ruleDate instanceof Date ? ruleDate : new Date(ruleDate);
       if (isNaN(rule.getTime())) return null;
+
       let age = baseDate.getFullYear() - rule.getFullYear();
       const monthDiff = baseDate.getMonth() - rule.getMonth();
       if (
@@ -68,6 +70,7 @@ export default function TypeInscriptionDialog({
       setDescription(typeInscription.description);
       setValue(typeInscription.value);
       setSpecialType(Boolean(typeInscription.specialType));
+      // Converte a data para idade
       setMaxAge(getAgeFromRuleDate(typeInscription.rule));
       setParticipantLimit(typeInscription.participantLimit);
       setLimitIsStrict(Boolean(typeInscription.limitIsStrict));
@@ -86,20 +89,11 @@ export default function TypeInscriptionDialog({
     if (!description.trim()) return;
     if (value === null || Number.isNaN(value)) return;
 
-    const rule =
-      maxAge === null || Number.isNaN(maxAge)
-        ? null
-        : (() => {
-            const rule = new Date(baseDate);
-            rule.setFullYear(rule.getFullYear() - maxAge);
-            return rule;
-          })();
-
     await onSubmit({
       description: description.trim(),
       value,
       specialType,
-      rule,
+      rule: maxAge, // Passa a idade diretamente como number
       participantLimit,
       limitIsStrict,
     });

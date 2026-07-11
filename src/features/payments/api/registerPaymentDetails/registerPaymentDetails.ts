@@ -1,5 +1,5 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { RegisterPaymentDetailsResponse } from "../../types/registerPaymentDetails/registerPaymentDetails";
+import { axiosClient } from '@/lib/axios';
+import { RegisterPaymentDetailsResponse } from '../../types/registerPaymentDetails/registerPaymentDetails';
 
 export async function registerPaymentDetails(
   inscriptionId: string,
@@ -7,7 +7,7 @@ export async function registerPaymentDetails(
   pageSize: number,
 ): Promise<RegisterPaymentDetailsResponse> {
   try {
-    const { data } = await axiosInstance.get<RegisterPaymentDetailsResponse>(
+    const { data } = await axiosClient.get<RegisterPaymentDetailsResponse>(
       `/payments/${inscriptionId}/list/pending/details`,
       {
         params: {
@@ -26,7 +26,7 @@ export async function registerPaymentDetails(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

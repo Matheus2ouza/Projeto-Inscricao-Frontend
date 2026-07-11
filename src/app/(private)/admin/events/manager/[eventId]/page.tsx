@@ -1,8 +1,7 @@
 'use client';
 
 import EventManagement from '@/features/events/components/manager/EventManagement';
-import { useEventManager } from '@/features/events/hooks/manager/useEventManager';
-import { useTypeInscriptionsActions } from '@/features/typeInscription/hook/useTypeInscriptionsActions';
+import { useEventManagerData } from '@/features/events/hooks/manager/useEventManager';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -19,26 +18,9 @@ export default function EventManagementAdminPage() {
     return null;
   }
 
-  const {
-    event,
-    loadingEvent,
-    errorEvent,
-    refetchEvent,
-    typeInscriptions,
-    loadingTypeInscriptions,
-    refetchTypeInscriptions,
-  } = useEventManager({ eventId });
-
-  const {
-    handleCreateTypeInscription,
-    isCreatingTypeInscription,
-    handleUpdateTypeInscription,
-    isUpdatingTypeInscription,
-    handleDeleteTypeInscription,
-    isDeletingTypeInscription,
-    handleDisableTypeInscription,
-    isDisablingTypeInscription,
-  } = useTypeInscriptionsActions(eventId);
+  // Hook combinado para buscar evento e tipos de inscrição
+  const { event, typeInscriptions, loading, fetching, error, refresh } =
+    useEventManagerData(eventId);
 
   const handleBack = () => {
     router.replace(`/admin/events/manager`);
@@ -82,28 +64,24 @@ export default function EventManagementAdminPage() {
   };
 
   const renderContent = () => {
-    if (loadingEvent || loadingTypeInscriptions) {
+    // Verifica se está carregando
+    if (loading) {
       return renderSkeletonGrid();
     }
-    if (errorEvent) {
+
+    // Verifica se houve erro
+    if (error) {
       return (
         <div className="flex min-h-screen items-center justify-center">
           <div className="text-center">
             <p className="mb-4 text-gray-900 dark:text-white">
-              {'Erro ao carregar evento'}
+              {error.message || 'Erro ao carregar dados'}
             </p>
             <div className="flex justify-center gap-4">
               <Button variant="outline" asChild>
                 <Link href="/admin/events/manager">Voltar</Link>
               </Button>
-              <Button
-                onClick={() => {
-                  refetchEvent();
-                  refetchTypeInscriptions();
-                }}
-              >
-                Tentar Novamente
-              </Button>
+              <Button onClick={refresh}>Tentar Novamente</Button>
             </div>
           </div>
         </div>
@@ -114,16 +92,8 @@ export default function EventManagementAdminPage() {
       <EventManagement
         event={event}
         typeInscriptions={typeInscriptions}
-        refreshEvent={refetchEvent}
-        refreshTypeInscriptions={refetchTypeInscriptions}
-        onCreateTypeInscription={handleCreateTypeInscription}
-        isCreatingTypeInscription={isCreatingTypeInscription}
-        onUpdateTypeInscription={handleUpdateTypeInscription}
-        isUpdatingTypeInscription={isUpdatingTypeInscription}
-        onDeleteTypeInscription={handleDeleteTypeInscription}
-        isDeletingTypeInscription={isDeletingTypeInscription}
-        onDisableTypeInscription={handleDisableTypeInscription}
-        isDisablingTypeInscription={isDisablingTypeInscription}
+        refreshEvent={refresh}
+        refreshTypeInscriptions={refresh}
       />
     );
   };

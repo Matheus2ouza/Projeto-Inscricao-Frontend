@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/shared/components/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/shared/components/ui/command";
+} from '@/shared/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { cn } from "@/shared/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
-import React from "react";
+} from '@/shared/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import React from 'react';
 
 export type EventStatusOption = {
   value: boolean;
@@ -23,8 +23,8 @@ export type EventStatusOption = {
 };
 
 export const EVENT_STATUS_OPTIONS: EventStatusOption[] = [
-  { value: true, label: "Pagamentos Liberados" },
-  { value: false, label: "Pagamentos Bloqueados" },
+  { value: true, label: 'Pagamentos Liberados' },
+  { value: false, label: 'Pagamentos Bloqueados' },
 ];
 
 type EventStatusFilterProps = {
@@ -49,12 +49,12 @@ export default function EventSPaymentStatusFilter({
     .map((option) => option.label);
 
   const cleanLabel = (label: string) =>
-    label.replace(/^Pagamentos\s+/i, "").trim();
+    label.replace(/^Pagamentos\s+/i, '').trim();
 
   const displayText =
     selectedLabels.length > 0
-      ? selectedLabels.map((label) => cleanLabel(label)).join(", ")
-      : "";
+      ? selectedLabels.map((label) => cleanLabel(label)).join(', ')
+      : '';
 
   const toggleStatus = (statusValue: boolean) => {
     const isSelected = value.includes(statusValue);
@@ -70,15 +70,15 @@ export default function EventSPaymentStatusFilter({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className={cn("min-w-[260px] justify-between", className)}
+          className={cn('min-w-[260px] justify-between', className)}
           type="button"
         >
           <div className="text-left">
-            <p className="text-sm text-foreground truncate">
-              {displayText || "Nenhum status selecionado"}
+            <p className="text-foreground truncate text-sm">
+              {displayText || 'Nenhum status selecionado'}
             </p>
           </div>
-          <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+          <ChevronsUpDown className="text-muted-foreground h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[260px] p-0" align="start">
@@ -88,7 +88,7 @@ export default function EventSPaymentStatusFilter({
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = value.includes(option.value);
-                const optionValueKey = option.value ? "true" : "false";
+                const optionValueKey = option.value ? 'true' : 'false';
                 return (
                   <CommandItem
                     key={optionValueKey}
@@ -98,8 +98,8 @@ export default function EventSPaymentStatusFilter({
                     <span className="text-sm">{option.label}</span>
                     <Check
                       className={cn(
-                        "ml-auto h-4 w-4 text-blue-600 transition-opacity",
-                        isSelected ? "opacity-100" : "opacity-0",
+                        'ml-auto h-4 w-4 text-blue-600 transition-opacity',
+                        isSelected ? 'opacity-100' : 'opacity-0',
                       )}
                     />
                   </CommandItem>
@@ -107,7 +107,7 @@ export default function EventSPaymentStatusFilter({
               })}
             </CommandGroup>
           </CommandList>
-          <div className="p-2 border-t border-border">
+          <div className="border-border border-t p-2">
             <Button
               type="button"
               variant="outline"

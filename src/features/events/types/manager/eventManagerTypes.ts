@@ -1,14 +1,14 @@
-import type { TypeInscription } from "@/features/typeInscription/types/typesInscriptionsTypes";
+import type { TypeInscription } from '@/features/typeInscription/types/typesInscriptionsTypes';
 
 export enum InscriptionMode {
-  NORMAL = "NORMAL",
-  GUEST = "GUEST",
+  NORMAL = 'NORMAL',
+  GUEST = 'GUEST',
 }
 
 export enum EventStatus {
-  OPEN = "OPEN",
-  CLOSE = "CLOSE",
-  FINALIZED = "FINALIZED",
+  OPEN = 'OPEN',
+  CLOSE = 'CLOSE',
+  FINALIZED = 'FINALIZED',
 }
 
 export type Event = {
@@ -81,9 +81,9 @@ export type getEventResponse = {
 };
 
 export enum StatusEvent {
-  OPEN = "ABERTO",
-  CLOSE = "FECHADO",
-  FINALIZED = "FINALIZADO",
+  OPEN = 'ABERTO',
+  CLOSE = 'FECHADO',
+  FINALIZED = 'FINALIZADO',
 }
 
 export type UseEventManagerParams = {

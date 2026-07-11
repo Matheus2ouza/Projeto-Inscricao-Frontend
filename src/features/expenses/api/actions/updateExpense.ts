@@ -2,7 +2,7 @@ import {
   CategoryExpense,
   PaymentMethod,
 } from '@/features/expenses/types/detailsExpense/detailsExpenseTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export type UpdateExpenseRequest = {
   expenseId: string;
@@ -29,7 +29,7 @@ export async function updateExpense({
   createdAt,
 }: UpdateExpenseRequest) {
   try {
-    const { data } = await axiosInstance.patch(`expenses/${expenseId}`, {
+    const { data } = await axiosClient.patch(`expenses/${expenseId}`, {
       description,
       value,
       paymentMethod,

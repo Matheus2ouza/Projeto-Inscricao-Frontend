@@ -1,16 +1,16 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMyInscriptions } from "../../api/MyInscriptions/getInscripions";
-import { MyInscriptionsResponse } from "../../types/MyInscriptions/myInscriptionsTypes";
+import { myInscriptionsAction } from '@/features/inscriptions/actions/myInscriptions/myInscriptionsAction';
+import { MyInscriptionsResponse } from '@/features/inscriptions/types/myInscriptions/myInscriptionsTypes';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const MyInscriptionsKey = {
-  all: ["myInscriptions"] as const,
-  lists: () => [...MyInscriptionsKey.all, "list"] as const,
+  all: ['myInscriptions'] as const,
+  lists: () => [...MyInscriptionsKey.all, 'list'] as const,
   list: (eventId: string, page: number, pageSize: number, limitTime?: string) =>
     [
       ...MyInscriptionsKey.lists(),
       { eventId, page, pageSize, limitTime },
     ] as const,
-  details: () => [...MyInscriptionsKey.all, "detail"] as const,
+  details: () => [...MyInscriptionsKey.all, 'detail'] as const,
   detail: (id: string) => [...MyInscriptionsKey.details(), id] as const,
 };
 
@@ -22,7 +22,7 @@ export function useMyInscriptionsQuery(
 ) {
   return useQuery<MyInscriptionsResponse>({
     queryKey: MyInscriptionsKey.list(eventId, page, pageSize, limitTime),
-    queryFn: () => getMyInscriptions(eventId, page, pageSize, limitTime),
+    queryFn: () => myInscriptionsAction(eventId, page, pageSize, limitTime),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
@@ -66,7 +66,7 @@ export function usePrefetchMyInscriptionsQuery() {
     ) => {
       queryClient.prefetchQuery({
         queryKey: MyInscriptionsKey.list(eventId, page, pageSize, limitTime),
-        queryFn: () => getMyInscriptions(eventId, page, pageSize, limitTime),
+        queryFn: () => myInscriptionsAction(eventId, page, pageSize, limitTime),
       });
     },
   };

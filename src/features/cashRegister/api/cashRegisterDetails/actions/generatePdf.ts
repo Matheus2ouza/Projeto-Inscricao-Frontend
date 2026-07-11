@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import qs from 'qs';
 import {
   generatePdfParams,
@@ -12,7 +12,7 @@ export async function generatePdf({
   favorite,
 }: generatePdfParams): Promise<generatePdfResponse> {
   try {
-    const { data } = await axiosInstance.get<generatePdfResponse>(
+    const { data } = await axiosClient.get<generatePdfResponse>(
       `cash-register/${cashRegisterId}/pdf`,
       {
         params: {

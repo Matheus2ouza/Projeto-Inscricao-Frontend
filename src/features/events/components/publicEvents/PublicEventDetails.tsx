@@ -5,11 +5,12 @@ import {
   type SubscriptionStatus,
 } from '@/features/events/components/publicEvents/PublicEventInscriptionCta';
 import { Event } from '@/features/events/types/publicEvents/publicEventsTypes';
-import { ImageSwatches } from '@/features/guest/hook/guestInscription/useImagePalette';
 import EventMap from '@/shared/components/EventMap';
 import { GuestInscriptionAlready } from '@/shared/components/GuestInscriptionAlready';
 import { Button } from '@/shared/components/ui/button';
-import { getGradientClass } from '@/shared/utils/getGenerateGradient';
+import { ImageSwatches } from '@/shared/hooks/useImagePalette';
+import { formatInput } from '@/shared/utils/format';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
 import { getWithExpiry, setWithExpiry } from '@/shared/utils/storageWithExpiry';
 import { Calendar, Loader2, MapPin, Share2 } from 'lucide-react';
 import Image from 'next/image';
@@ -19,17 +20,17 @@ import { useEffect, useMemo, useState } from 'react';
 type PublicEventDetailsProps = {
   event: Event | null;
   palette: string[];
-  isDark: boolean;
+  isDark: boolean; // ✅ Agora é o tema
   swatches?: ImageSwatches;
   onViewSubscription: (eventId: string) => void;
   onSubscribe: (eventId: string) => void;
   onLogin: () => void;
 };
 
-export default function PublicEventDetails({
+export function PublicEventDetails({
   event,
   palette,
-  isDark,
+  isDark, // ✅ Tema (light/dark)
   swatches,
   onViewSubscription,
   onSubscribe,
@@ -71,14 +72,6 @@ export default function PublicEventDetails({
 
     setAlreadyDialogOpen(true);
   }, [event?.id]);
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
 
   const getEventStatus = () => {
     if (!event)
@@ -167,14 +160,16 @@ export default function PublicEventDetails({
   }, [isDark, swatches]);
 
   const recommendedTitleColor =
-    preferredSwatch?.titleTextColor ?? (isDark ? '#ffffff' : '#111111');
+    preferredSwatch?.titleTextColor ?? (isDark ? '#FFFFFF' : '#1F2937');
   const recommendedBodyColor =
-    preferredSwatch?.bodyTextColor ??
-    (isDark ? 'rgba(255,255,255,0.78)' : '#374151');
+    preferredSwatch?.bodyTextColor ?? (isDark ? '#B0BEC5' : '#374151');
+
+  // ✅ Glass surface adaptado ao tema
   const glassSurfaceClass = isDark
-    ? 'bg-white/20 border-white/20'
+    ? 'bg-white/10 border-white/10'
     : 'bg-black/5 border-black/10';
-  const accent = palette?.[0] ?? 'hsl(var(--primary))';
+
+  const accent = palette?.[0] ?? (isDark ? '#2A8A85' : '#3FB5AE');
 
   if (!event) {
     return (
@@ -187,7 +182,7 @@ export default function PublicEventDetails({
     );
   }
 
-  const gradientClass = getGradientClass(event.name);
+  const gradientClass = generateGradientClass();
   const subscriptionStatus = getSubscriptionStatus();
   const shouldShowImage = Boolean(event.image && !imageFailed);
   const hasCoordinates =
@@ -213,7 +208,7 @@ export default function PublicEventDetails({
         }}
       />
       <div
-        className={`relative aspect-video w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-md ${glassSurfaceClass}`}
+        className={`relative h-48 w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-md sm:h-56 md:h-64 ${glassSurfaceClass}`}
       >
         {shouldShowImage ? (
           <>
@@ -223,7 +218,7 @@ export default function PublicEventDetails({
               </div>
             )}
             <Image
-              src={event.image as string}
+              src={event.image}
               alt={event.name}
               fill
               priority
@@ -235,7 +230,6 @@ export default function PublicEventDetails({
                 setImageLoading(false);
               }}
             />
-            {/* Gradient Overlay for Text Readability */}
             <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
           </>
         ) : (
@@ -246,15 +240,29 @@ export default function PublicEventDetails({
           </div>
         )}
 
-        <div className="absolute right-0 bottom-0 left-0 z-20 p-4 sm:p-8 md:p-10">
-          <p
-            className="mb-1 text-xs font-medium tracking-[0.3em] uppercase drop-shadow-md sm:mb-2 sm:text-xl"
-            style={{ color: recommendedBodyColor }}
-          >
-            {event.regionName || 'Evento'}
-          </p>
+        <div className="absolute right-0 bottom-0 left-0 z-20 p-3 sm:p-5 md:p-6">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <p
+              className="text-[10px] font-medium tracking-[0.3em] uppercase drop-shadow-md sm:text-sm"
+              style={{ color: recommendedBodyColor }}
+            >
+              {event.regionName || 'Evento'}
+            </p>
+            <span
+              className="hidden h-4 w-px sm:block"
+              style={{ background: `${recommendedBodyColor}30` }}
+            />
+            <div className="flex items-center gap-1.5">
+              <span
+                className="text-[10px] font-medium drop-shadow-md sm:text-xs"
+                style={{ color: recommendedBodyColor }}
+              >
+                {formatInput(event.startDate, 'date', { month: 'short' })}
+              </span>
+            </div>
+          </div>
           <h1
-            className="text-2xl leading-tight font-bold break-words uppercase drop-shadow-lg sm:text-4xl md:text-5xl"
+            className="text-xl leading-tight font-bold break-words uppercase drop-shadow-md sm:text-2xl md:text-3xl"
             style={{ color: recommendedTitleColor }}
           >
             {event.name}
@@ -264,7 +272,7 @@ export default function PublicEventDetails({
 
       <div className="mb-6 flex flex-col gap-3 sm:flex-row">
         <Button
-          variant="outline"
+          variant="ghost"
           className={`group relative flex-1 justify-center gap-2 overflow-hidden py-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
           onClick={handleShare}
         >
@@ -321,73 +329,20 @@ export default function PublicEventDetails({
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <div
-            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md ${glassSurfaceClass}`}
-          >
-            <div
-              className="pointer-events-none absolute inset-0 opacity-30"
-              style={{
-                background: `radial-gradient(650px circle at 15% 20%, ${accent} 0%, transparent 58%)`,
-              }}
-            />
-            <div className="relative flex items-center gap-4">
-              <div
-                className="bg-primary/10 rounded-lg p-3"
-                style={{ color: accent }}
-              >
-                <Calendar className="h-6 w-6" />
-              </div>
-              <div>
-                <h3
-                  className="text-card-foreground font-medium"
-                  style={{ color: recommendedBodyColor }}
-                >
-                  Data de Início
-                </h3>
-                <p
-                  className="text-card-foreground mt-1 text-xl font-semibold"
-                  style={{ color: recommendedTitleColor }}
-                >
-                  {formatDate(event.startDate)}
-                </p>
-              </div>
-            </div>
-          </div>
-          <div
-            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md ${glassSurfaceClass}`}
-          >
-            <div
-              className="pointer-events-none absolute inset-0 opacity-30"
-              style={{
-                background: `radial-gradient(650px circle at 15% 20%, ${accent} 0%, transparent 58%)`,
-              }}
-            />
-            <div className="relative flex items-center gap-4">
-              <div
-                className="bg-primary/10 rounded-lg p-3"
-                style={{ color: accent }}
-              >
-                <Calendar className="h-6 w-6" />
-              </div>
-              <div>
-                <h3
-                  className="text-card-foreground font-medium"
-                  style={{ color: recommendedBodyColor }}
-                >
-                  Data de Término
-                </h3>
-                <p
-                  className="text-card-foreground mt-1 text-xl font-semibold"
-                  style={{ color: recommendedTitleColor }}
-                >
-                  {formatDate(event.endDate)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PublicEventInscriptionCta
+          eventId={event.id}
+          allowedInscriptionModes={event.allowedInscriptionModes}
+          subscriptionStatus={subscriptionStatus}
+          accentColor={accent} // ✅ Usa a cor ajustada
+          titleColor={recommendedTitleColor}
+          bodyColor={recommendedBodyColor}
+          glassSurfaceClass={glassSurfaceClass}
+          onSubscribe={onSubscribe}
+          onLogin={onLogin}
+          onViewSubscription={onViewSubscription}
+        />
 
+        {/* Card de Localização */}
         <div
           className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md ${glassSurfaceClass}`}
         >
@@ -434,19 +389,6 @@ export default function PublicEventDetails({
             )}
           </div>
         </div>
-
-        <PublicEventInscriptionCta
-          eventId={event.id}
-          allowedInscriptionModes={event.allowedInscriptionModes}
-          subscriptionStatus={subscriptionStatus}
-          accentColor={palette?.[0]}
-          titleColor={recommendedTitleColor}
-          bodyColor={recommendedBodyColor}
-          glassSurfaceClass={glassSurfaceClass}
-          onSubscribe={onSubscribe}
-          onLogin={onLogin}
-          onViewSubscription={onViewSubscription}
-        />
       </div>
     </div>
   );

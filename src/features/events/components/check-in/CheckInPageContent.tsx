@@ -1,19 +1,20 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
+} from '@/shared/components/ui/card';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/shared/components/ui/command";
+} from '@/shared/components/ui/command';
 import {
   Pagination,
   PaginationContent,
@@ -21,14 +22,14 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/shared/components/ui/pagination";
+} from '@/shared/components/ui/pagination';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { Switch } from "@/shared/components/ui/switch";
+} from '@/shared/components/ui/popover';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { Switch } from '@/shared/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -36,18 +37,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { cn } from "@/shared/lib/utils";
+} from '@/shared/components/ui/table';
 import {
   Check,
   ChevronsUpDown,
   TrendingDown,
   TrendingUp,
   Users,
-} from "lucide-react";
-import Image from "next/image";
-import { useMemo, useState } from "react";
-import { CheckInAccount, CheckInEventInfo } from "../../types/check-in/checkInTypes";
+} from 'lucide-react';
+import Image from 'next/image';
+import { useMemo, useState } from 'react';
+import {
+  CheckInAccount,
+  CheckInEventInfo,
+} from '../../types/check-in/checkInTypes';
 
 interface CheckInPageContentProps {
   event: CheckInEventInfo;
@@ -63,20 +66,20 @@ interface CheckInPageContentProps {
   onAccountClick?: (accountId: string) => void;
 }
 
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
 });
 
 const getStatusClasses = (status: string) => {
   const normalized = status.toUpperCase();
-  if (normalized.includes("PENDENTE")) {
-    return "border-destructive text-destructive";
+  if (normalized.includes('PENDENTE')) {
+    return 'border-destructive text-destructive';
   }
-  if (normalized.includes("PAGO") || normalized.includes("OK")) {
-    return "border-emerald-200 text-emerald-700";
+  if (normalized.includes('PAGO') || normalized.includes('OK')) {
+    return 'border-emerald-200 text-emerald-700';
   }
-  return "border-foreground/20";
+  return 'border-foreground/20';
 };
 
 export default function CheckInPageContent({
@@ -93,30 +96,30 @@ export default function CheckInPageContent({
   onAccountClick,
 }: CheckInPageContentProps) {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const options = useMemo(
     () => [
-      { value: "10", label: "10" },
-      { value: "15", label: "15" },
-      { value: "25", label: "25" },
+      { value: '10', label: '10' },
+      { value: '15', label: '15' },
+      { value: '25', label: '25' },
     ],
-    []
+    [],
   );
 
   const filteredOptions = useMemo(
     () =>
       options.filter((option) =>
-        option.label.toLowerCase().includes(query.toLowerCase())
+        option.label.toLowerCase().includes(query.toLowerCase()),
       ),
-    [options, query]
+    [options, query],
   );
   return (
     <>
-      <Card className="border-0 shadow-sm mb-6">
-        <CardContent className="p-6 flex flex-col gap-6">
+      <Card className="mb-6 border-0 shadow-sm">
+        <CardContent className="flex flex-col gap-6 p-6">
           <div className="flex flex-col gap-6 lg:flex-row">
             <div className="w-full lg:w-1/3">
-              <div className="relative h-48 w-full overflow-hidden rounded-xl border border-border/40 bg-muted">
+              <div className="border-border/40 bg-muted relative h-48 w-full overflow-hidden rounded-xl border">
                 {event.imageUrl ? (
                   <Image
                     src={event.imageUrl}
@@ -126,37 +129,37 @@ export default function CheckInPageContent({
                     sizes="(max-width: 768px) 100vw, 300px"
                   />
                 ) : (
-                  <div className="h-full w-full bg-muted flex items-center justify-center text-3xl font-semibold text-muted-foreground">
+                  <div className="bg-muted text-muted-foreground flex h-full w-full items-center justify-center text-3xl font-semibold">
                     {event.name?.charAt(0)}
                   </div>
                 )}
               </div>
             </div>
-            <div className="flex-1 flex flex-col gap-5">
+            <div className="flex flex-1 flex-col gap-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Evento</p>
+                  <p className="text-muted-foreground text-sm">Evento</p>
                   <p className="text-2xl font-semibold">{event.name}</p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl border bg-card flex items-center gap-3">
-                  <div className="p-3 rounded-full bg-green-100">
-                    <Users className="w-5 h-5 text-green-600" />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="bg-card flex items-center gap-3 rounded-xl border p-4">
+                  <div className="rounded-full bg-green-100 p-3">
+                    <Users className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Contas</p>
+                    <p className="text-muted-foreground text-sm">Contas</p>
                     <p className="text-xl font-semibold">
                       {event.countAccounts}
                     </p>
                   </div>
                 </div>
-                <div className="p-4 rounded-xl border bg-card flex items-center gap-3">
-                  <div className="p-3 rounded-full bg-blue-100">
-                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                <div className="bg-card flex items-center gap-3 rounded-xl border p-4">
+                  <div className="rounded-full bg-blue-100 p-3">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Faturamento total
                     </p>
                     <p className="text-xl font-semibold">
@@ -164,13 +167,13 @@ export default function CheckInPageContent({
                     </p>
                   </div>
                 </div>
-                <div className="p-4 rounded-xl border bg-card flex items-center gap-3">
-                  <div className="p-3 rounded-full bg-red-100">
-                    <TrendingDown className="w-5 h-5 text-red-600" />
+                <div className="bg-card flex items-center gap-3 rounded-xl border p-4">
+                  <div className="rounded-full bg-red-100 p-3">
+                    <TrendingDown className="h-5 w-5 text-red-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Débitos</p>
-                    <p className="text-xl font-semibold text-destructive">
+                    <p className="text-muted-foreground text-sm">Débitos</p>
+                    <p className="text-destructive text-xl font-semibold">
                       {currencyFormatter.format(event.totalDebt)}
                     </p>
                   </div>
@@ -187,11 +190,11 @@ export default function CheckInPageContent({
         </CardHeader>
         <CardContent className="p-0">
           <div className="px-6 pt-4">
-            <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-              <p className="font-semibold uppercase tracking-[0.2em]">Contas</p>
+            <div className="text-muted-foreground flex items-center justify-between gap-3 text-sm">
+              <p className="font-semibold tracking-[0.2em] uppercase">Contas</p>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em]">
+                  <p className="text-xs font-semibold tracking-[0.3em] uppercase">
                     Apenas com débitos
                   </p>
                   <Switch
@@ -203,7 +206,7 @@ export default function CheckInPageContent({
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em]">
+                <p className="text-xs font-semibold tracking-[0.3em] uppercase">
                   Itens por página
                 </p>
                 <Popover open={open} onOpenChange={setOpen}>
@@ -215,8 +218,8 @@ export default function CheckInPageContent({
                       className="w-[120px] justify-between px-3 text-sm"
                     >
                       {options.find(
-                        (option) => option.value === String(pageSize)
-                      )?.label ?? "10"}
+                        (option) => option.value === String(pageSize),
+                      )?.label ?? '10'}
                       <ChevronsUpDown className="text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
@@ -232,16 +235,16 @@ export default function CheckInPageContent({
                               onSelect={(currentValue) => {
                                 onPageSizeChange(Number(currentValue));
                                 setOpen(false);
-                                setQuery("");
+                                setQuery('');
                               }}
                             >
                               {option.label}
                               <Check
                                 className={cn(
-                                  "ml-auto",
+                                  'ml-auto',
                                   pageSize === Number(option.value)
-                                    ? "opacity-100"
-                                    : "opacity-0"
+                                    ? 'opacity-100'
+                                    : 'opacity-0',
                                 )}
                               />
                             </CommandItem>
@@ -255,12 +258,12 @@ export default function CheckInPageContent({
             </div>
           </div>
           {tableLoading ? (
-            <div className="p-6 space-y-3">
+            <div className="space-y-3 p-6">
               <Skeleton className="h-8 w-1/3" />
               {Array.from({ length: 3 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-11 rounded-lg border border-border/50 bg-muted/60"
+                  className="border-border/50 bg-muted/60 h-11 rounded-lg border"
                 />
               ))}
             </div>
@@ -280,7 +283,7 @@ export default function CheckInPageContent({
                   <TableRow
                     key={account.id}
                     className={
-                      onAccountClick ? "cursor-pointer hover:bg-muted/60" : ""
+                      onAccountClick ? 'hover:bg-muted/60 cursor-pointer' : ''
                     }
                     onClick={
                       onAccountClick
@@ -293,8 +296,8 @@ export default function CheckInPageContent({
                     </TableCell>
                     <TableCell>
                       <span
-                        className={`inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium uppercase tracking-[0.2em] ${getStatusClasses(
-                          account.status
+                        className={`inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium tracking-[0.2em] uppercase ${getStatusClasses(
+                          account.status,
                         )}`}
                       >
                         {account.status}
@@ -307,7 +310,7 @@ export default function CheckInPageContent({
                       {account.countPay}
                     </TableCell>
                     <TableCell
-                      className={`text-center ${account.countDebt > 0 ? "text-red-600" : ""}`}
+                      className={`text-center ${account.countDebt > 0 ? 'text-red-600' : ''}`}
                     >
                       {account.countDebt}
                     </TableCell>
@@ -326,8 +329,8 @@ export default function CheckInPageContent({
               <PaginationItem>
                 <PaginationPrevious
                   onClick={() => page > 1 && onPageChange(page - 1)}
-                  href={page > 1 ? "#" : undefined}
-                  className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                  href={page > 1 ? '#' : undefined}
+                  className={page === 1 ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
               {(() => {
@@ -354,9 +357,9 @@ export default function CheckInPageContent({
               <PaginationItem>
                 <PaginationNext
                   onClick={() => page < pageCount && onPageChange(page + 1)}
-                  href={page < pageCount ? "#" : undefined}
+                  href={page < pageCount ? '#' : undefined}
                   className={
-                    page === pageCount ? "pointer-events-none opacity-50" : ""
+                    page === pageCount ? 'pointer-events-none opacity-50' : ''
                   }
                 />
               </PaginationItem>

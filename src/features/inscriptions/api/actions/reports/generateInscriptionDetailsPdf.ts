@@ -1,15 +1,14 @@
 import {
   GenerateInscriptionDetailsPdfInput,
   GenerateInscriptionDetailsPdfResponse,
-} from "@/features/inscriptions/types/actions/reports/generateInscriptionDetailsPdfTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-
+} from '@/features/inscriptions/types/actions/reports/generateInscriptionDetailsPdfTypes';
+import { axiosClient } from '@/lib/axios';
 export async function generateInscriptionDetailsPdf({
   inscriptionId,
 }: GenerateInscriptionDetailsPdfInput) {
   try {
     const { data } =
-      await axiosInstance.get<GenerateInscriptionDetailsPdfResponse>(
+      await axiosClient.get<GenerateInscriptionDetailsPdfResponse>(
         `/inscriptions/${inscriptionId}/details/pdf`,
       );
     return data;
@@ -21,7 +20,7 @@ export async function generateInscriptionDetailsPdf({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar as inscrições.",
+        'Não foi possível buscar as inscrições.',
     );
   }
 }

@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import {
   CreateEventRequest,
   RegisterEventResponse,
@@ -8,7 +8,7 @@ export async function registerEvent(
   data: CreateEventRequest,
 ): Promise<RegisterEventResponse> {
   try {
-    const response = await axiosInstance.post('/events/create', data);
+    const response = await axiosClient.post('/events/create', data);
 
     return { id: response.data.id };
   } catch (error: unknown) {

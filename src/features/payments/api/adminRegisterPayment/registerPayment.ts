@@ -2,13 +2,13 @@ import {
   RegisterPaymentInput,
   RegisterPaymentResponse,
 } from '@/features/payments/types/adminRegisterPayment/registerPaymentType';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function registerPayment(
   body: RegisterPaymentInput,
 ): Promise<RegisterPaymentResponse> {
   try {
-    const { data } = await axiosInstance.post<RegisterPaymentResponse>(
+    const { data } = await axiosClient.post<RegisterPaymentResponse>(
       `payments/register/admin`,
       body,
     );

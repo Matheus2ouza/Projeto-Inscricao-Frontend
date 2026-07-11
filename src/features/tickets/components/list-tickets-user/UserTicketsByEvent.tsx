@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import type { TicketsByEventResponse } from "@/features/tickets/types/analysis/ticketsTypes";
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { cn } from "@/shared/lib/utils";
-import { getAvailabilityState } from "@/shared/utils/getAvailabilityState";
-import { getFontSizeClass } from "@/shared/utils/getFontSizeClass";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { Check, Copy, ExternalLink, Ticket, Wallet } from "lucide-react";
-import Image from "next/image";
-import { useMemo, useState } from "react";
+import type { TicketsByEventResponse } from '@/features/tickets/types/analysis/ticketsTypes';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { getAvailabilityState } from '@/shared/utils/getAvailabilityState';
+import { getFontSizeClass } from '@/shared/utils/getFontSizeClass';
+import { AspectRatio } from '@radix-ui/react-aspect-ratio';
+import { Check, Copy, ExternalLink, Ticket, Wallet } from 'lucide-react';
+import Image from 'next/image';
+import { useMemo, useState } from 'react';
 
 type UserTicketsByEventProps = {
   event?: TicketsByEventResponse;
@@ -21,13 +21,13 @@ export function UserTicketsByEvent({
   event,
   onSelectTicket,
 }: UserTicketsByEventProps) {
-  const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
+  const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
   });
 
-  const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "medium",
+  const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'medium',
   });
 
   const [copied, setCopied] = useState(false);
@@ -35,8 +35,8 @@ export function UserTicketsByEvent({
   const canPurchase = Boolean(event?.ticketEnabled);
 
   const ticketPageUrl = useMemo(() => {
-    if (typeof window === "undefined") {
-      return "";
+    if (typeof window === 'undefined') {
+      return '';
     }
     return `${window.location.origin}/events/tickets/${event?.id}`;
   }, [event?.id]);
@@ -47,15 +47,15 @@ export function UserTicketsByEvent({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error("Falha ao copiar link de tickets", error);
+      console.error('Falha ao copiar link de tickets', error);
     }
   };
 
   return (
     <div className="space-y-6">
       <Card className="border-0 shadow-sm">
-        <CardContent className="p-6 flex flex-col gap-6 md:flex-row md:items-stretch">
-          <div className="w-full md:w-1/2 relative">
+        <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-stretch">
+          <div className="relative w-full md:w-1/2">
             {event?.imageUrl ? (
               <div className="relative w-full overflow-hidden rounded-xl">
                 <AspectRatio ratio={16 / 9}>
@@ -68,40 +68,40 @@ export function UserTicketsByEvent({
                 </AspectRatio>
               </div>
             ) : (
-              <div className="h-56 w-full rounded-xl bg-muted flex items-center justify-center">
-                <Ticket className="w-12 h-12 text-muted-foreground" />
+              <div className="bg-muted flex h-56 w-full items-center justify-center rounded-xl">
+                <Ticket className="text-muted-foreground h-12 w-12" />
               </div>
             )}
             <Badge
-              variant={canPurchase ? "default" : "outline"}
+              variant={canPurchase ? 'default' : 'outline'}
               className={cn(
-                "absolute top-4 right-4 shadow-sm",
+                'absolute top-4 right-4 shadow-sm',
                 canPurchase
-                  ? "bg-green-600 text-white hover:bg-green-600"
-                  : "text-amber-600 border-amber-400 bg-white/90 backdrop-blur"
+                  ? 'bg-green-600 text-white hover:bg-green-600'
+                  : 'border-amber-400 bg-white/90 text-amber-600 backdrop-blur',
               )}
             >
-              {canPurchase ? "Vendas disponíveis" : "Vendas indisponíveis"}
+              {canPurchase ? 'Vendas disponíveis' : 'Vendas indisponíveis'}
             </Badge>
           </div>
           <div className="flex-1 space-y-4 md:flex md:flex-col">
             <div>
-              <h1 className={cn("text-2xl font-semibold")}>{event?.name}</h1>
+              <h1 className={cn('text-2xl font-semibold')}>{event?.name}</h1>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               Abaixo você verá os tickets disponíveis para compra. Caso prefira,
               copie o link e compartilhe com os inscritos para que eles mesmos
               possam acessar e adquirir seus tickets.
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+              <span className="text-muted-foreground text-xs tracking-wide uppercase">
                 Link Público
               </span>
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <input
                   readOnly
                   value={ticketPageUrl}
-                  className="w-full text-xs bg-transparent border rounded px-2 py-1 truncate"
+                  className="w-full truncate rounded border bg-transparent px-2 py-1 text-xs"
                 />
               </div>
               <Button
@@ -109,13 +109,13 @@ export function UserTicketsByEvent({
                 size="sm"
                 variant="outline"
                 className={cn(
-                  "p-1 h-7 w-7 sm:h-8 sm:w-8 transition-all duration-300",
+                  'h-7 w-7 p-1 transition-all duration-300 sm:h-8 sm:w-8',
                   copied
-                    ? "bg-green-50 text-green-600 border-green-200"
-                    : "bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+                    ? 'border-green-200 bg-green-50 text-green-600'
+                    : 'border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100',
                 )}
                 onClick={handleCopyLink}
-                title={copied ? "Copiado!" : "Copiar link"}
+                title={copied ? 'Copiado!' : 'Copiar link'}
               >
                 {copied ? (
                   <Check className="h-3 w-3" />
@@ -137,7 +137,7 @@ export function UserTicketsByEvent({
                   }
                 }}
               >
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="h-4 w-4" />
                 Comprar ticket
               </Button>
             </div>
@@ -147,33 +147,33 @@ export function UserTicketsByEvent({
 
       {tickets.length === 0 ? (
         <Card className="border-0 shadow-sm">
-          <CardContent className="p-12 text-center text-muted-foreground">
+          <CardContent className="text-muted-foreground p-12 text-center">
             Nenhum ticket disponível para este evento no momento.
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {tickets.map((ticket) => {
             const isUnavailable = ticket.available <= 0 || !canPurchase;
             const availabilityState = getAvailabilityState(
               ticket.available,
-              ticket.quantity
+              ticket.quantity,
             );
             return (
               <Card
                 key={ticket.id}
-                className="h-full border border-border/40 shadow-sm rounded-2xl flex flex-col"
+                className="border-border/40 flex h-full flex-col rounded-2xl border shadow-sm"
               >
-                <CardContent className="flex flex-col h-full">
-                  <div className="flex items-center justify-between gap-2 mb-4">
+                <CardContent className="flex h-full flex-col">
+                  <div className="mb-4 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="p-2 rounded-full bg-primary/10 text-primary">
-                        <Ticket className="w-4 h-4" />
+                      <span className="bg-primary/10 text-primary rounded-full p-2">
+                        <Ticket className="h-4 w-4" />
                       </span>
                       <h3
                         className={cn(
-                          "font-semibold leading-tight text-lg",
-                          getFontSizeClass(ticket.name)
+                          'text-lg leading-tight font-semibold',
+                          getFontSizeClass(ticket.name),
                         )}
                       >
                         {ticket.name}
@@ -181,40 +181,40 @@ export function UserTicketsByEvent({
                     </div>
                     <span
                       className={cn(
-                        "px-2 py-1 text-xs rounded-md",
-                        availabilityState.badgeClass
+                        'rounded-md px-2 py-1 text-xs',
+                        availabilityState.badgeClass,
                       )}
                     >
                       {availabilityState.label}
                     </span>
                   </div>
 
-                  <dl className="space-y-3 text-sm text-muted-foreground flex-1">
+                  <dl className="text-muted-foreground flex-1 space-y-3 text-sm">
                     <div className="flex items-center justify-between">
                       <dt>Quantidade total</dt>
-                      <dd className="font-medium text-foreground">
+                      <dd className="text-foreground font-medium">
                         {ticket.quantity}
                       </dd>
                     </div>
                     <div className="flex items-center justify-between">
                       <dt>Validade</dt>
-                      <dd className="font-medium text-foreground">
+                      <dd className="text-foreground font-medium">
                         {dateFormatter.format(new Date(ticket.expirationDate))}
                       </dd>
                     </div>
                     <div className="flex items-center justify-between">
                       <dt>Preço</dt>
-                      <dd className="font-medium text-foreground flex items-center gap-1">
-                        <Wallet className="w-4 h-4" />
+                      <dd className="text-foreground flex items-center gap-1 font-medium">
+                        <Wallet className="h-4 w-4" />
                         {currencyFormatter.format(ticket.price)}
                       </dd>
                     </div>
                   </dl>
 
-                  <div className="mt-4 text-xs text-muted-foreground text-center">
+                  <div className="text-muted-foreground mt-4 text-center text-xs">
                     {isUnavailable
-                      ? "Url indisponível até o ticket ser liberado."
-                      : "Disponível na tela de compra."}
+                      ? 'Url indisponível até o ticket ser liberado.'
+                      : 'Disponível na tela de compra.'}
                   </div>
                 </CardContent>
               </Card>

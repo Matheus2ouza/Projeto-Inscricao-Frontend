@@ -1,9 +1,9 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
+import { axiosClient } from '@/lib/axios';
+import qs from 'qs';
 import {
   getEventsResponse,
   StatusEvent,
-} from "../types/listEventsForParticipantsTypes";
+} from '../types/listEventsForParticipantsTypes';
 
 export async function getEvents(params: {
   page: number;
@@ -12,8 +12,8 @@ export async function getEvents(params: {
   guest?: boolean;
 }): Promise<getEventsResponse> {
   try {
-    const { data } = await axiosInstance.get<getEventsResponse>(
-      "/events/participants",
+    const { data } = await axiosClient.get<getEventsResponse>(
+      '/events/participants',
       {
         params: {
           page: params.page,
@@ -21,7 +21,7 @@ export async function getEvents(params: {
           status: params.status,
           guest: params.guest,
         },
-        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+        paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
       },
     );
     return data;
@@ -34,7 +34,7 @@ export async function getEvents(params: {
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os eventos.",
+        'Não foi possível carregar os eventos.',
     );
   }
 }

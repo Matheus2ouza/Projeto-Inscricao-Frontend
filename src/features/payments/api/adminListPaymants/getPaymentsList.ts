@@ -2,7 +2,7 @@ import type {
   ListAllPaymentsRequest,
   ListAllPaymentsResponse,
 } from '@/features/payments/types/adminListPaymants/listPayments.types';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function getPaymentsList(
   request: ListAllPaymentsRequest,
@@ -10,7 +10,7 @@ export async function getPaymentsList(
   const { eventId, accountId, page, pageSize } = request;
 
   try {
-    const { data } = await axiosInstance.get<ListAllPaymentsResponse>(
+    const { data } = await axiosClient.get<ListAllPaymentsResponse>(
       `/payments/${eventId}/list`,
       {
         params: {

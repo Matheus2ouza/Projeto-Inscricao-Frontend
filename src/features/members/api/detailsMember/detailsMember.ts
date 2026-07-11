@@ -1,9 +1,9 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { getDetailsMemberResponse } from "../../types/detailsMember/detailsMemberType";
+import { axiosClient } from '@/lib/axios';
+import { getDetailsMemberResponse } from '../../types/detailsMember/detailsMemberType';
 
 export async function getDetailsMember(memberId: string) {
   try {
-    const { data } = await axiosInstance.get<getDetailsMemberResponse>(
+    const { data } = await axiosClient.get<getDetailsMemberResponse>(
       `/members/${memberId}`,
     );
     return data;
@@ -16,7 +16,7 @@ export async function getDetailsMember(memberId: string) {
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os detalhes do membro.",
+        'Não foi possível carregar os detalhes do membro.',
     );
   }
 }

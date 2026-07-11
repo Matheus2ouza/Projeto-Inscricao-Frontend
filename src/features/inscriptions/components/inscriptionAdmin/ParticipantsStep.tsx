@@ -6,8 +6,11 @@ import {
   shirtTypeEnum,
   type CreateInscriptionAdminForm,
 } from '@/features/inscriptions/schema/inscriptionAdmin/createInscriptionAdminSchema';
-import { ComboboxMemberSingle } from '@/features/members/components/combobox/ComboboxMemberSingle';
-import type { Member } from '@/features/members/types/combobox/membersComboboxType';
+import {
+  ComboboxMemberSingle,
+  MemberSingleOption,
+} from '@/features/members/components/membersCombobox/ComboboxMemberSingle';
+import type { Member } from '@/features/members/types/membersCombobox/membersComboboxTypes';
 import {
   ComboboxTypeInscription,
   TypeInscriptionOption,
@@ -107,6 +110,15 @@ export function ParticipantsStep({
 }: ParticipantsStepProps) {
   const { control } = form;
 
+  const handleMemberSelected = (
+    memberId: string,
+    memberOption?: MemberSingleOption,
+  ) => {
+    // Agora memberOption é do tipo MemberSingleOption | undefined
+    const fullMember = memberOption?.member;
+    onMemberSelected(memberId, fullMember);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -138,7 +150,7 @@ export function ParticipantsStep({
                 accountId={accountId}
                 requireAccountId
                 value=""
-                onChange={onMemberSelected}
+                onChange={handleMemberSelected}
                 placeholder="Buscar membro..."
                 disabledValues={fields.map(
                   (field) => field.accountParticipantId || '',

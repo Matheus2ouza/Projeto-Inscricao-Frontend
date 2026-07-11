@@ -2,13 +2,13 @@ import {
   ApprovePaymentInput,
   ApprovePaymentResponse,
 } from '@/features/payments/types/analysisPayment/actions/approvePaymentTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function approvePayment({
   paymentId,
 }: ApprovePaymentInput): Promise<ApprovePaymentResponse> {
   try {
-    const { data } = await axiosInstance.post<ApprovePaymentResponse>(
+    const { data } = await axiosClient.post<ApprovePaymentResponse>(
       `payments/${paymentId}/analysis/approve`,
     );
 

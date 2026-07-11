@@ -352,110 +352,110 @@ export default function ListExclusiveInscriptionLink({
                       key={link.id}
                       className="glass-surface hover:glass-surface-strong rounded-lg p-6 transition-colors"
                     >
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-sm font-medium">
-                            #
-                          </span>
-                          <span className="font-semibold">
-                            {calculateGlobalIndex(idx, page, pageSize)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-muted-foreground text-xs tracking-[0.2em] uppercase">
-                          Nome do Link
-                        </p>
-                        <p className="text-lg leading-tight font-semibold">
-                          {link.name}
-                        </p>
-                      </div>
-
-                      {link.typeInscriptionAllowed.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {link.typeInscriptionAllowed.map((type) => (
-                            <Badge
-                              key={type.id}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {type.description}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="border-border rounded-lg border bg-white/5 p-4 shadow-sm shadow-black/5 dark:bg-white/5">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-muted-foreground text-xs">
-                            URL de Inscrição:
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <input
-                              readOnly
-                              className="w-full truncate rounded border bg-transparent px-2 py-1 text-xs"
-                              value={`${baseUrl}/exclusive/${link.token}`}
-                            />
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground text-sm font-medium">
+                              #
+                            </span>
+                            <span className="font-semibold">
+                              {calculateGlobalIndex(idx, page, pageSize)}
+                            </span>
                           </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className={`glass-button transition-all ${
-                              isCopied
-                                ? 'border-green-200 bg-green-50 text-green-600'
-                                : ''
-                            }`}
-                            onClick={() => copyToClipboard(link.token)}
-                            title={isCopied ? 'Copiado!' : 'Copiar URL'}
-                          >
-                            {isCopied ? (
-                              <Check className="h-4 w-4" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </Button>
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <div className="border-border rounded-lg border bg-white/5 p-3 text-center shadow-sm shadow-black/5 dark:bg-white/5">
-                          <p className="text-muted-foreground text-xs">
-                            Inscrições
+                        <div className="space-y-1">
+                          <p className="text-muted-foreground text-xs tracking-[0.2em] uppercase">
+                            Nome do Link
                           </p>
-                          <p className="mt-1 text-lg font-bold">
-                            {link.countInscriptions}
-                          </p>
-                        </div>
-                        <div className="border-border rounded-lg border bg-white/5 p-3 text-center shadow-sm shadow-black/5 dark:bg-white/5">
-                          <p className="text-muted-foreground text-xs">
-                            Valor Total
-                          </p>
-                          <p className="mt-1 text-lg font-bold text-green-600 dark:text-green-400">
-                            {getFormatCurrency(
-                              link.typeInscriptionAllowed.reduce(
-                                (acc, type) => acc + type.value,
-                                0,
-                              ),
-                            )}
+                          <p className="text-lg leading-tight font-semibold">
+                            {link.name}
                           </p>
                         </div>
-                        <div className="border-border rounded-lg border bg-white/5 p-3 text-center shadow-sm shadow-black/5 dark:bg-white/5">
-                          <p className="text-muted-foreground text-xs">
-                            Expira em
-                          </p>
-                          <p className="text-foreground mt-1 text-sm font-medium">
-                            {link.expiresAt
-                              ? formatDate(link.expiresAt)
-                              : 'Nunca'}
-                          </p>
+
+                        {link.typeInscriptionAllowed.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {link.typeInscriptionAllowed.map((type) => (
+                              <Badge
+                                key={type.id}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {type.description}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="border-border rounded-lg border bg-white/5 p-4 shadow-sm shadow-black/5 dark:bg-white/5">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-muted-foreground text-xs">
+                              URL de Inscrição:
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <input
+                                readOnly
+                                className="w-full truncate rounded border bg-transparent px-2 py-1 text-xs"
+                                value={`${baseUrl}/exclusive/${link.token}`}
+                              />
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className={`glass-button transition-all ${
+                                isCopied
+                                  ? 'border-green-200 bg-green-50 text-green-600'
+                                  : ''
+                              }`}
+                              onClick={() => copyToClipboard(link.token)}
+                              title={isCopied ? 'Copiado!' : 'Copiar URL'}
+                            >
+                              {isCopied ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                          <div className="border-border rounded-lg border bg-white/5 p-3 text-center shadow-sm shadow-black/5 dark:bg-white/5">
+                            <p className="text-muted-foreground text-xs">
+                              Inscrições
+                            </p>
+                            <p className="mt-1 text-lg font-bold">
+                              {link.countInscriptions}
+                            </p>
+                          </div>
+                          <div className="border-border rounded-lg border bg-white/5 p-3 text-center shadow-sm shadow-black/5 dark:bg-white/5">
+                            <p className="text-muted-foreground text-xs">
+                              Valor Total
+                            </p>
+                            <p className="mt-1 text-lg font-bold text-green-600 dark:text-green-400">
+                              {getFormatCurrency(
+                                link.typeInscriptionAllowed.reduce(
+                                  (acc, type) => acc + type.value,
+                                  0,
+                                ),
+                              )}
+                            </p>
+                          </div>
+                          <div className="border-border rounded-lg border bg-white/5 p-3 text-center shadow-sm shadow-black/5 dark:bg-white/5">
+                            <p className="text-muted-foreground text-xs">
+                              Expira em
+                            </p>
+                            <p className="text-foreground mt-1 text-sm font-medium">
+                              {link.expiresAt
+                                ? formatDate(link.expiresAt)
+                                : 'Nunca'}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
               </div>
             )}
           </div>

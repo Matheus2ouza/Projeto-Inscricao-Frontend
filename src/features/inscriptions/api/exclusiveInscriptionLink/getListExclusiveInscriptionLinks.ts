@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import {
   ListExclusiveInscriptionLinksInput,
   ListExclusiveInscriptionLinksResponse,
@@ -10,7 +10,7 @@ export async function getListExclusiveInscriptionLinks({
   pageSize,
 }: ListExclusiveInscriptionLinksInput): Promise<ListExclusiveInscriptionLinksResponse> {
   try {
-    const { data } = await axiosInstance.get(
+    const { data } = await axiosClient.get(
       `exclusive-inscription/find-all/${eventId}`,
       {
         params: {

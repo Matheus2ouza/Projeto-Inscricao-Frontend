@@ -1,5 +1,5 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { PaymentStatus, UpdatePaymentResponse } from "../types/analysisTypes";
+import { axiosClient } from '@/lib/axios/client';
+import { PaymentStatus, UpdatePaymentResponse } from '../types/analysisTypes';
 
 type UpdatePaymentStatusParams = {
   paymentId: string;
@@ -24,9 +24,9 @@ export async function updatePaymentStatus({
       payload.rejectionReason = rejectionReason;
     }
 
-    const update = await axiosInstance.patch(
+    const update = await axiosClient.patch(
       `payments/${paymentId}/update`,
-      payload
+      payload,
     );
 
     return update?.data;
@@ -38,7 +38,7 @@ export async function updatePaymentStatus({
 
     throw new Error(
       axiosError.response?.data?.message ||
-      "Erro ao atualizar status do pagamento"
+        'Erro ao atualizar status do pagamento',
     );
   }
 }

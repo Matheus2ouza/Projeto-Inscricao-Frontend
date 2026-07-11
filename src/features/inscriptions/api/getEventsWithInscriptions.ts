@@ -1,17 +1,20 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { FindAllWithInscriptionsRequest, FindAllWithInscriptionsResponse } from "../types/InscriptionsTypes";
+import { axiosClient } from '@/lib/axios/';
+import {
+  FindAllWithInscriptionsRequest,
+  FindAllWithInscriptionsResponse,
+} from '../types/InscriptionsTypes';
 
 export async function getEventsWithInscriptions(
-  params: FindAllWithInscriptionsRequest
+  params: FindAllWithInscriptionsRequest,
 ): Promise<FindAllWithInscriptionsResponse> {
-  const { data } = await axiosInstance.get<FindAllWithInscriptionsResponse>(
-    "/events/inscriptions",
+  const { data } = await axiosClient.get<FindAllWithInscriptionsResponse>(
+    '/events/inscriptions',
     {
       params: {
         page: params.page,
         pageSize: params.pageSize,
       },
-    }
+    },
   );
   return data;
 }

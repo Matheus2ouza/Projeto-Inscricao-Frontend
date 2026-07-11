@@ -18,7 +18,7 @@ export type Event = {
   amountCollected?: number;
 };
 
-export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
+export type StatusEvent = 'OPEN' | 'CLOSE' | 'FINALIZED';
 
 export type EventsListQueryParams = {
   page: number;

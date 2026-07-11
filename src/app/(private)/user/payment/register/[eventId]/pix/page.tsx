@@ -1,14 +1,11 @@
 'use client';
 
 import RegisterPaymentPix from '@/features/payments/components/registerPayment/RegisterPaymentPix';
-import { useRegisterPayment } from '@/features/payments/hooks/registerPayment/useRegisterPayment';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
-import { useCurrentUser } from '@/shared/context/user-context';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 export default function RegisterPaymentPixPage() {
-  const { user } = useCurrentUser();
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,8 +35,6 @@ export default function RegisterPaymentPixPage() {
   const inscriptionsIds = Array.from(
     new Set<string>([...queryList, ...repeatedParams]),
   );
-
-  const registerPayment = useRegisterPayment();
 
   const allowCardParam = searchParams.get('allowCard');
   const allowCard = allowCardParam === '1' || allowCardParam === 'true';
@@ -72,15 +67,12 @@ export default function RegisterPaymentPixPage() {
             totalValue={resolvedTotalValue}
             allowCard={allowCard}
             allowCustomValue={true}
-            onSubmitPayment={({ value, image }) =>
-              registerPayment.mutateAsync({
-                eventId,
-                accountId: user.id,
-                totalValue: value,
-                image,
-                inscriptions: inscriptionsIds.map((id) => ({ id })),
-              })
-            }
+            onPaymentRegistered={(payment) => {
+              // Opcional: fazer algo após o pagamento ser registrado
+              console.log('Pagamento registrado:', payment);
+              // Exemplo: redirecionar para página de sucesso
+              // router.push(`/user/payment/success/${payment.id}`);
+            }}
           />
         </div>
       )}

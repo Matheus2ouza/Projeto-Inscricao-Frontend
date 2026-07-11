@@ -1,11 +1,11 @@
 import { PreviewExclusiveInscriptionLinkResponse } from '@/features/inscriptions/types/exclusiveInscriptionLink/validateExclusiveInscriptionLink/validateExclusiveInscriptionLinkTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function previewExclusiveLink(
   token: string,
 ): Promise<PreviewExclusiveInscriptionLinkResponse> {
   try {
-    const { data } = await axiosInstance.get(
+    const { data } = await axiosClient.get(
       `exclusive-inscription/${token}/preview`,
     );
     return data;

@@ -1,11 +1,11 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import {
   CONTAINER_WIDTHS,
   PAGE_CONTAINER_CLASSES,
 } from '@/shared/constants/layout';
-import { cn } from '@/shared/lib/utils';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ReactNode } from 'react';

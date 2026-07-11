@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,11 +9,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/shared/components/ui/dialog";
-import { Input } from "@/shared/components/ui/input";
-import { Slider } from "@/shared/components/ui/slider";
-import { cn } from "@/shared/lib/utils";
-import { useEffect, useRef, useState } from "react";
+} from '@/shared/components/ui/dialog';
+import { Input } from '@/shared/components/ui/input';
+import { Slider } from '@/shared/components/ui/slider';
+import { useEffect, useRef, useState } from 'react';
 
 type ImageCropDialogProps = {
   open: boolean;
@@ -32,14 +32,14 @@ const DEFAULT_ASPECT = 16 / 9;
 export default function ImageCropDialog({
   open,
   onOpenChange,
-  title = "Editar imagem",
-  description = "Envie uma imagem, posicione e ajuste o zoom. Salvaremos em 1920x1080.",
+  title = 'Editar imagem',
+  description = 'Envie uma imagem, posicione e ajuste o zoom. Salvaremos em 1920x1080.',
   aspect = DEFAULT_ASPECT,
   targetWidth = 1920,
   targetHeight = 1080,
   onConfirm,
-  confirmLabel = "Confirmar",
-  cancelLabel = "Cancelar",
+  confirmLabel = 'Confirmar',
+  cancelLabel = 'Cancelar',
 }: ImageCropDialogProps) {
   const [file, setFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -72,7 +72,7 @@ export default function ImageCropDialog({
   const onFiles = (files: FileList | File[] | null) => {
     const f = files && (files instanceof FileList ? files[0] : files[0]);
     if (!f) return;
-    if (!f.type.startsWith("image/")) return;
+    if (!f.type.startsWith('image/')) return;
     const url = URL.createObjectURL(f);
     setFile(f);
     setImageUrl(url);
@@ -84,7 +84,8 @@ export default function ImageCropDialog({
 
   const getBaseScale = (viewportWidth: number, viewportHeight: number) => {
     if (!imgRef.current) return 1;
-    const imageAspect = imgRef.current.naturalWidth / imgRef.current.naturalHeight;
+    const imageAspect =
+      imgRef.current.naturalWidth / imgRef.current.naturalHeight;
     const viewportAspect = viewportWidth / viewportHeight;
     if (imageAspect > viewportAspect) {
       return viewportWidth / imgRef.current.naturalWidth;
@@ -94,7 +95,7 @@ export default function ImageCropDialog({
 
   const clampOffset = (
     candidate: { x: number; y: number },
-    nextScale = scale
+    nextScale = scale,
   ) => {
     if (!imgRef.current || !containerRef.current) return candidate;
     const container = containerRef.current.getBoundingClientRect();
@@ -123,10 +124,13 @@ export default function ImageCropDialog({
     const cursorX = e.clientX - rect.left - rect.width / 2;
     const cursorY = e.clientY - rect.top - rect.height / 2;
     const scaleRatio = newScale / scale;
-    const newOffset = clampOffset({
-      x: cursorX - (cursorX - offset.x) * scaleRatio,
-      y: cursorY - (cursorY - offset.y) * scaleRatio,
-    }, newScale);
+    const newOffset = clampOffset(
+      {
+        x: cursorX - (cursorX - offset.x) * scaleRatio,
+        y: cursorY - (cursorY - offset.y) * scaleRatio,
+      },
+      newScale,
+    );
     setScale(newScale);
     setOffset(newOffset);
     lastOffsetRef.current = newOffset;
@@ -165,14 +169,14 @@ export default function ImageCropDialog({
 
   const handleConfirm = async () => {
     if (!imageUrl || !imgRef.current) return;
-    const mimeType = file?.type?.startsWith("image/") ? file.type : "image/png";
-    const extension = mimeType.split("/")[1] ?? "png";
+    const mimeType = file?.type?.startsWith('image/') ? file.type : 'image/png';
+    const extension = mimeType.split('/')[1] ?? 'png';
     // Render a fixed canvas of targetWidth x targetHeight
     // We want to preserve what's visible in the viewport, including black bars (contain mode)
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = targetWidth;
     canvas.height = targetHeight;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const img = imgRef.current;
@@ -216,11 +220,11 @@ export default function ImageCropDialog({
     const viewportTopInImage = Math.max(0, -imageViewportTop / appliedScale);
     const viewportRightInImage = Math.min(
       img.naturalWidth,
-      (viewportWidth - imageViewportLeft) / appliedScale
+      (viewportWidth - imageViewportLeft) / appliedScale,
     );
     const viewportBottomInImage = Math.min(
       img.naturalHeight,
-      (viewportHeight - imageViewportTop) / appliedScale
+      (viewportHeight - imageViewportTop) / appliedScale,
     );
 
     const sx = viewportLeftInImage;
@@ -266,7 +270,7 @@ export default function ImageCropDialog({
       canvasOffsetY;
 
     // Draw the visible portion of the image
-    ctx.imageSmoothingQuality = "high";
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(
       img,
       sx,
@@ -276,15 +280,15 @@ export default function ImageCropDialog({
       finalCanvasX,
       finalCanvasY,
       zoomedCanvasWidth,
-      zoomedCanvasHeight
+      zoomedCanvasHeight,
     );
 
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(
         (b) => resolve(b),
         mimeType,
-        mimeType === "image/jpeg" ? 0.92 : undefined
-      )
+        mimeType === 'image/jpeg' ? 0.92 : undefined,
+      ),
     );
     if (!blob) return;
 
@@ -297,7 +301,7 @@ export default function ImageCropDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[70vw] sm:max-w-[65vw] overflow-hidden">
+      <DialogContent className="max-w-[70vw] overflow-hidden sm:max-w-[65vw]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -314,18 +318,18 @@ export default function ImageCropDialog({
               onDragLeave={() => setIsDraggingOver(false)}
               onDrop={handleDrop}
               className={cn(
-                "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer",
-                isDraggingOver ? "border-primary bg-primary/5" : "border-muted"
+                'cursor-pointer rounded-lg border-2 border-dashed p-8 text-center',
+                isDraggingOver ? 'border-primary bg-primary/5' : 'border-muted',
               )}
               onClick={() => {
                 const input = document.getElementById(
-                  "image-input-hidden"
+                  'image-input-hidden',
                 ) as HTMLInputElement;
                 input?.click();
               }}
             >
-              <p className="text-sm mb-2">Arraste e solte uma imagem aqui</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="mb-2 text-sm">Arraste e solte uma imagem aqui</p>
+              <p className="text-muted-foreground text-xs">
                 ou clique para selecionar
               </p>
               <Input
@@ -340,10 +344,10 @@ export default function ImageCropDialog({
 
           {/* Crop viewport */}
           {imageUrl && (
-            <div className="space-y-3 min-w-0">
+            <div className="min-w-0 space-y-3">
               <div
                 ref={containerRef}
-                className="relative w-full max-w-[min(90vw,800px)] max-h-[70vh] bg-black/70 rounded-md overflow-hidden select-none mx-auto"
+                className="relative mx-auto max-h-[70vh] w-full max-w-[min(90vw,800px)] overflow-hidden rounded-md bg-black/70 select-none"
                 style={{ aspectRatio: `${aspect}` }}
                 onWheel={handleWheel}
                 onMouseDown={startPan}
@@ -357,18 +361,18 @@ export default function ImageCropDialog({
                     ref={imgRef}
                     src={imageUrl}
                     alt="Imagem para recorte"
-                    className="pointer-events-none select-none will-change-transform"
+                    className="pointer-events-none will-change-transform select-none"
                     draggable={false}
                     style={{
                       transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
-                      transformOrigin: "center center",
+                      transformOrigin: 'center center',
                     }}
                   />
                 </div>
 
                 {/* Overlay guides */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="w-full h-full grid grid-cols-3 grid-rows-3">
+                <div className="pointer-events-none absolute inset-0">
+                  <div className="grid h-full w-full grid-cols-3 grid-rows-3">
                     {Array.from({ length: 9 }).map((_, i) => (
                       <div key={i} className="border border-white/10" />
                     ))}
@@ -377,7 +381,7 @@ export default function ImageCropDialog({
               </div>
 
               <div className="flex items-center gap-4">
-                <span className="text-sm w-16">Zoom</span>
+                <span className="w-16 text-sm">Zoom</span>
                 <Slider
                   value={[scale]}
                   min={0.2}

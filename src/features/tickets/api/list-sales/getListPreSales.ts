@@ -1,5 +1,5 @@
-import type { ListPreSalesResponse } from "@/features/tickets/types/list-sales/ticketListSalesTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+import type { ListPreSalesResponse } from '@/features/tickets/types/list-sales/ticketListSalesTypes';
+import { axiosClient } from '@/lib/axios';
 
 type GetListPreSalesParams = {
   page: number;
@@ -8,12 +8,12 @@ type GetListPreSalesParams = {
 
 export async function getListPreSales(
   eventId: string,
-  params: GetListPreSalesParams
+  params: GetListPreSalesParams,
 ): Promise<ListPreSalesResponse> {
   try {
-    const { data } = await axiosInstance.get<ListPreSalesResponse>(
+    const { data } = await axiosClient.get<ListPreSalesResponse>(
       `tickets/${eventId}/list`,
-      { params }
+      { params },
     );
 
     return {
@@ -26,7 +26,7 @@ export async function getListPreSales(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao carregar a lista de vendas dos tickets."
+        'Falha ao carregar a lista de vendas dos tickets.',
     );
   }
 }

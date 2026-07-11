@@ -1,27 +1,28 @@
-"use client";
+'use client';
 
-import { useTypeInscriptionsQuery } from "@/features/inscriptions/hooks/inscriptionIndiv/useTypeInscriptionsQuery";
 import {
   MemberDisplayData,
   UseFormInscriptionGrupReturn,
-} from "@/features/inscriptions/types/inscriptionGrup/inscriptionGrupTypes";
-import { TypeInscription } from "@/features/inscriptions/types/inscriptionIndiv/individualInscriptionTypes";
+} from '@/features/inscriptions/types/groupInscription/inscriptionGrupTypes';
+import { TypeInscription } from '@/features/inscriptions/types/individualInscription/individualInscriptionTypes';
 import {
   ComboboxMemberSingle,
   MemberSingleOption,
-} from "@/features/members/components/combobox/ComboboxMemberSingle";
-import { ComboboxTypeInscription } from "@/features/typeInscription/components/ComboboxTypeInscription";
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
+} from '@/features/members/components/membersCombobox/ComboboxMemberSingle';
+import { ComboboxTypeInscription } from '@/features/typeInscription/components/ComboboxTypeInscription';
+import { useListTypeInscriptions } from '@/features/typeInscription/hook/listTypeInscriptions/useListTypeInscriptions';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
+} from '@/shared/components/ui/card';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
 import {
   Table,
   TableBody,
@@ -29,12 +30,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { cn } from "@/shared/lib/utils";
-import { Drawer } from "antd";
-import { HelpCircle, Phone, Plus, Trash2, User, Users } from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+} from '@/shared/components/ui/table';
+import { Drawer } from 'antd';
+import { HelpCircle, Phone, Plus, Trash2, User, Users } from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 interface GroupInscriptionFormProps {
   hookData: UseFormInscriptionGrupReturn;
@@ -58,25 +58,25 @@ export function GroupInscriptionForm({
   } = hookData;
 
   // Busca os tipos de inscrição para obter o nome quando selecionado
-  const { data: typeInscriptions } = useTypeInscriptionsQuery(eventId);
+  const { typeInscriptions } = useListTypeInscriptions({ eventId });
 
   // IDs dos membros já adicionados à lista (para desabilitar no combobox)
   const addedMemberIds = members.map((m) => m.accountParticipantId);
 
   // Estado local para o drawer de adição de membro
-  const [tempMemberId, setTempMemberId] = useState("");
+  const [tempMemberId, setTempMemberId] = useState('');
   const [tempMemberData, setTempMemberData] = useState<
     MemberSingleOption | undefined
   >(undefined);
-  const [tempTypeId, setTempTypeId] = useState("");
-  const [tempTypeName, setTempTypeName] = useState("");
+  const [tempTypeId, setTempTypeId] = useState('');
+  const [tempTypeName, setTempTypeName] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const handleOpenDrawer = () => {
-    setTempMemberId("");
+    setTempMemberId('');
     setTempMemberData(undefined);
-    setTempTypeId("");
-    setTempTypeName("");
+    setTempTypeId('');
+    setTempTypeName('');
     setIsDrawerOpen(true);
   };
 
@@ -106,35 +106,35 @@ export function GroupInscriptionForm({
       // Fechar o drawer após adicionar
       setIsDrawerOpen(false);
       // Limpar os campos temporários
-      setTempMemberId("");
+      setTempMemberId('');
       setTempMemberData(undefined);
-      setTempTypeId("");
-      setTempTypeName("");
+      setTempTypeId('');
+      setTempTypeName('');
     }
   };
 
   const formatBirthDate = (dateString?: string | Date) => {
-    if (!dateString) return "-";
+    if (!dateString) return '-';
     const date = new Date(dateString);
-    return date.toLocaleDateString("pt-BR");
+    return date.toLocaleDateString('pt-BR');
   };
 
   return (
     <>
       <div className="space-y-6">
         {/* Versão Desktop - Card com mais informações */}
-        <Card className="hidden md:block w-full border-blue-100 dark:border-blue-900 bg-gradient-to-r from-blue-50 to-white dark:from-blue-950/30 dark:to-background">
+        <Card className="border-riodavida/20 from-riodavida/5 dark:border-riodavida/20 dark:from-riodavida/10 dark:to-background hidden w-full bg-gradient-to-r to-white md:block">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <div className="bg-riodavida/10 dark:bg-riodavida/20 rounded-lg p-3">
+                  <HelpCircle className="text-riodavida dark:text-riodavida h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg text-blue-800 dark:text-blue-300">
+                  <h3 className="text-riodavida-gray-dark dark:text-riodavida-gray text-lg font-semibold">
                     Precisa de ajuda com inscrições em grupo?
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-sm">
                     Aprenda a gerenciar inscrições em grupo de forma eficiente
                     com nossa documentação.
                   </p>
@@ -144,7 +144,7 @@ export function GroupInscriptionForm({
                 variant="outline"
                 size="sm"
                 asChild
-                className="border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+                className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark dark:border-riodavida/30 dark:text-riodavida dark:hover:bg-riodavida/20 dark:hover:text-riodavida-light"
               >
                 <Link href="/documentation/inscription/in-group">
                   Ver Documentação
@@ -155,14 +155,14 @@ export function GroupInscriptionForm({
         </Card>
 
         {/* Versão Mobile - Card simplificado */}
-        <Card className="md:hidden w-full border-blue-100 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20">
+        <Card className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 w-full md:hidden">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm text-blue-700 dark:text-blue-300 truncate">
+              <div className="min-w-0 flex-1">
+                <p className="text-riodavida dark:text-riodavida truncate text-sm font-medium">
                   Precisa de ajuda com inscrições em grupo?
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                <p className="text-muted-foreground mt-0.5 truncate text-xs">
                   Consulte nossa documentação
                 </p>
               </div>
@@ -170,7 +170,7 @@ export function GroupInscriptionForm({
                 variant="ghost"
                 size="sm"
                 asChild
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/30 px-2 py-1 h-auto"
+                className="text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark dark:text-riodavida dark:hover:bg-riodavida/20 dark:hover:text-riodavida-light h-auto px-2 py-1"
               >
                 <Link href="/documentation/inscription/in-group">Ver</Link>
               </Button>
@@ -179,25 +179,25 @@ export function GroupInscriptionForm({
         </Card>
 
         {/* Card do Responsável */}
-        <Card className="w-full">
+        <Card className="liquid-card w-full">
           <CardHeader className="pb-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <CardTitle className="text-xl sm:text-2xl flex items-center gap-2">
-                  <User className="h-5 w-5 sm:h-6 sm:w-6" />
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                  <User className="text-riodavida h-5 w-5 sm:h-6 sm:w-6" />
                   Dados do Responsável
                 </CardTitle>
-                <CardDescription className="text-sm sm:text-base mt-1">
+                <CardDescription className="mt-1 text-sm sm:text-base">
                   Preencha os dados do responsável pelas inscrições
                 </CardDescription>
               </div>
-              <div className="text-xs sm:text-sm text-muted-foreground bg-muted px-3 py-1.5 rounded-md">
+              <div className="text-muted-foreground border-riodavida/20 bg-riodavida/5 rounded-md border px-3 py-1.5 text-xs sm:text-sm">
                 Campos com * são obrigatórios
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               {/* Responsável */}
               <div className="space-y-3 sm:col-span-2">
                 <Label htmlFor="responsible" className="text-base font-medium">
@@ -205,19 +205,19 @@ export function GroupInscriptionForm({
                 </Label>
                 <Input
                   id="responsible"
-                  {...register("responsible")}
+                  {...register('responsible')}
                   value={formData.responsible}
                   onChange={handleInputChange}
                   placeholder="Digite o nome completo do responsável"
                   required
                   className={cn(
-                    "h-11 sm:h-12 text-base",
+                    'focus:border-riodavida focus:ring-riodavida/20 h-11 text-base sm:h-12',
                     formErrors.responsible &&
-                      "border-red-500 focus:border-red-500",
+                      'border-red-500 focus:border-red-500',
                   )}
                 />
                 {formErrors.responsible && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="mt-1 text-sm text-red-500">
                     {formErrors.responsible.message}
                   </p>
                 )}
@@ -231,20 +231,20 @@ export function GroupInscriptionForm({
                 <Input
                   id="email"
                   type="email"
-                  {...register("email")}
-                  value={formData.email ?? ""}
+                  {...register('email')}
+                  value={formData.email ?? ''}
                   onChange={handleInputChange}
                   placeholder="exemplo@dominio.com"
                   className={cn(
-                    "h-11 sm:h-12 text-base",
-                    formErrors.email && "border-red-500 focus:border-red-500",
+                    'focus:border-riodavida focus:ring-riodavida/20 h-11 text-base sm:h-12',
+                    formErrors.email && 'border-red-500 focus:border-red-500',
                   )}
                 />
-                <p className="text-xs sm:text-[13px] text-muted-foreground">
+                <p className="text-muted-foreground text-xs sm:text-[13px]">
                   Opcional — usado apenas para atualizações da inscrição.
                 </p>
                 {formErrors.email && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="mt-1 text-sm text-red-500">
                     {formErrors.email.message}
                   </p>
                 )}
@@ -253,24 +253,24 @@ export function GroupInscriptionForm({
               {/* Telefone */}
               <div className="space-y-3">
                 <Label htmlFor="phone" className="text-base font-medium">
-                  <Phone className="w-4 h-4 inline mr-2" />
+                  <Phone className="text-riodavida mr-2 inline h-4 w-4" />
                   Telefone do Responsável *
                 </Label>
                 <Input
                   id="phone"
-                  {...register("phone")}
+                  {...register('phone')}
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder="(11) 99999-9999"
                   required
                   maxLength={15}
                   className={cn(
-                    "h-11 sm:h-12 text-base",
-                    formErrors.phone && "border-red-500 focus:border-red-500",
+                    'focus:border-riodavida focus:ring-riodavida/20 h-11 text-base sm:h-12',
+                    formErrors.phone && 'border-red-500 focus:border-red-500',
                   )}
                 />
                 {formErrors.phone && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="mt-1 text-sm text-red-500">
                     {formErrors.phone.message}
                   </p>
                 )}
@@ -280,47 +280,47 @@ export function GroupInscriptionForm({
         </Card>
 
         {/* Card dos Membros */}
-        <Card className="w-full">
+        <Card className="liquid-card w-full">
           <CardHeader className="pb-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <CardTitle className="text-xl sm:text-2xl flex items-center gap-2">
-                  <Users className="h-5 w-5 sm:h-6 sm:w-6" />
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                  <Users className="text-riodavida h-5 w-5 sm:h-6 sm:w-6" />
                   Membros da Inscrição
                 </CardTitle>
-                <CardDescription className="text-sm sm:text-base mt-1">
+                <CardDescription className="mt-1 text-sm sm:text-base">
                   Adicione os membros que farão parte desta inscrição em grupo
                 </CardDescription>
 
-                <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                  <div className="flex items-center justify-between sm:justify-start gap-3 bg-slate-50 dark:bg-slate-900 px-3 sm:px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm w-full sm:w-auto">
-                    <div className="p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                      <Users className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 dark:text-blue-400" />
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                  <div className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 shadow-sm sm:w-auto sm:justify-start sm:px-4">
+                    <div className="bg-riodavida/10 dark:bg-riodavida/20 rounded-full p-1.5 sm:p-2">
+                      <Users className="text-riodavida dark:text-riodavida h-3 w-3 sm:h-4 sm:w-4" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      <span className="text-muted-foreground text-[9px] font-bold tracking-wider uppercase sm:text-[10px]">
                         Total de Inscritos
                       </span>
-                      <span className="text-base sm:text-lg font-bold leading-none text-slate-900 dark:text-slate-100">
+                      <span className="text-riodavida-gray-dark dark:text-riodavida-gray text-base leading-none font-bold sm:text-lg">
                         {members.length}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-start gap-3 bg-slate-50 dark:bg-slate-900 px-3 sm:px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm w-full sm:w-auto">
-                    <div className="p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center h-6 w-6 sm:h-8 sm:w-8">
-                      <span className="text-green-600 dark:text-green-400 font-bold text-xs sm:text-sm">
+                  <div className="border-riodavida-secondary/20 bg-riodavida-secondary/5 dark:border-riodavida-secondary/20 dark:bg-riodavida-secondary/10 flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 shadow-sm sm:w-auto sm:justify-start sm:px-4">
+                    <div className="bg-riodavida-secondary/10 dark:bg-riodavida-secondary/20 flex h-6 w-6 items-center justify-center rounded-full p-1.5 sm:h-8 sm:w-8 sm:p-2">
+                      <span className="text-riodavida-secondary dark:text-riodavida-muted-light text-xs font-bold sm:text-sm">
                         R$
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[9px] sm:text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      <span className="text-muted-foreground text-[9px] font-bold tracking-wider uppercase sm:text-[10px]">
                         Valor Total
                       </span>
-                      <span className="text-base sm:text-lg font-bold leading-none text-green-600 dark:text-green-400">
-                        {totalValue.toLocaleString("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
+                      <span className="text-riodavida-secondary dark:text-riodavida-muted-light text-base leading-none font-bold sm:text-lg">
+                        {totalValue.toLocaleString('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
                         })}
                       </span>
                     </div>
@@ -329,11 +329,12 @@ export function GroupInscriptionForm({
               </div>
               <Button
                 type="button"
-                className="flex items-center gap-2 w-full sm:w-auto h-10 sm:h-auto"
+                variant={'primary'}
+                className="bg-riodavida hover:bg-riodavida-dark flex gap-2"
                 onClick={handleOpenDrawer}
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="text-sm sm:text-base">Adicionar Membro</span>
+                Adicionar Membro
               </Button>
             </div>
           </CardHeader>
@@ -346,40 +347,42 @@ export function GroupInscriptionForm({
               open={isDrawerOpen}
               styles={{
                 body: {
-                  padding: "16px 24px",
-                  overflowY: "auto",
+                  padding: '16px 24px',
+                  overflowY: 'auto',
                 },
                 header: {
-                  padding: "16px 24px",
-                  borderBottom: "1px solid #e5e7eb",
+                  padding: '16px 24px',
+                  borderBottom: '1px solid #e5e7eb',
                 },
                 footer: {
-                  padding: "12px 24px",
-                  borderTop: "1px solid #e5e7eb",
+                  padding: '12px 24px',
+                  borderTop: '1px solid #e5e7eb',
                 },
               }}
               footer={
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDrawerOpen(false)}
-                    className="w-full sm:w-1/2 h-10 sm:h-auto"
-                    type="button"
-                  >
-                    Cancelar
-                  </Button>
+                <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-3">
                   <Button
                     onClick={handleAddMember}
                     disabled={!tempMemberId || !tempTypeId}
-                    className="w-full sm:w-1/2 h-10 sm:h-auto"
+                    className="bg-riodavida hover:bg-riodavida-dark w-full text-white sm:w-1/2"
+                    size="lg"
                     type="button"
                   >
                     Adicionar
                   </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="w-full sm:w-1/2"
+                    type="button"
+                    size="lg"
+                  >
+                    Cancelar
+                  </Button>
                 </div>
               }
             >
-              <div className="space-y-4 sm:space-y-6 py-2">
+              <div className="space-y-4 py-2 sm:space-y-6">
                 <div className="space-y-3">
                   <Label htmlFor="memberSelect" className="text-sm font-medium">
                     Buscar Membro
@@ -392,10 +395,10 @@ export function GroupInscriptionForm({
                       setTempMemberId(id);
                       if (member && id) {
                         setTempMemberData({
-                          label: member.name,
+                          label: member.label || '',
                           value: id,
                           registered: member.registered || false,
-                          member,
+                          member: member.member,
                         });
                       } else {
                         setTempMemberData(undefined);
@@ -406,10 +409,10 @@ export function GroupInscriptionForm({
                 </div>
 
                 {tempMemberData && (
-                  <div className="space-y-3 p-3 sm:p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="border-riodavida/20 bg-riodavida/5 dark:bg-riodavida/10 space-y-3 rounded-lg border p-3 sm:p-4">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">
+                        <Label className="text-muted-foreground text-xs">
                           Nome
                         </Label>
                         <p className="text-sm font-medium break-words">
@@ -417,7 +420,7 @@ export function GroupInscriptionForm({
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs text-muted-foreground">
+                        <Label className="text-muted-foreground text-xs">
                           Nascimento
                         </Label>
                         <p className="text-sm font-medium">
@@ -425,11 +428,11 @@ export function GroupInscriptionForm({
                         </p>
                       </div>
                       <div className="space-y-1 sm:col-span-2">
-                        <Label className="text-xs text-muted-foreground">
+                        <Label className="text-muted-foreground text-xs">
                           Gênero
                         </Label>
                         <p className="text-sm font-medium capitalize">
-                          {tempMemberData.member?.gender || "-"}
+                          {tempMemberData.member?.gender || '-'}
                         </p>
                       </div>
                     </div>
@@ -466,12 +469,12 @@ export function GroupInscriptionForm({
             </Drawer>
 
             {members.length === 0 ? (
-              <div className="text-center py-8 sm:py-10 border-2 border-dashed rounded-lg bg-gray-50 dark:bg-gray-900/50">
-                <Users className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mx-auto mb-2 sm:mb-3" />
-                <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100">
+              <div className="border-riodavida/20 bg-riodavida/5 dark:bg-riodavida/10 rounded-lg border-2 border-dashed py-8 text-center sm:py-10">
+                <Users className="text-riodavida/50 mx-auto mb-2 h-8 w-8 sm:mb-3 sm:h-10 sm:w-10" />
+                <h3 className="text-riodavida-gray-dark dark:text-riodavida-gray text-base font-medium sm:text-lg">
                   Nenhum membro adicionado
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 mb-3 sm:mb-4 px-4">
+                <p className="mt-1 mb-3 px-4 text-xs text-gray-500 sm:mb-4 sm:text-sm dark:text-gray-400">
                   Selecione uma conta e clique no botão "Adicionar Membro" para
                   começar.
                 </p>
@@ -480,7 +483,7 @@ export function GroupInscriptionForm({
                   onClick={handleOpenDrawer}
                   type="button"
                   size="sm"
-                  className="h-9 sm:h-10"
+                  className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark h-9 sm:h-10"
                 >
                   Adicionar Membro
                 </Button>
@@ -488,15 +491,25 @@ export function GroupInscriptionForm({
             ) : (
               <>
                 {/* Versão Desktop - Tabela Completa */}
-                <div className="hidden md:block rounded-md border">
+                <div className="border-riodavida/10 hidden rounded-md border md:block">
                   <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-riodavida/5">
                       <TableRow>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Nascimento</TableHead>
-                        <TableHead>Gênero</TableHead>
-                        <TableHead>Tipo de Inscrição</TableHead>
-                        <TableHead className="w-[100px]">Ações</TableHead>
+                        <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                          Nome
+                        </TableHead>
+                        <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                          Nascimento
+                        </TableHead>
+                        <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                          Gênero
+                        </TableHead>
+                        <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                          Tipo de Inscrição
+                        </TableHead>
+                        <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray w-[100px]">
+                          Ações
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -509,11 +522,14 @@ export function GroupInscriptionForm({
                             {formatBirthDate(member.birthDate)}
                           </TableCell>
                           <TableCell className="capitalize">
-                            {member.gender || "-"}
+                            {member.gender || '-'}
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="text-xs">
-                              {member.typeInscriptionName || "Selecionado"}
+                            <Badge
+                              variant="secondary"
+                              className="bg-riodavida/10 text-riodavida dark:bg-riodavida/20 dark:text-riodavida"
+                            >
+                              {member.typeInscriptionName || 'Selecionado'}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -521,7 +537,7 @@ export function GroupInscriptionForm({
                               variant="ghost"
                               size="icon"
                               onClick={() => removeMember(index)}
-                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -533,24 +549,24 @@ export function GroupInscriptionForm({
                 </div>
 
                 {/* Versão Mobile - Lista Simplificada */}
-                <div className="md:hidden space-y-3">
+                <div className="space-y-3 md:hidden">
                   {members.map((member, index) => (
                     <div
                       key={index}
-                      className="border rounded-lg p-3 space-y-2 bg-card"
+                      className="bg-card border-riodavida/10 space-y-2 rounded-lg border p-3"
                     >
                       {/* Linha 1: Nome e Ação */}
                       <div className="flex items-start justify-between">
-                        <div className="space-y-1 flex-1">
-                          <p className="font-medium text-sm truncate">
+                        <div className="flex-1 space-y-1">
+                          <p className="truncate text-sm font-medium">
                             {member.name}
                           </p>
-                          <div className="flex flex-wrap gap-1 items-center">
+                          <div className="flex flex-wrap items-center gap-1">
                             <Badge
                               variant="secondary"
-                              className="text-xs font-normal"
+                              className="bg-riodavida/10 text-riodavida dark:bg-riodavida/20 dark:text-riodavida text-xs font-normal"
                             >
-                              {member.typeInscriptionName || "Selecionado"}
+                              {member.typeInscriptionName || 'Selecionado'}
                             </Badge>
                           </div>
                         </div>
@@ -558,14 +574,14 @@ export function GroupInscriptionForm({
                           variant="ghost"
                           size="sm"
                           onClick={() => removeMember(index)}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 ml-2 h-8 w-8 p-0"
+                          className="ml-2 h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
 
                       {/* Linha 2: Detalhes Adicionais */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t text-xs text-muted-foreground">
+                      <div className="text-muted-foreground border-riodavida/10 grid grid-cols-1 gap-2 border-t pt-2 text-xs sm:grid-cols-2">
                         <div>
                           <span className="font-medium">Nascimento:</span>
                           <p className="mt-0.5">
@@ -575,7 +591,7 @@ export function GroupInscriptionForm({
                         <div>
                           <span className="font-medium">Gênero:</span>
                           <p className="mt-0.5 capitalize">
-                            {member.gender || "-"}
+                            {member.gender || '-'}
                           </p>
                         </div>
                       </div>
@@ -585,23 +601,24 @@ export function GroupInscriptionForm({
               </>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center mt-6">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="order-2 sm:order-1">
                 <Button
                   variant="outline"
                   size="sm"
                   asChild
-                  className="w-full sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
+                  className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark h-9 w-full sm:w-auto sm:text-sm"
                 >
                   <Link href="/documentation/inscription/in-group">
                     Precisa de ajuda? Consulte o guia
                   </Link>
                 </Button>
               </div>
-              <div className="order-1 sm:order-2 w-full sm:w-auto">
+              <div className="order-1 w-full sm:order-2 sm:w-auto">
                 <Button
                   onClick={() => handleSubmit({} as any)}
-                  className="w-full sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base transform uppercase dark:text-white h-11 sm:h-12"
+                  className="bg-riodavida hover:bg-riodavida-dark w-full text-white"
+                  size={'lg'}
                   disabled={
                     isSubmitting ||
                     members.length === 0 ||
@@ -611,7 +628,7 @@ export function GroupInscriptionForm({
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                      <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
                         <circle
                           className="opacity-25"
                           cx="12"
@@ -630,7 +647,7 @@ export function GroupInscriptionForm({
                       Processando...
                     </span>
                   ) : (
-                    "Finalizar Inscrição em Grupo"
+                    'Finalizar Inscrição em Grupo'
                   )}
                 </Button>
               </div>

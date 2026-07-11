@@ -9,9 +9,9 @@ export type User = {
   id: string;
   username: string;
   role: UserRole;
-  email: string | null;
-  region: Region | null;
-  image: string | null;
+  email?: string;
+  region?: Region;
+  image?: string;
 };
 
 export type LoginServiceInput = {

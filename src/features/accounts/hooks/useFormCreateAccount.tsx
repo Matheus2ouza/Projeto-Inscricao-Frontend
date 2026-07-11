@@ -1,12 +1,12 @@
 'use client';
 
 import { useGlobalLoading } from '@/components/GlobalLoading';
+import { registerAccountAction } from '@/features/accounts/actions/registerAccount/registerAccountAction';
 import {
   accountsKeys,
   useInvalidateAccountsQuery,
 } from '@/features/accounts/hooks/useAccountsQuery';
 import { usersKeys } from '@/features/accounts/hooks/useUsers';
-import { registerAccount } from '@/features/auth/web-api/registerAccount';
 import { useQueryClient } from '@tanstack/react-query';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import React from 'react';
@@ -67,7 +67,7 @@ export default function useFormCreateAccount(): useFormCreateAccount {
     try {
       const regionValue = input.region?.trim() === '' ? null : input.region;
 
-      await registerAccount({
+      await registerAccountAction({
         username: input.username,
         password: input.password,
         role: input.role as string,

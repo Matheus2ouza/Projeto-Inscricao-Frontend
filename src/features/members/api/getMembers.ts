@@ -1,19 +1,19 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { FindAllToMembersResponse } from "../types/membersType";
+import { axiosClient } from '@/lib/axios/client';
+import { FindAllToMembersResponse } from '../types/membersType';
 
 export async function getMembers(
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<FindAllToMembersResponse> {
   try {
-    const { data } = await axiosInstance.get<FindAllToMembersResponse>(
+    const { data } = await axiosClient.get<FindAllToMembersResponse>(
       `/members`,
       {
         params: {
           page,
           pageSize,
         },
-      }
+      },
     );
     return data;
   } catch (error) {
@@ -25,7 +25,7 @@ export async function getMembers(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros."
+        'Não foi possível carregar os membros.',
     );
   }
 }

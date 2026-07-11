@@ -1,21 +1,22 @@
-"use client";
+'use client';
 
-import type { PaymentMethod } from "@/features/inscriptions/types/avulsa/avulsaTypes";
-import { useTicketSalesListActions } from "@/features/tickets/hooks/list-sales/actions/useTicketSalesListActions";
+import type { PaymentMethod } from '@/features/inscriptions/types/avulsa/avulsaTypes';
+import { useTicketSalesListActions } from '@/features/tickets/hooks/list-sales/actions/useTicketSalesListActions';
 import type {
   TicketSaleListEvent,
   TicketSaleListItem,
-} from "@/features/tickets/types/list-sales/ticketListSalesTypes";
-import type { StatusPayment } from "@/features/tickets/types/ticketSales/grup/ticketSaleGroupTypes";
-import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
+} from '@/features/tickets/types/list-sales/ticketListSalesTypes';
+import type { StatusPayment } from '@/features/tickets/types/ticketSales/grup/ticketSaleGroupTypes';
+import { cn } from '@/lib/utils';
+import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
+} from '@/shared/components/ui/card';
 import {
   Pagination,
   PaginationContent,
@@ -23,7 +24,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/shared/components/ui/pagination";
+} from '@/shared/components/ui/pagination';
 import {
   Table,
   TableBody,
@@ -31,17 +32,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { cn } from "@/shared/lib/utils";
+} from '@/shared/components/ui/table';
 import {
   Download,
   Loader2,
   ReceiptText,
   RefreshCcw,
   Ticket,
-} from "lucide-react";
-import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+} from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
 
 type TicketSalesListContentProps = {
   event: TicketSaleListEvent | null;
@@ -59,20 +59,20 @@ const statusDisplay: Record<
   { label: string; className: string }
 > = {
   PENDING: {
-    label: "Pendente",
-    className: "bg-amber-100 text-amber-800 border-amber-200",
+    label: 'Pendente',
+    className: 'bg-amber-100 text-amber-800 border-amber-200',
   },
   UNDER_REVIEW: {
-    label: "Em análise",
-    className: "bg-blue-100 text-blue-800 border-blue-200",
+    label: 'Em análise',
+    className: 'bg-blue-100 text-blue-800 border-blue-200',
   },
   PAID: {
-    label: "Pago",
-    className: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    label: 'Pago',
+    className: 'bg-emerald-100 text-emerald-800 border-emerald-200',
   },
   CANCELLED: {
-    label: "Cancelado",
-    className: "bg-rose-100 text-rose-800 border-rose-200",
+    label: 'Cancelado',
+    className: 'bg-rose-100 text-rose-800 border-rose-200',
   },
 };
 
@@ -81,16 +81,16 @@ const paymentMethodDisplay: Record<
   { label: string; className: string }
 > = {
   DINHEIRO: {
-    label: "Dinheiro",
-    className: "text-emerald-700",
+    label: 'Dinheiro',
+    className: 'text-emerald-700',
   },
   PIX: {
-    label: "PIX",
-    className: "text-blue-700",
+    label: 'PIX',
+    className: 'text-blue-700',
   },
   CARTAO: {
-    label: "Cartão",
-    className: "text-purple-700",
+    label: 'Cartão',
+    className: 'text-purple-700',
   },
 };
 
@@ -105,7 +105,7 @@ export default function TicketSalesListContent({
   onPageChange,
 }: TicketSalesListContentProps) {
   const [eventImageLoading, setEventImageLoading] = useState(
-    Boolean(event?.imageUrl)
+    Boolean(event?.imageUrl),
   );
   const { handleDownloadSecondCopy, downloadingSaleId } =
     useTicketSalesListActions();
@@ -116,25 +116,25 @@ export default function TicketSalesListContent({
 
   const currencyFormatter = useMemo(
     () =>
-      new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
+      new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
       }),
-    []
+    [],
   );
 
   const dateFormatter = useMemo(
     () =>
-      new Intl.DateTimeFormat("pt-BR", {
-        dateStyle: "medium",
-        timeStyle: "short",
+      new Intl.DateTimeFormat('pt-BR', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
       }),
-    []
+    [],
   );
 
   const totalAmount = useMemo(
     () => sales.reduce((sum, sale) => sum + sale.totalValue, 0),
-    [sales]
+    [sales],
   );
 
   const totalRecords = event?.countTicketSales ?? total;
@@ -152,9 +152,9 @@ export default function TicketSalesListContent({
           <PaginationItem>
             <PaginationPrevious
               onClick={() => onPageChange(page - 1)}
-              href={page > 1 ? "#" : undefined}
+              href={page > 1 ? '#' : undefined}
               aria-disabled={page === 1}
-              className={cn(page === 1 && "pointer-events-none opacity-50")}
+              className={cn(page === 1 && 'pointer-events-none opacity-50')}
             />
           </PaginationItem>
           {Array.from({ length: pageCount }).map((_, index) => {
@@ -174,10 +174,10 @@ export default function TicketSalesListContent({
           <PaginationItem>
             <PaginationNext
               onClick={() => onPageChange(page + 1)}
-              href={page < pageCount ? "#" : undefined}
+              href={page < pageCount ? '#' : undefined}
               aria-disabled={page === pageCount}
               className={cn(
-                page === pageCount && "pointer-events-none opacity-50"
+                page === pageCount && 'pointer-events-none opacity-50',
               )}
             />
           </PaginationItem>
@@ -192,14 +192,14 @@ export default function TicketSalesListContent({
         <CardContent className="space-y-6 p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm text-muted-foreground uppercase tracking-wide">
+              <p className="text-muted-foreground text-sm tracking-wide uppercase">
                 Lista de vendas
               </p>
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                {event?.name ?? "Evento selecionado"}
+                {event?.name ?? 'Evento selecionado'}
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {totalRecords} registro{totalRecords === 1 ? "" : "s"}{" "}
+              <p className="text-muted-foreground mt-1 text-sm">
+                {totalRecords} registro{totalRecords === 1 ? '' : 's'}{' '}
                 encontrado
               </p>
             </div>
@@ -208,13 +208,14 @@ export default function TicketSalesListContent({
                 type="button"
                 onClick={onRefresh}
                 disabled={isFetching}
-                className="w-full sm:w-auto flex items-center"
+                className="flex w-full items-center sm:w-auto"
               >
                 <RefreshCcw
-                  className={`mr-2 h-4 w-4 text-white ${isFetching ? "animate-spin" : ""
-                    }`}
+                  className={`mr-2 h-4 w-4 text-white ${
+                    isFetching ? 'animate-spin' : ''
+                  }`}
                 />
-                {isFetching ? "Atualizando..." : "Atualizar Dados"}
+                {isFetching ? 'Atualizando...' : 'Atualizar Dados'}
               </Button>
             </div>
           </div>
@@ -223,7 +224,7 @@ export default function TicketSalesListContent({
             <div className="w-full lg:w-1/3">
               {event?.imageUrl ? (
                 <div className="relative w-full overflow-hidden rounded-2xl">
-                  <AspectRatio ratio={16 / 9} className="w-full h-full">
+                  <AspectRatio ratio={16 / 9} className="h-full w-full">
                     {eventImageLoading && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/10">
                         <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -237,8 +238,8 @@ export default function TicketSalesListContent({
                       (max-width: 1200px) 60vw,
                       33vw"
                       className={cn(
-                        "object-cover transition-opacity duration-300",
-                        eventImageLoading ? "opacity-0" : "opacity-100"
+                        'object-cover transition-opacity duration-300',
+                        eventImageLoading ? 'opacity-0' : 'opacity-100',
                       )}
                       onLoadingComplete={() => setEventImageLoading(false)}
                       onError={() => setEventImageLoading(false)}
@@ -247,32 +248,32 @@ export default function TicketSalesListContent({
                   </AspectRatio>
                 </div>
               ) : (
-                <div className="h-48 w-full rounded-2xl bg-muted flex items-center justify-center">
-                  <Ticket className="h-10 w-10 text-muted-foreground" />
+                <div className="bg-muted flex h-48 w-full items-center justify-center rounded-2xl">
+                  <Ticket className="text-muted-foreground h-10 w-10" />
                 </div>
               )}
             </div>
             <div className="flex-1 space-y-6">
               <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wide">
+                <p className="text-muted-foreground text-sm tracking-wide uppercase">
                   Evento
                 </p>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {event?.name ?? "Evento selecionado"}
+                  {event?.name ?? 'Evento selecionado'}
                 </h3>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Card className="border border-border/40 shadow-none">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Card className="border-border/40 border shadow-none">
                   <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Vendas encontradas
                     </p>
                     <p className="text-2xl font-bold">{totalRecords}</p>
                   </CardContent>
                 </Card>
-                <Card className="border border-border/40 shadow-none">
+                <Card className="border-border/40 border shadow-none">
                   <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Valor listado
                     </p>
                     <p className="text-2xl font-bold">
@@ -286,10 +287,10 @@ export default function TicketSalesListContent({
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm">
               Aprovadas
             </CardTitle>
           </CardHeader>
@@ -298,7 +299,7 @@ export default function TicketSalesListContent({
               <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                 {totalPaid}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Vendas finalizadas
               </p>
             </div>
@@ -308,7 +309,7 @@ export default function TicketSalesListContent({
 
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">
+            <CardTitle className="text-muted-foreground text-sm">
               Pendentes/Em análise
             </CardTitle>
           </CardHeader>
@@ -317,7 +318,7 @@ export default function TicketSalesListContent({
               <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                 {totalPending}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Aguardando processamento
               </p>
             </div>
@@ -327,12 +328,12 @@ export default function TicketSalesListContent({
       </div>
 
       {sales.length === 0 ? (
-        <Card className="border border-dashed border-border/60 shadow-none">
-          <CardContent className="py-12 text-center space-y-3">
+        <Card className="border-border/60 border border-dashed shadow-none">
+          <CardContent className="space-y-3 py-12 text-center">
             <p className="text-base font-semibold text-gray-900 dark:text-white">
               Nenhuma venda encontrada
             </p>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-muted-foreground mx-auto max-w-2xl text-sm">
               Ainda não existem vendas registradas para este evento. Assim que
               novas solicitações forem recebidas, elas aparecerão aqui
               automaticamente.
@@ -347,7 +348,7 @@ export default function TicketSalesListContent({
           {sales.map((sale) => {
             const ticketCount = sale.TicketSaleItem.reduce(
               (sum, item) => sum + item.quantity,
-              0
+              0,
             );
             const paymentDisplay =
               sale.payments?.paymentMethod &&
@@ -359,45 +360,45 @@ export default function TicketSalesListContent({
             return (
               <Card
                 key={sale.id}
-                className="border border-border/40 shadow-sm rounded-2xl overflow-hidden"
+                className="border-border/40 overflow-hidden rounded-2xl border shadow-sm"
               >
                 <CardHeader className="space-y-3">
                   <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                     <div>
-                      <p className="text-xs uppercase font-semibold text-muted-foreground tracking-wide">
+                      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
                         Comprador
                       </p>
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                         {sale.name}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         {sale.email}
                       </p>
                     </div>
                     <Badge
                       variant="outline"
                       className={cn(
-                        "px-3 py-1 text-xs font-semibold rounded-full border",
-                        statusInfo.className
+                        'rounded-full border px-3 py-1 text-xs font-semibold',
+                        statusInfo.className,
                       )}
                     >
                       {statusInfo.label}
                     </Badge>
                   </div>
 
-                  <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                  <div className="text-muted-foreground flex flex-wrap gap-4 text-xs">
                     {sale.phone && (
                       <span className="font-medium">
-                        Telefone:{" "}
+                        Telefone:{' '}
                         <span className="font-normal">{sale.phone}</span>
                       </span>
                     )}
                     {sale.payments?.createdAt && (
                       <span className="font-medium">
-                        Registrado em:{" "}
+                        Registrado em:{' '}
                         <span className="font-normal">
                           {dateFormatter.format(
-                            new Date(sale.payments.createdAt)
+                            new Date(sale.payments.createdAt),
                           )}
                         </span>
                       </span>
@@ -405,25 +406,25 @@ export default function TicketSalesListContent({
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="rounded-lg border bg-card p-4">
-                      <p className="text-xs text-muted-foreground uppercase">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div className="bg-card rounded-lg border p-4">
+                      <p className="text-muted-foreground text-xs uppercase">
                         Valor total
                       </p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {currencyFormatter.format(sale.totalValue)}
                       </p>
                     </div>
-                    <div className="rounded-lg border bg-card p-4">
-                      <p className="text-xs text-muted-foreground uppercase">
+                    <div className="bg-card rounded-lg border p-4">
+                      <p className="text-muted-foreground text-xs uppercase">
                         Quantidade
                       </p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {ticketCount} ticket{ticketCount === 1 ? "" : "s"}
+                        {ticketCount} ticket{ticketCount === 1 ? '' : 's'}
                       </p>
                     </div>
-                    <div className="rounded-lg border bg-card p-4">
-                      <p className="text-xs text-muted-foreground uppercase">
+                    <div className="bg-card rounded-lg border p-4">
+                      <p className="text-muted-foreground text-xs uppercase">
                         Pagamento
                       </p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -432,12 +433,12 @@ export default function TicketSalesListContent({
                             {paymentDisplay.label}
                           </span>
                         ) : (
-                          "-"
+                          '-'
                         )}
                       </p>
                       {sale.totalValue && (
-                        <p className="text-xs text-muted-foreground">
-                          Valor informado:{" "}
+                        <p className="text-muted-foreground text-xs">
+                          Valor informado:{' '}
                           {currencyFormatter.format(sale.totalValue)}
                         </p>
                       )}
@@ -445,15 +446,15 @@ export default function TicketSalesListContent({
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">
+                    <p className="text-muted-foreground text-sm font-medium">
                       Tickets desta venda
                     </p>
                     {sale.TicketSaleItem.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-muted-foreground text-sm">
                         Nenhum ticket vinculado a esta venda.
                       </div>
                     ) : (
-                      <div className="rounded-xl border overflow-hidden">
+                      <div className="overflow-hidden rounded-xl border">
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -480,7 +481,7 @@ export default function TicketSalesListContent({
                                 </TableCell>
                                 <TableCell className="text-right">
                                   {currencyFormatter.format(
-                                    item.pricePerTicket
+                                    item.pricePerTicket,
                                   )}
                                 </TableCell>
                                 <TableCell className="text-right font-semibold">
@@ -495,11 +496,11 @@ export default function TicketSalesListContent({
                   </div>
 
                   <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                    {sale.status === "PAID" && (
+                    {sale.status === 'PAID' && (
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full sm:w-auto gap-2"
+                        className="w-full gap-2 sm:w-auto"
                         onClick={() => handleDownloadSecondCopy(sale.id)}
                         disabled={downloadingSaleId === sale.id}
                       >

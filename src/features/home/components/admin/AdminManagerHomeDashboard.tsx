@@ -1,8 +1,10 @@
 'use client';
 
-import type { DashboardAdminResponse } from '@/features/home/api/admin/dashboard';
-import type { DashboardMetric } from '@/features/home/hook/admin/useAdminDashboard';
-import { useDates } from '@/features/home/hook/admin/useDates';
+import { useDates } from '@/features/home/hooks/admin/useDates';
+import type {
+  DashboardAdminResponse,
+  DashboardMetric,
+} from '@/features/home/types/admin/dashboardTypes';
 import { Badge } from '@/shared/components/ui/badge';
 import {
   Popover,

@@ -2,7 +2,7 @@ import {
   GenerateListeExpensesPdfInput,
   GenerateListeExpensesPdfResponse,
 } from '@/features/expenses/types/actions/reports/generateListeExpensesPdfTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import qs from 'qs';
 
 export async function generateListExpensesPdf({
@@ -13,7 +13,7 @@ export async function generateListExpensesPdf({
   endCreatedAt,
 }: GenerateListeExpensesPdfInput): Promise<GenerateListeExpensesPdfResponse> {
   try {
-    const { data } = await axiosInstance.get<GenerateListeExpensesPdfResponse>(
+    const { data } = await axiosClient.get<GenerateListeExpensesPdfResponse>(
       `expenses/${eventId}/all/pdf`,
       {
         params: {

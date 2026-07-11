@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
 import {
   ExpenseDetail,
   ReportGeneralResponse,
-} from "@/features/report/types/reportGeral/reportTypes";
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
-import { getGradientClass } from "@/shared/utils/getGenerateGradient";
-import { getInitial } from "@/shared/utils/getInitials";
+} from '@/features/report/types/reportGeral/reportTypes';
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
+import { getInitial } from '@/shared/utils/getInitials';
 import {
   AlertCircle,
   Banknote,
@@ -23,17 +23,17 @@ import {
   TrendingUp,
   Users,
   UsersRound,
-} from "lucide-react";
-import Image from "next/image";
+} from 'lucide-react';
+import Image from 'next/image';
 
 // Helper para ícones de pagamento
-const getPaymentIcon = (method: string, className = "w-6 h-6") => {
+const getPaymentIcon = (method: string, className = 'w-6 h-6') => {
   switch (method) {
-    case "DINHEIRO":
+    case 'DINHEIRO':
       return <Banknote className={className} />;
-    case "PIX":
+    case 'PIX':
       return <Smartphone className={className} />;
-    case "CARTAO":
+    case 'CARTAO':
       return <CreditCard className={className} />;
     default:
       return <CreditCard className={className} />;
@@ -50,35 +50,35 @@ type PaymentMethodTheme = {
 
 const paymentMethodThemes: Record<string, PaymentMethodTheme> = {
   DINHEIRO: {
-    borderLeft: "border-l-emerald-500",
-    iconText: "text-emerald-600",
-    badgeBg: "bg-emerald-50",
-    badgeText: "text-emerald-700",
-    badgeBorder: "border-emerald-200",
+    borderLeft: 'border-l-emerald-500',
+    iconText: 'text-emerald-600',
+    badgeBg: 'bg-emerald-50',
+    badgeText: 'text-emerald-700',
+    badgeBorder: 'border-emerald-200',
   },
   PIX: {
-    borderLeft: "border-l-fuchsia-500",
-    iconText: "text-fuchsia-600",
-    badgeBg: "bg-fuchsia-50",
-    badgeText: "text-fuchsia-700",
-    badgeBorder: "border-fuchsia-200",
+    borderLeft: 'border-l-fuchsia-500',
+    iconText: 'text-fuchsia-600',
+    badgeBg: 'bg-fuchsia-50',
+    badgeText: 'text-fuchsia-700',
+    badgeBorder: 'border-fuchsia-200',
   },
   CARTAO: {
-    borderLeft: "border-l-violet-500",
-    iconText: "text-violet-600",
-    badgeBg: "bg-violet-50",
-    badgeText: "text-violet-700",
-    badgeBorder: "border-violet-200",
+    borderLeft: 'border-l-violet-500',
+    iconText: 'text-violet-600',
+    badgeBg: 'bg-violet-50',
+    badgeText: 'text-violet-700',
+    badgeBorder: 'border-violet-200',
   },
 };
 
 const getPaymentMethodTheme = (method: string): PaymentMethodTheme =>
   paymentMethodThemes[method] ?? {
-    borderLeft: "border-l-slate-300",
-    iconText: "text-slate-600",
-    badgeBg: "bg-slate-100",
-    badgeText: "text-slate-600",
-    badgeBorder: "border-slate-200",
+    borderLeft: 'border-l-slate-300',
+    iconText: 'text-slate-600',
+    badgeBg: 'bg-slate-100',
+    badgeText: 'text-slate-600',
+    badgeBorder: 'border-slate-200',
   };
 
 type TypeInscriptionTheme = {
@@ -87,14 +87,14 @@ type TypeInscriptionTheme = {
 };
 
 const typeInscriptionThemes: TypeInscriptionTheme[] = [
-  { dot: "bg-emerald-500", borderLeft: "border-l-emerald-500" },
-  { dot: "bg-blue-500", borderLeft: "border-l-blue-500" },
-  { dot: "bg-violet-500", borderLeft: "border-l-violet-500" },
-  { dot: "bg-amber-500", borderLeft: "border-l-amber-500" },
-  { dot: "bg-rose-500", borderLeft: "border-l-rose-500" },
-  { dot: "bg-teal-500", borderLeft: "border-l-teal-500" },
-  { dot: "bg-indigo-500", borderLeft: "border-l-indigo-500" },
-  { dot: "bg-cyan-500", borderLeft: "border-l-cyan-500" },
+  { dot: 'bg-emerald-500', borderLeft: 'border-l-emerald-500' },
+  { dot: 'bg-blue-500', borderLeft: 'border-l-blue-500' },
+  { dot: 'bg-violet-500', borderLeft: 'border-l-violet-500' },
+  { dot: 'bg-amber-500', borderLeft: 'border-l-amber-500' },
+  { dot: 'bg-rose-500', borderLeft: 'border-l-rose-500' },
+  { dot: 'bg-teal-500', borderLeft: 'border-l-teal-500' },
+  { dot: 'bg-indigo-500', borderLeft: 'border-l-indigo-500' },
+  { dot: 'bg-cyan-500', borderLeft: 'border-l-cyan-500' },
 ];
 
 const hashToIndex = (value: string, mod: number) => {
@@ -125,17 +125,17 @@ export default function ReportDetails({
     return (
       <Card className="border-0 shadow-sm">
         <CardContent className="p-8 text-center">
-          <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <FileText className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
           <p className="text-muted-foreground">Nenhum dado disponível</p>
         </CardContent>
       </Card>
     );
   }
 
-  const gradientClass = getGradientClass(data.name);
+  const gradientClass = generateGradientClass();
   const formatPaymentMethodLabel = (method: string) =>
     method.charAt(0) + method.slice(1).toLowerCase();
-  const paymentMethodOrder = ["DINHEIRO", "PIX", "CARTAO"];
+  const paymentMethodOrder = ['DINHEIRO', 'PIX', 'CARTAO'];
   const aggregateByPaymentMethod = (
     groups: Array<{
       byPaymentMethod: Array<{
@@ -202,11 +202,11 @@ export default function ReportDetails({
 
   return (
     <div className="space-y-6">
-      <Card className="border-0 shadow-lg overflow-hidden">
-        <div className="relative bg-gradient-to-br from-slate-50 to-white border-b">
+      <Card className="overflow-hidden border-0 shadow-lg">
+        <div className="relative border-b bg-gradient-to-br from-slate-50 to-white">
           <CardContent className="p-6 lg:p-8">
-            <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-              <div className="relative h-48 w-full lg:w-64 lg:h-48 rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-gradient-to-br from-slate-100 to-white">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+              <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-100 to-white shadow-md lg:h-48 lg:w-64">
                 {data.image ? (
                   <Image
                     src={data.image}
@@ -218,9 +218,9 @@ export default function ReportDetails({
                   />
                 ) : (
                   <div
-                    className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${gradientClass}`}
+                    className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradientClass}`}
                   >
-                    <h3 className="text-white text-6xl lg:text-7xl font-bold tracking-wider">
+                    <h3 className="text-6xl font-bold tracking-wider text-white lg:text-7xl">
                       {getInitial(data.name)}
                     </h3>
                   </div>
@@ -229,27 +229,27 @@ export default function ReportDetails({
 
               <div className="flex-1 space-y-4">
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium uppercase tracking-wider mb-3">
-                    <CalendarDays className="w-3 h-3" />
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium tracking-wider text-slate-600 uppercase">
+                    <CalendarDays className="h-3 w-3" />
                     Evento
                   </div>
-                  <h1 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-2">
+                  <h1 className="mb-2 text-3xl font-bold text-slate-800 lg:text-4xl">
                     {data.name}
                   </h1>
                   <div className="flex items-center gap-4 text-slate-600">
                     <span className="text-sm font-medium">
-                      {new Date(data.startDate).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
+                      {new Date(data.startDate).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
                       })}
                     </span>
                     <span className="text-slate-400">—</span>
                     <span className="text-sm font-medium">
-                      {new Date(data.endDate).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
+                      {new Date(data.endDate).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
                       })}
                     </span>
                   </div>
@@ -262,8 +262,8 @@ export default function ReportDetails({
                     className="shadow-md"
                     size="lg"
                   >
-                    <Download className="w-4 h-4" />
-                    {isDownloading ? "Gerando PDF..." : "Baixar Relatório PDF"}
+                    <Download className="h-4 w-4" />
+                    {isDownloading ? 'Gerando PDF...' : 'Baixar Relatório PDF'}
                   </Button>
                 </div>
               </div>
@@ -271,21 +271,21 @@ export default function ReportDetails({
           </CardContent>
         </div>
 
-        <CardContent className="p-6 lg:p-8 space-y-8">
+        <CardContent className="space-y-8 p-6 lg:p-8">
           <section className="space-y-6">
             <div className="flex items-center gap-3">
-              <Users className="w-6 h-6 text-gray-500" />
+              <Users className="h-6 w-6 text-gray-500" />
               <h2 className="text-2xl font-bold text-slate-800">Inscrições</h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                     Total Arrecadado
                   </p>
                   <div className="text-slate-400">
-                    <TrendingUp className="w-5 h-5" />
+                    <TrendingUp className="h-5 w-5" />
                   </div>
                 </div>
                 <p className="text-2xl font-bold text-emerald-600">
@@ -294,12 +294,12 @@ export default function ReportDetails({
               </div>
 
               <div className="rounded-xl border border-rose-100 bg-gradient-to-br from-rose-50 to-white p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                     Débitos Totais
                   </p>
                   <div className="text-slate-400">
-                    <AlertCircle className="w-5 h-5" />
+                    <AlertCircle className="h-5 w-5" />
                   </div>
                 </div>
                 <p className="text-2xl font-bold text-rose-600">
@@ -308,12 +308,12 @@ export default function ReportDetails({
               </div>
 
               <div className="rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                     Total de Inscrições
                   </p>
                   <div className="text-slate-400">
-                    <FileText className="w-5 h-5" />
+                    <FileText className="h-5 w-5" />
                   </div>
                 </div>
                 <p className="text-2xl font-bold text-blue-600">
@@ -322,12 +322,12 @@ export default function ReportDetails({
               </div>
 
               <div className="rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-5 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                     Participantes
                   </p>
                   <div className="text-slate-400">
-                    <UsersRound className="w-5 h-5" />
+                    <UsersRound className="h-5 w-5" />
                   </div>
                 </div>
                 <p className="text-2xl font-bold text-indigo-600">
@@ -341,7 +341,7 @@ export default function ReportDetails({
 
       {data.typeInscriptions.length > 0 && (
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6 lg:p-8 space-y-8">
+          <CardContent className="space-y-8 p-6 lg:p-8">
             <section className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-slate-700">
@@ -352,14 +352,14 @@ export default function ReportDetails({
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {data.typeInscriptions.map((type) => {
                   const theme = getTypeInscriptionTheme(type.id);
 
                   return (
                     <div
                       key={type.id}
-                      className={`rounded-xl border border-slate-200 border-l-4 ${theme.borderLeft} bg-white p-5 shadow-sm hover:shadow-md transition-shadow`}
+                      className={`rounded-xl border border-l-4 border-slate-200 ${theme.borderLeft} bg-white p-5 shadow-sm transition-shadow hover:shadow-md`}
                     >
                       <div className="space-y-3">
                         <div className="flex items-center justify-between gap-4">
@@ -367,21 +367,21 @@ export default function ReportDetails({
                             <span
                               className={`h-2.5 w-2.5 rounded-full ${theme.dot}`}
                             />
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                            <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                               Tipo
                             </p>
                           </div>
-                          <p className="font-medium text-slate-800 text-right truncate">
+                          <p className="truncate text-right font-medium text-slate-800">
                             {type.description}
                           </p>
                         </div>
 
-                        <div className="pt-3 border-t border-slate-100">
+                        <div className="border-t border-slate-100 pt-3">
                           <div className="flex items-center justify-between gap-4">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                            <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                               Valor unitário
                             </p>
-                            <p className="text-lg font-semibold text-slate-800 whitespace-nowrap">
+                            <p className="text-lg font-semibold whitespace-nowrap text-slate-800">
                               {getFormatCurrency(type.amount)}
                             </p>
                           </div>
@@ -398,7 +398,7 @@ export default function ReportDetails({
 
       {data.typeInscriptions.length > 0 && (
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6 lg:p-8 space-y-8">
+          <CardContent className="space-y-8 p-6 lg:p-8">
             <section className="space-y-6">
               <div className="flex items-center justify-start">
                 <h3 className="text-lg font-semibold text-slate-700">
@@ -406,11 +406,11 @@ export default function ReportDetails({
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                      <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                         Participantes
                       </p>
                       <p className="text-xl font-bold text-slate-800">
@@ -418,7 +418,7 @@ export default function ReportDetails({
                       </p>
                     </div>
                     <div className="text-slate-400">
-                      <UsersRound className="w-6 h-6" />
+                      <UsersRound className="h-6 w-6" />
                     </div>
                   </div>
                 </div>
@@ -426,7 +426,7 @@ export default function ReportDetails({
                 <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                      <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                         Valor Arrecadado
                       </p>
                       <p className="text-xl font-bold text-slate-800">
@@ -434,7 +434,7 @@ export default function ReportDetails({
                       </p>
                     </div>
                     <div className="text-slate-400">
-                      <DollarSign className="w-6 h-6" />
+                      <DollarSign className="h-6 w-6" />
                     </div>
                   </div>
                 </div>
@@ -442,19 +442,19 @@ export default function ReportDetails({
 
               {normalByPaymentMethod.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                  <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                     Por Método de Pagamento
                   </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {normalByPaymentMethod.map((method) => {
                       const theme = getPaymentMethodTheme(method.paymentMethod);
 
                       return (
                         <div
                           key={method.paymentMethod}
-                          className={`rounded-lg border border-slate-200 border-l-4 ${theme.borderLeft} bg-white p-4`}
+                          className={`rounded-lg border border-l-4 border-slate-200 ${theme.borderLeft} bg-white p-4`}
                         >
-                          <div className="flex items-center gap-3 mb-3">
+                          <div className="mb-3 flex items-center gap-3">
                             <div className={theme.iconText}>
                               {getPaymentIcon(method.paymentMethod)}
                             </div>
@@ -462,7 +462,7 @@ export default function ReportDetails({
                               {formatPaymentMethodLabel(method.paymentMethod)}
                             </span>
                           </div>
-                          <p className="text-lg font-bold text-slate-800 mb-1">
+                          <p className="mb-1 text-lg font-bold text-slate-800">
                             {getFormatCurrency(method.totalValue)}
                           </p>
                           <p className="text-xs text-slate-500">
@@ -476,12 +476,12 @@ export default function ReportDetails({
               )}
 
               <div className="pt-2">
-                <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                   Por Tipo de Inscrição
                 </h4>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {data.typeInscriptions.map((type, idx) => {
                   const theme = getTypeInscriptionTheme(type.id);
                   const inscription = data.inscriptions[idx];
@@ -491,26 +491,26 @@ export default function ReportDetails({
                   return (
                     <div
                       key={type.id}
-                      className={`rounded-xl border border-slate-200 border-l-4 ${theme.borderLeft} bg-white p-5 shadow-sm hover:shadow-md transition-shadow`}
+                      className={`rounded-xl border border-l-4 border-slate-200 ${theme.borderLeft} bg-white p-5 shadow-sm transition-shadow hover:shadow-md`}
                     >
-                      <div className="flex justify-between items-start gap-3 mb-4">
-                        <div className="flex items-center gap-2 min-w-0">
+                      <div className="mb-4 flex items-start justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2">
                           <span
                             className={`h-2.5 w-2.5 rounded-full ${theme.dot}`}
                           />
-                          <h5 className="font-medium text-slate-800 truncate">
+                          <h5 className="truncate font-medium text-slate-800">
                             {type.description}
                           </h5>
                         </div>
-                        <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full whitespace-nowrap">
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium whitespace-nowrap text-slate-600">
                           {countParticipants} participante
-                          {countParticipants !== 1 ? "s" : ""}
+                          {countParticipants !== 1 ? 's' : ''}
                         </span>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-100">
+                      <div className="border-t border-slate-100 pt-3">
                         <div className="flex items-baseline justify-between gap-4">
-                          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                          <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                             Total
                           </p>
                           <p className="text-lg font-bold text-slate-800">
@@ -530,7 +530,7 @@ export default function ReportDetails({
       {data.typeInscriptions.length > 0 &&
         data.guestInscriptions.length > 0 && (
           <Card className="border-0 shadow-lg">
-            <CardContent className="p-6 lg:p-8 space-y-8">
+            <CardContent className="space-y-8 p-6 lg:p-8">
               <section className="space-y-6">
                 <div className="flex items-center justify-start">
                   <h3 className="text-lg font-semibold text-slate-700">
@@ -538,11 +538,11 @@ export default function ReportDetails({
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                        <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Participantes
                         </p>
                         <p className="text-xl font-bold text-slate-800">
@@ -550,7 +550,7 @@ export default function ReportDetails({
                         </p>
                       </div>
                       <div className="text-slate-400">
-                        <UsersRound className="w-6 h-6" />
+                        <UsersRound className="h-6 w-6" />
                       </div>
                     </div>
                   </div>
@@ -558,7 +558,7 @@ export default function ReportDetails({
                   <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                        <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Valor Arrecadado
                         </p>
                         <p className="text-xl font-bold text-slate-800">
@@ -566,7 +566,7 @@ export default function ReportDetails({
                         </p>
                       </div>
                       <div className="text-slate-400">
-                        <DollarSign className="w-6 h-6" />
+                        <DollarSign className="h-6 w-6" />
                       </div>
                     </div>
                   </div>
@@ -574,10 +574,10 @@ export default function ReportDetails({
 
                 {guestByPaymentMethod.length > 0 && (
                   <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                    <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                       Por Método de Pagamento
                     </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                       {guestByPaymentMethod.map((method) => {
                         const theme = getPaymentMethodTheme(
                           method.paymentMethod,
@@ -586,9 +586,9 @@ export default function ReportDetails({
                         return (
                           <div
                             key={method.paymentMethod}
-                            className={`rounded-lg border border-slate-200 border-l-4 ${theme.borderLeft} bg-white p-4`}
+                            className={`rounded-lg border border-l-4 border-slate-200 ${theme.borderLeft} bg-white p-4`}
                           >
-                            <div className="flex items-center gap-3 mb-3">
+                            <div className="mb-3 flex items-center gap-3">
                               <div className={theme.iconText}>
                                 {getPaymentIcon(method.paymentMethod)}
                               </div>
@@ -596,7 +596,7 @@ export default function ReportDetails({
                                 {formatPaymentMethodLabel(method.paymentMethod)}
                               </span>
                             </div>
-                            <p className="text-lg font-bold text-slate-800 mb-1">
+                            <p className="mb-1 text-lg font-bold text-slate-800">
                               {getFormatCurrency(method.totalValue)}
                             </p>
                             <p className="text-xs text-slate-500">
@@ -610,12 +610,12 @@ export default function ReportDetails({
                 )}
 
                 <div className="pt-2">
-                  <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                  <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                     Por Tipo de Inscrição
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {data.typeInscriptions.map((type, idx) => {
                     const theme = getTypeInscriptionTheme(type.id);
                     const inscription = data.guestInscriptions[idx];
@@ -626,26 +626,26 @@ export default function ReportDetails({
                     return (
                       <div
                         key={type.id}
-                        className={`rounded-xl border border-slate-200 border-l-4 ${theme.borderLeft} bg-white p-5 shadow-sm hover:shadow-md transition-shadow`}
+                        className={`rounded-xl border border-l-4 border-slate-200 ${theme.borderLeft} bg-white p-5 shadow-sm transition-shadow hover:shadow-md`}
                       >
-                        <div className="flex justify-between items-start gap-3 mb-4">
-                          <div className="flex items-center gap-2 min-w-0">
+                        <div className="mb-4 flex items-start justify-between gap-3">
+                          <div className="flex min-w-0 items-center gap-2">
                             <span
                               className={`h-2.5 w-2.5 rounded-full ${theme.dot}`}
                             />
-                            <h5 className="font-medium text-slate-800 truncate">
+                            <h5 className="truncate font-medium text-slate-800">
                               {type.description}
                             </h5>
                           </div>
-                          <span className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-full whitespace-nowrap">
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium whitespace-nowrap text-slate-600">
                             {countParticipants} participante
-                            {countParticipants !== 1 ? "s" : ""}
+                            {countParticipants !== 1 ? 's' : ''}
                           </span>
                         </div>
 
-                        <div className="pt-3 border-t border-slate-100">
+                        <div className="border-t border-slate-100 pt-3">
                           <div className="flex items-baseline justify-between gap-4">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                            <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
                               Total
                             </p>
                             <p className="text-lg font-bold text-slate-800">
@@ -664,7 +664,7 @@ export default function ReportDetails({
 
       {data.inscriptionAvuls && (
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6 lg:p-8 space-y-8">
+          <CardContent className="space-y-8 p-6 lg:p-8">
             <section className="space-y-6">
               <div className="flex items-center justify-start">
                 <h3 className="text-lg font-semibold text-slate-700">
@@ -672,11 +672,11 @@ export default function ReportDetails({
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                      <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                         Participantes
                       </p>
                       <p className="text-xl font-bold text-slate-800">
@@ -684,7 +684,7 @@ export default function ReportDetails({
                       </p>
                     </div>
                     <div className="text-slate-400">
-                      <UsersRound className="w-6 h-6" />
+                      <UsersRound className="h-6 w-6" />
                     </div>
                   </div>
                 </div>
@@ -692,7 +692,7 @@ export default function ReportDetails({
                 <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                      <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                         Valor Arrecadado
                       </p>
                       <p className="text-xl font-bold text-slate-800">
@@ -700,7 +700,7 @@ export default function ReportDetails({
                       </p>
                     </div>
                     <div className="text-slate-400">
-                      <DollarSign className="w-6 h-6" />
+                      <DollarSign className="h-6 w-6" />
                     </div>
                   </div>
                 </div>
@@ -708,19 +708,19 @@ export default function ReportDetails({
 
               {data.inscriptionAvuls.byPaymentMethod.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                  <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                     Por Método de Pagamento
                   </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {data.inscriptionAvuls.byPaymentMethod.map((method) => {
                       const theme = getPaymentMethodTheme(method.paymentMethod);
 
                       return (
                         <div
                           key={method.paymentMethod}
-                          className={`rounded-lg border border-slate-200 border-l-4 ${theme.borderLeft} bg-white p-4`}
+                          className={`rounded-lg border border-l-4 border-slate-200 ${theme.borderLeft} bg-white p-4`}
                         >
-                          <div className="flex items-center gap-3 mb-3">
+                          <div className="mb-3 flex items-center gap-3">
                             <div className={theme.iconText}>
                               {getPaymentIcon(method.paymentMethod)}
                             </div>
@@ -728,7 +728,7 @@ export default function ReportDetails({
                               {formatPaymentMethodLabel(method.paymentMethod)}
                             </span>
                           </div>
-                          <p className="text-lg font-bold text-slate-800 mb-1">
+                          <p className="mb-1 text-lg font-bold text-slate-800">
                             {getFormatCurrency(method.totalValue)}
                           </p>
                         </div>
@@ -744,7 +744,7 @@ export default function ReportDetails({
 
       {data.ticketSale && (
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6 lg:p-8 space-y-8">
+          <CardContent className="space-y-8 p-6 lg:p-8">
             <section className="space-y-6">
               <div className="flex items-center justify-start">
                 <h3 className="text-lg font-semibold text-slate-700">
@@ -752,11 +752,11 @@ export default function ReportDetails({
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                      <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                         Valor Vendido
                       </p>
                       <p className="text-xl font-bold text-slate-800">
@@ -764,7 +764,7 @@ export default function ReportDetails({
                       </p>
                     </div>
                     <div className="text-slate-400">
-                      <Ticket className="w-6 h-6" />
+                      <Ticket className="h-6 w-6" />
                     </div>
                   </div>
                 </div>
@@ -772,7 +772,7 @@ export default function ReportDetails({
                 <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">
+                      <p className="mb-2 text-xs font-medium tracking-wider text-slate-500 uppercase">
                         Tickets Vendidos
                       </p>
                       <p className="text-xl font-bold text-slate-800">
@@ -780,7 +780,7 @@ export default function ReportDetails({
                       </p>
                     </div>
                     <div className="text-slate-400">
-                      <BarChart3 className="w-6 h-6" />
+                      <BarChart3 className="h-6 w-6" />
                     </div>
                   </div>
                 </div>
@@ -788,16 +788,16 @@ export default function ReportDetails({
 
               {data.ticketSale.byTicket.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                  <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                     Por Ticket
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {data.ticketSale.byTicket.map((ticket) => (
                       <div
                         key={ticket.ticketId}
-                        className="rounded-lg border border-slate-200 bg-white p-4 hover:shadow-md transition-shadow"
+                        className="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
                       >
-                        <h5 className="font-medium text-slate-800 mb-2">
+                        <h5 className="mb-2 font-medium text-slate-800">
                           {ticket.ticketName}
                         </h5>
                         <div className="space-y-2">
@@ -822,19 +822,19 @@ export default function ReportDetails({
 
               {data.ticketSale.byPaymentMethod.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                  <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                     Por Método de Pagamento
                   </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {data.ticketSale.byPaymentMethod.map((method) => {
                       const theme = getPaymentMethodTheme(method.paymentMethod);
 
                       return (
                         <div
                           key={method.paymentMethod}
-                          className={`rounded-lg border border-slate-200 border-l-4 ${theme.borderLeft} bg-white p-4`}
+                          className={`rounded-lg border border-l-4 border-slate-200 ${theme.borderLeft} bg-white p-4`}
                         >
-                          <div className="flex items-center gap-3 mb-3">
+                          <div className="mb-3 flex items-center gap-3">
                             <div className={theme.iconText}>
                               {getPaymentIcon(method.paymentMethod)}
                             </div>
@@ -842,7 +842,7 @@ export default function ReportDetails({
                               {formatPaymentMethodLabel(method.paymentMethod)}
                             </span>
                           </div>
-                          <p className="text-lg font-bold text-slate-800 mb-1">
+                          <p className="mb-1 text-lg font-bold text-slate-800">
                             {getFormatCurrency(method.totalValue)}
                           </p>
                           <p className="text-xs text-slate-500">
@@ -861,7 +861,7 @@ export default function ReportDetails({
 
       {data.expenses && (
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6 lg:p-8 space-y-8">
+          <CardContent className="space-y-8 p-6 lg:p-8">
             <section className="space-y-6">
               <div className="flex items-center justify-start">
                 <h3 className="text-lg font-semibold text-slate-700">
@@ -869,13 +869,13 @@ export default function ReportDetails({
                 </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div
-                  className={`rounded-xl border border-slate-200 border-l-4 ${getPaymentMethodTheme("DINHEIRO").borderLeft} bg-white p-5`}
+                  className={`rounded-xl border border-l-4 border-slate-200 ${getPaymentMethodTheme('DINHEIRO').borderLeft} bg-white p-5`}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={getPaymentMethodTheme("DINHEIRO").iconText}>
-                      <Banknote className="w-6 h-6" />
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className={getPaymentMethodTheme('DINHEIRO').iconText}>
+                      <Banknote className="h-6 w-6" />
                     </div>
                     <span className="text-sm font-medium text-slate-700">
                       Dinheiro
@@ -887,11 +887,11 @@ export default function ReportDetails({
                 </div>
 
                 <div
-                  className={`rounded-xl border border-slate-200 border-l-4 ${getPaymentMethodTheme("PIX").borderLeft} bg-white p-5`}
+                  className={`rounded-xl border border-l-4 border-slate-200 ${getPaymentMethodTheme('PIX').borderLeft} bg-white p-5`}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={getPaymentMethodTheme("PIX").iconText}>
-                      <Smartphone className="w-6 h-6" />
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className={getPaymentMethodTheme('PIX').iconText}>
+                      <Smartphone className="h-6 w-6" />
                     </div>
                     <span className="text-sm font-medium text-slate-700">
                       Pix
@@ -903,11 +903,11 @@ export default function ReportDetails({
                 </div>
 
                 <div
-                  className={`rounded-xl border border-slate-200 border-l-4 ${getPaymentMethodTheme("CARTAO").borderLeft} bg-white p-5`}
+                  className={`rounded-xl border border-l-4 border-slate-200 ${getPaymentMethodTheme('CARTAO').borderLeft} bg-white p-5`}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={getPaymentMethodTheme("CARTAO").iconText}>
-                      <CreditCard className="w-6 h-6" />
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className={getPaymentMethodTheme('CARTAO').iconText}>
+                      <CreditCard className="h-6 w-6" />
                     </div>
                     <span className="text-sm font-medium text-slate-700">
                       Cartão
@@ -921,10 +921,10 @@ export default function ReportDetails({
 
               {data.expenses.gastos.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                  <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                     Detalhes
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {data.expenses.gastos.map((expense: ExpenseDetail) => {
                       const theme = getPaymentMethodTheme(
                         expense.paymentMethod,
@@ -933,29 +933,29 @@ export default function ReportDetails({
                       return (
                         <div
                           key={expense.id}
-                          className="rounded-lg border border-slate-200 bg-white p-4 hover:shadow-md transition-shadow"
+                          className="rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md"
                         >
-                          <div className="flex justify-between items-start mb-3">
+                          <div className="mb-3 flex items-start justify-between">
                             <span
-                              className={`px-2 py-1 text-xs font-medium rounded border flex items-center gap-1 ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
+                              className={`flex items-center gap-1 rounded border px-2 py-1 text-xs font-medium ${theme.badgeBg} ${theme.badgeText} ${theme.badgeBorder}`}
                             >
-                              {getPaymentIcon(expense.paymentMethod, "w-3 h-3")}
+                              {getPaymentIcon(expense.paymentMethod, 'w-3 h-3')}
                               {formatPaymentMethodLabel(expense.paymentMethod)}
                             </span>
-                            <span className="text-xs text-slate-500 flex items-center gap-1">
-                              <CalendarDays className="w-3 h-3" />
+                            <span className="flex items-center gap-1 text-xs text-slate-500">
+                              <CalendarDays className="h-3 w-3" />
                               {new Date(expense.createdAt).toLocaleDateString(
-                                "pt-BR",
+                                'pt-BR',
                               )}
                             </span>
                           </div>
-                          <p className="text-lg font-bold text-slate-800 mb-2">
+                          <p className="mb-2 text-lg font-bold text-slate-800">
                             {getFormatCurrency(expense.value)}
                           </p>
                           <p className="text-sm text-slate-600">
                             {expense.description}
                           </p>
-                          <p className="text-xs text-slate-500 mt-2">
+                          <p className="mt-2 text-xs text-slate-500">
                             Responsável: {expense.responsible}
                           </p>
                         </div>

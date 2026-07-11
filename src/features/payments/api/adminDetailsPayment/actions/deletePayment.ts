@@ -1,9 +1,9 @@
 import { DeletePaymentInput } from '@/features/payments/types/adminDetailsPayment/actions/deletePaymentTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function deletePayment({ paymentId }: DeletePaymentInput) {
   try {
-    const { data } = await axiosInstance.delete(`/payments/${paymentId}`);
+    const { data } = await axiosClient.delete(`/payments/${paymentId}`);
     return data;
   } catch (error) {
     const axiosError = error as {

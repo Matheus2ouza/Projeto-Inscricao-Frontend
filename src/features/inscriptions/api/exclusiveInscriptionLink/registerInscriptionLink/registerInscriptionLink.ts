@@ -2,13 +2,13 @@ import {
   RegisterInscriptionLinkInput,
   RegisterInscriptionLinkResponse,
 } from '@/features/inscriptions/types/exclusiveInscriptionLink/registerInscriptionLink/registerInscriptionLinkTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function registerInscriptionLink(
   payload: RegisterInscriptionLinkInput,
 ): Promise<RegisterInscriptionLinkResponse> {
   try {
-    const { data } = await axiosInstance.post(
+    const { data } = await axiosClient.post(
       'inscription/exclusive/register',
       payload,
     );

@@ -1,5 +1,5 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import type { EventsListResponse } from "../../inscriptions/types/listEventsTypes";
+import { axiosClient } from '@/lib/axios/';
+import type { EventsListResponse } from '../../inscriptions/types/listEventsTypes';
 
 export type getEventsForTicketParams = {
   page: number;
@@ -7,16 +7,16 @@ export type getEventsForTicketParams = {
 };
 
 export async function getEventsForTicket(
-  params: getEventsForTicketParams
+  params: getEventsForTicketParams,
 ): Promise<EventsListResponse> {
-  const { data } = await axiosInstance.get<EventsListResponse>(
-    "/events/tickets",
+  const { data } = await axiosClient.get<EventsListResponse>(
+    '/events/tickets',
     {
       params: {
         page: params.page,
         pageSize: params.pageSize,
       },
-    }
+    },
   );
 
   return data;

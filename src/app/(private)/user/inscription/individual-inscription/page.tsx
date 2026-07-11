@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import ListEventsForInscription from "@/features/inscriptions/components/ListEventsForInscription";
-import { useEventsForInscription } from "@/features/inscriptions/hooks/useEventsForInscription";
-import { StatusEvent } from "@/features/inscriptions/types/listEventsTypes";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Button } from "@/shared/components/ui/button";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { Card, CardBody, CardFooter } from "@heroui/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useListEventsToInscription } from '@/features/events/hooks/listEvents/listEventsToInscription/useListEventsToInscription';
+import ListEventsForInscription from '@/features/inscriptions/components/ListEventsForInscription';
+import { StatusEvent } from '@/features/inscriptions/types/listEventsTypes';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Button } from '@/shared/components/ui/button';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { Card, CardBody, CardFooter } from '@heroui/react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SelectedEventInscriptionIndividualPage() {
   const router = useRouter();
   const [pendingFilter, setPendingFilter] = useState<StatusEvent[]>([]);
   const [appliedFilter, setAppliedFilter] = useState<StatusEvent[]>([]);
-  const { events, total, page, pageCount, loading, error, setPage, refetch } =
-    useEventsForInscription({
+  const { events, total, page, pageCount, loading, error, setPage, refresh } =
+    useListEventsToInscription({
       initialPage: 1,
       pageSize: 8,
       status: appliedFilter.length > 0 ? appliedFilter : undefined,
@@ -35,22 +35,22 @@ export default function SelectedEventInscriptionIndividualPage() {
   };
 
   const handleBack = () => {
-    router.push("/user/home");
+    router.push('/user/home');
   };
 
   const renderSkeletonGrid = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, index) => (
         <Card
           key={index}
-          className="w-full border border-transparent shadow-md rounded-xl bg-white dark:bg-zinc-900 dark:border-zinc-800"
+          className="w-full rounded-xl border border-transparent bg-white shadow-md dark:border-zinc-800 dark:bg-zinc-900"
         >
           <CardBody className="p-0">
-            <Skeleton className="w-full h-48 rounded-t-xl" />
+            <Skeleton className="h-48 w-full rounded-t-xl" />
           </CardBody>
-          <CardFooter className="flex flex-col items-start p-4 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 rounded-b-xl">
-            <Skeleton className="h-6 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2 mb-2" />
+          <CardFooter className="flex flex-col items-start rounded-b-xl border-t border-gray-100 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+            <Skeleton className="mb-2 h-6 w-3/4" />
+            <Skeleton className="mb-2 h-4 w-1/2" />
             <Skeleton className="h-4 w-1/2" />
           </CardFooter>
         </Card>
@@ -65,16 +65,16 @@ export default function SelectedEventInscriptionIndividualPage() {
 
     if (error) {
       return (
-        <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
+        <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
           <div>
-            <p className="text-red-600 dark:text-red-400 font-semibold">
+            <p className="font-semibold text-red-600 dark:text-red-400">
               Não foi possível carregar os eventos.
             </p>
             <p className="text-muted-foreground mt-1 max-w-md">
-              {error || "Tente novamente em instantes."}
+              {error.message || 'Tente novamente em instantes.'}
             </p>
           </div>
-          <Button onClick={() => refetch()} variant="outline">
+          <Button onClick={() => refresh()} variant="outline">
             Tentar novamente
           </Button>
         </div>

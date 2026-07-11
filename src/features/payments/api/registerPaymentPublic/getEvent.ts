@@ -1,9 +1,9 @@
 import { Event } from '@/features/payments/types/registerPaymentPublic/registerPaymentPublicType';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function getEvent(eventId: string): Promise<Event> {
   try {
-    const { data } = await axiosInstance.get<Event>(`/events/${eventId}`);
+    const { data } = await axiosClient.get<Event>(`/events/${eventId}`);
     return data;
   } catch (error) {
     const axiosError = error as {

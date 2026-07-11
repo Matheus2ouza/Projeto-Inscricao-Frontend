@@ -2,13 +2,13 @@ import {
   SaleGrupOutput,
   SaleGrupRequest,
 } from '@/features/tickets/types/register-sale/ticketSaleRegisterTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function registerTicketSaleGroup(
   payload: SaleGrupRequest,
 ): Promise<SaleGrupOutput> {
   try {
-    const { data } = await axiosInstance.post<SaleGrupOutput>(
+    const { data } = await axiosClient.post<SaleGrupOutput>(
       `/tickets/${payload.eventId}/sale-group`,
       payload,
     );

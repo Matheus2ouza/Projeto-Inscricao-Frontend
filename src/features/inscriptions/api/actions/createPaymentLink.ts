@@ -1,14 +1,13 @@
 import {
   CreatePaymentLinkParams,
   CreatePaymentLinkResponse,
-} from "@/features/inscriptions/types/actions/createPaymentLinkTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-
+} from '@/features/inscriptions/types/actions/createPaymentLinkTypes';
+import { axiosClient } from '@/lib/axios';
 export async function createPaymentLink({
   inscriptionId,
 }: CreatePaymentLinkParams): Promise<CreatePaymentLinkResponse> {
   try {
-    const { data } = await axiosInstance.post<CreatePaymentLinkResponse>(
+    const { data } = await axiosClient.post<CreatePaymentLinkResponse>(
       `payments/${inscriptionId}/link`,
     );
     return data;
@@ -20,7 +19,7 @@ export async function createPaymentLink({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar os detalhes da inscrição.",
+        'Não foi possível buscar os detalhes da inscrição.',
     );
   }
 }
