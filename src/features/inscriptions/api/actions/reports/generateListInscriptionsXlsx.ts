@@ -1,9 +1,9 @@
 import {
   GeneratelistInscriptionsXlsxInput,
   GeneratelistInscriptionsXlsxResponse,
-} from "@/features/inscriptions/types/actions/reports/generateListInscriptionsXlsxTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
+} from '@/features/inscriptions/types/actions/reports/generateListInscriptionsXlsxTypes';
+import { axiosClient } from '@/lib/axios';
+import qs from 'qs';
 
 export async function generatelistInscriptionsXlsx({
   eventId,
@@ -20,7 +20,7 @@ export async function generatelistInscriptionsXlsx({
     const normalizedIsGuest = isGuest === false ? false : undefined;
 
     const { data } =
-      await axiosInstance.get<GeneratelistInscriptionsXlsxResponse>(
+      await axiosClient.get<GeneratelistInscriptionsXlsxResponse>(
         `/inscriptions/${eventId}/all/xlsx`,
         {
           params: {
@@ -33,7 +33,7 @@ export async function generatelistInscriptionsXlsx({
             startDate,
             endDate,
           },
-          paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+          paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
         },
       );
     return data;
@@ -45,7 +45,7 @@ export async function generatelistInscriptionsXlsx({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar as inscrições.",
+        'Não foi possível buscar as inscrições.',
     );
   }
 }

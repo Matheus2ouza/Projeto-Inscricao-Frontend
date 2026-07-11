@@ -4,33 +4,34 @@ import { useGlobalLoading } from '@/components/GlobalLoading';
 import { ComboboxEvent } from '@/features/events/components/combobox/ComboBoxEvent';
 import { StatusEvent } from '@/features/events/types/combobox/comboboxEventTypes';
 import AdminManagerHomeDashboard from '@/features/home/components/admin/AdminManagerHomeDashboard';
-import { useAdminDashboard } from '@/features/home/hook/admin/useAdminDashboard';
+import { useDashboardAdmin } from '@/features/home/hooks/admin/useAdminDashboard';
+import { useInvalidateDashboardAdminQuery } from '@/features/home/hooks/admin/useDashboardAdminQuery';
+import { DashboardAdminResponse } from '@/features/home/types/admin/dashboardTypes';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { useCurrentUser } from '@/shared/context/user-context';
-import { useUserRole } from '@/shared/hooks/useUserRole';
 import { RotateCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AdminManagerHome() {
   const router = useRouter();
   const { setLoading } = useGlobalLoading();
-  const { loading } = useUserRole();
   const { user } = useCurrentUser();
+  const [selectedEventId, setSelectedEventId] = useState('');
+  const [refreshingAll, setRefreshingAll] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date());
   const [relativeTime, setRelativeTime] = useState('há instantes');
-  const [selectedEventId, setSelectedEventId] = useState('');
-  const dashboard = useAdminDashboard(selectedEventId || undefined);
-  const [refreshingAll, setRefreshingAll] = useState(false);
 
-  const refreshDashboard = async () => {
-    setRefreshingAll(true);
-    await dashboard.refetchAll();
-    setLastUpdated(new Date());
-    router.refresh();
-    setRefreshingAll(false);
-  };
+  // Hooks de dashboard
+  const dashboard = useDashboardAdmin({
+    eventId: selectedEventId || undefined,
+  });
 
+  // Hook de invalidação
+  const invalidateDashboard = useInvalidateDashboardAdminQuery();
+
+  // Atualiza o tempo relativo
   useEffect(() => {
     const updateRelativeTime = () => {
       const diffMs = Date.now() - lastUpdated.getTime();
@@ -50,20 +51,97 @@ export default function AdminManagerHome() {
     return () => clearInterval(intervalId);
   }, [lastUpdated]);
 
-  useEffect(() => {
-    setLoading(loading);
-    return () => setLoading(false);
-  }, [loading, setLoading]);
-
+  // Atualiza timestamp quando os dados são carregados
   useEffect(() => {
     if (!dashboard.isFetching && !dashboard.loading) {
       setLastUpdated(new Date());
     }
   }, [dashboard.isFetching, dashboard.loading, selectedEventId]);
 
-  const handleViewPayment = (eventId: string, paymentId: string) => {
-    router.push(`payments/list-payments/${eventId}/details/${paymentId}`);
-  };
+  // Refresh completo do dashboard
+  const refreshDashboard = useCallback(async () => {
+    if (refreshingAll || dashboard.isFetching) return;
+
+    setRefreshingAll(true);
+    try {
+      // Invalida o cache e força refetch
+      invalidateDashboard.invalidateSummary(selectedEventId || undefined);
+      await dashboard.refetchAll();
+      setLastUpdated(new Date());
+      router.refresh();
+
+      toast.success('Dashboard atualizado com sucesso!');
+    } catch (error) {
+      const message = (error as Error | null)?.message ?? 'Erro inesperado';
+      toast.error('Erro ao atualizar dashboard', {
+        description: message,
+      });
+    } finally {
+      setRefreshingAll(false);
+    }
+  }, [
+    refreshingAll,
+    dashboard.isFetching,
+    dashboard.refetchAll,
+    invalidateDashboard,
+    selectedEventId,
+    router,
+  ]);
+
+  // Refresh apenas de métricas específicas
+  const refreshMetric = useCallback(
+    async (metric: keyof DashboardAdminResponse) => {
+      await dashboard.refreshMetric(metric);
+      setLastUpdated(new Date());
+    },
+    [dashboard],
+  );
+
+  const handleViewPayment = useCallback(
+    (eventId: string, paymentId: string) => {
+      router.push(`payments/list-payments/${eventId}/details/${paymentId}`);
+    },
+    [router],
+  );
+
+  // Memo para evitar re-renders desnecessários
+  const pageActions = useMemo(
+    () => (
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="min-w-[220px]">
+          <ComboboxEvent
+            value={selectedEventId}
+            onChange={setSelectedEventId}
+            statuses={[
+              StatusEvent.OPEN,
+              StatusEvent.CLOSE,
+              StatusEvent.FINALIZED,
+            ]}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={refreshDashboard}
+          disabled={refreshingAll || dashboard.isFetching}
+          className="group focus-visible:ring-offset-background inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
+        >
+          <RotateCw
+            className={`h-4 w-4 text-[#0C3DAD] transition-colors group-hover:text-white dark:text-[#9CC3FF] ${
+              refreshingAll || dashboard.isFetching ? 'animate-spin' : ''
+            }`}
+          />
+          <span>Atualizado {relativeTime}</span>
+        </button>
+      </div>
+    ),
+    [
+      selectedEventId,
+      refreshDashboard,
+      refreshingAll,
+      dashboard.isFetching,
+      relativeTime,
+    ],
+  );
 
   return (
     <PageContainer
@@ -71,43 +149,14 @@ export default function AdminManagerHome() {
       description="Gerencie suas inscrições e acompanhe os eventos disponíveis."
       showBackButton={false}
       maxWidth="2xl"
-      actions={
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="min-w-[220px]">
-            <ComboboxEvent
-              value={selectedEventId}
-              onChange={setSelectedEventId}
-              statuses={[
-                StatusEvent.OPEN,
-                StatusEvent.CLOSE,
-                StatusEvent.FINALIZED,
-              ]}
-            />
-          </div>
-          <button
-            type="button"
-            onClick={refreshDashboard}
-            disabled={
-              refreshingAll || dashboard.loading || dashboard.isFetching
-            }
-            className="group focus-visible:ring-offset-background inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-[#0C3DAD] transition-colors hover:bg-[#0C3DAD] hover:text-white focus-visible:ring-2 focus-visible:ring-[#0C3DAD]/60 focus-visible:ring-offset-2 focus-visible:outline-none dark:text-[#9CC3FF] dark:hover:bg-[#0C3DAD] dark:hover:text-white dark:focus-visible:ring-white/40"
-          >
-            <RotateCw
-              className={`h-4 w-4 text-[#0C3DAD] transition-colors group-hover:text-white dark:text-[#9CC3FF] ${
-                refreshingAll || dashboard.isFetching ? 'animate-spin' : ''
-              }`}
-            />
-            <span>Atualizado {relativeTime}</span>
-          </button>
-        </div>
-      }
+      actions={pageActions}
     >
       <AdminManagerHomeDashboard
         data={dashboard.data}
         loading={dashboard.loading}
         isFetching={dashboard.isFetching}
         refreshingMetric={dashboard.refreshingMetric}
-        onRefreshMetric={dashboard.refreshMetric}
+        onRefreshMetric={refreshMetric}
         onViewPayment={handleViewPayment}
       />
     </PageContainer>

@@ -1,6 +1,7 @@
 'use client';
 
 import useFormCreateRegion from '@/features/regions/hooks/useFormCreateRegion';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -32,7 +33,6 @@ import {
   PaginationPrevious,
 } from '@/shared/components/ui/pagination';
 import { Skeleton } from '@/shared/components/ui/skeleton';
-import { cn } from '@/shared/lib/utils';
 import { DialogClose, DialogTitle } from '@radix-ui/react-dialog';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import Image from 'next/image';

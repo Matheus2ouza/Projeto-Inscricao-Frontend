@@ -1,8 +1,7 @@
-import axiosInstance from "@/shared/lib/apiClient";
-
+import { axiosClient } from '@/lib/axios';
 export async function deleteInscription(inscriptionId: string): Promise<void> {
   try {
-    await axiosInstance.delete(`/inscriptions/${inscriptionId}/delete`);
+    await axiosClient.delete(`/inscriptions/${inscriptionId}/delete`);
   } catch (error) {
     const axiosError = error as {
       response?: { data?: { message?: string } };
@@ -10,8 +9,7 @@ export async function deleteInscription(inscriptionId: string): Promise<void> {
     };
 
     throw new Error(
-      axiosError.response?.data?.message ||
-      "Falha ao deletar inscrição"
+      axiosError.response?.data?.message || 'Falha ao deletar inscrição',
     );
   }
 }

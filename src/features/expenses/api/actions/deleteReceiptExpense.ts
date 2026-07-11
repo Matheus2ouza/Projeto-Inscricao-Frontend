@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export type DeleteReceiptExpenseRequest = {
   id: string;
@@ -15,7 +15,7 @@ export async function deleteReceiptExpense({
   receiptIndex,
 }: DeleteReceiptExpenseRequest) {
   try {
-    const { data } = await axiosInstance.delete(`expenses/${id}/receipts`, {
+    const { data } = await axiosClient.delete(`expenses/${id}/receipts`, {
       params: {
         receiptIndex,
       },

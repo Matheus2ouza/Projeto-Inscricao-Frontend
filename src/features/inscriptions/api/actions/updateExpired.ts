@@ -1,15 +1,14 @@
 import {
   UpdateExpiredParams,
   UpdateExpiredResponse,
-} from "@/features/inscriptions/types/actions/updateExpiredTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-
+} from '@/features/inscriptions/types/actions/updateExpiredTypes';
+import { axiosClient } from '@/lib/axios';
 export async function updateExpired({
   inscriptionId,
   expiresAt,
 }: UpdateExpiredParams): Promise<UpdateExpiredResponse> {
   try {
-    const { data } = await axiosInstance.patch<UpdateExpiredResponse>(
+    const { data } = await axiosClient.patch<UpdateExpiredResponse>(
       `/inscriptions/${inscriptionId}/expires`,
       {},
       {
@@ -27,7 +26,7 @@ export async function updateExpired({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível buscar os detalhes da inscrição.",
+        'Não foi possível buscar os detalhes da inscrição.',
     );
   }
 }

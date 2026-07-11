@@ -1,4 +1,4 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 
 type DownloadParticipantsPdfApiResponse = {
   pdfBase64?: string;
@@ -12,13 +12,12 @@ type DownloadParticipantsPdfOutput = {
 };
 
 export async function downloadSecondCopyPdf(
-  ticketSaleId: string
+  ticketSaleId: string,
 ): Promise<DownloadParticipantsPdfOutput> {
   try {
-    const response =
-      await axiosInstance.get<DownloadParticipantsPdfApiResponse>(
-        `/tickets/${ticketSaleId}/pdf/second-copy`
-      );
+    const response = await axiosClient.get<DownloadParticipantsPdfApiResponse>(
+      `/tickets/${ticketSaleId}/pdf/second-copy`,
+    );
 
     const payload = response.data;
     const pdfBase64 = payload?.pdfBase64;
@@ -26,7 +25,7 @@ export async function downloadSecondCopyPdf(
       payload?.filename ?? `Segunda-via-${ticketSaleId.slice(0, 8)}.pdf`;
 
     if (!pdfBase64) {
-      throw new Error("Resposta do servidor não retornou o PDF da lista.");
+      throw new Error('Resposta do servidor não retornou o PDF da lista.');
     }
 
     return { pdfBase64, filename };
@@ -38,8 +37,8 @@ export async function downloadSecondCopyPdf(
 
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Não foi possível gerar o PDF da lista dos tickets."
+        axiosError.message ??
+        'Não foi possível gerar o PDF da lista dos tickets.',
     );
   }
 }

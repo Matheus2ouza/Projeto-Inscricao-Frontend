@@ -15,6 +15,7 @@ export type Event = {
   startDate: string;
   endDate: string;
   image: string;
+  url: string;
   regionName: string;
   location: string;
   latitude: number;

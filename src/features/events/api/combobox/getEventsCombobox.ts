@@ -2,13 +2,13 @@ import {
   EventResponse,
   StatusEvent,
 } from '@/features/events/types/combobox/comboboxEventTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios';
 import qs from 'qs';
 
 export async function getEventsCombobox(
   status?: StatusEvent | StatusEvent[],
 ): Promise<EventResponse> {
-  const { data } = await axiosInstance.get<EventResponse>('/events/all/names', {
+  const { data } = await axiosClient.get<EventResponse>('/events/all/names', {
     params: {
       status,
     },

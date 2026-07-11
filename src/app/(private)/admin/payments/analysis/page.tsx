@@ -1,7 +1,7 @@
 'use client';
 
+import { useListEventsToPayment } from '@/features/events/hooks/listEvents/listEventsToPayment/useListEventsToPayment';
 import ListEventsForPayment from '@/features/payments/components/ListEventsForPayment';
-import { useEventsForPayment } from '@/features/payments/hooks/useEventsForPayment';
 import { Event } from '@/features/payments/types/listEventsTypes';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
@@ -20,7 +20,7 @@ export default function AnalysisPaymentAdminPage() {
     useState<boolean[]>(defaultStatusFilter);
   const wasClearedRef = useRef(false);
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
-    useEventsForPayment({
+    useListEventsToPayment({
       pageSize: 8,
       paymentEnabled: appliedFilter.length > 0 ? appliedFilter : undefined,
     });

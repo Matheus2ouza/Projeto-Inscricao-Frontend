@@ -1,7 +1,7 @@
 'use client';
 
 import SelectedEventManager from '@/features/events/components/manager/SelectedEventManager';
-import { useEventsAll } from '@/features/events/hooks/manager/useEventsAll';
+import { useListEventsToManager } from '@/features/events/hooks/listEvents/listEventsToManager/useListEventsToManager';
 import { StatusEvent } from '@/features/events/types/selectEvent';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
@@ -18,7 +18,7 @@ export default function SelectEventAdminPage() {
     [],
   );
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
-    useEventsAll({
+    useListEventsToManager({
       initialPage: 1,
       pageSize: 4,
       status: appliedStatusFilter.length > 0 ? appliedStatusFilter : undefined,

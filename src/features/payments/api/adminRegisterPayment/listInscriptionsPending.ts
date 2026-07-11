@@ -1,8 +1,8 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function listInscriptionsPending(eventId: string) {
   try {
-    const { data } = await axiosInstance.get(`inscriptions/${eventId}/list`, {
+    const { data } = await axiosClient.get(`inscriptions/${eventId}/list`, {
       params: {
         status: 'PENDING',
       },

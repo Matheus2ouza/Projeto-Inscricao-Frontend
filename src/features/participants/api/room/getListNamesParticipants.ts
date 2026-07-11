@@ -1,11 +1,11 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import { GetListNamesParticipantsResponse } from '../../types/room/listParticipantsRoomTypes';
 
 export async function getListNamesParticipants(
   eventId?: string,
 ): Promise<GetListNamesParticipantsResponse> {
   try {
-    const { data } = await axiosInstance.get(`participants/${eventId}/names`);
+    const { data } = await axiosClient.get(`participants/${eventId}/names`);
     return data;
   } catch (error) {
     const axiosError = error as {

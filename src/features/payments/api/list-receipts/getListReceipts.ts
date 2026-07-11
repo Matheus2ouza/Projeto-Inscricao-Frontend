@@ -1,5 +1,5 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { ListReceiptsResponse } from "../../types/list-receipts/listReceipts";
+import { axiosClient } from '@/lib/axios';
+import { ListReceiptsResponse } from '../../types/list-receipts/listReceipts';
 
 export async function getListReceipts(
   eventId: string,
@@ -7,7 +7,7 @@ export async function getListReceipts(
   pageSize: number,
 ): Promise<ListReceiptsResponse> {
   try {
-    const { data } = await axiosInstance.get<ListReceiptsResponse>(
+    const { data } = await axiosClient.get<ListReceiptsResponse>(
       `/payments/${eventId}/receipts`,
       {
         params: {
@@ -26,7 +26,7 @@ export async function getListReceipts(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

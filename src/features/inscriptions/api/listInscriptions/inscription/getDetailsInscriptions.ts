@@ -1,11 +1,11 @@
 import { DetailsInscriptionResponse } from '@/features/inscriptions/types/listInscriptions/inscription/detailsInscriptionTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function getDetailsInscription(
   inscriptionId: string,
 ): Promise<DetailsInscriptionResponse> {
   try {
-    const { data } = await axiosInstance.get<DetailsInscriptionResponse>(
+    const { data } = await axiosClient.get<DetailsInscriptionResponse>(
       `/inscriptions/${inscriptionId}/details`,
     );
     return data;

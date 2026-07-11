@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import {
   RegisterGuestInscriptionInput,
   RegisterGuestInscriptionResponse,
@@ -8,7 +8,7 @@ export async function registerGuest(
   payload: RegisterGuestInscriptionInput,
 ): Promise<RegisterGuestInscriptionResponse> {
   try {
-    const { data } = await axiosInstance.post<RegisterGuestInscriptionResponse>(
+    const { data } = await axiosClient.post<RegisterGuestInscriptionResponse>(
       `inscription/guest/register`,
       payload,
     );

@@ -1,15 +1,15 @@
 import {
   CreateTicketInput,
   CreateTicketOutput,
-} from "@/features/tickets/types/analysis/ticketsTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+} from '@/features/tickets/types/analysis/ticketsTypes';
+import { axiosClient } from '@/lib/axios';
 
 export async function createTicket(
   create: CreateTicketInput,
 ): Promise<CreateTicketOutput> {
   try {
-    const { data } = await axiosInstance.post<CreateTicketOutput>(
-      "/tickets/create",
+    const { data } = await axiosClient.post<CreateTicketOutput>(
+      '/tickets/create',
       create,
     );
     return data;
@@ -17,7 +17,7 @@ export async function createTicket(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao criar ticket. Tente novamente.",
+        'Falha ao criar ticket. Tente novamente.',
     );
   }
 }

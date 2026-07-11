@@ -1,17 +1,22 @@
 'use client';
 
-import PublicEventDetails from '@/features/events/components/publicEvents/PublicEventDetails';
+import { PublicEventDetails } from '@/features/events/components/publicEvents/PublicEventDetails';
 import { usePublicEvent } from '@/features/events/hooks/publicEvents/usePublicEvent';
-import BackgroundPaths from '@/features/guest/components/guestInscription/background-paths';
-import { useImagePalette } from '@/features/guest/hook/guestInscription/useImagePalette';
+import BackgroundPaths from '@/shared/components/BackgroundPaths';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useImagePalette } from '@/shared/hooks/useImagePalette';
+import { useTheme } from 'next-themes';
 import { useParams, useRouter } from 'next/navigation';
 
 export default function EventPage() {
   const router = useRouter();
   const params = useParams();
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDarkMode = currentTheme === 'dark';
+
   const rawSlug = params.slug;
   const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug;
 
@@ -21,7 +26,10 @@ export default function EventPage() {
 
   const { event, loading, error, refetch } = usePublicEvent({ slug });
 
-  const { palette, isDark, swatches, ready } = useImagePalette(event?.image);
+  const { palette, isDark, swatches, ready } = useImagePalette(
+    event?.image,
+    isDarkMode,
+  );
 
   const preferredSwatch =
     (isDark ? swatches.DarkVibrant : swatches.LightVibrant) ??
@@ -31,10 +39,9 @@ export default function EventPage() {
     swatches.LightMuted;
 
   const titleColor =
-    preferredSwatch?.titleTextColor ?? (isDark ? '#ffffff' : '#111111');
+    preferredSwatch?.titleTextColor ?? (isDark ? '#FFFFFF' : '#1F2937');
   const bodyColor =
-    preferredSwatch?.bodyTextColor ??
-    (isDark ? 'rgba(255,255,255,0.7)' : '#374151');
+    preferredSwatch?.bodyTextColor ?? (isDark ? '#B0BEC5' : '#374151');
 
   const handleViewSubscription = (eventId: string) => {
     router.push(`/guest/${eventId}/inscription`);
@@ -147,7 +154,7 @@ export default function EventPage() {
 
   return (
     <div className="relative isolate min-h-screen">
-      <BackgroundPaths palette={palette} />
+      <BackgroundPaths palette={palette} intensity="low" />
       <PageContainer
         title={event?.name.toUpperCase() ?? 'Evento'}
         description={event?.regionName ?? ''}

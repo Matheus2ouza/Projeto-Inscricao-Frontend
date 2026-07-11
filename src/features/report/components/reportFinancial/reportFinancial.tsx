@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
-import { Card, CardContent } from "@/shared/components/ui/card";
-import { Label } from "@/shared/components/ui/label";
+import { Button } from '@/shared/components/ui/button';
+import { Card, CardContent } from '@/shared/components/ui/card';
+import { Label } from '@/shared/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { Switch } from "@/shared/components/ui/switch";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
-import { getGradientClass } from "@/shared/utils/getGenerateGradient";
-import { getInitial } from "@/shared/utils/getInitials";
+} from '@/shared/components/ui/popover';
+import { Switch } from '@/shared/components/ui/switch';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
+import { getInitial } from '@/shared/utils/getInitials';
 import {
   Banknote,
   CalendarDays,
@@ -21,9 +21,9 @@ import {
   Smartphone,
   Users,
   Wallet,
-} from "lucide-react";
-import Image from "next/image";
-import { ReportFinancialResponse } from "../../types/reportFinancial/reportFinancialTypes";
+} from 'lucide-react';
+import Image from 'next/image';
+import { ReportFinancialResponse } from '../../types/reportFinancial/reportFinancialTypes';
 
 interface ReportDetailsProps {
   data: ReportFinancialResponse | null;
@@ -47,7 +47,7 @@ export default function ReportFinancialDetails({
   onDownload,
 }: ReportDetailsProps) {
   if (!data) return null;
-  const gradientClass = getGradientClass(data.name);
+  const gradientClass = generateGradientClass();
 
   // Helper function for summary cards
   const renderSummaryCard = (
@@ -60,10 +60,10 @@ export default function ReportFinancialDetails({
     fullWidth: boolean = false,
   ) => (
     <div
-      className={`rounded-xl border ${borderColor} ${bgColor} p-5 shadow-sm ${fullWidth ? "col-span-1 lg:col-span-2" : ""}`}
+      className={`rounded-xl border ${borderColor} ${bgColor} p-5 shadow-sm ${fullWidth ? 'col-span-1 lg:col-span-2' : ''}`}
     >
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-xs font-medium tracking-wider text-slate-500 uppercase">
           {label}
         </p>
         {icon && <div className="text-slate-400">{icon}</div>}
@@ -73,13 +73,13 @@ export default function ReportFinancialDetails({
   );
 
   return (
-    <Card className="border-0 shadow-lg overflow-hidden">
+    <Card className="overflow-hidden border-0 shadow-lg">
       {/* Header do Evento */}
-      <div className="relative bg-gradient-to-br from-slate-50 to-white border-b">
+      <div className="relative border-b bg-gradient-to-br from-slate-50 to-white">
         <CardContent className="p-6 lg:p-8">
-          <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
             {/* Imagem do Evento */}
-            <div className="relative h-48 w-full lg:w-64 lg:h-48 rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-gradient-to-br from-slate-100 to-white">
+            <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-100 to-white shadow-md lg:h-48 lg:w-64">
               {data.image ? (
                 <Image
                   src={data.image}
@@ -91,9 +91,9 @@ export default function ReportFinancialDetails({
                 />
               ) : (
                 <div
-                  className={`w-full h-full flex items-center justify-center bg-gradient-to-br ${gradientClass}`}
+                  className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradientClass}`}
                 >
-                  <h3 className="text-white text-6xl lg:text-7xl font-bold tracking-wider">
+                  <h3 className="text-6xl font-bold tracking-wider text-white lg:text-7xl">
                     {getInitial(data.name)}
                   </h3>
                 </div>
@@ -102,36 +102,36 @@ export default function ReportFinancialDetails({
 
             {/* Informações do Evento */}
             <div className="flex-1 space-y-4">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
                 <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium uppercase tracking-wider mb-3">
-                    <CalendarDays className="w-3 h-3" />
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium tracking-wider text-slate-600 uppercase">
+                    <CalendarDays className="h-3 w-3" />
                     Evento
                   </div>
-                  <h1 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-2">
+                  <h1 className="mb-2 text-3xl font-bold text-slate-800 lg:text-4xl">
                     {data.name}
                   </h1>
                   <div className="flex items-center gap-4 text-slate-600">
                     <span className="text-sm font-medium">
-                      {new Date(data.startDate).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
+                      {new Date(data.startDate).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
                       })}
                     </span>
                     <span className="text-slate-400">—</span>
                     <span className="text-sm font-medium">
-                      {new Date(data.endDate).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
+                      {new Date(data.endDate).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
                       })}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border shadow-sm">
+                  <div className="flex items-center gap-2 rounded-lg border bg-white px-4 py-2 shadow-sm">
                     <Switch
                       id="show-details"
                       checked={showDetails}
@@ -140,7 +140,7 @@ export default function ReportFinancialDetails({
                     />
                     <Label
                       htmlFor="show-details"
-                      className="text-sm font-medium text-slate-600 cursor-pointer"
+                      className="cursor-pointer text-sm font-medium text-slate-600"
                     >
                       Exibir Detalhes
                     </Label>
@@ -151,28 +151,28 @@ export default function ReportFinancialDetails({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-10 gap-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                        className="h-10 gap-2 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                         disabled={isDownloading || loading}
                       >
                         {isDownloading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          <Download className="w-4 h-4" />
+                          <Download className="h-4 w-4" />
                         )}
-                        {isDownloading ? "Baixando..." : "Baixar PDF"}
+                        {isDownloading ? 'Baixando...' : 'Baixar PDF'}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80" align="end">
                       <div className="grid gap-4">
                         <div className="space-y-2">
-                          <h4 className="font-medium leading-none">
+                          <h4 className="leading-none font-medium">
                             Opções de Download
                           </h4>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-muted-foreground text-sm">
                             Configure o conteúdo do arquivo PDF.
                           </p>
                         </div>
-                        <div className="flex items-center space-x-2 border rounded-lg p-3 bg-slate-50">
+                        <div className="flex items-center space-x-2 rounded-lg border bg-slate-50 p-3">
                           <Switch
                             id="pdf-details"
                             checked={detailsPdf}
@@ -180,7 +180,7 @@ export default function ReportFinancialDetails({
                           />
                           <Label
                             htmlFor="pdf-details"
-                            className="text-sm font-medium cursor-pointer"
+                            className="cursor-pointer text-sm font-medium"
                           >
                             Incluir detalhes (tabelas)
                           </Label>
@@ -191,9 +191,9 @@ export default function ReportFinancialDetails({
                           className="w-full"
                         >
                           {isDownloading ? (
-                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
-                            <Download className="w-4 h-4 mr-2" />
+                            <Download className="mr-2 h-4 w-4" />
                           )}
                           Confirmar Download
                         </Button>
@@ -207,60 +207,60 @@ export default function ReportFinancialDetails({
         </CardContent>
       </div>
 
-      <CardContent className="p-6 lg:p-8 space-y-8">
+      <CardContent className="space-y-8 p-6 lg:p-8">
         {/* Resumo Financeiro Geral */}
         <section className="space-y-6">
           <div className="flex items-center gap-3">
-            <Wallet className="w-6 h-6 text-blue-600" />
+            <Wallet className="h-6 w-6 text-blue-600" />
             <h2 className="text-2xl font-bold text-slate-800">
               Resumo Financeiro
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {renderSummaryCard(
-              "Total Geral",
+              'Total Geral',
               getFormatCurrency(data.totalGeral),
-              "text-emerald-600",
-              "bg-gradient-to-br from-emerald-50 to-white",
-              "border-emerald-100",
-              <Wallet className="w-5 h-5" />,
+              'text-emerald-600',
+              'bg-gradient-to-br from-emerald-50 to-white',
+              'border-emerald-100',
+              <Wallet className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Total Dinheiro",
+              'Total Dinheiro',
               getFormatCurrency(data.totalCash),
-              "text-blue-600",
-              "bg-gradient-to-br from-blue-50 to-white",
-              "border-blue-100",
-              <Banknote className="w-5 h-5" />,
+              'text-blue-600',
+              'bg-gradient-to-br from-blue-50 to-white',
+              'border-blue-100',
+              <Banknote className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Total Cartão",
+              'Total Cartão',
               getFormatCurrency(data.totalCard),
-              "text-indigo-600",
-              "bg-gradient-to-br from-indigo-50 to-white",
-              "border-indigo-100",
-              <CreditCard className="w-5 h-5" />,
+              'text-indigo-600',
+              'bg-gradient-to-br from-indigo-50 to-white',
+              'border-indigo-100',
+              <CreditCard className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Total Pix",
+              'Total Pix',
               getFormatCurrency(data.totalPix),
-              "text-violet-600",
-              "bg-gradient-to-br from-violet-50 to-white",
-              "border-violet-100",
-              <Smartphone className="w-5 h-5" />,
+              'text-violet-600',
+              'bg-gradient-to-br from-violet-50 to-white',
+              'border-violet-100',
+              <Smartphone className="h-5 w-5" />,
             )}
           </div>
 
           {/* Total Gasto */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {renderSummaryCard(
-              "Total Gastos",
+              'Total Gastos',
               getFormatCurrency(data.totalSpent),
-              "text-rose-600",
-              "bg-gradient-to-br from-rose-50 to-white",
-              "border-rose-100",
-              <Wallet className="w-5 h-5" />,
+              'text-rose-600',
+              'bg-gradient-to-br from-rose-50 to-white',
+              'border-rose-100',
+              <Wallet className="h-5 w-5" />,
               true,
             )}
           </div>
@@ -270,43 +270,43 @@ export default function ReportFinancialDetails({
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold text-slate-700">Inscrições</h3>
-            <span className="text-sm text-slate-600 font-medium">
+            <span className="text-sm font-medium text-slate-600">
               Total: {getFormatCurrency(data.inscription.totalGeral)}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {renderSummaryCard(
-              "Participantes",
+              'Participantes',
               data.inscription.countParticipants.toString(),
-              "text-slate-800",
-              "bg-gradient-to-br from-slate-50 to-white",
-              "border-slate-100",
-              <Users className="w-5 h-5" />,
+              'text-slate-800',
+              'bg-gradient-to-br from-slate-50 to-white',
+              'border-slate-100',
+              <Users className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Dinheiro",
+              'Dinheiro',
               getFormatCurrency(data.inscription.totalCash),
-              "text-blue-600",
-              "bg-gradient-to-br from-blue-50 to-white",
-              "border-blue-100",
-              <Banknote className="w-5 h-5" />,
+              'text-blue-600',
+              'bg-gradient-to-br from-blue-50 to-white',
+              'border-blue-100',
+              <Banknote className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Cartão",
+              'Cartão',
               getFormatCurrency(data.inscription.totalCard),
-              "text-indigo-600",
-              "bg-gradient-to-br from-indigo-50 to-white",
-              "border-indigo-100",
-              <CreditCard className="w-5 h-5" />,
+              'text-indigo-600',
+              'bg-gradient-to-br from-indigo-50 to-white',
+              'border-indigo-100',
+              <CreditCard className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Pix",
+              'Pix',
               getFormatCurrency(data.inscription.totalPix),
-              "text-violet-600",
-              "bg-gradient-to-br from-violet-50 to-white",
-              "border-violet-100",
-              <Smartphone className="w-5 h-5" />,
+              'text-violet-600',
+              'bg-gradient-to-br from-violet-50 to-white',
+              'border-violet-100',
+              <Smartphone className="h-5 w-5" />,
             )}
           </div>
 
@@ -315,26 +315,26 @@ export default function ReportFinancialDetails({
             data.inscription.details &&
             data.inscription.details.length > 0 && (
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                   Detalhes das Inscrições
                 </h4>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b border-slate-200">
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Data
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Total Pago
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Dinheiro
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Cartão
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Pix
                         </th>
                       </tr>
@@ -345,21 +345,21 @@ export default function ReportFinancialDetails({
                           key={detail.id}
                           className="border-b border-slate-100 hover:bg-slate-50"
                         >
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {new Date(detail.createdAt).toLocaleDateString(
-                              "pt-BR",
+                              'pt-BR',
                             )}
                           </td>
-                          <td className="py-3 px-4 text-sm font-semibold text-slate-800">
+                          <td className="px-4 py-3 text-sm font-semibold text-slate-800">
                             {getFormatCurrency(detail.totalPaid)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.paidCash)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.paidCard)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.paidPix)}
                           </td>
                         </tr>
@@ -377,43 +377,43 @@ export default function ReportFinancialDetails({
             <h3 className="text-xl font-semibold text-slate-700">
               Inscrições Avulsas
             </h3>
-            <span className="text-sm text-slate-600 font-medium">
+            <span className="text-sm font-medium text-slate-600">
               Total: {getFormatCurrency(data.inscriptionAvuls.totalGeral)}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {renderSummaryCard(
-              "Participantes",
+              'Participantes',
               data.inscriptionAvuls.countParticipants.toString(),
-              "text-slate-800",
-              "bg-gradient-to-br from-slate-50 to-white",
-              "border-slate-100",
-              <Users className="w-5 h-5" />,
+              'text-slate-800',
+              'bg-gradient-to-br from-slate-50 to-white',
+              'border-slate-100',
+              <Users className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Dinheiro",
+              'Dinheiro',
               getFormatCurrency(data.inscriptionAvuls.totalCash),
-              "text-blue-600",
-              "bg-gradient-to-br from-blue-50 to-white",
-              "border-blue-100",
-              <Banknote className="w-5 h-5" />,
+              'text-blue-600',
+              'bg-gradient-to-br from-blue-50 to-white',
+              'border-blue-100',
+              <Banknote className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Cartão",
+              'Cartão',
               getFormatCurrency(data.inscriptionAvuls.totalCard),
-              "text-indigo-600",
-              "bg-gradient-to-br from-indigo-50 to-white",
-              "border-indigo-100",
-              <CreditCard className="w-5 h-5" />,
+              'text-indigo-600',
+              'bg-gradient-to-br from-indigo-50 to-white',
+              'border-indigo-100',
+              <CreditCard className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Pix",
+              'Pix',
               getFormatCurrency(data.inscriptionAvuls.totalPix),
-              "text-violet-600",
-              "bg-gradient-to-br from-violet-50 to-white",
-              "border-violet-100",
-              <Smartphone className="w-5 h-5" />,
+              'text-violet-600',
+              'bg-gradient-to-br from-violet-50 to-white',
+              'border-violet-100',
+              <Smartphone className="h-5 w-5" />,
             )}
           </div>
 
@@ -422,26 +422,26 @@ export default function ReportFinancialDetails({
             data.inscriptionAvuls.details &&
             data.inscriptionAvuls.details.length > 0 && (
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                   Detalhes das Inscrições Avulsas
                 </h4>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b border-slate-200">
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Data
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Total Pago
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Dinheiro
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Cartão
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Pix
                         </th>
                       </tr>
@@ -452,21 +452,21 @@ export default function ReportFinancialDetails({
                           key={detail.id}
                           className="border-b border-slate-100 hover:bg-slate-50"
                         >
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {new Date(detail.createdAt).toLocaleDateString(
-                              "pt-BR",
+                              'pt-BR',
                             )}
                           </td>
-                          <td className="py-3 px-4 text-sm font-semibold text-slate-800">
+                          <td className="px-4 py-3 text-sm font-semibold text-slate-800">
                             {getFormatCurrency(detail.totalPaid)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.paidCash)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.paidCard)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.paidPix)}
                           </td>
                         </tr>
@@ -484,43 +484,43 @@ export default function ReportFinancialDetails({
             <h3 className="text-xl font-semibold text-slate-700">
               Venda de Tickets
             </h3>
-            <span className="text-sm text-slate-600 font-medium">
+            <span className="text-sm font-medium text-slate-600">
               Total: {getFormatCurrency(data.ticketsSale.totalGeral)}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {renderSummaryCard(
-              "Tickets Vendidos",
+              'Tickets Vendidos',
               data.ticketsSale.countTickets.toString(),
-              "text-slate-800",
-              "bg-gradient-to-br from-slate-50 to-white",
-              "border-slate-100",
-              <Users className="w-5 h-5" />,
+              'text-slate-800',
+              'bg-gradient-to-br from-slate-50 to-white',
+              'border-slate-100',
+              <Users className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Dinheiro",
+              'Dinheiro',
               getFormatCurrency(data.ticketsSale.totalCash),
-              "text-blue-600",
-              "bg-gradient-to-br from-blue-50 to-white",
-              "border-blue-100",
-              <Banknote className="w-5 h-5" />,
+              'text-blue-600',
+              'bg-gradient-to-br from-blue-50 to-white',
+              'border-blue-100',
+              <Banknote className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Cartão",
+              'Cartão',
               getFormatCurrency(data.ticketsSale.totalCard),
-              "text-indigo-600",
-              "bg-gradient-to-br from-indigo-50 to-white",
-              "border-indigo-100",
-              <CreditCard className="w-5 h-5" />,
+              'text-indigo-600',
+              'bg-gradient-to-br from-indigo-50 to-white',
+              'border-indigo-100',
+              <CreditCard className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Pix",
+              'Pix',
               getFormatCurrency(data.ticketsSale.totalPix),
-              "text-violet-600",
-              "bg-gradient-to-br from-violet-50 to-white",
-              "border-violet-100",
-              <Smartphone className="w-5 h-5" />,
+              'text-violet-600',
+              'bg-gradient-to-br from-violet-50 to-white',
+              'border-violet-100',
+              <Smartphone className="h-5 w-5" />,
             )}
           </div>
 
@@ -529,23 +529,23 @@ export default function ReportFinancialDetails({
             data.ticketsSale.details &&
             data.ticketsSale.details.length > 0 && (
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                   Detalhes dos Tickets
                 </h4>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b border-slate-200">
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Total
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Dinheiro
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Cartão
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Pix
                         </th>
                       </tr>
@@ -556,16 +556,16 @@ export default function ReportFinancialDetails({
                           key={detail.id}
                           className="border-b border-slate-100 hover:bg-slate-50"
                         >
-                          <td className="py-3 px-4 text-sm font-semibold text-slate-800">
+                          <td className="px-4 py-3 text-sm font-semibold text-slate-800">
                             {getFormatCurrency(detail.total)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.totalCash)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.totalCard)}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {getFormatCurrency(detail.totalPix)}
                           </td>
                         </tr>
@@ -581,35 +581,35 @@ export default function ReportFinancialDetails({
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold text-slate-700">Gastos</h3>
-            <span className="text-sm text-slate-600 font-medium">
+            <span className="text-sm font-medium text-slate-600">
               Total: {getFormatCurrency(data.spent.totalGeral)}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {renderSummaryCard(
-              "Dinheiro",
+              'Dinheiro',
               getFormatCurrency(data.spent.totalCash),
-              "text-blue-600",
-              "bg-gradient-to-br from-blue-50 to-white",
-              "border-blue-100",
-              <Banknote className="w-5 h-5" />,
+              'text-blue-600',
+              'bg-gradient-to-br from-blue-50 to-white',
+              'border-blue-100',
+              <Banknote className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Cartão",
+              'Cartão',
               getFormatCurrency(data.spent.totalCard),
-              "text-indigo-600",
-              "bg-gradient-to-br from-indigo-50 to-white",
-              "border-indigo-100",
-              <CreditCard className="w-5 h-5" />,
+              'text-indigo-600',
+              'bg-gradient-to-br from-indigo-50 to-white',
+              'border-indigo-100',
+              <CreditCard className="h-5 w-5" />,
             )}
             {renderSummaryCard(
-              "Pix",
+              'Pix',
               getFormatCurrency(data.spent.totalPix),
-              "text-violet-600",
-              "bg-gradient-to-br from-violet-50 to-white",
-              "border-violet-100",
-              <Smartphone className="w-5 h-5" />,
+              'text-violet-600',
+              'bg-gradient-to-br from-violet-50 to-white',
+              'border-violet-100',
+              <Smartphone className="h-5 w-5" />,
             )}
           </div>
 
@@ -618,23 +618,23 @@ export default function ReportFinancialDetails({
             data.spent.spentDetails &&
             data.spent.spentDetails.length > 0 && (
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-slate-600 uppercase tracking-wider">
+                <h4 className="text-sm font-medium tracking-wider text-slate-600 uppercase">
                   Detalhes dos Gastos
                 </h4>
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b border-slate-200">
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Data
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Responsável
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Método
                         </th>
-                        <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                        <th className="px-4 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase">
                           Valor
                         </th>
                       </tr>
@@ -645,18 +645,18 @@ export default function ReportFinancialDetails({
                           key={detail.id}
                           className="border-b border-slate-100 hover:bg-slate-50"
                         >
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {new Date(detail.createdAt).toLocaleDateString(
-                              "pt-BR",
+                              'pt-BR',
                             )}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-800">
+                          <td className="px-4 py-3 text-sm text-slate-800">
                             {detail.responsible}
                           </td>
-                          <td className="py-3 px-4 text-sm text-slate-700">
+                          <td className="px-4 py-3 text-sm text-slate-700">
                             {detail.paymentMethod}
                           </td>
-                          <td className="py-3 px-4 text-sm font-semibold text-slate-800">
+                          <td className="px-4 py-3 text-sm font-semibold text-slate-800">
                             {getFormatCurrency(detail.totalSpent)}
                           </td>
                         </tr>

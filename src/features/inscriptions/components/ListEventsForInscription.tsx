@@ -13,9 +13,9 @@ import {
   PaginationPrevious,
 } from '@/shared/components/ui/pagination';
 import { useCurrentUser } from '@/shared/context/user-context';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
 import { getEventStatusInfo } from '@/shared/utils/getEventStatusInfo';
 import { getFontSizeClass } from '@/shared/utils/getFontSizeClass';
-import { getGradientClass } from '@/shared/utils/getGenerateGradient';
 import { getInitial } from '@/shared/utils/getInitials';
 import { Card, CardBody, CardFooter } from '@heroui/react';
 import { AspectRatio } from '@radix-ui/react-aspect-ratio';
@@ -123,7 +123,7 @@ export default function ListEventsForInscription({
           const isInscriptionNotAllowed =
             !event.allowedInscriptionModes.includes(InscriptionMode.NORMAL);
           const statusInfo = getEventStatusInfo(event.status);
-          const gradientClass = getGradientClass(event.name);
+          const gradientClass = generateGradientClass();
           const isImageLoading = event.imageUrl
             ? imageLoadingStates[event.id] !== false
             : false;
@@ -239,6 +239,7 @@ export default function ListEventsForInscription({
                     size="sm"
                     className="w-full rounded-lg dark:text-white"
                     onClick={() => onSelectEvent(event.id)}
+                    variant={'primary'}
                     disabled={
                       onClickEventAllowed
                         ? false

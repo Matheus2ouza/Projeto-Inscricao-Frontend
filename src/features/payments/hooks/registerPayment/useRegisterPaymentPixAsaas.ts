@@ -4,7 +4,7 @@ import { useInvalidateDetailsGuestInscriptionQuery } from '@/features/guest/hook
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { registerPaymentPixAssas } from '../../api/registerPayment/registerPaymentPix';
-import { RegisterPaymentPixAssasResponse } from '../../types/registerPayment/registerPaymentTypes';
+import { RegisterPaymentPixAssasResponse } from '../../types/registerPayment/registerPaymentTypesOld';
 
 export function useRegisterPaymentPixAssas() {
   const { invalidateAll } = useInvalidateDetailsGuestInscriptionQuery();

@@ -1,8 +1,8 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import {
   RegisterPaymentPixAssasResponse,
   RegisterPaymentPixResponse,
-} from '../../types/registerPayment/registerPaymentTypes';
+} from '../../types/registerPayment/registerPaymentTypesOld';
 
 export type RegisterPaymentPixRequest = {
   eventId: string;
@@ -22,7 +22,7 @@ export async function registerPaymentPix(
   body: RegisterPaymentPixRequest,
 ): Promise<RegisterPaymentPixResponse> {
   try {
-    const { data } = await axiosInstance.post<RegisterPaymentPixResponse>(
+    const { data } = await axiosClient.post<RegisterPaymentPixResponse>(
       `/payments/${body.eventId}/register/pix`,
       body,
     );
@@ -45,7 +45,7 @@ export async function registerPaymentPixAssas(
   inscriptionId: string,
 ): Promise<RegisterPaymentPixAssasResponse> {
   try {
-    const { data } = await axiosInstance.post(
+    const { data } = await axiosClient.post(
       `/payments/${inscriptionId}/register/pix/assas`,
     );
     return data;

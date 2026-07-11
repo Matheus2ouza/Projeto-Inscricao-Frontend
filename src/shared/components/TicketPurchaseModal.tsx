@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,8 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/shared/components/ui/dialog";
-import { cn } from "@/shared/lib/utils";
+} from '@/shared/components/ui/dialog';
 
 type TicketPurchaseItem = {
   id: string;
@@ -28,9 +28,9 @@ type TicketPurchaseModalProps = {
   confirmLabel?: string;
 };
 
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
 });
 
 export function TicketPurchaseModal({
@@ -42,7 +42,7 @@ export function TicketPurchaseModal({
   isProcessing = false,
   confirmLabel,
 }: TicketPurchaseModalProps) {
-  const confirmButtonLabel = confirmLabel ?? "Finalizar compra";
+  const confirmButtonLabel = confirmLabel ?? 'Finalizar compra';
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -54,7 +54,7 @@ export function TicketPurchaseModal({
         </DialogHeader>
 
         {items.length === 0 ? (
-          <div className="py-6 text-center text-muted-foreground">
+          <div className="text-muted-foreground py-6 text-center">
             Nenhum ticket selecionado.
           </div>
         ) : (
@@ -68,8 +68,8 @@ export function TicketPurchaseModal({
                     className="flex items-center justify-between gap-4 px-4 py-3"
                   >
                     <div>
-                      <p className="font-semibold leading-tight">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="leading-tight font-semibold">{item.name}</p>
+                      <p className="text-muted-foreground text-xs">
                         {item.quantity} x {currencyFormatter.format(item.price)}
                       </p>
                     </div>
@@ -81,7 +81,7 @@ export function TicketPurchaseModal({
               })}
             </div>
 
-            <div className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3">
+            <div className="bg-muted/50 flex items-center justify-between rounded-lg px-4 py-3">
               <p className="text-sm font-medium">Total a pagar</p>
               <p className="text-lg font-semibold">
                 {currencyFormatter.format(totalAmount)}
@@ -90,11 +90,11 @@ export function TicketPurchaseModal({
           </div>
         )}
 
-        <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+        <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className={cn(isProcessing && "pointer-events-none opacity-70")}
+            className={cn(isProcessing && 'pointer-events-none opacity-70')}
           >
             Voltar
           </Button>
@@ -103,7 +103,7 @@ export function TicketPurchaseModal({
             disabled={items.length === 0 || isProcessing}
             className="dark:text-white"
           >
-            {isProcessing ? "Processando..." : confirmButtonLabel}
+            {isProcessing ? 'Processando...' : confirmButtonLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

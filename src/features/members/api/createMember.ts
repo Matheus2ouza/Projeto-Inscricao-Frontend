@@ -1,5 +1,4 @@
-import axiosInstance from "@/shared/lib/apiClient";
-
+import { axiosClient } from '@/lib/axios';
 type CreateMemberRequest = {
   name: string;
   birthDate: string;
@@ -11,12 +10,12 @@ type CreateMemberResponse = {
 };
 
 export async function createMember(
-  input: CreateMemberRequest
+  input: CreateMemberRequest,
 ): Promise<CreateMemberResponse> {
   try {
-    const { data } = await axiosInstance.post<CreateMemberResponse>(
-      "/members/create",
-      input
+    const { data } = await axiosClient.post<CreateMemberResponse>(
+      '/members/create',
+      input,
     );
     return data;
   } catch (error) {
@@ -28,7 +27,7 @@ export async function createMember(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível criar o membro."
+        'Não foi possível criar o membro.',
     );
   }
 }

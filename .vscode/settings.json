@@ -15,5 +15,16 @@
     "source.organizeImports": "always"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "css.lint.unknownAtRules": "ignore"
+  "css.lint.unknownAtRules": "ignore",
+  "cSpell.words": [
+    "Analizar",
+    "glassmorphism",
+    "Glassmorphism",
+    "Grup",
+    "Indiv",
+    "responsibles",
+    "Responsibles",
+    "riodavida",
+    "RIODAVIDA"
+  ]
 }

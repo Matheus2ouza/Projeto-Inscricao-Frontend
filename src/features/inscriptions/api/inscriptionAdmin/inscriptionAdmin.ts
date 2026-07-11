@@ -2,11 +2,11 @@ import {
   createInscriptionAdminData,
   createInscriptionAdminResponse,
 } from '@/features/inscriptions/types/inscriptionAdmin/inscriptionAdminTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function createInscriptionAdmin(data: createInscriptionAdminData) {
   try {
-    const response = await axiosInstance.post<createInscriptionAdminResponse>(
+    const response = await axiosClient.post<createInscriptionAdminResponse>(
       `inscription/admin`,
       data,
     );

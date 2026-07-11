@@ -1,4 +1,4 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios/client';
 
 export type UpdateTypeInscriptionActiveResponse = {
   id: string;
@@ -11,7 +11,7 @@ export async function updateTypeInscriptionActive(
 ): Promise<UpdateTypeInscriptionActiveResponse> {
   try {
     const { data } =
-      await axiosInstance.patch<UpdateTypeInscriptionActiveResponse>(
+      await axiosClient.patch<UpdateTypeInscriptionActiveResponse>(
         `/type-inscription/${typeInscriptionId}/active`,
         {},
         {
@@ -28,7 +28,7 @@ export async function updateTypeInscriptionActive(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível desabilitar o tipo de inscrição",
+        'Não foi possível desabilitar o tipo de inscrição',
     );
   }
 }

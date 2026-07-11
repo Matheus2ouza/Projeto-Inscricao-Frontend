@@ -1,14 +1,13 @@
 import {
   FutureReleasesParams,
   GetFutureReleasesResponse,
-} from "@/features/cashRegister/types/cashRegisterDetails/actions/futureReleasesTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-
+} from '@/features/cashRegister/types/cashRegisterDetails/actions/futureReleasesTypes';
+import { axiosClient } from '@/lib/axios/client';
 export async function getFutureReleases({
   cashRegisterId,
 }: FutureReleasesParams): Promise<GetFutureReleasesResponse> {
   try {
-    const { data } = await axiosInstance.get<GetFutureReleasesResponse>(
+    const { data } = await axiosClient.get<GetFutureReleasesResponse>(
       `/cash-register/${cashRegisterId}/future-releases`,
     );
     return data;
@@ -21,7 +20,7 @@ export async function getFutureReleases({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

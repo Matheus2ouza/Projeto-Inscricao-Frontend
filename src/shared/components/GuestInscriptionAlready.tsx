@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/components/ui/dialog';
-import { cn } from '@/shared/lib/utils';
 import { AlertCircle, Eye } from 'lucide-react';
 
 type GuestInscriptionAlreadyProps = {

@@ -1,95 +1,86 @@
-"use client";
+'use client';
 
+import { cn } from '@/lib/utils';
 import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from "@/shared/components/ui/alert";
-import { Button } from "@/shared/components/ui/button";
-import {
+  Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/shared/components/ui/dialog";
-import { Label } from "@/shared/components/ui/label";
-import { cn } from "@/shared/lib/utils";
-import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+} from '@/shared/components/ui';
+import { Label } from '@/shared/components/ui/label';
+import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 export interface DismissibleAlertProps {
-  /**
-   * ID único do aviso. Usado para identificar no localStorage.
-   * Importante: use um ID único para cada aviso diferente.
-   */
   id: string;
-  /**
-   * Título do aviso
-   */
   title: string;
-  /**
-   * Texto/descrição do aviso
-   */
   children: React.ReactNode;
-  /**
-   * Variante do alerta
-   * - default: Azul (informativo)
-   * - destructive: Vermelho (erro/alerta)
-   * - warning: Amarelo (aviso)
-   * - success: Verde (sucesso)
-   */
-  variant?: "default" | "destructive" | "warning" | "success";
-  /**
-   * Classe CSS adicional para o container
-   */
+  variant?: 'default' | 'destructive' | 'warning' | 'success';
   className?: string;
-  /**
-   * Ícone personalizado (opcional). Se não fornecido, será usado um ícone padrão baseado na variante.
-   */
   icon?: React.ReactNode;
-  /**
-   * Callback quando o aviso é fechado
-   */
   onClose?: () => void;
-  /**
-   * Se true, o aviso pode ser fechado manualmente (padrão: true)
-   */
   dismissible?: boolean;
-  /**
-   * Se true, o aviso será renderizado como modal centralizado com overlay (padrão: false)
-   */
   asModal?: boolean;
 }
 
-/**
- * Componente de aviso que pode ser ocultado permanentemente
- * usando a opção "Não mostrar novamente". O estado é salvo no localStorage.
- *
- * @example
- * // Aviso informativo
- * <DismissibleAlert
- *   id="welcome-notice"
- *   title="Bem-vindo!"
- *   variant="default"
- * >
- *   Este é um aviso importante que pode ser ocultado permanentemente.
- * </DismissibleAlert>
- *
- * @example
- * // Aviso de erro
- * <DismissibleAlert
- *   id="error-notice"
- *   title="Atenção!"
- *   variant="destructive"
- * >
- *   Ocorreu um erro ao processar sua solicitação.
- * </DismissibleAlert>
- */
+// Mapeamento de cores sólidas da paleta Riodavida
+const variantStyles = {
+  default: {
+    bg: 'bg-[#3FB5AE] dark:bg-[#2A8A85]',
+    text: 'text-white dark:text-white',
+    desc: 'text-white/90 dark:text-white/90',
+    icon: 'text-white dark:text-white',
+    border: 'border-[#2E8F8A] dark:border-[#1F6B66]',
+    hover: 'hover:bg-[#2E8F8A] dark:hover:bg-[#1F6B66]',
+    checkbox: 'text-white',
+  },
+  destructive: {
+    bg: 'bg-red-600 dark:bg-red-700',
+    text: 'text-white dark:text-white',
+    desc: 'text-white/90 dark:text-white/90',
+    icon: 'text-white dark:text-white',
+    border: 'border-red-700 dark:border-red-800',
+    hover: 'hover:bg-red-700 dark:hover:bg-red-800',
+    checkbox: 'text-white',
+  },
+  warning: {
+    bg: 'bg-amber-500 dark:bg-amber-600',
+    text: 'text-white dark:text-white',
+    desc: 'text-white/90 dark:text-white/90',
+    icon: 'text-white dark:text-white',
+    border: 'border-amber-600 dark:border-amber-700',
+    hover: 'hover:bg-amber-600 dark:hover:bg-amber-700',
+    checkbox: 'text-white',
+  },
+  success: {
+    bg: 'bg-[#A8BE3C] dark:bg-[#8A9E2E]',
+    text: 'text-white dark:text-white',
+    desc: 'text-white/90 dark:text-white/90',
+    icon: 'text-white dark:text-white',
+    border: 'border-[#8AA02E] dark:border-[#6E821E]',
+    hover: 'hover:bg-[#8AA02E] dark:hover:bg-[#6E821E]',
+    checkbox: 'text-white',
+  },
+};
+
+// Ícones padrão
+const defaultIcons = {
+  default: <Info className="h-5 w-5" />,
+  destructive: <AlertCircle className="h-5 w-5" />,
+  warning: <AlertCircle className="h-5 w-5" />,
+  success: <CheckCircle2 className="h-5 w-5" />,
+};
+
 export default function DismissibleAlert({
   id,
   title,
   children,
-  variant = "default",
+  variant = 'default',
   className,
   icon,
   onClose,
@@ -101,7 +92,7 @@ export default function DismissibleAlert({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       const storageKey = `dismissible-alert-${id}`;
       const dismissed = localStorage.getItem(storageKey);
       if (!dismissed) {
@@ -112,9 +103,9 @@ export default function DismissibleAlert({
   }, [id]);
 
   const handleClose = () => {
-    if (dontShowAgain && typeof window !== "undefined") {
+    if (dontShowAgain && typeof window !== 'undefined') {
       const storageKey = `dismissible-alert-${id}`;
-      localStorage.setItem(storageKey, "true");
+      localStorage.setItem(storageKey, 'true');
     }
     setIsVisible(false);
     setOpen(false);
@@ -123,91 +114,49 @@ export default function DismissibleAlert({
 
   if (!isVisible) return null;
 
-  // Ícone padrão baseado na variante
-  const defaultIcon =
-    icon ||
-    (variant === "destructive" ? (
-      <AlertCircle className="h-5 w-5" />
-    ) : variant === "warning" ? (
-      <AlertCircle className="h-5 w-5" />
-    ) : variant === "success" ? (
-      <CheckCircle2 className="h-5 w-5" />
-    ) : (
-      <Info className="h-5 w-5" />
-    ));
+  const styles = variantStyles[variant];
+  const IconComponent = icon || defaultIcons[variant];
 
-  // Classes de estilo baseadas na variante
-  const variantStyles = {
-    default:
-      "border-l-blue-500 bg-blue-50 dark:border-l-blue-400 dark:bg-blue-950",
-    destructive:
-      "border-l-red-500 bg-red-50 dark:border-l-red-400 dark:bg-red-950",
-    warning:
-      "border-l-yellow-500 bg-yellow-50 dark:border-l-yellow-400 dark:bg-yellow-900",
-    success:
-      "border-l-green-500 bg-green-50 dark:border-l-green-400 dark:bg-green-950",
-  };
-
-  const iconColor = {
-    default: "text-blue-600 dark:text-blue-400",
-    destructive: "text-red-600 dark:text-red-400",
-    warning: "text-amber-600 dark:text-amber-400",
-    success: "text-green-600 dark:text-green-400",
-  };
-
-  const textColor = {
-    default: "text-blue-900 dark:text-blue-100",
-    destructive: "text-red-900 dark:text-red-100",
-    warning: "text-amber-900 dark:text-amber-100",
-    success: "text-green-900 dark:text-green-100",
-  };
-
-  const descriptionColor = {
-    default: "text-blue-700 dark:text-blue-200",
-    destructive: "text-red-700 dark:text-red-200",
-    warning: "text-amber-700 dark:text-amber-200",
-    success: "text-green-700 dark:text-green-200",
-  };
-
-  // Conteúdo do aviso para modal
-  const modalAlertContent = (
+  // Conteúdo comum (usado inline e modal)
+  const renderContent = () => (
     <>
       <div className="flex items-start gap-3">
-        <div className={cn("flex-shrink-0 mt-0.5", iconColor[variant])}>
-          {defaultIcon}
+        <div className={cn('mt-0.5 flex-shrink-0', styles.icon)}>
+          {IconComponent}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className={cn("font-semibold mb-2 text-lg", textColor[variant])}>
+        <div className="min-w-0 flex-1">
+          <div className={cn('mb-2 text-lg font-semibold', styles.text)}>
             {title}
           </div>
-          <div
-            className={cn(
-              "mb-4 text-sm leading-relaxed",
-              descriptionColor[variant]
-            )}
-          >
+          <div className={cn('mb-4 text-sm leading-relaxed', styles.desc)}>
             {children}
           </div>
           {dismissible && (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4">
-              <Label
-                htmlFor={`dont-show-modal-${id}`}
-                className="flex items-center gap-2 text-sm cursor-pointer transition-colors hover:opacity-80"
-              >
-                <input
-                  id={`dont-show-modal-${id}`}
-                  type="checkbox"
+            <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id={`dont-show-${id}`}
                   checked={dontShowAgain}
-                  onChange={(e) => setDontShowAgain(e.target.checked)}
-                  tabIndex={-1}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-blue-400 cursor-pointer"
+                  onCheckedChange={(checked) => setDontShowAgain(!!checked)}
+                  className="border-white/30 bg-white/10 text-white data-[state=checked]:bg-white data-[state=checked]:text-[#3FB5AE] dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-[#2A8A85]"
                 />
-                <span>Não mostrar novamente</span>
-              </Label>
+                <Label
+                  htmlFor={`dont-show-${id}`}
+                  className={cn(
+                    'cursor-pointer text-sm transition-colors hover:opacity-80',
+                    styles.desc,
+                  )}
+                >
+                  Não mostrar novamente
+                </Label>
+              </div>
               <Button
                 onClick={handleClose}
-                className="flex-shrink-0 w-full sm:w-auto text-white"
-                variant={variant === "destructive" ? "destructive" : "default"}
+                className={cn(
+                  'w-full border-white/20 bg-white/20 text-white transition-colors hover:bg-white/30 sm:w-auto',
+                  styles.hover,
+                )}
+                variant="ghost"
               >
                 Entendi
               </Button>
@@ -218,86 +167,83 @@ export default function DismissibleAlert({
     </>
   );
 
-  // Renderizar como modal
+  // Modal
   if (asModal) {
     const handleDialogClose = (newOpen: boolean) => {
-      if (!newOpen) {
-        handleClose();
-      }
+      if (!newOpen) handleClose();
     };
 
     return (
       <Dialog open={open} onOpenChange={handleDialogClose}>
         <DialogContent
           className={cn(
-            "sm:max-w-md",
-            variantStyles[variant],
-            "border-l-4",
-            className
+            'border-l-4 sm:max-w-md',
+            styles.bg,
+            styles.border,
+            className,
           )}
           showCloseButton={false}
-          onOpenAutoFocus={(e) => {
-            // Prevenir autofocus em qualquer elemento
-            e.preventDefault();
-          }}
+          onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle className={cn("sr-only", textColor[variant])}>
-              {title}
-            </DialogTitle>
+            <DialogTitle className="sr-only">{title}</DialogTitle>
           </DialogHeader>
-          {modalAlertContent}
+          {renderContent()}
         </DialogContent>
       </Dialog>
     );
   }
 
-  // Renderizar inline
+  // Inline
   return (
     <Alert
-      variant={variant === "destructive" ? "destructive" : "default"}
+      variant="default"
       className={cn(
-        "relative border-l-4 shadow-sm dark:shadow-none",
-        variantStyles[variant],
-        className
+        'relative border-l-4 shadow-lg',
+        styles.bg,
+        styles.border,
+        className,
       )}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-3 sm:gap-4">
-          <div className={cn("flex-shrink-0 mt-0.5", iconColor[variant])}>
-            {defaultIcon}
+          <div className={cn('mt-0.5 flex-shrink-0', styles.icon)}>
+            {IconComponent}
           </div>
-          <div className="flex-1 min-w-0">
-            <AlertTitle
-              className={cn("font-semibold mb-1", textColor[variant])}
-            >
+          <div className="min-w-0 flex-1">
+            <AlertTitle className={cn('mb-1 font-semibold', styles.text)}>
               {title}
             </AlertTitle>
-            <AlertDescription
-              className={cn("mb-3 text-sm", descriptionColor[variant])}
-            >
+            <AlertDescription className={cn('mb-3 text-sm', styles.desc)}>
               {children}
             </AlertDescription>
             {dismissible && (
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-3">
-                <Label
-                  htmlFor={`dont-show-${id}`}
-                  className="flex items-center gap-2 text-sm cursor-pointer transition-colors hover:opacity-80"
-                >
-                  <input
+              <div className="mt-4 flex flex-col gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2">
+                  <Checkbox
                     id={`dont-show-${id}`}
-                    type="checkbox"
                     checked={dontShowAgain}
-                    onChange={(e) => setDontShowAgain(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-blue-400 cursor-pointer"
+                    onCheckedChange={(checked) => setDontShowAgain(!!checked)}
+                    className="border-white/30 bg-white/10 text-white data-[state=checked]:bg-white data-[state=checked]:text-[#3FB5AE] dark:data-[state=checked]:bg-white dark:data-[state=checked]:text-[#2A8A85]"
                   />
-                  <span>Não mostrar novamente</span>
-                </Label>
+                  <Label
+                    htmlFor={`dont-show-${id}`}
+                    className={cn(
+                      'cursor-pointer text-sm transition-colors hover:opacity-80',
+                      styles.desc,
+                    )}
+                  >
+                    Não mostrar novamente
+                  </Label>
+                </div>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={handleClose}
-                  className="w-full sm:w-auto"
+                  className={cn(
+                    'w-full border-white/20 bg-white/20 text-white transition-colors hover:bg-white/30 sm:w-auto',
+                    styles.hover,
+                  )}
                 >
                   Fechar
                 </Button>
@@ -308,7 +254,7 @@ export default function DismissibleAlert({
         {dismissible && (
           <button
             onClick={handleClose}
-            className="self-start rounded-md p-1 transition-colors opacity-70 hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="self-start rounded-md p-1 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
             aria-label="Fechar aviso"
           >
             <X className="h-4 w-4" />
@@ -319,13 +265,8 @@ export default function DismissibleAlert({
   );
 }
 
-/**
- * Função helper para resetar um aviso (útil para testes ou reset manual)
- * @param id - ID do aviso a ser resetado
- */
 export function resetDismissibleAlert(id: string) {
-  if (typeof window !== "undefined") {
-    const storageKey = `dismissible-alert-${id}`;
-    localStorage.removeItem(storageKey);
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(`dismissible-alert-${id}`);
   }
 }

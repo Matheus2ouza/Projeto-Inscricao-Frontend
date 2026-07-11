@@ -10,6 +10,7 @@ import {
   PaymentInstallment,
   StatusPayment,
 } from '@/features/guest/types/detailsInscription/detailsInscriptionType';
+import { cn } from '@/lib/utils';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import ImageUpdateDialog from '@/shared/components/ImageUpdateDialog';
 import ImageViewerDialog, {
@@ -43,7 +44,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table';
-import { cn } from '@/shared/lib/utils';
 import { formatDateTime } from '@/shared/utils/formatDate';
 import { getCalculateAge } from '@/shared/utils/getCalculateAge';
 import {

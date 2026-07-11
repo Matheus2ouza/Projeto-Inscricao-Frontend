@@ -1,6 +1,7 @@
 'use client';
 
-import type { CreatePaymentResponse } from '@/features/payments/types/registerPayment/registerPaymentTypes';
+import { useRegisterPayment } from '@/features/payments/hooks/registerPayment/useRegisterPayment';
+import { RegisterPaymentResponse } from '@/features/payments/types/registerPayment/registerPaymentTypes';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
@@ -25,11 +26,7 @@ interface RegisterPaymentPixProps {
   eventId: string;
   totalValue: number;
   allowCard?: boolean;
-  onPaymentRegistered?: (payment: CreatePaymentResponse) => void;
-  onSubmitPayment: (payload: {
-    value: number;
-    image: string;
-  }) => Promise<CreatePaymentResponse | void> | CreatePaymentResponse | void;
+  onPaymentRegistered?: (payment: RegisterPaymentResponse) => void;
   allowCustomValue?: boolean;
 }
 
@@ -39,7 +36,6 @@ export default function RegisterPaymentPix({
   totalValue,
   allowCard = false,
   onPaymentRegistered,
-  onSubmitPayment,
   allowCustomValue = true,
 }: RegisterPaymentPixProps) {
   const [paymentValue, setPaymentValue] = useState<string>('');
@@ -51,6 +47,9 @@ export default function RegisterPaymentPix({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Hook para registrar pagamento
+  const registerPayment = useRegisterPayment();
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const ALLOWED_FILE_TYPES = [
@@ -201,22 +200,36 @@ export default function RegisterPaymentPix({
         receiptPreview && receiptPreview.length > 0
           ? receiptPreview
           : await readFileAsDataURL(receiptFile);
-      const paymentResult = await onSubmitPayment({
-        value: resolvedValue,
-        image: imageData,
+
+      const paymentResult = await registerPayment.mutateAsync({
+        eventId,
+        input: {
+          accountId: '',
+          totalValue: resolvedValue,
+          image: imageData,
+          inscriptions: selectedInscriptions.map((ins) => ({ id: ins.id })),
+        },
       });
 
       setPaymentValue('');
       setReceiptFile(null);
       setReceiptPreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
 
       if (onPaymentRegistered && paymentResult) {
         onPaymentRegistered(paymentResult);
       }
+
+      toast.success('Pagamento registrado com sucesso!', {
+        description: 'Sua inscrição foi processada.',
+      });
     } catch (error) {
       console.error('Erro ao registrar pagamento:', error);
       toast.error('Erro ao registrar pagamento', {
-        description: 'Tente novamente.',
+        description:
+          error instanceof Error ? error.message : 'Tente novamente.',
       });
     } finally {
       setIsSubmitting(false);
@@ -245,14 +258,14 @@ export default function RegisterPaymentPix({
     <div className="w-full">
       <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="space-y-6">
-          <Card className="w-full border-0 shadow-lg">
+          <Card className="liquid-card w-full border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="mb-6 flex items-center gap-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <QrCode className="text-primary h-6 w-6" />
+                <div className="bg-riodavida/10 rounded-lg p-2">
+                  <QrCode className="text-riodavida h-6 w-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                     Dados para Transferência PIX
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -280,10 +293,18 @@ export default function RegisterPaymentPix({
                           {labels[key]}
                         </Label>
                         <div
-                          className={`flex items-center justify-between rounded-lg p-3 ${isPixKey ? 'bg-primary/5 border-primary/20 border' : 'bg-gray-50 dark:bg-gray-800'}`}
+                          className={`flex items-center justify-between rounded-lg p-3 ${
+                            isPixKey
+                              ? 'border-riodavida/20 bg-riodavida/5 border'
+                              : 'bg-riodavida/5 dark:bg-riodavida/10'
+                          }`}
                         >
                           <div
-                            className={`font-medium ${isPixKey ? 'text-primary' : 'text-gray-900 dark:text-white'}`}
+                            className={`font-medium ${
+                              isPixKey
+                                ? 'text-riodavida'
+                                : 'text-riodavida-gray-dark dark:text-riodavida-gray'
+                            }`}
                           >
                             {value}
                           </div>
@@ -292,7 +313,7 @@ export default function RegisterPaymentPix({
                             variant="ghost"
                             size="sm"
                             onClick={() => handleCopyToClipboard(value, key)}
-                            className="h-8 w-8 p-0"
+                            className="text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark dark:text-riodavida dark:hover:bg-riodavida/20 h-8 w-8 p-0"
                           >
                             {copiedField === key ? (
                               <CheckCheck className="h-4 w-4 text-green-500" />
@@ -306,19 +327,19 @@ export default function RegisterPaymentPix({
                   })}
                 </div>
 
-                <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 dark:border-blue-800/30 dark:bg-blue-900/20">
-                  <h3 className="mb-2 font-semibold text-blue-800 dark:text-blue-300">
+                <div className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 rounded-xl border p-4">
+                  <h3 className="text-riodavida dark:text-riodavida-light mb-2 font-semibold">
                     Instruções importantes:
                   </h3>
-                  <ul className="space-y-2 text-sm text-blue-700 dark:text-blue-400">
+                  <ul className="text-riodavida-gray-dark dark:text-riodavida-gray space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
+                      <div className="bg-riodavida mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" />
                       <span>
                         Realize o pagamento via PIX com os dados acima
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
+                      <div className="bg-riodavida mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" />
                       <span>
                         Caso o comprovante esteja em formato{' '}
                         <strong>PDF</strong> então poderá tirar um print ou foto
@@ -326,11 +347,11 @@ export default function RegisterPaymentPix({
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
+                      <div className="bg-riodavida mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" />
                       <span>Envie o comprovante no formulário</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
+                      <div className="bg-riodavida mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" />
                       {allowCustomValue ? (
                         <span>O valor pode ser pago parcial ou total</span>
                       ) : (
@@ -344,14 +365,14 @@ export default function RegisterPaymentPix({
           </Card>
 
           {allowCard && (
-            <Card className="w-full border-0 shadow-lg">
+            <Card className="liquid-card w-full border-0 shadow-lg">
               <CardContent className="p-6">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/30">
-                    <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="bg-riodavida/10 rounded-lg p-2">
+                    <CreditCard className="text-riodavida h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-riodavida-gray-dark dark:text-riodavida-gray font-semibold">
                       Pagar com Cartão
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -362,7 +383,7 @@ export default function RegisterPaymentPix({
                 <Button
                   onClick={handleGoToCardPayment}
                   variant="outline"
-                  className="h-12 w-full"
+                  className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark h-12 w-full"
                 >
                   Ir para pagamento com cartão
                 </Button>
@@ -372,14 +393,14 @@ export default function RegisterPaymentPix({
         </div>
 
         <div className="w-full">
-          <Card className="h-full w-full border-0 shadow-lg">
+          <Card className="liquid-card h-full w-full border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="mb-6 flex items-center gap-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <ImageIcon className="text-primary h-6 w-6" />
+                <div className="bg-riodavida/10 rounded-lg p-2">
+                  <ImageIcon className="text-riodavida h-6 w-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                     Enviar Comprovante
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -388,11 +409,11 @@ export default function RegisterPaymentPix({
                 </div>
               </div>
 
-              <div className="bg-primary/10 mb-6 rounded-xl p-4">
+              <div className="bg-riodavida/5 border-riodavida/20 mb-6 rounded-xl border p-4">
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Valor total
                 </div>
-                <div className="text-primary text-2xl font-bold">
+                <div className="text-riodavida dark:text-riodavida-light text-2xl font-bold">
                   {getFormatCurrency(totalValue)}
                 </div>
               </div>
@@ -418,7 +439,7 @@ export default function RegisterPaymentPix({
                           value={paymentValue}
                           onChange={(e) => setPaymentValue(e.target.value)}
                           required
-                          className="h-12 pl-10 text-lg font-semibold"
+                          className="focus:border-riodavida focus:ring-riodavida/20 h-12 pl-10 text-lg font-semibold"
                         />
                       </div>
                       <p className="text-xs text-gray-500">
@@ -427,17 +448,17 @@ export default function RegisterPaymentPix({
                       </p>
                     </>
                   ) : (
-                    <div className="bg-primary/5 border-primary/20 rounded-lg border p-4">
+                    <div className="border-riodavida/20 bg-riodavida/5 rounded-lg border p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-primary text-lg font-bold">
+                          <div className="text-riodavida dark:text-riodavida-light text-lg font-bold">
                             {getFormatCurrency(totalValue)}
                           </div>
                           <div className="mt-1 text-sm text-gray-500">
                             Valor fixo da inscrição
                           </div>
                         </div>
-                        <div className="bg-primary/10 text-primary rounded px-2 py-1 text-xs">
+                        <div className="bg-riodavida/10 text-riodavida dark:text-riodavida-light rounded px-2 py-1 text-xs">
                           Obrigatório
                         </div>
                       </div>
@@ -445,9 +466,8 @@ export default function RegisterPaymentPix({
                   )}
                 </div>
 
-                <Separator />
+                <Separator className="bg-riodavida/10" />
 
-                {/* Substitua a seção de upload do comprovante por esta versão: */}
                 <div className="space-y-3">
                   <Label className="text-sm font-medium">
                     Comprovante de Pagamento*
@@ -458,16 +478,14 @@ export default function RegisterPaymentPix({
 
                   {receiptFile ? (
                     <div className="space-y-4">
-                      {/* Preview da imagem com melhor visual */}
                       {receiptPreview && (
-                        <div className="group relative overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                        <div className="group border-riodavida/20 bg-riodavida/5 relative overflow-hidden rounded-xl border-2">
                           <div className="relative aspect-video">
                             <img
                               src={receiptPreview}
                               alt="Preview do comprovante"
                               className="h-full w-full object-contain p-4"
                             />
-                            {/* Overlay com botão de remover */}
                             <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-200 group-hover:bg-black/10">
                               <Button
                                 type="button"
@@ -481,7 +499,6 @@ export default function RegisterPaymentPix({
                             </div>
                           </div>
 
-                          {/* Informações do arquivo */}
                           <div className="absolute right-3 bottom-3 left-3">
                             <div className="rounded-lg bg-black/70 p-3 text-white backdrop-blur-sm">
                               <div className="flex items-center justify-between">
@@ -503,13 +520,12 @@ export default function RegisterPaymentPix({
                         </div>
                       )}
 
-                      {/* Botão para trocar arquivo */}
                       <div className="flex items-center justify-center">
                         <Button
                           type="button"
                           variant="outline"
                           onClick={handleRemoveFile}
-                          className="gap-2"
+                          className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark gap-2"
                         >
                           <svg
                             className="h-4 w-4"
@@ -532,8 +548,8 @@ export default function RegisterPaymentPix({
                     <div
                       className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-all ${
                         isDragOver
-                          ? 'border-primary bg-primary/5 scale-[1.02]'
-                          : 'hover:border-primary hover:bg-primary/5 border-gray-300 dark:border-gray-700'
+                          ? 'border-riodavida bg-riodavida/5 scale-[1.02]'
+                          : 'border-riodavida/30 hover:border-riodavida hover:bg-riodavida/5'
                       }`}
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
@@ -541,14 +557,17 @@ export default function RegisterPaymentPix({
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <div className="flex flex-col items-center gap-4">
-                        {/* Ícone animado para drag and drop */}
                         <div className="relative">
                           <div
-                            className={`rounded-full p-4 transition-all ${isDragOver ? 'bg-primary/20 scale-110' : 'bg-primary/10'}`}
+                            className={`rounded-full p-4 transition-all ${
+                              isDragOver
+                                ? 'bg-riodavida/20 scale-110'
+                                : 'bg-riodavida/10'
+                            }`}
                           >
                             {isDragOver ? (
                               <svg
-                                className="text-primary h-8 w-8 animate-bounce"
+                                className="text-riodavida h-8 w-8 animate-bounce"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                               >
@@ -559,7 +578,7 @@ export default function RegisterPaymentPix({
                                 />
                               </svg>
                             ) : (
-                              <ImageIcon className="text-primary h-8 w-8" />
+                              <ImageIcon className="text-riodavida h-8 w-8" />
                             )}
                           </div>
                           {isDragOver && (
@@ -568,7 +587,7 @@ export default function RegisterPaymentPix({
                         </div>
 
                         <div>
-                          <p className="mb-1 font-medium text-gray-900 dark:text-white">
+                          <p className="text-riodavida-gray-dark dark:text-riodavida-gray mb-1 font-medium">
                             {isDragOver
                               ? 'Solte o arquivo aqui'
                               : 'Clique para fazer upload'}
@@ -578,7 +597,6 @@ export default function RegisterPaymentPix({
                           </p>
                         </div>
 
-                        {/* Informações de formato */}
                         <div className="mt-2 flex items-center gap-4">
                           <div className="flex items-center gap-1">
                             <div className="h-2 w-2 rounded-full bg-blue-500" />
@@ -598,9 +616,8 @@ export default function RegisterPaymentPix({
                           </div>
                         </div>
 
-                        {/* Dica visual */}
                         {!isDragOver && (
-                          <div className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
+                          <div className="bg-riodavida/5 mt-3 flex items-center gap-2 rounded-lg p-2">
                             <svg
                               className="h-4 w-4 text-gray-400"
                               fill="none"
@@ -615,8 +632,8 @@ export default function RegisterPaymentPix({
                               />
                             </svg>
                             <span className="text-xs text-gray-500">
-                              Caso seja PDF, então você pode tirar um screenshot
-                              do comprovante e enviá-lo.
+                              Caso seja PDF, tire um screenshot do comprovante e
+                              envie.
                             </span>
                           </div>
                         )}
@@ -634,7 +651,7 @@ export default function RegisterPaymentPix({
                   )}
                 </div>
 
-                <div className="border-t pt-6">
+                <div className="border-riodavida/20 border-t pt-6">
                   <Button
                     type="submit"
                     disabled={
@@ -642,7 +659,7 @@ export default function RegisterPaymentPix({
                       !receiptFile ||
                       (allowCustomValue ? !paymentValue : false)
                     }
-                    className="h-12 w-full text-base font-semibold"
+                    className="bg-riodavida hover:bg-riodavida-dark h-12 w-full text-base font-semibold text-white"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center justify-center gap-2">

@@ -1,9 +1,9 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { ReportFinancialResponse } from "../../types/reportFinancial/reportFinancialTypes";
+import { axiosClient } from '@/lib/axios';
+import { ReportFinancialResponse } from '../../types/reportFinancial/reportFinancialTypes';
 
 export async function getReportFinancial(eventId: string, details: boolean) {
   try {
-    const { data } = await axiosInstance.get<ReportFinancialResponse>(
+    const { data } = await axiosClient.get<ReportFinancialResponse>(
       `/report/${eventId}/financial`,
       {
         params: {
@@ -17,7 +17,7 @@ export async function getReportFinancial(eventId: string, details: boolean) {
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao carregar relatório do evento",
+        'Falha ao carregar relatório do evento',
     );
   }
 }

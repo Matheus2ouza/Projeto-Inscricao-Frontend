@@ -1,11 +1,11 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { GetCashRegisterResponse } from "../../types/cashRegisterDetails/cashRegisterDetailsType";
+import { axiosClient } from '@/lib/axios/client';
+import { GetCashRegisterResponse } from '../../types/cashRegisterDetails/cashRegisterDetailsType';
 
 export async function getCashRegister(
   cashRegisetrId: string,
 ): Promise<GetCashRegisterResponse> {
   try {
-    const { data } = await axiosInstance.get<GetCashRegisterResponse>(
+    const { data } = await axiosClient.get<GetCashRegisterResponse>(
       `cash-register/${cashRegisetrId}`,
     );
     return data;
@@ -18,7 +18,7 @@ export async function getCashRegister(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

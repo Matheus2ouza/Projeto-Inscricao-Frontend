@@ -2,7 +2,7 @@ import {
   CreateExclusiveInscriptionLinkInput,
   CreateExclusiveInscriptionLinkResponse,
 } from '@/features/inscriptions/types/exclusiveInscriptionLink/createExclusiveInscriptionLink/createExclusiveInscriptionLinkTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function createExclusiveInscriptionLink({
   eventId,
@@ -11,7 +11,7 @@ export async function createExclusiveInscriptionLink({
   expiresAt,
 }: CreateExclusiveInscriptionLinkInput): Promise<CreateExclusiveInscriptionLinkResponse> {
   try {
-    const response = await axiosInstance.post(`exclusive-inscription/create`, {
+    const response = await axiosClient.post(`exclusive-inscription/create`, {
       eventId,
       typeInscriptionIds,
       name,

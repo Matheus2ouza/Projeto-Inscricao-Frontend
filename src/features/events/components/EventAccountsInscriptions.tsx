@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { getEvent } from "@/features/events/api/manager/getEvent";
-import { useEventAccountsInscriptions } from "@/features/events/hooks/useEventAccountsInscriptions";
-import { useGenerateSelectedInscriptionsPdf } from "@/features/events/hooks/useGenerateSelectedInscriptionsPdf";
-import { AccountWithInscriptions } from "@/features/events/types/eventTypes";
-import { Button } from "@/shared/components/ui/button";
+import { useEventAccountsInscriptions } from '@/features/events/hooks/useEventAccountsInscriptions';
+import { useGenerateSelectedInscriptionsPdf } from '@/features/events/hooks/useGenerateSelectedInscriptionsPdf';
+import { AccountWithInscriptions } from '@/features/events/types/eventTypes';
+import { cn } from '@/lib/utils';
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+} from '@/shared/components/ui/card';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -20,11 +20,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { cn } from "@/shared/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, ClipboardList, Users } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+} from '@/shared/components/ui/table';
+import { useQuery } from '@tanstack/react-query';
+import { AlertCircle, ClipboardList, Users } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { getEventDetailsAction } from '../actions/eventDetails/eventDetailsActions';
 
 interface EventAccountsInscriptionsProps {
   eventId: string;
@@ -40,8 +40,8 @@ export default function EventAccountsInscriptions({
     isLoading: loadingEvent,
     error: eventError,
   } = useQuery({
-    queryKey: ["event-basic", eventId],
-    queryFn: () => getEvent(eventId),
+    queryKey: ['event-basic', eventId],
+    queryFn: () => getEventDetailsAction(eventId),
     enabled: Boolean(eventId),
     staleTime: 5 * 60 * 1000,
   });
@@ -60,15 +60,15 @@ export default function EventAccountsInscriptions({
     () =>
       accounts.flatMap(
         (account) =>
-          account.inscriptions?.map((inscription) => inscription.id) ?? []
+          account.inscriptions?.map((inscription) => inscription.id) ?? [],
       ),
-    [accounts]
+    [accounts],
   );
 
   useEffect(() => {
     setSelectedInscriptionIds((prev) => {
       const filtered = prev.filter((id) =>
-        availableInscriptionIds.includes(id)
+        availableInscriptionIds.includes(id),
       );
 
       if (filtered.length === prev.length) {
@@ -88,12 +88,12 @@ export default function EventAccountsInscriptions({
   const totalAccounts = accounts.length;
   const totalInscriptions = accounts.reduce(
     (acc, account) => acc + (account.countInscriptons ?? 0),
-    0
+    0,
   );
   const totalParticipants = accounts.reduce((acc, account) => {
     const participantsInAccount = account.inscriptions?.reduce(
       (sum, inscription) => sum + (inscription.countParticipants ?? 0),
-      0
+      0,
     );
     return acc + (participantsInAccount ?? 0);
   }, 0);
@@ -102,7 +102,7 @@ export default function EventAccountsInscriptions({
     setSelectedInscriptionIds((prev) =>
       prev.includes(inscriptionId)
         ? prev.filter((id) => id !== inscriptionId)
-        : [...prev, inscriptionId]
+        : [...prev, inscriptionId],
     );
   };
 
@@ -111,7 +111,7 @@ export default function EventAccountsInscriptions({
 
     setSelectedInscriptionIds((prev) => {
       const shouldUnselect = accountInscriptionIds.every((id) =>
-        prev.includes(id)
+        prev.includes(id),
       );
 
       if (shouldUnselect) {
@@ -130,7 +130,7 @@ export default function EventAccountsInscriptions({
 
   const handleToggleAll = () => {
     setSelectedInscriptionIds((prev) =>
-      isEverythingSelected ? [] : availableInscriptionIds
+      isEverythingSelected ? [] : availableInscriptionIds,
     );
   };
 
@@ -145,12 +145,12 @@ export default function EventAccountsInscriptions({
   const formatDate = (value: string | Date) => {
     const date = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(date.getTime())) {
-      return "-";
+      return '-';
     }
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
     });
   };
 
@@ -158,13 +158,13 @@ export default function EventAccountsInscriptions({
     const inscriptions = account.inscriptions ?? [];
     const participantsTotal = inscriptions.reduce(
       (sum, inscription) => sum + (inscription.countParticipants ?? 0),
-      0
+      0,
     );
     const accountInscriptionIds = inscriptions.map(
-      (inscription) => inscription.id
+      (inscription) => inscription.id,
     );
     const accountSelectedCount = accountInscriptionIds.filter((id) =>
-      selectedInscriptionIds.includes(id)
+      selectedInscriptionIds.includes(id),
     ).length;
     const isAccountFullySelected =
       accountInscriptionIds.length > 0 &&
@@ -173,17 +173,17 @@ export default function EventAccountsInscriptions({
     return (
       <div
         key={account.id}
-        className="rounded-2xl border border-border bg-card/50 shadow-sm transition hover:shadow-md"
+        className="border-border bg-card/50 rounded-2xl border shadow-sm transition hover:shadow-md"
       >
-        <div className="flex flex-col gap-3 border-b border-border/60 p-4">
+        <div className="border-border/60 flex flex-col gap-3 border-b p-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-base font-semibold text-foreground">
+              <p className="text-foreground text-base font-semibold">
                 {account.username}
               </p>
-              <p className="text-sm text-muted-foreground">
-                {account.countInscriptons}{" "}
-                {account.countInscriptons === 1 ? "inscrição" : "inscrições"}
+              <p className="text-muted-foreground text-sm">
+                {account.countInscriptons}{' '}
+                {account.countInscriptons === 1 ? 'inscrição' : 'inscrições'}
               </p>
             </div>
             <div className="flex flex-col gap-2 sm:items-end">
@@ -192,16 +192,16 @@ export default function EventAccountsInscriptions({
                   <Button
                     type="button"
                     size="sm"
-                    variant={isAccountFullySelected ? "default" : "outline"}
+                    variant={isAccountFullySelected ? 'default' : 'outline'}
                     onClick={() =>
                       toggleAccountSelection(accountInscriptionIds)
                     }
                   >
                     {isAccountFullySelected
-                      ? "Desmarcar conta"
+                      ? 'Desmarcar conta'
                       : accountSelectedCount > 0
-                        ? "Marcar restantes"
-                        : "Selecionar conta"}
+                        ? 'Marcar restantes'
+                        : 'Selecionar conta'}
                   </Button>
                 </div>
               )}
@@ -225,18 +225,18 @@ export default function EventAccountsInscriptions({
                   <TableRow
                     key={inscription.id}
                     className={cn(
-                      "transition-colors",
+                      'transition-colors',
                       selectedInscriptionIds.includes(inscription.id)
-                        ? "bg-primary/5"
-                        : undefined
+                        ? 'bg-primary/5'
+                        : undefined,
                     )}
                   >
                     <TableCell className="text-center">
                       <input
                         type="checkbox"
-                        className="h-4 w-4 cursor-pointer accent-primary"
+                        className="accent-primary h-4 w-4 cursor-pointer"
                         checked={selectedInscriptionIds.includes(
-                          inscription.id
+                          inscription.id,
                         )}
                         onChange={() =>
                           toggleInscriptionSelection(inscription.id)
@@ -258,8 +258,8 @@ export default function EventAccountsInscriptions({
               </TableBody>
             </Table>
           ) : (
-            <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/60 bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
-              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+            <div className="border-border/60 bg-muted/40 text-muted-foreground flex items-center gap-2 rounded-lg border border-dashed px-4 py-6 text-sm">
+              <AlertCircle className="text-muted-foreground h-4 w-4" />
               Nenhuma inscrição encontrada para esta conta.
             </div>
           )}
@@ -271,16 +271,16 @@ export default function EventAccountsInscriptions({
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground sm:text-3xl uppercase">
+        <h1 className="text-foreground text-2xl font-bold uppercase sm:text-3xl">
           {loadingEvent
-            ? "Carregando evento..."
-            : (event?.name ?? "Evento não encontrado")}
+            ? 'Carregando evento...'
+            : (event?.name ?? 'Evento não encontrado')}
         </h1>
         <p className="text-muted-foreground">
           Selecione as contas e Inscrições para gerar o PDF
         </p>
         {(eventError as Error | undefined)?.message && (
-          <p className="text-sm text-destructive">
+          <p className="text-destructive text-sm">
             Não foi possível carregar os dados do evento.
           </p>
         )}
@@ -290,7 +290,7 @@ export default function EventAccountsInscriptions({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Users className="h-4 w-4 text-primary" />
+              <Users className="text-primary h-4 w-4" />
               Contas
             </CardTitle>
             <CardDescription>Total de contas com inscrições</CardDescription>
@@ -303,7 +303,7 @@ export default function EventAccountsInscriptions({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <ClipboardList className="h-4 w-4 text-primary" />
+              <ClipboardList className="text-primary h-4 w-4" />
               Inscrições
             </CardTitle>
             <CardDescription>Total de inscrições registradas</CardDescription>
@@ -316,7 +316,7 @@ export default function EventAccountsInscriptions({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Users className="h-4 w-4 text-primary" />
+              <Users className="text-primary h-4 w-4" />
               Participantes
             </CardTitle>
             <CardDescription>Total de participantes vinculados</CardDescription>
@@ -328,17 +328,18 @@ export default function EventAccountsInscriptions({
       </div>
 
       {!isLoading && !error && accounts.length > 0 && (
-        <div className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-4">
+        <div className="border-primary/30 bg-primary/5 rounded-2xl border border-dashed p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-foreground">
+              <p className="text-foreground text-sm font-semibold">
                 Selecione as inscrições para gerar o PDF
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {hasSelection
-                  ? `${totalSelected} inscrição${totalSelected === 1 ? "" : "s"
-                  } selecionada${totalSelected === 1 ? "" : "s"}`
-                  : "Nenhuma inscrição selecionada."}
+                  ? `${totalSelected} inscrição${
+                      totalSelected === 1 ? '' : 's'
+                    } selecionada${totalSelected === 1 ? '' : 's'}`
+                  : 'Nenhuma inscrição selecionada.'}
               </p>
             </div>
             <Button
@@ -347,7 +348,7 @@ export default function EventAccountsInscriptions({
               onClick={handleGeneratePdf}
               disabled={!hasSelection || isGeneratingPdf}
             >
-              {isGeneratingPdf ? "Gerando PDF..." : "Gerar PDF"}
+              {isGeneratingPdf ? 'Gerando PDF...' : 'Gerar PDF'}
             </Button>
           </div>
         </div>
@@ -384,7 +385,7 @@ export default function EventAccountsInscriptions({
           {Array.from({ length: 3 }).map((_, index) => (
             <div
               key={index}
-              className="rounded-2xl border border-border bg-card/50 p-4 shadow-sm"
+              className="border-border bg-card/50 rounded-2xl border p-4 shadow-sm"
             >
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <Skeleton className="h-5 w-48" />
@@ -399,25 +400,25 @@ export default function EventAccountsInscriptions({
           ))}
         </div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-destructive/40 bg-destructive/5 p-10 text-center">
-          <AlertCircle className="h-10 w-10 text-destructive" />
+        <div className="border-destructive/40 bg-destructive/5 flex flex-col items-center justify-center gap-4 rounded-2xl border p-10 text-center">
+          <AlertCircle className="text-destructive h-10 w-10" />
           <div>
-            <p className="text-lg font-semibold text-destructive">
+            <p className="text-destructive text-lg font-semibold">
               Não foi possível carregar as inscrições.
             </p>
-            <p className="text-sm text-muted-foreground">
-              {(error as Error).message || "Tente novamente mais tarde."}
+            <p className="text-muted-foreground text-sm">
+              {(error as Error).message || 'Tente novamente mais tarde.'}
             </p>
           </div>
         </div>
       ) : accounts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border/60 bg-muted/40 p-10 text-center">
-          <ClipboardList className="h-10 w-10 text-muted-foreground" />
+        <div className="border-border/60 bg-muted/40 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-10 text-center">
+          <ClipboardList className="text-muted-foreground h-10 w-10" />
           <div>
-            <p className="text-lg font-semibold text-foreground">
+            <p className="text-foreground text-lg font-semibold">
               Nenhuma inscrição encontrada
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               As contas deste evento ainda não possuem inscrições.
             </p>
           </div>

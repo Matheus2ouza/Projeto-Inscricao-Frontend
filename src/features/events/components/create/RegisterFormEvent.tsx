@@ -5,6 +5,7 @@ import { ResponsiblesAutocomplete } from '@/features/accounts/components/Respons
 import type { AccountRole } from '@/features/accounts/types/accounts.types';
 import { ComboboxRegion } from '@/features/regions/components/ComboboxRegion';
 import { useRegions } from '@/features/regions/hooks/useRegions';
+import { cn } from '@/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import {
   FormControl,
@@ -15,7 +16,6 @@ import {
 } from '@/shared/components/ui/form';
 import { Input } from '@/shared/components/ui/input';
 import { useCurrentUser } from '@/shared/context/user-context';
-import { cn } from '@/shared/lib/utils';
 import type { SelectProps } from 'antd';
 import { DatePicker, Select, Space } from 'antd';
 import dayjs from 'dayjs';

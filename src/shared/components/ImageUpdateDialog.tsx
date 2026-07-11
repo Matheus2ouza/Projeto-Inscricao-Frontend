@@ -1,8 +1,8 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
-import { cn } from '@/shared/lib/utils';
 import { Modal } from 'antd';
 import { ImageIcon, X } from 'lucide-react';
 import Image from 'next/image';

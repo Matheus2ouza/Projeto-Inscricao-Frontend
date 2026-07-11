@@ -2,7 +2,7 @@ import {
   GeneratelistInscriptionsPdfInput,
   GeneratelistInscriptionsPdfResponse,
 } from '@/features/inscriptions/types/actions/reports/generateListInscriptionsPdfTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import qs from 'qs';
 
 export async function generatelistInscriptionsPdf({
@@ -20,7 +20,7 @@ export async function generatelistInscriptionsPdf({
     const normalizedIsGuest = isGuest === false ? false : undefined;
 
     const { data } =
-      await axiosInstance.get<GeneratelistInscriptionsPdfResponse>(
+      await axiosClient.get<GeneratelistInscriptionsPdfResponse>(
         `/inscriptions/${eventId}/all/pdf`,
         {
           params: {

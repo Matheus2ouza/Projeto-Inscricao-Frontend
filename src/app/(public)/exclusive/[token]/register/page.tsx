@@ -1,11 +1,11 @@
 'use client';
 
-import BackgroundPaths from '@/features/guest/components/guestInscription/background-paths';
-import { useImagePalette } from '@/features/guest/hook/guestInscription/useImagePalette';
 import { RegisterExclusiveInscription } from '@/features/inscriptions/components/exclusiveInscriptionLink/registerInscriptionLink/RegisterExclusiveInscription';
 import { useValidateExclusiveInscriptionLink } from '@/features/inscriptions/hooks/exclusiveInscriptionLink/validateExclusiveInscriptionLink/useValidateExclusiveInscriptionLink';
+import BackgroundPaths from '@/shared/components/BackgroundPaths';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useImagePalette } from '@/shared/hooks/useImagePalette';
 import { useParams, useRouter } from 'next/navigation';
 
 export default function RegisterExclusiveInscriptionPage() {

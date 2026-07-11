@@ -1,21 +1,21 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
-import { getAllEventsResponse } from "../types/eventTypes";
+import { axiosClient } from '@/lib/axios/';
+import qs from 'qs';
+import { getAllEventsResponse } from '../types/eventTypes';
 
 export async function getEventsToAnalysis(params: {
   page: number;
   pageSize: number;
   status?: string[];
 }): Promise<getAllEventsResponse> {
-  const { data } = await axiosInstance.get<getAllEventsResponse>(
-    "/events/analysis/payment",
+  const { data } = await axiosClient.get<getAllEventsResponse>(
+    '/events/analysis/payment',
     {
       params: {
         page: params.page,
         pageSize: params.pageSize,
         status: params.status,
       },
-      paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+      paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
     },
   );
   return data;

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import IndividualInscriptionForm from "@/features/inscriptions/components/inscriptionIndiv/IndivInscriptionForm";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { useParams, useRouter } from "next/navigation";
+import IndividualInscriptionForm from '@/features/inscriptions/components/inscriptionIndiv/IndivInscriptionForm';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function IndividualInscriptionPage() {
   const router = useRouter();

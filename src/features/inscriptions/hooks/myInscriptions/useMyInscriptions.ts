@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   UseMyInscriptionsParams,
   UseMyInscriptionsResult,
-} from "../../types/MyInscriptions/myInscriptionsTypes";
+} from '../../types/myInscriptions/myInscriptionsTypes';
 import {
   useMyInscriptionsQuery,
   usePrefetchMyInscriptionsQuery,
-} from "./useMyInscriptionsQuery";
+} from './useMyInscriptionsQuery';
 
 export function useMyInscriptions({
   eventId,

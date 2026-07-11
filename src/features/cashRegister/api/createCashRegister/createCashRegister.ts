@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import {
   CreateCashInput,
   CreateCashResponse,
@@ -12,7 +12,7 @@ export async function createCashRegister({
   allocationEvent,
 }: CreateCashInput): Promise<CreateCashResponse> {
   try {
-    const { data } = await axiosInstance.post(`cash-register`, {
+    const { data } = await axiosClient.post(`cash-register`, {
       name,
       regionId,
       status,

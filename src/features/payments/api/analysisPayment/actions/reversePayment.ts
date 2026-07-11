@@ -2,13 +2,13 @@ import {
   ReversePaymentInput,
   ReversePaymentResponse,
 } from '@/features/payments/types/analysisPayment/actions/reversePaymentTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function reversePayment({
   paymentId,
 }: ReversePaymentInput): Promise<ReversePaymentResponse> {
   try {
-    const { data } = await axiosInstance.post<ReversePaymentResponse>(
+    const { data } = await axiosClient.post<ReversePaymentResponse>(
       `payments/${paymentId}/analysis/reverse`,
     );
 

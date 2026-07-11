@@ -1,6 +1,5 @@
 'use client';
 
-import RegisterPaymentPix from '@/features/payments/components/registerPayment/RegisterPaymentPix';
 import { useRegisterPaymentPix } from '@/features/payments/hooks/registerPayment/useRegisterPaymentPix';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -55,24 +54,27 @@ export default function GuestRegisterPaymentPixPage() {
 
   const renderContent = () => {
     return (
-      <RegisterPaymentPix
-        selectedInscriptions={inscriptionsIds.map((id) => ({ id }))}
-        eventId={eventId}
-        totalValue={resolvedTotalValue}
-        allowCard={allowCard}
-        allowCustomValue={false}
-        onSubmitPayment={({ value, image }) =>
-          registerPaymentPix.mutateAsync({
-            eventId,
-            guestName,
-            guestEmail,
-            isGuest: true,
-            totalValue: value,
-            image,
-            inscriptions: inscriptionsIds.map((id) => ({ id })),
-          })
-        }
-      />
+      // <RegisterPaymentPix
+      //   selectedInscriptions={inscriptionsIds.map((id) => ({ id }))}
+      //   eventId={eventId}
+      //   totalValue={resolvedTotalValue}
+      //   allowCard={allowCard}
+      //   allowCustomValue={false}
+      //   onSubmitPayment={({ value, image }) =>
+      //     registerPaymentPix.mutateAsync({
+      //       eventId,
+      //       guestName,
+      //       guestEmail,
+      //       isGuest: true,
+      //       totalValue: value,
+      //       image,
+      //       inscriptions: inscriptionsIds.map((id) => ({ id })),
+      //     })
+      //   }
+      // />
+      <div>
+        <p>aguardando refatoração</p>
+      </div>
     );
   };
 

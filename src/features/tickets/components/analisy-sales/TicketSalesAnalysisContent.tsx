@@ -1,17 +1,18 @@
-"use client";
+'use client';
 
+import { cn } from '@/lib/utils';
 import ImageViewerDialog, {
   ImageViewerDownloadExtension,
-} from "@/shared/components/ImageViewerDialog";
-import { AspectRatio } from "@/shared/components/ui/aspect-ratio";
-import { Badge } from "@/shared/components/ui/badge";
-import { Button } from "@/shared/components/ui/button";
+} from '@/shared/components/ImageViewerDialog';
+import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
+import { Badge } from '@/shared/components/ui/badge';
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
+} from '@/shared/components/ui/card';
 import {
   Pagination,
   PaginationContent,
@@ -19,8 +20,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/shared/components/ui/pagination";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+} from '@/shared/components/ui/pagination';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -28,13 +29,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table";
-import { cn } from "@/shared/lib/utils";
-import { getFormatPaymentMethod } from "@/shared/utils/getFormatPaymentMethod";
+} from '@/shared/components/ui/table';
+import { getFormatPaymentMethod } from '@/shared/utils/getFormatPaymentMethod';
 import {
   getStatusColor,
   getStatusInscriptionText,
-} from "@/shared/utils/getStatusColor";
+} from '@/shared/utils/getStatusColor';
 import {
   DollarSign,
   Loader2,
@@ -42,15 +42,15 @@ import {
   Phone,
   RefreshCcw,
   Ticket,
-  User
-} from "lucide-react";
-import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import { useTicketSalesActions } from "../../hooks/analisy-sales/useTicketSalesActions";
+  User,
+} from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
+import { useTicketSalesActions } from '../../hooks/analisy-sales/useTicketSalesActions';
 import type {
   TicketSaleAnalysis,
   TicketSalesAnalysisEvent,
-} from "../../types/analisy-sales/ticketSalesAnalysisTypes";
+} from '../../types/analisy-sales/ticketSalesAnalysisTypes';
 
 type TicketSalesAnalysisContentProps = {
   event: TicketSalesAnalysisEvent | null;
@@ -81,7 +81,7 @@ export default function TicketSalesAnalysisContent({
     downloadFileExtension?: ImageViewerDownloadExtension;
   } | null>(null);
   const [eventImageLoading, setEventImageLoading] = useState(
-    Boolean(event?.imageUrl)
+    Boolean(event?.imageUrl),
   );
 
   const {
@@ -101,23 +101,23 @@ export default function TicketSalesAnalysisContent({
 
   const currencyFormatter = useMemo(
     () =>
-      new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
+      new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
         minimumFractionDigits: 2,
       }),
-    []
+    [],
   );
 
   const formattedTotalRevenue = useMemo(() => {
     return currencyFormatter.format(
-      ticketSales.reduce((acc, sale) => acc + sale.totalValue, 0)
+      ticketSales.reduce((acc, sale) => acc + sale.totalValue, 0),
     );
   }, [currencyFormatter, ticketSales]);
 
   if (!event) {
     return (
-      <div className="text-center text-muted-foreground py-12 border rounded-2xl">
+      <div className="text-muted-foreground rounded-2xl border py-12 text-center">
         Nenhuma informação de vendas encontrada para este evento.
       </div>
     );
@@ -136,7 +136,7 @@ export default function TicketSalesAnalysisContent({
     title?: string,
     description?: string,
     downloadFileName?: string,
-    downloadFileExtension?: ImageViewerDownloadExtension
+    downloadFileExtension?: ImageViewerDownloadExtension,
   ) => {
     setImageViewerData({
       url,
@@ -157,10 +157,10 @@ export default function TicketSalesAnalysisContent({
       {Array.from({ length: 3 }).map((_, index) => (
         <Card
           key={`ticket-skeleton-${index}`}
-          className="border border-border/40 shadow-sm rounded-2xl"
+          className="border-border/40 rounded-2xl border shadow-sm"
         >
           <CardHeader className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-4 w-full">
+            <div className="flex w-full items-center gap-4">
               <Skeleton className="h-12 w-12 rounded-full" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-1/3" />
@@ -170,7 +170,7 @@ export default function TicketSalesAnalysisContent({
             <Skeleton className="h-6 w-24 rounded-full" />
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {Array.from({ length: 3 }).map((__, infoIndex) => (
                 <div key={infoIndex} className="space-y-2">
                   <Skeleton className="h-3 w-1/2" />
@@ -178,11 +178,11 @@ export default function TicketSalesAnalysisContent({
                 </div>
               ))}
             </div>
-            <div className="rounded-xl border p-4 space-y-3">
+            <div className="space-y-3 rounded-xl border p-4">
               {[...Array(2)].map((__, rowIndex) => (
                 <div
                   key={rowIndex}
-                  className="grid grid-cols-4 gap-4 items-center"
+                  className="grid grid-cols-4 items-center gap-4"
                 >
                   {Array.from({ length: 4 }).map((___, cellIndex) => (
                     <Skeleton key={cellIndex} className="h-3 w-full" />
@@ -207,26 +207,27 @@ export default function TicketSalesAnalysisContent({
   return (
     <div className="space-y-8">
       <Card className="border-0 shadow-sm">
-        <CardContent className="p-6 space-y-6">
+        <CardContent className="space-y-6 p-6">
           <div className="flex w-full justify-end">
             <Button
               type="button"
               onClick={onRefresh}
               disabled={isFetching}
-              className="w-full sm:w-auto flex items-center"
+              className="flex w-full items-center sm:w-auto"
             >
               <RefreshCcw
-                className={`mr-2 h-4 w-4 text-white ${isFetching ? "animate-spin" : ""
-                  }`}
+                className={`mr-2 h-4 w-4 text-white ${
+                  isFetching ? 'animate-spin' : ''
+                }`}
               />
-              {isFetching ? "Atualizando..." : "Atualizar Dados"}
+              {isFetching ? 'Atualizando...' : 'Atualizar Dados'}
             </Button>
           </div>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
-            <div className="w-full lg:w-1/3 relative">
+            <div className="relative w-full lg:w-1/3">
               {event.imageUrl ? (
                 <div className="relative w-full overflow-hidden rounded-2xl">
-                  <AspectRatio ratio={16 / 9} className="w-full h-full">
+                  <AspectRatio ratio={16 / 9} className="h-full w-full">
                     {eventImageLoading && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/10">
                         <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -241,8 +242,8 @@ export default function TicketSalesAnalysisContent({
                       (max-width: 1200px) 60vw,
                       33vw"
                       className={cn(
-                        "object-cover transition-opacity duration-300",
-                        eventImageLoading ? "opacity-0" : "opacity-100"
+                        'object-cover transition-opacity duration-300',
+                        eventImageLoading ? 'opacity-0' : 'opacity-100',
                       )}
                       onLoadingComplete={() => setEventImageLoading(false)}
                       onError={() => setEventImageLoading(false)}
@@ -250,30 +251,30 @@ export default function TicketSalesAnalysisContent({
                   </AspectRatio>
                 </div>
               ) : (
-                <div className="h-48 w-full rounded-2xl bg-muted flex items-center justify-center">
-                  <Ticket className="h-10 w-10 text-muted-foreground" />
+                <div className="bg-muted flex h-48 w-full items-center justify-center rounded-2xl">
+                  <Ticket className="text-muted-foreground h-10 w-10" />
                 </div>
               )}
             </div>
             <div className="flex-1 space-y-6">
               <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wider">
+                <p className="text-muted-foreground text-sm tracking-wider uppercase">
                   Evento
                 </p>
                 <h2 className="text-2xl font-semibold">{event.name}</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Card className="border border-border/40 shadow-none">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Card className="border-border/40 border shadow-none">
                   <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Vendas encontradas
                     </p>
                     <p className="text-2xl font-bold">{total}</p>
                   </CardContent>
                 </Card>
-                <Card className="border border-border/40 shadow-none">
+                <Card className="border-border/40 border shadow-none">
                   <CardContent className="p-4">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Valor nesta página
                     </p>
                     <p className="text-2xl font-bold">
@@ -289,7 +290,7 @@ export default function TicketSalesAnalysisContent({
       {shouldShowTicketSkeletons ? (
         renderTicketSkeletonCards()
       ) : ticketSales.length === 0 ? (
-        <div className="border rounded-2xl py-12 text-center text-muted-foreground">
+        <div className="text-muted-foreground rounded-2xl border py-12 text-center">
           Nenhuma venda de ticket foi registrada até o momento.
         </div>
       ) : (
@@ -297,61 +298,61 @@ export default function TicketSalesAnalysisContent({
           {ticketSales.map((sale) => {
             const payment = sale.payments;
             const paymentDisplay = getFormatPaymentMethod(
-              payment?.paymentMethod
+              payment?.paymentMethod,
             );
             const paymentValue = payment?.value ?? 0;
 
             return (
               <Card
                 key={sale.id}
-                className="border border-border/50 shadow-sm rounded-2xl"
+                className="border-border/50 rounded-2xl border shadow-sm"
               >
                 <CardHeader className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="h-6 w-6 text-primary" />
+                    <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-full">
+                      <User className="text-primary h-6 w-6" />
                     </div>
                     <div>
                       <CardTitle className="text-lg">{sale.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         Venda #{sale.id.slice(-6)}
                       </p>
                     </div>
                   </div>
                   <Badge
-                    className={`${getStatusColor(sale.status)} px-3 py-1 text-xs rounded-full border`}
+                    className={`${getStatusColor(sale.status)} rounded-full border px-3 py-1 text-xs`}
                   >
                     {getStatusInscriptionText(sale.status)}
                   </Badge>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-muted-foreground">
+                      <div className="text-muted-foreground flex items-center gap-2">
                         <Mail className="h-4 w-4" />
-                        <span className="text-xs uppercase tracking-wide">
+                        <span className="text-xs tracking-wide uppercase">
                           E-mail
                         </span>
                       </div>
                       <p className="truncate text-base font-medium uppercase">
-                        {sale.email || "Sem e-mail"}
+                        {sale.email || 'Sem e-mail'}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-muted-foreground">
+                      <div className="text-muted-foreground flex items-center gap-2">
                         <Phone className="h-4 w-4" />
-                        <span className="text-xs uppercase tracking-wide">
+                        <span className="text-xs tracking-wide uppercase">
                           Telefone
                         </span>
                       </div>
                       <p className="text-base font-medium">
-                        {sale.phone || "Sem telefone"}
+                        {sale.phone || 'Sem telefone'}
                       </p>
                     </div>
-                    <div className="text-right sm:text-left space-y-1">
-                      <div className="flex items-center gap-2 justify-end sm:justify-start text-muted-foreground">
+                    <div className="space-y-1 text-right sm:text-left">
+                      <div className="text-muted-foreground flex items-center justify-end gap-2 sm:justify-start">
                         <DollarSign className="h-4 w-4" />
-                        <p className="text-xs uppercase tracking-wide">Total</p>
+                        <p className="text-xs tracking-wide uppercase">Total</p>
                       </div>
                       <p className="text-base font-semibold">
                         {currencyFormatter.format(sale.totalValue)}
@@ -359,10 +360,10 @@ export default function TicketSalesAnalysisContent({
                     </div>
                   </div>
 
-                  <div className="rounded-xl border p-4 bg-muted/30 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-muted/30 space-y-4 rounded-xl border p-4">
+                    <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3">
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           Valor pago
                         </p>
                         <p className="text-base font-semibold">
@@ -370,42 +371,42 @@ export default function TicketSalesAnalysisContent({
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">Método</p>
+                        <p className="text-muted-foreground text-xs">Método</p>
                         <Badge
                           variant="outline"
                           className={cn(
-                            "inline-flex w-fit px-3 py-1 text-xs rounded-full border",
-                            paymentDisplay.className
+                            'inline-flex w-fit rounded-full border px-3 py-1 text-xs',
+                            paymentDisplay.className,
                           )}
                         >
                           {paymentDisplay.label}
                         </Badge>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           Data/Hora
                         </p>
                         <p className="text-base font-semibold">
                           {payment.createdAt
                             ? new Date(payment.createdAt).toLocaleString(
-                              "pt-BR"
-                            )
-                            : "-"}
+                                'pt-BR',
+                              )
+                            : '-'}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">
+                    <p className="text-muted-foreground text-sm font-medium">
                       Itens adquiridos
                     </p>
                     {sale.TicketSaleItem.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-muted-foreground text-sm">
                         Nenhum ticket associado a esta venda.
                       </div>
                     ) : (
-                      <div className="rounded-xl border overflow-hidden">
+                      <div className="overflow-hidden rounded-xl border">
                         <Table>
                           <TableHeader>
                             <TableRow>
@@ -432,7 +433,7 @@ export default function TicketSalesAnalysisContent({
                                 </TableCell>
                                 <TableCell className="text-right">
                                   {currencyFormatter.format(
-                                    item.pricePerTicket
+                                    item.pricePerTicket,
                                   )}
                                 </TableCell>
                                 <TableCell className="text-right font-semibold">
@@ -447,7 +448,7 @@ export default function TicketSalesAnalysisContent({
                   </div>
 
                   <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-                    {sale.status === "UNDER_REVIEW" && (
+                    {sale.status === 'UNDER_REVIEW' && (
                       <>
                         <Button
                           size="sm"
@@ -455,9 +456,9 @@ export default function TicketSalesAnalysisContent({
                           disabled={approvingSaleId === sale.id && isApproving}
                         >
                           {approvingSaleId === sale.id && isApproving && (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           )}
-                          {isApproving ? "Aprovando..." : "Aprovar venda"}
+                          {isApproving ? 'Aprovando...' : 'Aprovar venda'}
                         </Button>
                         <Button
                           variant="destructive"
@@ -468,9 +469,9 @@ export default function TicketSalesAnalysisContent({
                           }
                         >
                           {cancellingSaleId === sale.id && isCancelling && (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           )}
-                          {isCancelling ? "Cancelando..." : "Cancelar venda"}
+                          {isCancelling ? 'Cancelando...' : 'Cancelar venda'}
                         </Button>
                       </>
                     )}
@@ -484,7 +485,7 @@ export default function TicketSalesAnalysisContent({
                             `Comprovante de pagamento · ${sale.name}`,
                             `Pagamento via ${paymentDisplay.label} no valor de ${currencyFormatter.format(paymentValue)}`,
                             `comprovante_pagamento_${paymentValue}_${sale.id}`,
-                            ImageViewerDownloadExtension.JPG
+                            ImageViewerDownloadExtension.JPG,
                           )
                         }
                       >
@@ -505,9 +506,9 @@ export default function TicketSalesAnalysisContent({
             <PaginationItem>
               <PaginationPrevious
                 onClick={handlePreviousPage}
-                href={page > 1 ? "#" : undefined}
+                href={page > 1 ? '#' : undefined}
                 aria-disabled={page === 1}
-                className={cn(page === 1 && "pointer-events-none opacity-50")}
+                className={cn(page === 1 && 'pointer-events-none opacity-50')}
               />
             </PaginationItem>
 
@@ -529,10 +530,10 @@ export default function TicketSalesAnalysisContent({
             <PaginationItem>
               <PaginationNext
                 onClick={handleNextPage}
-                href={page < pageCount ? "#" : undefined}
+                href={page < pageCount ? '#' : undefined}
                 aria-disabled={page === pageCount}
                 className={cn(
-                  page === pageCount && "pointer-events-none opacity-50"
+                  page === pageCount && 'pointer-events-none opacity-50',
                 )}
               />
             </PaginationItem>

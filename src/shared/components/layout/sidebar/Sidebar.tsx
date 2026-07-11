@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import {
   Collapsible,
   CollapsibleContent,
@@ -22,7 +23,6 @@ import {
   SidebarProvider,
 } from '@/shared/components/ui/sidebar';
 import { useLogout } from '@/shared/hooks/logout/logout';
-import { cn } from '@/shared/lib/utils';
 import {
   CalendarCheck2,
   ChevronRight,

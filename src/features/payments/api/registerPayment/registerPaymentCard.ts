@@ -1,14 +1,14 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 import {
   CreatePaymenInscriptionResponse,
   CreatePaymentInscriptiInput,
-} from "../../types/registerPayment/registerPaymentCredTypes";
+} from '../../types/registerPayment/registerPaymentCredTypes';
 
 export async function registerPaymentCard(
   input: CreatePaymentInscriptiInput,
 ): Promise<CreatePaymenInscriptionResponse> {
   try {
-    const { data } = await axiosInstance.post<CreatePaymenInscriptionResponse>(
+    const { data } = await axiosClient.post<CreatePaymenInscriptionResponse>(
       `/payments/${input.eventId}/register/cred`,
       input,
     );
@@ -22,7 +22,7 @@ export async function registerPaymentCard(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

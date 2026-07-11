@@ -1,5 +1,5 @@
 import { AnalysisPaymentsResponse } from '@/features/payments/types/analysisPayment/analysisPayment';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function getAnalysisPayment(
   eventId: string,
@@ -7,7 +7,7 @@ export async function getAnalysisPayment(
   pageSize: number,
 ): Promise<AnalysisPaymentsResponse> {
   try {
-    const { data } = await axiosInstance.get<AnalysisPaymentsResponse>(
+    const { data } = await axiosClient.get<AnalysisPaymentsResponse>(
       `/payments/${eventId}/analysis-pending`,
       {
         params: {

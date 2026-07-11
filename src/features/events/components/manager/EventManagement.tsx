@@ -1,21 +1,11 @@
 'use client';
 
-import { useAccount } from '@/features/accounts/hooks/useAccount';
-import { deleteImageEvent } from '@/features/events/api/manager/eventActions/deleteImageEvent';
-import { deleteLogoEvent } from '@/features/events/api/manager/eventActions/deleteLogoEvent';
-import { updateEventImage } from '@/features/events/api/manager/eventActions/updateEventImage';
-import { updateEventLogo } from '@/features/events/api/manager/eventActions/updateEventLogo';
-import ResponsiblesDialog from '@/features/events/components/manager/ResponsiblesDialog';
 import { useFormEditEvent } from '@/features/events/hooks/manager/useFormEditEvent';
-import { useEventResponsible } from '@/features/events/hooks/useEventResponsible';
 import {
   Event,
   InscriptionMode,
 } from '@/features/events/types/manager/eventManagerTypes';
-import { CreateTypeInscriptionInput } from '@/features/typeInscription/api/createTypeInscription';
-import { UpdateTypeInscriptionInput } from '@/features/typeInscription/api/updateTypeInscription';
-import TypeInscriptionDialog from '@/features/typeInscription/components/TypeInscriptionDialog';
-import { TypeInscription } from '@/features/typeInscription/types/typesInscriptionsTypes';
+import { TypeInscription } from '@/features/typeInscription/types/listTypeInscriptionsToManager/listTypeInscriptionsManagerTypes';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import EventMap from '@/shared/components/EventMap';
 import ImageCropDialog from '@/shared/components/ImageCropDialog';
@@ -28,67 +18,43 @@ import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
-import calculateMaxAge from '@/shared/utils/calculateMaxAge';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import {
   AlertCircle,
   Calendar,
-  CreditCard,
   DollarSign,
-  Edit3,
   Eye,
   EyeClosed,
   MapPin,
   Plus,
-  Save,
-  Tag,
-  Trash2,
   User,
-  UserCheck,
   Users,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
-import { useInvalidateDetailsEventQuery } from '../../hooks/manager/useEventManagerQuery';
+import { useInvalidateEventDetailsManagerQuery } from '../../hooks/manager/eventDetailsManager/useEventDetailsManagerQuery';
 import InscriptionModesDialog from './InscriptionModesDialog';
+
+import { deleteImageEventAction } from '../../actions/manager/deleteImageEvent/deleteImageEventAction';
+import { deleteLogoEventAction } from '../../actions/manager/deleteLogoEvent/deleteLogoEventAction';
+import { updateEventImageAction } from '../../actions/manager/updateEventImage/updateEventImageAction';
+import { updateEventLogoAction } from '../../actions/manager/updateEventLogo/updateEventLogoAction';
+import { EventActionsHeader } from './EventActionsHeader';
+import { ResponsiblesSection } from './ResponsiblesSection';
+import { TypesInscriptionSection } from './TypesInscriptionSection';
 
 interface EventManagementProps {
   event: Event | null;
   typeInscriptions: TypeInscription[] | null;
   refreshEvent: () => void;
   refreshTypeInscriptions: () => void;
-  onCreateTypeInscription: (
-    input: CreateTypeInscriptionInput,
-  ) => Promise<TypeInscription>;
-  isCreatingTypeInscription: boolean;
-  onUpdateTypeInscription: (params: {
-    typeInscriptionId: string;
-    input: UpdateTypeInscriptionInput;
-  }) => Promise<TypeInscription>;
-  isUpdatingTypeInscription: boolean;
-  onDeleteTypeInscription: (typeInscriptionId: string) => Promise<void>;
-  isDeletingTypeInscription: boolean;
-  onDisableTypeInscription: (params: {
-    typeInscriptionId: string;
-    active: boolean;
-  }) => Promise<unknown>;
-  isDisablingTypeInscription: boolean;
 }
-
 export default function EventManagement({
   event,
   typeInscriptions,
   refreshEvent,
   refreshTypeInscriptions,
-  onCreateTypeInscription,
-  isCreatingTypeInscription,
-  onUpdateTypeInscription,
-  isUpdatingTypeInscription,
-  onDeleteTypeInscription,
-  isDeletingTypeInscription,
-  onDisableTypeInscription,
-  isDisablingTypeInscription,
 }: EventManagementProps) {
   if (!event) {
     return (
@@ -105,9 +71,6 @@ export default function EventManagement({
   }
 
   const [showAmount, setShowAmount] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentType, setCurrentType] = useState<TypeInscription | null>(null);
-  const dialogScrollPositionRef = useRef(0);
 
   const {
     isEditing,
@@ -115,31 +78,11 @@ export default function EventManagement({
     loading,
     formData,
     handleInputChange,
-    handleSave,
     handleDelete,
-    handleCancel,
-    handleUpdatePayment,
-    handleUpdateAllowCard,
-    handleUpdateInscription,
-    handleResponsiblesChange,
     handleInscriptionModesChange,
-    getNewResponsibleIds,
   } = useFormEditEvent(event);
-  const { invalidateDetail } = useInvalidateDetailsEventQuery();
+  const { invalidateDetail } = useInvalidateEventDetailsManagerQuery();
 
-  // Buscar contas para obter os nomes dos responsáveis
-  const { accounts } = useAccount(isEditing);
-
-  const typeInscriptionLoading =
-    isCreatingTypeInscription ||
-    isUpdatingTypeInscription ||
-    isDeletingTypeInscription ||
-    isDisablingTypeInscription;
-
-  const { remove: removeResponsible, loading: removingResponsible } =
-    useEventResponsible();
-
-  const [responsiblesDialogOpen, setResponsiblesDialogOpen] = useState(false);
   const [inscriptionModesDialogOpen, setInscriptionModesDialogOpen] =
     useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
@@ -150,30 +93,7 @@ export default function EventManagement({
   const [deleteLogo, setDeleteLogo] = useState(false);
   const [isDeleteImageOpen, setIsDeleteImageOpen] = useState(false);
   const [isDeleteLogoOpen, setIsDeleteLogoOpen] = useState(false);
-  const [isDeleteEventOpen, setisDeleteEventOpen] = useState(false);
-  const [deleteResponsibleDialog, setDeleteResponsibleDialog] = useState<{
-    open: boolean;
-    responsibleId: string | null;
-    responsibleName: string | null;
-  }>({
-    open: false,
-    responsibleId: null,
-    responsibleName: null,
-  });
-  const [deleteTypeDialog, setDeleteTypeDialog] = useState<{
-    open: boolean;
-    type: TypeInscription | null;
-  }>({
-    open: false,
-    type: null,
-  });
-  const [disableTypeDialog, setDisableTypeDialog] = useState<{
-    open: boolean;
-    type: TypeInscription | null;
-  }>({
-    open: false,
-    type: null,
-  });
+  const [isDeleteEventOpen, setIsDeleteEventOpen] = useState(false);
 
   // Opções para os modos de inscrição
   const inscriptionModeOptions = [
@@ -209,10 +129,10 @@ export default function EventManagement({
   const handleConfirmDeleteImage = useCallback(async () => {
     try {
       setDeleteImage(true);
-      await deleteImageEvent(event.id);
+      await deleteImageEventAction(event.id);
       toast.success('Imagem deletada com sucesso!');
       setIsDeleteImageOpen(false);
-      await refreshEvent();
+      refreshEvent();
     } catch (err) {
       const message =
         err instanceof Error
@@ -227,7 +147,7 @@ export default function EventManagement({
   const handleConfirmDeleteLogo = useCallback(async () => {
     try {
       setDeleteLogo(true);
-      await deleteLogoEvent(event.id);
+      await deleteLogoEventAction(event.id);
       toast.success('Logo deletada com sucesso!');
       setIsDeleteLogoOpen(false);
       refreshEvent();
@@ -244,129 +164,11 @@ export default function EventManagement({
 
   const statusBadge = getEventStatus();
   const totalRevenue = event.amountCollected;
-  const typesInscriptions = typeInscriptions ?? event.typesInscriptions ?? [];
-  const hasTypeInscriptions = typesInscriptions.length > 0;
-
-  // Funções para gerenciar tipos de inscrição
-  const handleCreateType = () => {
-    dialogScrollPositionRef.current =
-      typeof window !== 'undefined' ? window.scrollY : 0;
-    setCurrentType(null);
-    setDialogOpen(true);
-    requestAnimationFrame(() => {
-      if (typeof window !== 'undefined') {
-        window.scrollTo({
-          top: dialogScrollPositionRef.current,
-          behavior: 'auto',
-        });
-      }
-    });
-  };
-
-  const handleEditType = (type: TypeInscription) => {
-    dialogScrollPositionRef.current =
-      typeof window !== 'undefined' ? window.scrollY : 0;
-    setCurrentType(type);
-    setDialogOpen(true);
-    requestAnimationFrame(() => {
-      if (typeof window !== 'undefined') {
-        window.scrollTo({
-          top: dialogScrollPositionRef.current,
-          behavior: 'auto',
-        });
-      }
-    });
-  };
-
-  const handleDeleteType = (type: TypeInscription) => {
-    setDeleteTypeDialog({ open: true, type });
-  };
-
-  const handleDisableType = (type: TypeInscription) => {
-    setDisableTypeDialog({ open: true, type });
-  };
-
-  const handleSubmitType = async (data: {
-    description: string;
-    value: number;
-    specialType: boolean;
-    rule: Date | null;
-    participantLimit: number;
-    limitIsStrict: boolean;
-  }) => {
-    try {
-      const payload = {
-        ...data,
-        ruleDate: data.rule,
-      };
-      if (currentType) {
-        // Edição
-        await onUpdateTypeInscription({
-          typeInscriptionId: currentType.id,
-          input: payload,
-        });
-      } else {
-        // Criação
-        await onCreateTypeInscription({ ...data, eventId: event.id });
-      }
-      // Invalidar cache do evento para recarregar os tipos de inscrição
-      invalidateDetail(event.id);
-      refreshTypeInscriptions();
-      refreshEvent(); // Recarrega os dados do evento
-    } catch (error) {
-      // Erro já tratado no hook
-    }
-  };
-
-  const handleConfirmDeleteType = useCallback(async () => {
-    if (!deleteTypeDialog.type) return;
-
-    try {
-      await onDeleteTypeInscription(deleteTypeDialog.type.id);
-      invalidateDetail(event.id);
-      await refreshTypeInscriptions();
-      await refreshEvent();
-      setDeleteTypeDialog({ open: false, type: null });
-    } catch (error) {
-      // Erro já tratado no hook
-    }
-  }, [
-    deleteTypeDialog.type,
-    event.id,
-    invalidateDetail,
-    onDeleteTypeInscription,
-    refreshEvent,
-    refreshTypeInscriptions,
-  ]);
-
-  const handleConfirmDisableType = useCallback(async () => {
-    if (!disableTypeDialog.type) return;
-
-    try {
-      await onDisableTypeInscription({
-        typeInscriptionId: disableTypeDialog.type.id,
-        active: !disableTypeDialog.type.active,
-      });
-      invalidateDetail(event.id);
-      await refreshTypeInscriptions();
-      await refreshEvent();
-      setDisableTypeDialog({ open: false, type: null });
-    } catch (error) {
-      // Erro já tratado no hook
-    }
-  }, [
-    disableTypeDialog.type,
-    event.id,
-    invalidateDetail,
-    onDisableTypeInscription,
-    refreshEvent,
-    refreshTypeInscriptions,
-  ]);
 
   const handleConfirmDelete = useCallback(async () => {
     const success = await handleDelete();
     if (success) {
-      setisDeleteEventOpen(false);
+      setIsDeleteEventOpen(false);
     }
   }, [handleDelete]);
 
@@ -388,89 +190,11 @@ export default function EventManagement({
     <div className="bg-background min-h-screen rounded-lg">
       <div className="mx-auto max-w-7xl px-6 py-8">
         {/* Header com ações principais */}
-        <div className="mb-8 flex items-center justify-end">
-          <div className="flex items-center gap-3">
-            {!isEditing ? (
-              <>
-                <Button
-                  variant={event.status === 'OPEN' ? 'destructive' : 'default'}
-                  onClick={() =>
-                    handleUpdateInscription(
-                      event.status === 'OPEN' ? 'CLOSE' : 'OPEN',
-                    )
-                  }
-                  className="flex items-center gap-2"
-                  disabled={loading}
-                >
-                  {event.status === 'OPEN'
-                    ? 'Fechar Inscrições'
-                    : 'Abrir Inscrições'}
-                </Button>
-                <Button
-                  variant={event.paymentEnebled ? 'destructive' : 'outline'}
-                  onClick={() => handleUpdatePayment(!event.paymentEnebled)}
-                  className="flex items-center gap-2"
-                  disabled={loading}
-                >
-                  {event.paymentEnebled
-                    ? 'Fechar Pagamentos'
-                    : 'Abrir Pagamentos'}
-                </Button>
-                <Button
-                  variant={event.allowCard ? 'destructive' : 'outline'}
-                  onClick={() => handleUpdateAllowCard(!event.allowCard)}
-                  className="flex items-center gap-2"
-                  disabled={loading}
-                >
-                  <CreditCard className="h-4 w-4" />
-                  {event.allowCard ? 'Desabilitar Cartão' : 'Habilitar Cartão'}
-                </Button>
-                <Button
-                  variant="default"
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2"
-                  disabled={loading}
-                >
-                  <Edit3 className="h-4 w-4" />
-                  Editar Evento
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                  onClick={() => setisDeleteEventOpen(true)}
-                  disabled={loading}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Excluir
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={loading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={() => {
-                    // Obter apenas os IDs dos novos responsáveis adicionados
-                    const newResponsibleIds = getNewResponsibleIds();
-
-                    // Salvar apenas com os IDs dos novos responsáveis
-                    handleSave(newResponsibleIds);
-                  }}
-                  className="flex items-center gap-2 dark:text-white"
-                  disabled={loading}
-                >
-                  <Save className="h-4 w-4" />
-                  {loading ? 'Salvando...' : 'Salvar Alterações'}
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
+        <EventActionsHeader
+          event={event}
+          onEdit={() => setIsEditing(true)}
+          onDelete={() => setIsDeleteEventOpen(true)}
+        />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Coluna Principal */}
           <div className="space-y-6 lg:col-span-2">
@@ -758,249 +482,20 @@ export default function EventManagement({
             </div>
 
             {/* Card de Responsáveis */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Responsáveis
-                </h2>
-                <div className="flex items-center gap-3">
-                  {event.regionName && (
-                    <Badge
-                      variant="outline"
-                      className="flex items-center gap-1"
-                    >
-                      <MapPin className="h-3 w-3" />
-                      {event.regionName}
-                    </Badge>
-                  )}
-                  {isEditing && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setResponsiblesDialogOpen(true)}
-                      className="flex items-center gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Adicionar Responsável
-                    </Button>
-                  )}
-                </div>
-              </div>
+            <ResponsiblesSection
+              event={event}
+              responsibleIds={formData.responsibleIds}
+              refreshEvent={refreshEvent}
+            />
 
-              <div className="space-y-4">
-                {(() => {
-                  // Durante edição, mostrar todos os responsáveis selecionados (originais + novos)
-                  // No modo visualização, mostrar apenas os responsáveis do evento
-                  const displayResponsibles = isEditing
-                    ? formData.responsibleIds
-                        .map((id) => {
-                          // Tentar encontrar no evento primeiro
-                          const eventResponsible = event.responsibles?.find(
-                            (r) => r.id === id,
-                          );
-                          if (eventResponsible) {
-                            return eventResponsible;
-                          }
-                          // Se não encontrar, buscar nas accounts (novo responsável)
-                          const account = accounts.find((acc) => acc.id === id);
-                          if (account) {
-                            return {
-                              id: account.id,
-                              name: account.username,
-                            };
-                          }
-                          return null;
-                        })
-                        .filter(
-                          (r): r is { id: string; name: string } => r !== null,
-                        )
-                    : event.responsibles || [];
-
-                  return displayResponsibles.length > 0 ? (
-                    <div className="space-y-2">
-                      {displayResponsibles.map((responsible) => (
-                        <div
-                          key={responsible.id}
-                          className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-gray-50/80 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-white/5"
-                        >
-                          <div className="flex flex-1 items-center gap-2">
-                            <UserCheck className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {responsible.name}
-                            </span>
-                          </div>
-                          {isEditing && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                // Verificar se é o último responsável
-                                if (displayResponsibles.length === 1) {
-                                  toast.error(
-                                    'Impossível remover o responsável',
-                                    {
-                                      description:
-                                        'O evento deve ter pelo menos um responsável.',
-                                    },
-                                  );
-                                  return;
-                                }
-                                setDeleteResponsibleDialog({
-                                  open: true,
-                                  responsibleId: responsible.id,
-                                  responsibleName: responsible.name,
-                                });
-                              }}
-                              disabled={removingResponsible}
-                              className="h-8 px-3 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
-                            >
-                              Remover
-                            </Button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="py-8 text-center">
-                      <UserCheck className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                      <p className="text-gray-600 dark:text-gray-400">
-                        Nenhum responsável atribuído
-                      </p>
-                      {isEditing && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="mt-4 flex items-center gap-2"
-                          onClick={() => setResponsiblesDialogOpen(true)}
-                        >
-                          <Plus className="h-4 w-4" />
-                          Adicionar Responsável
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-
-            {/* Card de Tipos de Inscrição */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Tipos de Inscrição
-                </h2>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <Tag className="h-3 w-3" />
-                    {typesInscriptions.length} tipos
-                  </Badge>
-                  {isEditing && (
-                    <Button
-                      variant="outline"
-                      className="flex items-center gap-2"
-                      onClick={handleCreateType}
-                    >
-                      <Plus className="h-4 w-4" />
-                      Adicionar Novo Tipo
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {!hasTypeInscriptions ? (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Tag className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                  <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                    Nenhum tipo de inscrição configurado
-                  </h3>
-                  <p className="mb-4 text-gray-600 dark:text-gray-400">
-                    Adicione tipos de inscrição para permitir que participantes
-                    se inscrevam no evento.
-                  </p>
-                  <Button
-                    className="flex items-center gap-2"
-                    onClick={handleCreateType}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Adicionar Primeiro Tipo
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {typesInscriptions.map((type) => {
-                    const isTypeActive = type.active !== false;
-
-                    return (
-                      <div
-                        key={type.id}
-                        className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-gray-50/80 p-4 backdrop-blur-sm dark:border-white/10 dark:bg-white/5"
-                      >
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h4 className="font-medium text-gray-900 uppercase dark:text-white">
-                              {type.description}
-                            </h4>
-                            <Badge
-                              className={
-                                isTypeActive
-                                  ? 'bg-emerald-600 text-xs text-white hover:bg-emerald-600'
-                                  : 'text-xs'
-                              }
-                              variant={isTypeActive ? 'default' : 'destructive'}
-                            >
-                              {isTypeActive ? 'Ativo' : 'Desabilitado'}
-                            </Badge>
-                            {type.specialType && (
-                              <Badge
-                                variant="secondary"
-                                className="flex items-center gap-1 text-xs tracking-wide uppercase"
-                              >
-                                Especial
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {getFormatCurrency(type.value)} •{' '}
-                            {calculateMaxAge(type.rule)}
-                          </p>
-                        </div>
-                        {isEditing && (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditType(type)}
-                              disabled={typeInscriptionLoading}
-                            >
-                              Editar
-                            </Button>
-                            <Button
-                              variant={isTypeActive ? 'outline' : 'default'}
-                              size="sm"
-                              className="flex items-center gap-1"
-                              onClick={() => handleDisableType(type)}
-                              disabled={typeInscriptionLoading}
-                            >
-                              {isTypeActive ? 'Desabilitar' : 'Ativar'}
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteType(type)}
-                              disabled={typeInscriptionLoading}
-                            >
-                              Excluir
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <TypesInscriptionSection
+              eventId={event.id}
+              eventStartDate={event.startDate}
+              typeInscriptions={typeInscriptions}
+              isEditing={isEditing}
+              refreshEvent={refreshEvent}
+              refreshTypeInscriptions={refreshTypeInscriptions}
+            />
           </div>
 
           {/* Sidebar */}
@@ -1156,32 +651,6 @@ export default function EventManagement({
             </div>
           </div>
         </div>
-        {/* Diálogo para tipos de inscrição */}
-        <TypeInscriptionDialog
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-          typeInscription={currentType}
-          eventId={event.id}
-          eventStartDate={event.startDate}
-          onSubmit={handleSubmitType}
-          loading={typeInscriptionLoading}
-        />
-        {/* Diálogo para gerenciar responsáveis */}
-        {isEditing && (
-          <ResponsiblesDialog
-            open={responsiblesDialogOpen}
-            onOpenChange={setResponsiblesDialogOpen}
-            selectedResponsibleIds={formData.responsibleIds}
-            onAddResponsible={(responsibleId) => {
-              if (!formData.responsibleIds.includes(responsibleId)) {
-                handleResponsiblesChange([
-                  ...formData.responsibleIds,
-                  responsibleId,
-                ]);
-              }
-            }}
-          />
-        )}
 
         {/* Diálogo para gerenciar modos de inscrição */}
         {isEditing && (
@@ -1219,7 +688,7 @@ export default function EventManagement({
               onConfirm={async ({ base64 }) => {
                 try {
                   setUploadingImage(true);
-                  await updateEventImage({
+                  await updateEventImageAction({
                     eventId: event.id,
                     imageBase64: base64,
                   });
@@ -1247,7 +716,7 @@ export default function EventManagement({
               onConfirm={async ({ base64 }) => {
                 try {
                   setUploadingLogo(true);
-                  await updateEventLogo({
+                  await updateEventLogoAction({
                     eventId: event.id,
                     imageBase64: base64,
                   });
@@ -1291,7 +760,7 @@ export default function EventManagement({
         {/* Diálogo de confirmação para excluir evento */}
         <ConfirmationDialog
           open={isDeleteEventOpen}
-          onOpenChange={setisDeleteEventOpen}
+          onOpenChange={setIsDeleteEventOpen}
           onConfirm={handleConfirmDelete}
           title="Excluir evento?"
           message="Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita."
@@ -1299,85 +768,6 @@ export default function EventManagement({
           cancelText="Cancelar"
           isLoading={loading}
           variant="destructive"
-        />
-        <ConfirmationDialog
-          open={deleteTypeDialog.open}
-          onOpenChange={(open) => {
-            setDeleteTypeDialog({
-              open,
-              type: open ? deleteTypeDialog.type : null,
-            });
-          }}
-          onConfirm={handleConfirmDeleteType}
-          title="Excluir tipo de inscrição?"
-          message={`Tem certeza que deseja excluir o tipo "${deleteTypeDialog.type?.description ?? ''}"? Esta ação não pode ser desfeita.`}
-          confirmText="Excluir tipo"
-          cancelText="Cancelar"
-          isLoading={isDeletingTypeInscription}
-          variant="destructive"
-        />
-        <ConfirmationDialog
-          open={disableTypeDialog.open}
-          onOpenChange={(open) => {
-            setDisableTypeDialog({
-              open,
-              type: open ? disableTypeDialog.type : null,
-            });
-          }}
-          onConfirm={handleConfirmDisableType}
-          title={
-            disableTypeDialog.type?.active
-              ? 'Desabilitar tipo de inscrição?'
-              : 'Ativar tipo de inscrição?'
-          }
-          message={`Tem certeza que deseja ${
-            disableTypeDialog.type?.active ? 'desabilitar' : 'ativar'
-          } o tipo "${disableTypeDialog.type?.description ?? ''}"?`}
-          confirmText={
-            disableTypeDialog.type?.active ? 'Desabilitar' : 'Ativar'
-          }
-          cancelText="Cancelar"
-          isLoading={isDisablingTypeInscription}
-          variant="default"
-        />
-        {/* Diálogo de confirmação para excluir responsável */}
-        <ConfirmationDialog
-          open={deleteResponsibleDialog.open}
-          onOpenChange={(open) => {
-            setDeleteResponsibleDialog({
-              open,
-              responsibleId: null,
-              responsibleName: null,
-            });
-          }}
-          onConfirm={async () => {
-            if (deleteResponsibleDialog.responsibleId) {
-              const success = await removeResponsible(
-                event.id,
-                deleteResponsibleDialog.responsibleId,
-                () => {
-                  // Callback de sucesso: recarregar e atualizar lista local
-                  refreshEvent();
-                  handleResponsiblesChange(
-                    formData.responsibleIds.filter(
-                      (id) => id !== deleteResponsibleDialog.responsibleId,
-                    ),
-                  );
-                  setDeleteResponsibleDialog({
-                    open: false,
-                    responsibleId: null,
-                    responsibleName: null,
-                  });
-                },
-              );
-            }
-          }}
-          title="Excluir Responsável"
-          message={`Tem certeza que deseja remover o responsável "${deleteResponsibleDialog.responsibleName}" deste evento?`}
-          confirmText="Excluir"
-          cancelText="Cancelar"
-          variant="destructive"
-          isLoading={removingResponsible}
         />
       </div>
     </div>

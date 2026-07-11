@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import type { GetDashboardUserResponse } from "@/features/home/api/user/dashboard";
-import { useDates } from "@/features/home/hook/user/useDates";
-import type { DashboardUserMetric } from "@/features/home/hook/user/useUserDashboard";
-import DismissibleAlert from "@/shared/components/DismissibleAlert";
-import { Badge } from "@/shared/components/ui/badge";
+import type { GetDashboardUserResponse } from '@/features/home/apis/user/dashboard';
+import type { DashboardUserMetric } from '@/features/home/hooks/user/useDashboardUser';
+import { useDates } from '@/features/home/hooks/user/useDates';
+import DismissibleAlert from '@/shared/components/DismissibleAlert';
+import { Badge } from '@/shared/components/ui/badge';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { getConvertStatusEvent } from "@/shared/utils/getConvertStatus";
-import { getFormatCurrency } from "@/shared/utils/getFormatCurrency";
+} from '@/shared/components/ui/popover';
+import { getConvertStatusEvent } from '@/shared/utils/getConvertStatus';
+import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import {
   addDays,
   addMonths,
@@ -23,8 +23,8 @@ import {
   isWithinInterval,
   startOfMonth,
   startOfWeek,
-} from "date-fns";
-import { ptBR } from "date-fns/locale";
+} from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import {
   CalendarIcon,
   Clock3,
@@ -34,9 +34,9 @@ import {
   Users,
   Wallet,
   X,
-} from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState, type ElementType } from "react";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState, type ElementType } from 'react';
 
 type UserHomeDashboardProps = {
   data?: GetDashboardUserResponse;
@@ -59,18 +59,18 @@ export default function UserHomeDashboard({
   const eventDates = useDates();
 
   const statusColors: Record<string, string> = {
-    OPEN: "bg-emerald-500",
-    CLOSE: "bg-amber-500",
-    FINALIZED: "bg-slate-400",
-    "EM ANDAMENTO": "bg-blue-500",
+    OPEN: 'bg-emerald-500',
+    CLOSE: 'bg-amber-500',
+    FINALIZED: 'bg-slate-400',
+    'EM ANDAMENTO': 'bg-blue-500',
   };
 
   const infoTexts: Record<DashboardUserMetric, string> = {
-    events: "Quantidade de eventos ativos e publicados na sua região.",
+    events: 'Quantidade de eventos ativos e publicados na sua região.',
     inscriptions:
-      "Total de inscrições que você possui no evento mais próximo, incluindo participantes e pendências.",
+      'Total de inscrições que você possui no evento mais próximo, incluindo participantes e pendências.',
     payments:
-      "Resumo dos valores já pagos e pendentes das suas inscrições no evento mais próximo.",
+      'Resumo dos valores já pagos e pendentes das suas inscrições no evento mais próximo.',
   };
 
   const cards: {
@@ -89,65 +89,65 @@ export default function UserHomeDashboard({
     }[];
   }[] = [
     {
-      title: "Eventos ativos",
-      subtitle: "Eventos publicados",
+      title: 'Eventos ativos',
+      subtitle: 'Eventos publicados',
       stripe: {
-        color: "rgba(59, 130, 246, 0.5)",
-        bg: "rgba(59, 130, 246, 0.15)",
-        border: "border-blue-200",
+        color: 'rgba(59, 130, 246, 0.5)',
+        bg: 'rgba(59, 130, 246, 0.15)',
+        border: 'border-blue-200',
       },
-      textColor: "text-blue-700",
-      metric: "events",
+      textColor: 'text-blue-700',
+      metric: 'events',
       value: `${data?.events?.activeEvents ?? 0} evento(s)`,
     },
     {
-      title: "Minhas inscrições",
-      subtitle: "Resumo geral",
+      title: 'Minhas inscrições',
+      subtitle: 'Resumo geral',
       stripe: {
-        color: "rgba(16, 185, 129, 0.5)",
-        bg: "rgba(16, 185, 129, 0.15)",
-        border: "border-emerald-200",
+        color: 'rgba(16, 185, 129, 0.5)',
+        bg: 'rgba(16, 185, 129, 0.15)',
+        border: 'border-emerald-200',
       },
-      textColor: "text-emerald-700",
-      metric: "inscriptions",
+      textColor: 'text-emerald-700',
+      metric: 'inscriptions',
       value: `${data?.inscriptions?.countTotalInscriptions ?? 0} inscrição(ões)`,
       subItems: [
         {
           icon: Users,
-          iconColor: "text-emerald-600",
-          label: "Participantes",
+          iconColor: 'text-emerald-600',
+          label: 'Participantes',
           value: `${data?.inscriptions?.countTotalParticipants ?? 0}`,
         },
         {
           icon: Clock3,
-          iconColor: "text-amber-500",
-          label: "Pendentes",
+          iconColor: 'text-amber-500',
+          label: 'Pendentes',
           value: `${data?.inscriptions?.countPendingInscriptions ?? 0}`,
         },
       ],
     },
     {
-      title: "Pagamentos",
-      subtitle: "Acompanhamento",
+      title: 'Pagamentos',
+      subtitle: 'Acompanhamento',
       stripe: {
-        color: "rgba(248, 113, 113, 0.55)",
-        bg: "rgba(248, 113, 113, 0.16)",
-        border: "border-rose-200",
+        color: 'rgba(248, 113, 113, 0.55)',
+        bg: 'rgba(248, 113, 113, 0.16)',
+        border: 'border-rose-200',
       },
-      textColor: "text-rose-700",
-      metric: "payments",
+      textColor: 'text-rose-700',
+      metric: 'payments',
       value: getFormatCurrency(data?.payments?.countTotalDebt ?? 0),
       subItems: [
         {
           icon: Wallet,
-          iconColor: "text-emerald-600",
-          label: "Pago",
+          iconColor: 'text-emerald-600',
+          label: 'Pago',
           value: getFormatCurrency(data?.payments?.countTotalPaid ?? 0),
         },
         {
           icon: Percent,
-          iconColor: "text-blue-600",
-          label: "Concluído",
+          iconColor: 'text-blue-600',
+          label: 'Concluído',
           value: `${data?.payments?.debtCompletionPercentage ?? 0}%`,
         },
       ],
@@ -166,14 +166,14 @@ export default function UserHomeDashboard({
     events.forEach((evt) => {
       const start = new Date(evt.startDate);
       const end = new Date(evt.endDate);
-      const normalizedStatus = (evt.status ?? "OPEN").toUpperCase();
+      const normalizedStatus = (evt.status ?? 'OPEN').toUpperCase();
       const displayStatus = isWithinInterval(today, { start, end })
-        ? "EM ANDAMENTO"
+        ? 'EM ANDAMENTO'
         : normalizedStatus;
 
       let cursor = start;
       while (cursor <= end) {
-        const key = format(cursor, "yyyy-MM-dd");
+        const key = format(cursor, 'yyyy-MM-dd');
         const list = map.get(key) ?? [];
         list.push({
           id: evt.id,
@@ -203,31 +203,30 @@ export default function UserHomeDashboard({
   }, [currentMonth]);
 
   const eventsSelectedDay =
-    eventsByDay.get(format(selectedDate, "yyyy-MM-dd")) ?? [];
+    eventsByDay.get(format(selectedDate, 'yyyy-MM-dd')) ?? [];
 
   return (
     <>
       <DismissibleAlert
         id="system-documentation-available"
         title="Documentação Disponível"
-        variant="default"
         asModal={true}
       >
         Agora você pode consultar a documentação completa do sistema para tirar
         suas dúvidas sobre inscrições, pagamentos e eventos.
         <Link
           href="/documentation"
-          className="font-semibold underline underline-offset-2 ml-1"
+          className="ml-1 font-semibold underline underline-offset-2"
         >
           Acesse a documentação
         </Link>
       </DismissibleAlert>
 
-      <div className="mt-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+      <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <h2 className="mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
           Resumo
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {cards.map((card) => {
             const isRefreshing =
               loading || isFetching || refreshingMetric === card.metric;
@@ -235,14 +234,14 @@ export default function UserHomeDashboard({
             return (
               <div
                 key={card.metric}
-                className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-xs flex flex-col gap-3"
+                className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-xs dark:border-gray-800 dark:bg-gray-950"
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
                       {card.title}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {card.subtitle}
                     </p>
                   </div>
@@ -250,15 +249,15 @@ export default function UserHomeDashboard({
                     <button
                       type="button"
                       aria-label="Atualizar card"
-                      className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                      className="hover:bg-muted rounded-full p-1.5 transition-colors"
                       onClick={() => onRefreshMetric?.(card.metric)}
                       disabled={isRefreshing}
                     >
                       <RefreshCcw
-                        className={`w-4 h-4 ${
+                        className={`h-4 w-4 ${
                           isRefreshing
-                            ? "animate-spin text-primary"
-                            : "text-gray-500"
+                            ? 'text-primary animate-spin'
+                            : 'text-gray-500'
                         }`}
                       />
                     </button>
@@ -272,28 +271,28 @@ export default function UserHomeDashboard({
                         <button
                           type="button"
                           aria-label="Abrir detalhes do card"
-                          className="p-1.5 rounded-full hover:bg-muted transition-colors"
+                          className="hover:bg-muted rounded-full p-1.5 transition-colors"
                         >
-                          <Info className="w-4 h-4 text-blue-500" />
+                          <Info className="h-4 w-4 text-blue-500" />
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-64 rounded-2xl shadow-lg border bg-white dark:bg-gray-900">
+                      <PopoverContent className="w-64 rounded-2xl border bg-white shadow-lg dark:bg-gray-900">
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <p className="text-sm font-semibold text-foreground">
+                            <p className="text-foreground text-sm font-semibold">
                               {card.title}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-muted-foreground text-sm">
                               {infoTexts[card.metric]}
                             </p>
                           </div>
                           <button
                             type="button"
                             aria-label="Fechar"
-                            className="p-1 rounded-full hover:bg-muted transition-colors"
+                            className="hover:bg-muted rounded-full p-1 transition-colors"
                             onClick={() => setInfoOpen(null)}
                           >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </PopoverContent>
@@ -302,22 +301,22 @@ export default function UserHomeDashboard({
                 </div>
                 <div>
                   <p className={`text-2xl font-bold ${card.textColor}`}>
-                    {isRefreshing ? "..." : card.value}
+                    {isRefreshing ? '...' : card.value}
                   </p>
                   {card.detail && (
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       {card.detail}
                     </p>
                   )}
                 </div>
                 <div
-                  className={`h-3 w-full rounded-full overflow-hidden border ${card.stripe.border}`}
+                  className={`h-3 w-full overflow-hidden rounded-full border ${card.stripe.border}`}
                   style={{
                     backgroundImage: `repeating-linear-gradient(45deg, ${card.stripe.color}, ${card.stripe.color} 10px, ${card.stripe.bg} 10px, ${card.stripe.bg} 20px)`,
                   }}
                 />
                 {card.subItems && (
-                  <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="text-muted-foreground space-y-2 text-sm">
                     {card.subItems.map((item) => {
                       const Icon = item.icon;
                       return (
@@ -327,11 +326,11 @@ export default function UserHomeDashboard({
                         >
                           <div className="flex items-center gap-2">
                             <Icon
-                              className={`w-4 h-4 ${item.iconColor ?? "text-muted-foreground"}`}
+                              className={`h-4 w-4 ${item.iconColor ?? 'text-muted-foreground'}`}
                             />
                             <span>{item.label}</span>
                           </div>
-                          <span className="font-semibold text-foreground">
+                          <span className="text-foreground font-semibold">
                             {item.value}
                           </span>
                         </div>
@@ -345,17 +344,17 @@ export default function UserHomeDashboard({
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <div className="lg:col-span-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-          <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-8 dark:border-gray-800 dark:bg-gray-900">
+          <div className="mb-4 flex items-start justify-between gap-4">
             <div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Calendário de eventos
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Visualize rapidamente os eventos ativos por período.
               </p>
-              <div className="flex flex-wrap gap-3 mt-3">
+              <div className="mt-3 flex flex-wrap gap-3">
                 <Badge
                   variant="outline"
                   className="gap-2 border-emerald-300 bg-emerald-50 text-emerald-700"
@@ -374,43 +373,43 @@ export default function UserHomeDashboard({
             </div>
             <button
               type="button"
-              className="p-2 rounded-full hover:bg-muted transition-colors"
+              className="hover:bg-muted rounded-full p-2 transition-colors"
               onClick={() => eventDates.refetch()}
               aria-label="Atualizar calendário"
             >
               <RefreshCcw
-                className={`w-4 h-4 ${
+                className={`h-4 w-4 ${
                   eventDates.loading || eventDates.isFetching
-                    ? "animate-spin text-primary"
-                    : "text-gray-500"
+                    ? 'text-primary animate-spin'
+                    : 'text-gray-500'
                 }`}
               />
             </button>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-800 p-4">
-            <div className="flex items-center justify-between mb-4">
+          <div className="rounded-2xl border border-gray-200 p-4 dark:border-gray-800">
+            <div className="mb-4 flex items-center justify-between">
               <button
                 type="button"
                 aria-label="Mês anterior"
-                className="p-2 rounded-full hover:bg-muted transition-colors"
+                className="hover:bg-muted rounded-full p-2 transition-colors"
                 onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
               >
                 <span className="text-lg">&lt;</span>
               </button>
               <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                {format(currentMonth, "LLLL yyyy", { locale: ptBR })}
+                {format(currentMonth, 'LLLL yyyy', { locale: ptBR })}
               </div>
               <button
                 type="button"
                 aria-label="Próximo mês"
-                className="p-2 rounded-full hover:bg-muted transition-colors"
+                className="hover:bg-muted rounded-full p-2 transition-colors"
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
               >
                 <span className="text-lg">&gt;</span>
               </button>
             </div>
-            <div className="flex justify-end mb-3">
+            <div className="mb-3 flex justify-end">
               <button
                 type="button"
                 className="inline-flex items-center gap-2 text-sm text-blue-700 hover:underline"
@@ -420,13 +419,13 @@ export default function UserHomeDashboard({
                   setSelectedDate(today);
                 }}
               >
-                <CalendarIcon className="w-4 h-4" />
+                <CalendarIcon className="h-4 w-4" />
                 Hoje
               </button>
             </div>
 
-            <div className="grid grid-cols-7 text-center text-xs font-semibold text-blue-700 mb-2">
-              {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day) => (
+            <div className="mb-2 grid grid-cols-7 text-center text-xs font-semibold text-blue-700">
+              {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
                 <div key={day} className="py-2">
                   {day}
                 </div>
@@ -436,7 +435,7 @@ export default function UserHomeDashboard({
             <div className="grid grid-cols-7 gap-1 text-sm">
               {calendarDays.map((day) => {
                 const eventsDay =
-                  eventsByDay.get(format(day, "yyyy-MM-dd")) ?? [];
+                  eventsByDay.get(format(day, 'yyyy-MM-dd')) ?? [];
                 const isCurrentMonth = isSameMonth(day, currentMonth);
                 const isSelected = isSameDay(day, selectedDate);
                 return (
@@ -445,23 +444,23 @@ export default function UserHomeDashboard({
                     type="button"
                     className={`relative rounded-lg py-2 text-center transition-colors ${
                       isSelected
-                        ? "bg-blue-100 text-blue-700 font-semibold"
-                        : "hover:bg-muted"
-                    } ${!isCurrentMonth ? "text-muted-foreground/70" : ""}`}
+                        ? 'bg-blue-100 font-semibold text-blue-700'
+                        : 'hover:bg-muted'
+                    } ${!isCurrentMonth ? 'text-muted-foreground/70' : ''}`}
                     aria-label={format(day, "dd 'de' LLLL yyyy", {
                       locale: ptBR,
                     })}
                     onClick={() => setSelectedDate(day)}
                   >
-                    <span>{format(day, "d")}</span>
+                    <span>{format(day, 'd')}</span>
                     {eventsDay.length > 0 && (
-                      <div className="flex items-center justify-center gap-0.5 mt-1">
+                      <div className="mt-1 flex items-center justify-center gap-0.5">
                         {eventsDay.slice(0, 3).map((evt) => (
                           <span
                             key={evt.id}
                             className={`h-1.5 w-1.5 rounded-full ${
                               statusColors[evt.displayStatus] ??
-                              "bg-emerald-500"
+                              'bg-emerald-500'
                             }`}
                           />
                         ))}
@@ -473,39 +472,39 @@ export default function UserHomeDashboard({
             </div>
           </div>
 
-          <div className="mt-4 border-t border-gray-200 dark:border-gray-800 pt-4">
-            <div className="flex items-center gap-2 text-blue-700 font-semibold">
-              <CalendarIcon className="w-4 h-4" />
-              {format(selectedDate, "dd/MM/yyyy")}
+          <div className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-800">
+            <div className="flex items-center gap-2 font-semibold text-blue-700">
+              <CalendarIcon className="h-4 w-4" />
+              {format(selectedDate, 'dd/MM/yyyy')}
             </div>
             <div className="mt-2 space-y-2">
               {eventsSelectedDay.length === 0 && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Nenhum evento agendado para esta data.
                 </p>
               )}
               {eventsSelectedDay.map((evt) => (
                 <div
                   key={evt.id}
-                  className="rounded-lg border border-gray-200 dark:border-gray-800 px-3 py-2 text-sm flex items-center justify-between"
+                  className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-800"
                 >
                   <Link
                     href={`/user/events/${evt.id}`}
-                    className="font-semibold text-foreground hover:underline cursor-pointer"
+                    className="text-foreground cursor-pointer font-semibold hover:underline"
                   >
                     {evt.name}
                   </Link>
                   <Badge
                     variant="outline"
-                    className={`text-xs gap-1 border ${
+                    className={`gap-1 border text-xs ${
                       statusColors[evt.displayStatus]
-                        ? "border-transparent"
-                        : ""
+                        ? 'border-transparent'
+                        : ''
                     }`}
                   >
                     <span
                       className={`h-2 w-2 rounded-full ${
-                        statusColors[evt.displayStatus] ?? "bg-emerald-500"
+                        statusColors[evt.displayStatus] ?? 'bg-emerald-500'
                       }`}
                     />
                     {getConvertStatusEvent(evt.displayStatus)}
@@ -516,14 +515,14 @@ export default function UserHomeDashboard({
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-4 dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
             Destaque
           </h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Conteúdos e destaques em breve.
           </p>
-          <div className="mt-4 h-32 rounded-xl border border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center text-sm text-muted-foreground">
+          <div className="text-muted-foreground mt-4 flex h-32 items-center justify-center rounded-xl border border-dashed border-gray-300 text-sm dark:border-gray-700">
             Em construção
           </div>
         </div>

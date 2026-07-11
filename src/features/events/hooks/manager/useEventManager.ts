@@ -1,50 +1,64 @@
-import { useEventManagerQuery } from "@/features/events/hooks/manager/useEventManagerQuery";
-import {
-  UseEventManagerParams,
-  UseEventManagerResult,
-} from "@/features/events/types/manager/eventManagerTypes";
-import { useTypeInscriptionsQuery } from "@/features/typeInscription/hook/useTypeInscriptionsQuery";
+'use client';
 
-export function useEventManager({
-  eventId,
-}: UseEventManagerParams): UseEventManagerResult {
-  const {
-    data: event,
-    isLoading: loadingEvent,
-    isFetching: fetchingEvent,
-    isFetched: fetchedEvent,
-    error: errorEvent,
-    refetch: refetchEvent,
-  } = useEventManagerQuery(eventId);
+import { eventDetailsManagerAction } from '@/features/events/actions/manager/eventDetailsManager/eventDetailsManagerActions';
+import type { Event } from '@/features/events/types/manager/eventDetailsManager/eventDetailsManagerTypes';
+import { listTypeInscriptionsToManagerAction } from '@/features/typeInscription/actions/listTypeInscriptionsToManager/listTypeInscriptionsToManagerAction';
+import type { TypeInscription } from '@/features/typeInscription/types/listTypeInscriptionsToManager/listTypeInscriptionsManagerTypes';
+import { useQueries } from '@tanstack/react-query';
 
-  const {
-    data: typeInscriptions,
-    isLoading: loadingTypeInscriptions,
-    isFetching: fetchingTypeInscriptions,
-    isFetched: fetchedTypeInscriptions,
-    error: errorTypeInscriptions,
-    refetch: refetchTypeInscriptions,
-  } = useTypeInscriptionsQuery(eventId);
+interface UseEventManagerDataResult {
+  event: Event | null;
+  typeInscriptions: TypeInscription[];
+  loading: boolean;
+  fetching: boolean;
+  error: Error | null;
+  refresh: () => void;
+}
+
+export function useEventManagerData(
+  eventId: string,
+): UseEventManagerDataResult {
+  const results = useQueries({
+    queries: [
+      {
+        queryKey: ['event-details-manager', 'detail', eventId],
+        queryFn: () => eventDetailsManagerAction(eventId),
+        enabled: !!eventId,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+        retry: 2,
+        refetchOnWindowFocus: false,
+      },
+      {
+        queryKey: ['list-type-inscriptions-to-manager', 'list', eventId],
+        queryFn: () => listTypeInscriptionsToManagerAction(eventId),
+        enabled: !!eventId,
+        staleTime: 10 * 60 * 1000,
+        gcTime: 15 * 60 * 1000,
+        retry: 2,
+        refetchOnWindowFocus: false,
+      },
+    ],
+  });
+
+  const [eventResult, typeInscriptionsResult] = results;
+
+  const isLoading = eventResult.isLoading || typeInscriptionsResult.isLoading;
+  const isFetching =
+    eventResult.isFetching || typeInscriptionsResult.isFetching;
+  const error = eventResult.error || typeInscriptionsResult.error || null;
+
+  const refresh = () => {
+    eventResult.refetch();
+    typeInscriptionsResult.refetch();
+  };
 
   return {
-    // Event
-    event: event || null,
-    loadingEvent,
-    fetchingEvent,
-    fetchedEvent,
-    errorEvent: errorEvent || null,
-    refetchEvent: async () => {
-      await refetchEvent();
-    },
-
-    // Type Inscriptions
-    typeInscriptions: typeInscriptions || null,
-    loadingTypeInscriptions,
-    fetchingTypeInscriptions,
-    fetchedTypeInscriptions,
-    errorTypeInscriptions: errorTypeInscriptions || null,
-    refetchTypeInscriptions: async () => {
-      await refetchTypeInscriptions();
-    },
+    event: eventResult.data || null,
+    typeInscriptions: typeInscriptionsResult.data || [],
+    loading: isLoading,
+    fetching: isFetching,
+    error,
+    refresh,
   };
 }

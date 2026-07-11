@@ -1,22 +1,22 @@
-import React from "react";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/shared/components/ui/popover";
-import { Button } from "@/shared/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/shared/components/ui/button';
 import {
   Command,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
-} from "@/shared/components/ui/command";
-import { useRegions } from "../hooks/useRegions";
-import { RegionOption } from "./ComboboxRegion";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/shared/lib/utils";
+  CommandList,
+} from '@/shared/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import React from 'react';
+import { useRegions } from '../hooks/useRegions';
+import { RegionOption } from './ComboboxRegion';
 
 export type ComboboxRegionProps = {
   value: string[];
@@ -24,20 +24,20 @@ export type ComboboxRegionProps = {
   options?: RegionOption[];
   label?: string;
   buttonVariant?:
-    | "default"
-    | "secondary"
-    | "destructive"
-    | "outline"
-    | "ghost"
-    | "link";
+    | 'default'
+    | 'secondary'
+    | 'destructive'
+    | 'outline'
+    | 'ghost'
+    | 'link';
 };
 
 export function MultiSelectRegion({
   value = [],
   onChange,
   options,
-  label = "Região",
-  buttonVariant = "outline",
+  label = 'Região',
+  buttonVariant = 'outline',
 }: ComboboxRegionProps) {
   const [open, setOpen] = React.useState(false);
   const { regions: fetched, loading, error } = useRegions();
@@ -66,11 +66,11 @@ export function MultiSelectRegion({
   };
 
   const selectedRegions = regions.filter((region) =>
-    value.includes(region.value)
+    value.includes(region.value),
   );
   const displayText =
     selectedRegions.length > 0
-      ? selectedRegions.map((region) => region.label).join(", ")
+      ? selectedRegions.map((region) => region.label).join(', ')
       : label;
 
   return (
@@ -83,10 +83,10 @@ export function MultiSelectRegion({
         >
           <span
             className={cn(
-              "truncate",
+              'truncate',
               value.length > 0
-                ? "text-blue-700 dark:text-blue-300 font-semibold"
-                : "text-muted-foreground"
+                ? 'font-semibold text-blue-700 dark:text-blue-300'
+                : 'text-muted-foreground',
             )}
           >
             {displayText}
@@ -95,16 +95,16 @@ export function MultiSelectRegion({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0 w-[250px]" align="start">
+      <PopoverContent className="w-[250px] p-0" align="start">
         <Command>
           <CommandInput placeholder={`Buscar ${label.toLowerCase()}...`} />
           <CommandList>
             <CommandEmpty>
               {loading
-                ? "Carregando..."
+                ? 'Carregando...'
                 : error
-                ? "Falha ao carregar regiões."
-                : "Nenhuma região encontrada."}
+                  ? 'Falha ao carregar regiões.'
+                  : 'Nenhuma região encontrada.'}
             </CommandEmpty>
             <CommandGroup>
               {regions.map((region) => {
@@ -117,16 +117,16 @@ export function MultiSelectRegion({
                   >
                     <span
                       className={cn(
-                        "px-2 py-1 rounded text-xs font-semibold",
-                        isSelected ? "ring-2 ring-blue-400" : ""
+                        'rounded px-2 py-1 text-xs font-semibold',
+                        isSelected ? 'ring-2 ring-blue-400' : '',
                       )}
                     >
                       {region.label}
                     </span>
                     <Check
                       className={cn(
-                        "ml-auto",
-                        isSelected ? "opacity-100" : "opacity-0"
+                        'ml-auto',
+                        isSelected ? 'opacity-100' : 'opacity-0',
                       )}
                     />
                   </CommandItem>

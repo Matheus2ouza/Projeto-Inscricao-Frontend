@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
 import {
   useMembersParms,
   useMembersResult,
-} from "@/features/members/types/combobox/membersComboboxType";
-import { useMembersQuery } from "./useMembersQuery";
+} from '@/features/members/types/membersCombobox/membersComboboxTypes';
+import { useMembersQuery } from './useMembersQuery';
 
 export function useMember({
   eventId,
@@ -24,7 +24,7 @@ export function useMember({
     error: error
       ? error instanceof Error
         ? error.message
-        : "Falha ao carregar membros"
+        : 'Falha ao carregar membros'
       : null,
     refetch: async () => {
       await refetch();

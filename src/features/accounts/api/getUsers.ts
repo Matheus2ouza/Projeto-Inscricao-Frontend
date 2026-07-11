@@ -1,9 +1,9 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios/client';
 
 export type UserDto = {
   id: string;
   username: string;
-  role: "USER" | "ADMIN" | "SUPER" | "MANAGER";
+  role: 'USER' | 'ADMIN' | 'SUPER' | 'MANAGER';
   regionName: string | undefined;
   createdAt: string;
   updatedAt: string;
@@ -21,7 +21,7 @@ export async function getUsers(params: {
   pageSize: number;
 }): Promise<GetUsersResponse> {
   const { page, pageSize } = params;
-  const { data } = await axiosInstance.get<GetUsersResponse>("/users", {
+  const { data } = await axiosClient.get<GetUsersResponse>('/users', {
     params: { page, pageSize },
   });
   return data;

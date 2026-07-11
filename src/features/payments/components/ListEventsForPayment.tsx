@@ -13,8 +13,8 @@ import {
   PaginationPrevious,
 } from '@/shared/components/ui/pagination';
 import { useCurrentUser } from '@/shared/context/user-context';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
 import { getFontSizeClass } from '@/shared/utils/getFontSizeClass';
-import { getGradientClass } from '@/shared/utils/getGenerateGradient';
 import { getInitial } from '@/shared/utils/getInitials';
 import { getPaymentStatusInfo } from '@/shared/utils/getPaymentStatusInfo';
 import { Card, CardBody, CardFooter } from '@heroui/react';
@@ -151,7 +151,7 @@ export default function ListEventsForPayment({
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {events.map((event) => {
           const statusInfo = getPaymentStatusInfo(event.paymentEnabled);
-          const gradientClass = getGradientClass(event.name);
+          const gradientClass = generateGradientClass();
           const normalizedImageUrl = normalizeImageUrl(event.imageUrl);
           const hasImage =
             Boolean(normalizedImageUrl) && imageErrorStates[event.id] !== true;
@@ -260,6 +260,7 @@ export default function ListEventsForPayment({
                 <div className="flex w-full flex-col gap-2">
                   <Button
                     size="sm"
+                    variant={'primary'}
                     className="w-full rounded-lg dark:text-white"
                     onClick={() => onSelectEvent(event.id)}
                     disabled={isDisabled}

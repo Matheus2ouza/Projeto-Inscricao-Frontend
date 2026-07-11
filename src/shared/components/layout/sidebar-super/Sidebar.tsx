@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { cn } from '@/lib/utils';
 import {
   Collapsible,
   CollapsibleContent,
@@ -24,7 +25,6 @@ import {
   SidebarProvider,
 } from '@/shared/components/ui/sidebar';
 import { useIsMobile } from '@/shared/hooks/use-mobile';
-import { cn } from '@/shared/lib/utils';
 import {
   BanknoteArrowDown,
   CalendarDays,

@@ -1,12 +1,12 @@
-import { useState } from "react";
 import {
   UseListPaymentPendingParams,
   UseListPaymentPendingResult,
-} from "../../types/registerPayment/registerPaymentTypes";
+} from '@/features/payments/types/listPaymentsPeding/listPaymentsPedingTypes';
+import { useState } from 'react';
 import {
   UseListPaymentPendingQuery,
   usePrefetchListPaymentPendingQuery,
-} from "./UseListPaymentPendingQuery";
+} from './UseListPaymentPendingQuery';
 
 export function useListPaymentPending({
   eventId,

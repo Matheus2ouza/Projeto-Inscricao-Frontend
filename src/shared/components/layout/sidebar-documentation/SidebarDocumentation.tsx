@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
+import { cn } from '@/lib/utils';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/shared/components/ui/collapsible";
-import Logo from "@/shared/components/ui/logo";
+} from '@/shared/components/ui/collapsible';
+import Logo from '@/shared/components/ui/logo';
 import {
   Sidebar,
   SidebarContent,
@@ -19,12 +20,11 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarProvider,
-} from "@/shared/components/ui/sidebar";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { cn } from "@/shared/lib/utils";
-import { ChevronRight, ClipboardList, Home, Rocket } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+} from '@/shared/components/ui/sidebar';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { ChevronRight, ClipboardList, Home, Rocket } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 export default function SidebarDocumentation({
   children,
@@ -43,14 +43,14 @@ export default function SidebarDocumentation({
   };
 
   const sidebarStyle = {
-    "--sidebar-width": "18rem",
+    '--sidebar-width': '18rem',
   } as React.CSSProperties;
 
   return (
     <SidebarProvider style={sidebarStyle}>
       <div className="flex w-full">
         <Sidebar className="bg-sidebar">
-          <SidebarHeader className="flex-row items-center justify-center gap-2 border-b border-sidebar-border py-4">
+          <SidebarHeader className="border-sidebar-border flex-row items-center justify-center gap-2 border-b py-4">
             <Logo className="h-10 w-10" showTitle={false} />
           </SidebarHeader>
 
@@ -63,7 +63,7 @@ export default function SidebarDocumentation({
                     <SidebarMenuButton asChild>
                       <a
                         onClick={handleBackToHome}
-                        className="flex items-center gap-1 cursor-pointer"
+                        className="flex cursor-pointer items-center gap-1"
                       >
                         <Home className="size-4" />
                         Voltar à página inicial
@@ -85,8 +85,8 @@ export default function SidebarDocumentation({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              gettingStartedOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              gettingStartedOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -128,8 +128,8 @@ export default function SidebarDocumentation({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              inscriptionOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              inscriptionOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -187,8 +187,8 @@ export default function SidebarDocumentation({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              paymentOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              paymentOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -232,8 +232,8 @@ export default function SidebarDocumentation({
                           </span>
                           <ChevronRight
                             className={cn(
-                              "size-4 text-muted-foreground transition-transform",
-                              membershipOpen && "rotate-90",
+                              'text-muted-foreground size-4 transition-transform',
+                              membershipOpen && 'rotate-90',
                             )}
                           />
                         </SidebarMenuButton>
@@ -267,7 +267,7 @@ export default function SidebarDocumentation({
             </SidebarGroup>
           </SidebarContent>
         </Sidebar>
-        <div className="flex-1 flex flex-col min-h-screen">{children}</div>
+        <div className="flex min-h-screen flex-1 flex-col">{children}</div>
       </div>
     </SidebarProvider>
   );

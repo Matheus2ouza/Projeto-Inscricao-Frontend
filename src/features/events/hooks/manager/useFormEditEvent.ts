@@ -1,31 +1,40 @@
+'use client';
+
 import {
   Event,
   InscriptionMode,
   UpdateEventInput,
-} from "@/features/events/types/manager/eventManagerTypes";
-import { useCurrentUser } from "@/shared/context/user-context";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../../expenses/hooks/useSelectEventsQuery";
-import { deleteEvent } from "../../api/manager/eventActions/deleteEvent";
-import { updateAllowCard } from "../../api/manager/eventActions/updateAllowCard";
-import { updateEvent } from "../../api/manager/eventActions/updateEvent";
-import { useEventInscriptions } from "../useEventInscriptions";
-import { useEventPayment } from "../useEventPayment";
-import { useInvalidateDetailsEventQuery } from "./useEventManagerQuery";
+} from '@/features/events/types/manager/eventManagerTypes';
+import { useCurrentUser } from '@/shared/context/user-context';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useInvalidateEventsQuery } from '../../../expenses/hooks/useSelectEventsQuery';
+import { useInvalidateEventDetailsManagerQuery } from './eventDetailsManager/useEventDetailsManagerQuery';
+import { useEventManagerMutations } from './useEventManagerMutations';
 
 export function useFormEditEvent(event: Event) {
   const { user } = useCurrentUser();
   const { invalidateList: invalidateExpensesList } = useInvalidateEventsQuery();
   const { invalidateDetail, invalidateLists: invalidateManagerList } =
-    useInvalidateDetailsEventQuery();
+    useInvalidateEventDetailsManagerQuery();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { loading: paymentLoading, updatePayment } = useEventPayment();
-  const { loading: inscriptionsLoading, updateInscriptions } =
-    useEventInscriptions();
 
-  const roleSegment = user?.role?.toLowerCase() === "super" ? "super" : "admin";
+  // Mutations
+  const {
+    handleUpdateEvent,
+    isUpdatingEvent,
+    handleDeleteEvent,
+    isDeletingEvent,
+    handleUpdateAllowCard,
+    isUpdatingAllowCard,
+    handleUpdateEventPayment,
+    isUpdatingEventPayment,
+    handleUpdateEventInscriptions,
+    isUpdatingEventInscriptions,
+  } = useEventManagerMutations(event.id);
+
+  const roleSegment = user?.role?.toLowerCase() === 'super' ? 'super' : 'admin';
 
   // IDs dos responsáveis originais do evento
   const originalResponsibleIds = event.responsibles?.map((r) => r.id) || [];
@@ -35,21 +44,21 @@ export function useFormEditEvent(event: Event) {
 
   const [formData, setFormData] = useState({
     name: event.name,
-    description: event.description || "",
-    startDate: event.startDate.split("T")[0],
-    endDate: event.endDate.split("T")[0],
-    startTime: event.startDate.includes("T")
-      ? event.startDate.split("T")[1].substring(0, 5)
-      : "00:00",
-    endTime: event.endDate.includes("T")
-      ? event.endDate.split("T")[1].substring(0, 5)
-      : "00:00",
-    location: event.location || "",
+    description: event.description || '',
+    startDate: event.startDate.split('T')[0],
+    endDate: event.endDate.split('T')[0],
+    startTime: event.startDate.includes('T')
+      ? event.startDate.split('T')[1].substring(0, 5)
+      : '00:00',
+    endTime: event.endDate.includes('T')
+      ? event.endDate.split('T')[1].substring(0, 5)
+      : '00:00',
+    location: event.location || '',
     latitude: event.latitude || 0,
     longitude: event.longitude || 0,
     maxParticipants: event.maxParticipants || 0,
     ticketPrice: event.ticketPrice || 0,
-    status: event.status || "CLOSE",
+    status: event.status || 'CLOSE',
     active: event.active || false,
     responsibleIds: originalResponsibleIds,
     allowedInscriptionModes: originalInscriptionModes,
@@ -62,7 +71,7 @@ export function useFormEditEvent(event: Event) {
     setFormData((prev) => ({
       ...prev,
       [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+        type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -92,18 +101,16 @@ export function useFormEditEvent(event: Event) {
         allowedInscriptionModes: formData.allowedInscriptionModes,
       };
 
-      await updateEvent(event.id, updateData);
+      await handleUpdateEvent(updateData);
 
       // Invalidar cache do evento e da lista de eventos
       invalidateDetail(event.id);
       invalidateManagerList();
       invalidateExpensesList();
 
-      toast.success("Evento atualizado com sucesso!");
       setIsEditing(false);
     } catch (error) {
-      toast.error("Erro ao atualizar evento");
-      console.error("Error updating event:", error);
+      console.error('Error updating event:', error);
     } finally {
       setLoading(false);
     }
@@ -112,70 +119,81 @@ export function useFormEditEvent(event: Event) {
   const handleDelete = async (): Promise<boolean> => {
     try {
       setLoading(true);
-      await deleteEvent(event.id);
-      toast.success("Evento excluído com sucesso!");
+      await handleDeleteEvent();
+
+      toast.success('Evento excluído com sucesso!');
 
       // Redirecionar para a lista de eventos
       window.location.href = `/${roleSegment}/events/manager`;
       return true;
     } catch (error) {
-      toast.error("Erro ao excluir evento");
-      console.error("Error deleting event:", error);
+      console.error('Error deleting event:', error);
       return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateAllowCard = async (allowCard: boolean) => {
-    const success = await updateAllowCard(event.id, allowCard);
-    if (success) {
-      toast.success("Configuração de pagamento atualizada com sucesso!");
+  const handleUpdateAllowCardFn = async (allowCard: boolean) => {
+    try {
+      await handleUpdateAllowCard(allowCard);
       // Invalidar cache do evento
       invalidateDetail(event.id);
       invalidateManagerList();
       invalidateExpensesList();
+    } catch (error) {
+      console.error('Error updating allow card:', error);
     }
   };
 
   const handleUpdatePayment = async (paymentEnabled: boolean) => {
-    const success = await updatePayment(event.id, paymentEnabled);
-    if (success) {
+    try {
+      await handleUpdateEventPayment({
+        eventId: event.id,
+        paymentEnabled,
+      });
       // Invalidar cache do evento
       invalidateDetail(event.id);
       invalidateManagerList();
       invalidateExpensesList();
+    } catch (error) {
+      console.error('Error updating payment:', error);
     }
   };
 
-  const handleUpdateInscription = async (status: "OPEN" | "CLOSE") => {
-    const success = await updateInscriptions(event.id, status);
-    if (success) {
+  const handleUpdateInscription = async (status: 'OPEN' | 'CLOSE') => {
+    try {
+      await handleUpdateEventInscriptions({
+        eventId: event.id,
+        status,
+      });
       // Invalidar cache do evento
       invalidateDetail(event.id);
       invalidateManagerList();
       invalidateExpensesList();
+    } catch (error) {
+      console.error('Error updating inscriptions:', error);
     }
   };
 
   const handleCancel = () => {
     setFormData({
       name: event.name,
-      description: event.description || "",
-      startDate: event.startDate.split("T")[0],
-      endDate: event.endDate.split("T")[0],
-      startTime: event.startDate.includes("T")
-        ? event.startDate.split("T")[1].substring(0, 5)
-        : "00:00",
-      endTime: event.endDate.includes("T")
-        ? event.endDate.split("T")[1].substring(0, 5)
-        : "00:00",
-      location: event.location || "",
+      description: event.description || '',
+      startDate: event.startDate.split('T')[0],
+      endDate: event.endDate.split('T')[0],
+      startTime: event.startDate.includes('T')
+        ? event.startDate.split('T')[1].substring(0, 5)
+        : '00:00',
+      endTime: event.endDate.includes('T')
+        ? event.endDate.split('T')[1].substring(0, 5)
+        : '00:00',
+      location: event.location || '',
       latitude: event.latitude || 0,
       longitude: event.longitude || 0,
       maxParticipants: event.maxParticipants || 0,
       ticketPrice: event.ticketPrice || 0,
-      status: event.status || "CLOSE",
+      status: event.status || 'CLOSE',
       active: event.active || false,
       responsibleIds: originalResponsibleIds,
       allowedInscriptionModes: originalInscriptionModes,
@@ -214,7 +232,13 @@ export function useFormEditEvent(event: Event) {
   return {
     isEditing,
     setIsEditing,
-    loading: loading || paymentLoading || inscriptionsLoading,
+    loading:
+      loading ||
+      isUpdatingEvent ||
+      isDeletingEvent ||
+      isUpdatingAllowCard ||
+      isUpdatingEventPayment ||
+      isUpdatingEventInscriptions,
     formData,
     originalResponsibleIds,
     originalInscriptionModes,
@@ -223,7 +247,7 @@ export function useFormEditEvent(event: Event) {
     handleDelete,
     handleCancel,
     handleUpdatePayment,
-    handleUpdateAllowCard,
+    handleUpdateAllowCard: handleUpdateAllowCardFn,
     handleUpdateInscription,
     handleResponsiblesChange,
     handleInscriptionModesChange,

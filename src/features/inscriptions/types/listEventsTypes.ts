@@ -1,21 +1,21 @@
-import { EventStatusOption } from "@/shared/components/EventStatusFilter";
+import { EventStatusOption } from '@/shared/components/EventStatusFilter';
 
 export const EVENT_STATUS_OPTIONS: EventStatusOption[] = [
-  { value: "OPEN", label: "Inscrições Abertas" },
-  { value: "CLOSE", label: "Inscrições Fechadas" },
-  { value: "FINALIZED", label: "Finalizados" },
+  { value: 'OPEN', label: 'Inscrições Abertas' },
+  { value: 'CLOSE', label: 'Inscrições Fechadas' },
+  { value: 'FINALIZED', label: 'Finalizados' },
 ];
 
-export type StatusEvent = "OPEN" | "CLOSE" | "FINALIZED";
+export type StatusEvent = 'OPEN' | 'CLOSE' | 'FINALIZED';
 export const STATUS_EVENT_VALUES: StatusEvent[] = [
-  "OPEN",
-  "CLOSE",
-  "FINALIZED",
+  'OPEN',
+  'CLOSE',
+  'FINALIZED',
 ];
 
 export enum InscriptionMode {
-  NORMAL = "NORMAL",
-  GUEST = "GUEST",
+  NORMAL = 'NORMAL',
+  GUEST = 'GUEST',
 }
 
 export type Event = {

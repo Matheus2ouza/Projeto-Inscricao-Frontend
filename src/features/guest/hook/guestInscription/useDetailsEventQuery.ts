@@ -1,10 +1,10 @@
-import { Event } from "@/features/guest/types/guestInscription/guestInscriptionTypes";
-import { useQuery } from "@tanstack/react-query";
-import { getDetailsEvent } from "../../api/guestInscription/getDetailsEvent";
+import { Event } from '@/features/guest/types/guestInscription/guestInscriptionTypes';
+import { useQuery } from '@tanstack/react-query';
+import { getDetailsEvent } from '../../api/guestInscription/getDetailsEvent';
 
 export const eventDetailsKeys = {
-  all: ["event-details"] as const,
-  lists: () => [...eventDetailsKeys.all, "list"] as const,
+  all: ['event-details'] as const,
+  lists: () => [...eventDetailsKeys.all, 'list'] as const,
   list: (eventId: string) => [...eventDetailsKeys.lists(), eventId] as const,
 };
 

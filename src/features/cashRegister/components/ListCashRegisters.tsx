@@ -3,9 +3,9 @@
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import { formatDate } from '@/shared/utils/formatDate';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
 import { getListCashRegistersStatusInfo } from '@/shared/utils/getCashRegisterStatusInfo';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
-import { getGradientClass } from '@/shared/utils/getGenerateGradient';
 import { getInitial } from '@/shared/utils/getInitials';
 import { Card, CardBody, CardFooter } from '@heroui/react';
 import { AspectRatio } from '@radix-ui/react-aspect-ratio';
@@ -79,7 +79,7 @@ export function LisCashRegisters({
             const statusInfo = getListCashRegistersStatusInfo(
               cashRegister.status,
             );
-            const gradientClass = getGradientClass(cashRegister.name);
+            const gradientClass = generateGradientClass();
 
             return (
               <Card

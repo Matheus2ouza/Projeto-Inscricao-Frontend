@@ -1,12 +1,12 @@
-import { FindTicketsForSaleOutput } from "@/features/tickets/types/register-sale/ticketSaleRegisterTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+import { FindTicketsForSaleOutput } from '@/features/tickets/types/register-sale/ticketSaleRegisterTypes';
+import { axiosClient } from '@/lib/axios';
 
 export async function getTicketsForSale(
-  eventId: string
+  eventId: string,
 ): Promise<FindTicketsForSaleOutput> {
   try {
-    const { data } = await axiosInstance.get<FindTicketsForSaleOutput>(
-      `/tickets/public/${eventId}`
+    const { data } = await axiosClient.get<FindTicketsForSaleOutput>(
+      `/tickets/public/${eventId}`,
     );
     return data;
   } catch (error) {
@@ -17,8 +17,8 @@ export async function getTicketsForSale(
 
     throw new Error(
       axiosError.response?.data?.message ??
-      axiosError.message ??
-      "Falha ao carregar os tickets para venda"
+        axiosError.message ??
+        'Falha ao carregar os tickets para venda',
     );
   }
 }

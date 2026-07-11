@@ -1,9 +1,9 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
+import { axiosClient } from '@/lib/axios';
+import qs from 'qs';
 import type {
   GenaratePdfFinancialInput,
   GenaratePdfFinancialOutput,
-} from "../../types/reportFinancial/reportFinancialTypes";
+} from '../../types/reportFinancial/reportFinancialTypes';
 
 type GenaratePdfFinancialReportApiResponse = {
   pdfBase64?: string;
@@ -16,13 +16,13 @@ export async function genaratePdfFinancialReport({
 }: GenaratePdfFinancialInput): Promise<GenaratePdfFinancialOutput> {
   try {
     const response =
-      await axiosInstance.get<GenaratePdfFinancialReportApiResponse>(
+      await axiosClient.get<GenaratePdfFinancialReportApiResponse>(
         `/report/${eventId}/financial/pdf`,
         {
           params: {
             details,
           },
-          paramsSerializer: (p) => qs.stringify(p, { arrayFormat: "repeat" }),
+          paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
         },
       );
     return {
@@ -40,7 +40,7 @@ export async function genaratePdfFinancialReport({
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Falha ao gerar PDF do relatório do evento",
+        'Falha ao gerar PDF do relatório do evento',
     );
   }
 }

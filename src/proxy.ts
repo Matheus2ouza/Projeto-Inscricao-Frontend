@@ -1,5 +1,5 @@
+import { getToken } from 'next-auth/jwt';
 import { MiddlewareConfig, NextRequest, NextResponse } from 'next/server';
-import { verifySession } from './shared/lib/session';
 
 const REDIRECT_WHEN_NOT_AUTHENTICATED = '/login';
 const MAINTENANCE_MODE =
@@ -7,12 +7,26 @@ const MAINTENANCE_MODE =
   process.env.MAINTENANCE_MODE === 'true';
 const MAINTENANCE_PATH = '/maintenance';
 
+const roleHome: Record<string, string> = {
+  SUPER: '/super/home',
+  ADMIN: '/admin/home',
+  MANAGER: '/admin/home',
+  USER: '/user/home',
+};
+
+const rolePrefix: Record<string, string> = {
+  SUPER: '/super/',
+  ADMIN: '/admin/',
+  MANAGER: '/admin/',
+  USER: '/user/',
+};
+
 function isPublicPath(pathname: string): boolean {
   if (pathname === '/' || pathname.startsWith('/documentation')) return true;
-  if (pathname === '/login') return true; // pública, mas redireciona se autenticado
-  if (pathname.startsWith('/events/')) return true; // página pública dinâmica
-  if (pathname.startsWith('/guest/')) return true; // página pública dinâmica
-  if (pathname.startsWith('/exclusive/')) return true; // página pública dinâmica
+  if (pathname === '/login') return true;
+  if (pathname.startsWith('/events/')) return true;
+  if (pathname.startsWith('/guest/')) return true;
+  if (pathname.startsWith('/exclusive/')) return true;
   return false;
 }
 
@@ -33,72 +47,39 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const authToken = request.cookies.get('authToken')?.value;
   const isPublic = isPublicPath(pathname);
 
-  // Sem token
-  if (!authToken) {
-    // Rotas públicas passam
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  // Sem sessão válida
+  if (!token || token.error === 'RefreshAccessTokenError') {
     if (isPublic) {
-      console.log('[middleware] no auth token but public route', pathname);
       return NextResponse.next();
     }
 
-    // Rotas privadas redirecionam ao login
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED;
     console.warn(
-      '[middleware] no auth token, redirecting to login',
+      '[middleware] no valid session, redirecting to login',
       redirectUrl.pathname,
     );
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Com token, se rota pública que redireciona (ex.: /login), mandar para home do role
+  const role = token.role as string;
+
+  // Autenticado tentando acessar /login -> manda pra home do role
   if (shouldRedirectWhenAuthenticated(pathname)) {
-    const session = await verifySession();
-    if (session) {
-      const role = session.user.role;
-      const roleHome: Record<string, string> = {
-        SUPER: '/super/home',
-        ADMIN: '/admin/home',
-        MANAGER: '/admin/home',
-        USER: '/user/home',
-      };
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = roleHome[role] ?? '/user/home';
-      return NextResponse.redirect(redirectUrl);
-    }
-    console.warn(
-      '[middleware] expected session for authenticated redirect but none found',
-    );
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = roleHome[role] ?? '/user/home';
+    return NextResponse.redirect(redirectUrl);
   }
 
-  // Com token em rota privada: validar sessão e prefixo do role
+  // Rota privada: valida prefixo do role
   if (!isPublic) {
-    const session = await verifySession();
-    if (!session) {
-      const redirectUrl = request.nextUrl.clone();
-      redirectUrl.pathname = REDIRECT_WHEN_NOT_AUTHENTICATED;
-      console.warn(
-        '[middleware] auth token present but session invalid, redirecting to login',
-      );
-      return NextResponse.redirect(redirectUrl);
-    }
-
-    const role = session.user.role;
-    const rolePrefix: Record<string, string> = {
-      SUPER: '/super/',
-      ADMIN: '/admin/',
-      MANAGER: '/admin/',
-      USER: '/user/',
-    };
-    const roleHome: Record<string, string> = {
-      SUPER: '/super/home',
-      ADMIN: '/admin/home',
-      MANAGER: '/admin/home',
-      USER: '/user/home',
-    };
     const requiredPrefix = rolePrefix[role] ?? '/user/';
     const normalizedPrefix =
       requiredPrefix.endsWith('/') && requiredPrefix.length > 1
@@ -113,19 +94,12 @@ export default async function proxy(request: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
   }
+
   return NextResponse.next();
 }
 
 export const config: MiddlewareConfig = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     * - xlsx (allow Excel files)
-     */
     '/((?!api|web-api|_next/static|_next/image|images/|xlsx/|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 };

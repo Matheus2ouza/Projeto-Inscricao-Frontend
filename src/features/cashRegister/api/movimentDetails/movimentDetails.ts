@@ -1,12 +1,12 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios/client';
 import {
   MovimentDetailsInput,
   MovimentDetailsResponse,
-} from "../../types/movimentDetails/movimentDetailsTypes";
+} from '../../types/movimentDetails/movimentDetailsTypes';
 
 export async function getMovimentDetails({ movimentId }: MovimentDetailsInput) {
   try {
-    const { data } = await axiosInstance.get<MovimentDetailsResponse>(
+    const { data } = await axiosClient.get<MovimentDetailsResponse>(
       `cash-register/moviment/${movimentId}`,
     );
     return data;
@@ -19,7 +19,7 @@ export async function getMovimentDetails({ movimentId }: MovimentDetailsInput) {
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

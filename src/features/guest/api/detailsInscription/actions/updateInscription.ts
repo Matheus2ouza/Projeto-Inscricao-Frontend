@@ -1,14 +1,13 @@
 import {
   UpdateGuestInscriptionInput,
   UpdateGuestInscriptionResult,
-} from "@/features/guest/types/detailsInscription/actions/updateInscriptionType";
-import axiosInstance from "@/shared/lib/apiClient";
-
+} from '@/features/guest/types/detailsInscription/actions/updateInscriptionType';
+import { axiosClient } from '@/lib/axios';
 export async function updateGuestInscription(
   input: UpdateGuestInscriptionInput,
 ): Promise<UpdateGuestInscriptionResult> {
   try {
-    const { data } = await axiosInstance.put<UpdateGuestInscriptionResult>(
+    const { data } = await axiosClient.put<UpdateGuestInscriptionResult>(
       `/inscriptions/${input.inscriptionId}/guest`,
       input,
     );
@@ -22,7 +21,7 @@ export async function updateGuestInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível atualizar a inscrição",
+        'Não foi possível atualizar a inscrição',
     );
   }
 }

@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import { TypeInscription } from '../types/typesInscriptionsTypes';
 
 export type UpdateTypeInscriptionInput = {
@@ -16,7 +16,7 @@ export async function updateTypeInscription(
 ): Promise<TypeInscription> {
   try {
     console.log(input);
-    const response = await axiosInstance.put<TypeInscription>(
+    const response = await axiosClient.put<TypeInscription>(
       `/type-inscription/${typeInscriptionId}/update`,
       input,
     );

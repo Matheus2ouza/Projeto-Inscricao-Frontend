@@ -1,34 +1,35 @@
-"use client";
+'use client';
 
-import { useGlobalLoading } from "@/components/GlobalLoading";
-import { MemberSingleOption } from "@/features/members/components/combobox/ComboboxMemberSingle";
-import { useInvalidateMembersQuery } from "@/features/members/hook/useMembersQuery";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import * as React from "react";
-import { SubmitHandler, useForm, UseFormRegister } from "react-hook-form";
-import { toast } from "sonner";
+import { useGlobalLoading } from '@/components/GlobalLoading';
+import { registerIndividualInscriptionAction } from '@/features/inscriptions/actions/individualInscription/registerIndividualInscriptionAction';
+import { MemberSingleOption } from '@/features/members/components/membersCombobox/ComboboxMemberSingle';
+import { useInvalidateMembersQuery } from '@/features/members/hook/useMembersQuery';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as React from 'react';
+import { SubmitHandler, useForm, UseFormRegister } from 'react-hook-form';
+import { toast } from 'sonner';
 import {
   IndividualInscriptionFormInputs,
   individualInscriptionSchema,
-} from "../../schema/inscriptionIndiv/individualInscriptionSchema";
+} from '../../schema/inscriptionIndiv/individualInscriptionSchema';
 import {
   FormErrors,
   IndividualInscriptionSubmit,
   UseFormIndividualInscriptionProps,
   UseFormIndividualInscriptionReturn,
-} from "../../types/inscriptionIndiv/individualInscriptionTypes";
-import { useSubmitIndividualInscription } from "./useIndividualInscriptionQuery";
-import { useTypeInscriptionsQuery } from "./useTypeInscriptionsQuery";
+} from '../../types/individualInscription/individualInscriptionTypes';
 
 export function useFormCreateIndividualInscription({
   eventId,
 }: UseFormIndividualInscriptionProps): UseFormIndividualInscriptionReturn {
-  const router = useRouter();
   const { setLoading } = useGlobalLoading();
 
   // Estado para o ID do membro selecionado
-  const [selectedMemberId, setSelectedMemberId] = React.useState<string>("");
+  const [selectedMemberId, setSelectedMemberId] = React.useState<string>('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  // Hook para invalidar cache de membros
+  const { invalidateLists } = useInvalidateMembersQuery();
 
   // Inicializar o react-hook-form com Zod
   const {
@@ -38,70 +39,40 @@ export function useFormCreateIndividualInscription({
     setValue,
     watch,
     trigger,
-    reset, // Adicionado o método reset
+    reset,
   } = useForm<IndividualInscriptionFormInputs>({
     resolver: zodResolver(individualInscriptionSchema),
     defaultValues: {
-      responsible: "",
-      email: "",
-      phone: "",
-      participantName: "",
-      birthDate: "",
-      gender: "",
-      typeInscriptionId: "",
+      responsible: '',
+      email: '',
+      phone: '',
+      participantName: '',
+      birthDate: '',
+      gender: '',
+      typeInscriptionId: '',
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   // Observar os valores do formulário
   const formData = watch();
 
-  // Usar React Query para carregar tipos de inscrição
-  const { data: typeInscriptionsData, error: typeInscriptionsError } =
-    useTypeInscriptionsQuery(eventId);
-
-  // Usar React Query para submeter inscrição
-  const submitMutation = useSubmitIndividualInscription();
-
-  // Hook para invalidar cache de membros
-  const { invalidateLists } = useInvalidateMembersQuery();
-
-  // Processar dados dos tipos de inscrição
-  const typeInscriptions = typeInscriptionsData
-    ? Array.isArray(typeInscriptionsData)
-      ? typeInscriptionsData
-      : [typeInscriptionsData]
-    : [];
-
-  // Mostrar erro se houver
-  if (typeInscriptionsError) {
-    console.error(
-      "Erro ao carregar tipos de inscrição:",
-      typeInscriptionsError,
-    );
-    toast.error("Erro ao carregar tipos de inscrição");
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if (name === "phone") {
-      // Formatação automática do telefone
+    if (name === 'phone') {
       const formattedPhone = formatPhone(value);
       setValue(name as keyof IndividualInscriptionFormInputs, formattedPhone);
-    } else if (name === "birthDate") {
-      // Formatação automática da data
+    } else if (name === 'birthDate') {
       const formattedDate = formatDate(value);
       setValue(name as keyof IndividualInscriptionFormInputs, formattedDate);
     } else {
       setValue(name as keyof IndividualInscriptionFormInputs, value);
     }
 
-    // Validação em tempo real
     trigger(name as keyof IndividualInscriptionFormInputs);
   };
 
-  // Função para lidar com a seleção de um membro
   const handleMemberSelect = (
     memberId: string,
     member?: MemberSingleOption,
@@ -109,54 +80,42 @@ export function useFormCreateIndividualInscription({
     setSelectedMemberId(memberId);
 
     if (member) {
-      // Preenche os campos do formulário com os dados do membro
-      setValue("participantName", member.label);
+      setValue('participantName', member.label);
 
       if (member.member?.birthDate) {
-        // Formata a data de nascimento para DD/MM/AAAA
         const birthDate = new Date(member.member?.birthDate);
-        const formattedDate = birthDate.toLocaleDateString("pt-BR");
-        setValue("birthDate", formattedDate);
+        const formattedDate = birthDate.toLocaleDateString('pt-BR');
+        setValue('birthDate', formattedDate);
       }
 
       if (member.member?.gender) {
-        setValue("gender", member.member?.gender.toLowerCase());
+        setValue('gender', member.member?.gender.toLowerCase());
       }
 
-      // Valida os campos preenchidos
-      trigger("participantName");
-      trigger("birthDate");
-      trigger("gender");
+      trigger('participantName');
+      trigger('birthDate');
+      trigger('gender');
     }
   };
 
-  // Função para limpar todos os campos do formulário
   const clearForm = React.useCallback(() => {
-    // Limpa todos os campos do formulário
     reset({
-      responsible: "",
-      email: "",
-      phone: "",
-      participantName: "",
-      birthDate: "",
-      gender: "",
-      typeInscriptionId: "",
+      responsible: '',
+      email: '',
+      phone: '',
+      participantName: '',
+      birthDate: '',
+      gender: '',
+      typeInscriptionId: '',
     });
-
-    // Limpa o membro selecionado
-    setSelectedMemberId("");
-
-    console.log("Formulário limpo com sucesso");
+    setSelectedMemberId('');
   }, [reset]);
 
-  // Função para formatar telefone
   const formatPhone = (value: string): string => {
-    // Remove tudo que não é número
-    const numbers = value.replace(/\D/g, "");
+    const numbers = value.replace(/\D/g, '');
 
-    // Aplica a máscara (11) 99999-9999
     if (numbers.length <= 2) {
-      return numbers ? `(${numbers}` : "";
+      return numbers ? `(${numbers}` : '';
     } else if (numbers.length <= 6) {
       return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
     } else if (numbers.length <= 10) {
@@ -171,12 +130,9 @@ export function useFormCreateIndividualInscription({
     }
   };
 
-  // Função para formatar data
   const formatDate = (value: string): string => {
-    // Remove tudo que não é número
-    const numbers = value.replace(/\D/g, "");
+    const numbers = value.replace(/\D/g, '');
 
-    // Aplica a máscara DD/MM/AAAA
     if (numbers.length <= 2) {
       return numbers;
     } else if (numbers.length <= 4) {
@@ -207,82 +163,39 @@ export function useFormCreateIndividualInscription({
     }
 
     setLoading(true);
-    try {
-      const response = await submitMutation.mutateAsync(apiData);
+    setIsSubmitting(true);
 
-      toast.success("Inscrição realizada com sucesso!", {
-        description: `Inscrição realizada com sucesso! ID: ${response.inscriptionId}`,
+    try {
+      // Chamar o action diretamente
+      const response = await registerIndividualInscriptionAction(apiData);
+
+      toast.success('Inscrição realizada com sucesso!', {
+        description: `ID: ${response.id}`,
       });
 
-      // Limpa o formulário após sucesso
       clearForm();
-
-      // Invalida o cache dos membros para garantir que a lista esteja atualizada
-      await invalidateLists();
+      invalidateLists();
     } catch (error: unknown) {
-      console.error("Erro:", error);
+      console.error('Erro:', error);
 
-      // Type guard para verificar se é um erro com estrutura de resposta
-      const isErrorWithResponse = (
-        err: unknown,
-      ): err is {
-        response?: { status?: number; data?: { message?: string } };
-      } => {
-        return typeof err === "object" && err !== null && "response" in err;
-      };
-
-      // Type guard para verificar se é um erro do Next.js Server Action
-      const isServerActionError = (
-        err: unknown,
-      ): err is { message?: string; name?: string } => {
-        return (
-          typeof err === "object" &&
-          err !== null &&
-          "message" in err &&
-          "name" in err
-        );
-      };
-
-      // Type guard para verificar se é um Error padrão
-      const isStandardError = (err: unknown): err is Error => {
-        return err instanceof Error;
-      };
-
-      let errorMessage =
-        "Erro ao processar inscrição, verifique os dados e tente novamente.";
-
-      if (isErrorWithResponse(error) && error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (isServerActionError(error)) {
-        // Tratar erros específicos do Next.js Server Actions
-        if (error.message?.includes("UnrecognizedActionError")) {
-          errorMessage =
-            "Erro de conexão com o servidor. Tente novamente em alguns instantes.";
-        } else {
-          errorMessage = error.message || "Erro desconhecido do servidor.";
-        }
-      } else if (isStandardError(error)) {
-        errorMessage = error.message;
-      }
+      // O erro já vem tratado do service com mensagem amigável
+      const errorMessage =
+        error instanceof Error ? error.message : 'Erro ao processar inscrição';
 
       toast.error(errorMessage);
     } finally {
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  // Wrapper para o handleSubmit do react-hook-form
   const handleFormSubmit = rhfHandleSubmit(onSubmit);
 
   return {
-    // Estado
     formData,
-    typeInscriptions,
-    isSubmitting: submitMutation.isPending,
+    isSubmitting,
     formErrors: errors as FormErrors,
     selectedMemberId,
-
-    // Ações
     handleInputChange,
     handleSubmit: handleFormSubmit,
     handleMemberSelect,

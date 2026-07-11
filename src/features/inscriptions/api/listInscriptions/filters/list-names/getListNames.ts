@@ -2,11 +2,11 @@ import {
   ListNamesInput,
   ListNamesResponse,
 } from '@/features/inscriptions/types/listInscriptions/filters/list-names/listNamesTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function getListNames({ eventId }: ListNamesInput) {
   try {
-    const { data } = await axiosInstance.get<ListNamesResponse>(
+    const { data } = await axiosClient.get<ListNamesResponse>(
       `/inscriptions/${eventId}/all/names`,
     );
     return data;

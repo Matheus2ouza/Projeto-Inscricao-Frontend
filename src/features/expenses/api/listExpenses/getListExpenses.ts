@@ -1,5 +1,5 @@
 import { ListExpensesResponse } from '@/features/expenses/types/listExpenses/expensesTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function getListExpenses(
   page: number,
@@ -7,7 +7,7 @@ export async function getListExpenses(
   eventId?: string,
 ): Promise<ListExpensesResponse> {
   try {
-    const { data } = await axiosInstance.get<ListExpensesResponse>(
+    const { data } = await axiosClient.get<ListExpensesResponse>(
       `expenses/list/${eventId}`,
       {
         params: {

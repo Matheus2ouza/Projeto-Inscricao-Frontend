@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import qs from 'qs';
 
 export enum InscriptionsStatus {
@@ -50,7 +50,7 @@ export async function generateParticipantsByLocalityPdf({
   inscriptionsStatus,
 }: GenerateParticipantsByLocalityPdfParams): Promise<GenerateParticipantsByLocalityPdfResponse> {
   try {
-    const { data } = await axiosInstance.get(
+    const { data } = await axiosClient.get(
       `participants/pdf/${eventId}/locality`,
       {
         params: {

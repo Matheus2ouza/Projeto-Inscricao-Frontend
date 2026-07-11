@@ -1,5 +1,5 @@
-import type { FindAccountsDetailsResponse } from "@/features/events/types/check-in/checkInTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+import type { FindAccountsDetailsResponse } from '@/features/events/types/check-in/checkInTypes';
+import { axiosClient } from '@/lib/axios/';
 
 type RawPaymentInscription = {
   value: number;
@@ -9,9 +9,9 @@ type RawPaymentInscription = {
 };
 
 export enum StatusPayment {
-  APPROVED = "APROVADO",
-  UNDER_REVIEW = "EM ANALISE",
-  REFUSED = "REJEITADO",
+  APPROVED = 'APROVADO',
+  UNDER_REVIEW = 'EM ANALISE',
+  REFUSED = 'REJEITADO',
 }
 
 type RawParticipant = {
@@ -34,22 +34,22 @@ type RawInscription = {
 };
 
 export enum InscriptionStatus {
-  PENDING = "PENDENTE",
-  UNDER_REVIEW = "EM ANALISE",
-  PAID = "PAGO",
-  CANCELLED = "CANCELADO",
+  PENDING = 'PENDENTE',
+  UNDER_REVIEW = 'EM ANALISE',
+  PAID = 'PAGO',
+  CANCELLED = 'CANCELADO',
 }
 
 type FindAccountsDetailsApiResponse = Omit<
   FindAccountsDetailsResponse,
-  "inscriptions"
+  'inscriptions'
 > & {
   inscriptions: RawInscription[];
 };
 
 const normalizeInscription = (
   inscription: RawInscription,
-): FindAccountsDetailsResponse["inscriptions"][number] => ({
+): FindAccountsDetailsResponse['inscriptions'][number] => ({
   ...inscription,
   createdAt: new Date(inscription.createdAt),
   participants: inscription.participants.map((participant) => ({
@@ -67,7 +67,7 @@ export async function getCheckInAccountDetails(
   accountId: string,
 ) {
   try {
-    const { data } = await axiosInstance.get<FindAccountsDetailsApiResponse>(
+    const { data } = await axiosClient.get<FindAccountsDetailsApiResponse>(
       `/events/${eventId}/check-in/accounts/${accountId}/details`,
     );
     const normalizedData: FindAccountsDetailsResponse = {
@@ -83,7 +83,7 @@ export async function getCheckInAccountDetails(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os detalhes da conta",
+        'Não foi possível carregar os detalhes da conta',
     );
   }
 }

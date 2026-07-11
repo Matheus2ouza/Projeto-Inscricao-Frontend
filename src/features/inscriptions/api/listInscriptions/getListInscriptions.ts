@@ -2,7 +2,7 @@ import {
   getListInscriptionsParams,
   ListInscriptionsResponse,
 } from '@/features/inscriptions/types/listInscriptions/listInscriptionsTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 import qs from 'qs';
 
 export async function getListInscriptions({
@@ -17,7 +17,7 @@ export async function getListInscriptions({
   responsible,
 }: getListInscriptionsParams): Promise<ListInscriptionsResponse> {
   try {
-    const { data } = await axiosInstance.get<ListInscriptionsResponse>(
+    const { data } = await axiosClient.get<ListInscriptionsResponse>(
       `/inscriptions/${eventId}`,
       {
         params: {

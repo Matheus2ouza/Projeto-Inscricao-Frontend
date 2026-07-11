@@ -1,14 +1,17 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import { ListAvulsaRequest, ListAvulsaResponse } from "../../types/avulsa/avulsaTypes";
+import { axiosClient } from '@/lib/axios';
+import {
+  ListAvulsaRequest,
+  ListAvulsaResponse,
+} from '../../types/avulsa/avulsaTypes';
 
 export async function getAvulsaRegistrations(
-  params: ListAvulsaRequest
+  params: ListAvulsaRequest,
 ): Promise<ListAvulsaResponse> {
-  const { eventId, page = "1", pageSize = "15" } = params;
+  const { eventId, page = '1', pageSize = '15' } = params;
   try {
-    const { data } = await axiosInstance.get<ListAvulsaResponse>(
+    const { data } = await axiosClient.get<ListAvulsaResponse>(
       `inscriptions/avul/${eventId}`,
-      { params: { page, pageSize } }
+      { params: { page, pageSize } },
     );
     return {
       ...data,
@@ -23,7 +26,7 @@ export async function getAvulsaRegistrations(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-      "Falha ao carregar inscrições avulsas"
+        'Falha ao carregar inscrições avulsas',
     );
   }
 }

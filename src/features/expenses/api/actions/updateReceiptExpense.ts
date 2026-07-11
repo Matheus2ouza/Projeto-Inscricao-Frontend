@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export type UpdateReceiptExpenseRequest = {
   expenseId: string;
@@ -14,7 +14,7 @@ export async function updateReceiptExpense({
   receipts,
 }: UpdateReceiptExpenseRequest) {
   try {
-    const { data } = await axiosInstance.post(
+    const { data } = await axiosClient.post(
       `expenses/${expenseId}/receipts`,
       {
         receipts,

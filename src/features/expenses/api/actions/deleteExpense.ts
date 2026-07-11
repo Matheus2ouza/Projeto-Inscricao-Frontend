@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export type DeleteExpenseRequest = {
   id: string;
@@ -6,7 +6,7 @@ export type DeleteExpenseRequest = {
 
 export async function deleteExpense({ id }: DeleteExpenseRequest) {
   try {
-    await axiosInstance.delete(`expenses/${id}`);
+    await axiosClient.delete(`expenses/${id}`);
   } catch (error) {
     const axiosError = error as {
       response?: { data?: { message?: string } };

@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import DetailsEvent from "@/features/events/components/DetailsEvent";
-import { useDetailsEvent } from "@/features/events/hooks/useDetailsEvent";
-import PageContainer from "@/shared/components/layout/PageContainer";
-import { Skeleton } from "@/shared/components/ui/skeleton";
-import { useParams, useRouter } from "next/navigation";
+import DetailsEvent from '@/features/events/components/DetailsEvent';
+import { useEventDetails } from '@/features/events/hooks/eventDetails/useEventDetails';
+import PageContainer from '@/shared/components/layout/PageContainer';
+import { Skeleton } from '@/shared/components/ui/skeleton';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function EventsDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const eventId = params.eventId as string;
-  const { event, loading, error } = useDetailsEvent(eventId);
+  const { event, loading, error } = useEventDetails({ eventId });
 
   const renderSkeletonGrid = () => {
     return (
       <div className="space-y-8">
         <Skeleton className="h-80 w-full rounded-3xl" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             <Skeleton className="h-48 w-full rounded-2xl" />
             <Skeleton className="h-56 w-full rounded-2xl" />
           </div>
@@ -37,11 +37,11 @@ export default function EventsDetailsPage() {
 
     if (error) {
       return (
-        <div className="rounded-2xl border border-gray-200/80 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur-md p-10 text-center">
-          <h2 className="text-2xl font-semibold text-red-600 mb-2">
+        <div className="rounded-2xl border border-gray-200/80 bg-white/90 p-10 text-center backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+          <h2 className="mb-2 text-2xl font-semibold text-red-600">
             Erro ao carregar evento
           </h2>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">{error.message}</p>
         </div>
       );
     }

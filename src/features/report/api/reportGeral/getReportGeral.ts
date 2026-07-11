@@ -1,5 +1,5 @@
-import { ReportGeneralResponse } from "@/features/report/types/reportGeral/reportTypes";
-import axiosInstance from "@/shared/lib/apiClient";
+import { ReportGeneralResponse } from '@/features/report/types/reportGeral/reportTypes';
+import { axiosClient } from '@/lib/axios';
 
 const parseDate = (value: Date | string): Date => {
   return value instanceof Date ? value : new Date(value);
@@ -9,7 +9,7 @@ export async function getReportGeneral(
   eventId: string,
 ): Promise<ReportGeneralResponse> {
   try {
-    const { data } = await axiosInstance.get<ReportGeneralResponse>(
+    const { data } = await axiosClient.get<ReportGeneralResponse>(
       `/report/${eventId}/general`,
     );
 
@@ -22,7 +22,7 @@ export async function getReportGeneral(
     const axiosError = error as { response?: { data?: { message?: string } } };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao carregar relatório do evento",
+        'Falha ao carregar relatório do evento',
     );
   }
 }

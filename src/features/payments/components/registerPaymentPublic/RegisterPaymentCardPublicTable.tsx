@@ -5,8 +5,8 @@ import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { Separator } from '@/shared/components/ui/separator';
 import { formatDate } from '@/shared/utils/formatDate';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
-import { getGradientClass } from '@/shared/utils/getGenerateGradient';
 import { getInitial } from '@/shared/utils/getInitials';
 import { Calendar, CreditCardIcon, Loader2, Ticket } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -260,7 +260,7 @@ export default function RegisterPaymentCardPublicTable({
               />
             ) : (
               <div
-                className={`flex h-32 w-full items-center justify-center rounded-lg bg-gradient-to-br md:w-48 ${getGradientClass(
+                className={`flex h-32 w-full items-center justify-center rounded-lg bg-gradient-to-br md:w-48 ${generateGradientClass(
                   event.name,
                 )}`}
               >

@@ -1,12 +1,12 @@
-import axiosInstance from "@/shared/lib/apiClient";
+import { axiosClient } from '@/lib/axios';
 import {
   EditMemberData,
   EditMemberResponse,
-} from "../../types/detailsMember/editMemberType";
+} from '../../types/detailsMember/editMemberType';
 
 export async function editMember(memberId: string, member: EditMemberData) {
   try {
-    const { data } = await axiosInstance.put<EditMemberResponse>(
+    const { data } = await axiosClient.put<EditMemberResponse>(
       `/members/${memberId}`,
       {
         name: member.name,
@@ -28,7 +28,7 @@ export async function editMember(memberId: string, member: EditMemberData) {
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os detalhes do membro.",
+        'Não foi possível carregar os detalhes do membro.',
     );
   }
 }

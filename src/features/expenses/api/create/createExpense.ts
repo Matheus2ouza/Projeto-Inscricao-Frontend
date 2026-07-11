@@ -2,13 +2,13 @@ import {
   CreateExpenseRequest,
   CreateExpenseResponse,
 } from '@/features/expenses/types/createExpense/createExpenseTypes';
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 export async function createExpense(
   expenseData: CreateExpenseRequest,
 ): Promise<CreateExpenseResponse> {
   try {
-    const { data } = await axiosInstance.post<CreateExpenseResponse>(
+    const { data } = await axiosClient.post<CreateExpenseResponse>(
       '/expenses/create',
       expenseData,
     );

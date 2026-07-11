@@ -1,16 +1,16 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
-import { deleteInscription } from "@/features/inscriptions/api/deleteInscription";
-import { updateInscription } from "@/features/inscriptions/api/updateInscription";
-import { inscriptionDetailsKeys } from "@/features/inscriptions/hooks/useInscriptionDetails";
+import { updateInscriptionAction } from '@/features/inscriptions/actions/updateInscription/updateInscriptionAction';
+import { deleteInscription } from '@/features/inscriptions/api/deleteInscription';
+import { inscriptionDetailsKeys } from '@/features/inscriptions/hooks/useInscriptionDetails';
 import {
   UpdateInscriptionFormInputs,
   UpdateInscriptionSchema,
-} from "@/features/inscriptions/schema/updateInscriptionSchema";
+} from '@/features/inscriptions/schema/updateInscriptionSchema';
 
 interface UseUpdateInscriptionOptions {
   inscriptionId?: string;
@@ -30,9 +30,9 @@ export function useUpdateInscription({
   const form = useForm<UpdateInscriptionFormInputs>({
     resolver: zodResolver(UpdateInscriptionSchema),
     defaultValues: {
-      responsible: initialValues?.responsible ?? "",
-      phone: initialValues?.phone ?? "",
-      email: initialValues?.email ?? "",
+      responsible: initialValues?.responsible ?? '',
+      phone: initialValues?.phone ?? '',
+      email: initialValues?.email ?? '',
     },
   });
 
@@ -40,9 +40,9 @@ export function useUpdateInscription({
     if (!initialValues) return;
 
     form.reset({
-      responsible: initialValues.responsible ?? "",
-      phone: initialValues.phone ?? "",
-      email: initialValues.email ?? "",
+      responsible: initialValues.responsible ?? '',
+      phone: initialValues.phone ?? '',
+      email: initialValues.email ?? '',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -55,12 +55,12 @@ export function useUpdateInscription({
   const mutation = useMutation({
     mutationFn: async (values: UpdateInscriptionFormInputs) => {
       if (!inscriptionId) {
-        throw new Error("Inscrição não encontrada.");
+        throw new Error('Inscrição não encontrada.');
       }
-      return updateInscription(inscriptionId, values);
+      return updateInscriptionAction(inscriptionId, values);
     },
     onSuccess: async () => {
-      toast.success("Inscrição atualizada com sucesso!");
+      toast.success('Inscrição atualizada com sucesso!');
       if (inscriptionId) {
         await queryClient.invalidateQueries({
           queryKey: inscriptionDetailsKeys.detail(inscriptionId),
@@ -72,7 +72,7 @@ export function useUpdateInscription({
       const message =
         error instanceof Error
           ? error.message
-          : "Não foi possível atualizar a inscrição.";
+          : 'Não foi possível atualizar a inscrição.';
       toast.error(message);
     },
   });
@@ -82,7 +82,7 @@ export function useUpdateInscription({
   const deleteMutation = useMutation({
     mutationFn: async () => {
       if (!inscriptionId) {
-        throw new Error("Inscrição não encontrada.");
+        throw new Error('Inscrição não encontrada.');
       }
       return deleteInscription(inscriptionId);
     },
@@ -91,12 +91,12 @@ export function useUpdateInscription({
 
       // Marcar inscrição como deletada no cache para evitar queries futuras
       queryClient.setQueryData(
-        ["deleted-inscriptions"],
+        ['deleted-inscriptions'],
         (old: Set<string> | undefined) => {
           const deletedSet = old || new Set();
           deletedSet.add(inscriptionId);
           return new Set(deletedSet);
-        }
+        },
       );
 
       // Cancelar todas as queries relacionadas à inscrição antes de deletar
@@ -110,17 +110,17 @@ export function useUpdateInscription({
       });
     },
     onSuccess: async () => {
-      toast.success("Inscrição excluída com sucesso!");
+      toast.success('Inscrição excluída com sucesso!');
 
       if (inscriptionId) {
         // Garantir que a inscrição permaneça marcada como deletada
         queryClient.setQueryData(
-          ["deleted-inscriptions"],
+          ['deleted-inscriptions'],
           (old: Set<string> | undefined) => {
             const deletedSet = old || new Set();
             deletedSet.add(inscriptionId);
             return new Set(deletedSet);
-          }
+          },
         );
 
         // Invalidar apenas as listas de inscrições
@@ -136,18 +136,18 @@ export function useUpdateInscription({
       // Em caso de erro, remover a marcação de deletada
       if (inscriptionId) {
         queryClient.setQueryData(
-          ["deleted-inscriptions"],
+          ['deleted-inscriptions'],
           (old: Set<string> | undefined) => {
             if (!old) return old;
             const deletedSet = new Set(old);
             deletedSet.delete(inscriptionId);
             return deletedSet.size > 0 ? deletedSet : undefined;
-          }
+          },
         );
       }
 
       const message =
-        error instanceof Error ? error.message : "Erro ao excluir inscrição.";
+        error instanceof Error ? error.message : 'Erro ao excluir inscrição.';
       toast.error(message);
     },
   });

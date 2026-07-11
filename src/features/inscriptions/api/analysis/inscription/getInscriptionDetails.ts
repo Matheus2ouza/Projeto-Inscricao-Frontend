@@ -1,15 +1,14 @@
 import {
   AnalysisInscriptionResponse,
   InscriptionDetailRequest,
-} from "@/features/inscriptions/types/analysis/analysisTypes";
-import axiosInstance from "@/shared/lib/apiClient";
-
+} from '@/features/inscriptions/types/analysis/analysisTypes';
+import { axiosClient } from '@/lib/axios';
 export async function getInscriptionDetails(
   inscriptionId: string,
   params: InscriptionDetailRequest,
 ): Promise<AnalysisInscriptionResponse> {
   try {
-    const { data } = await axiosInstance.get<AnalysisInscriptionResponse>(
+    const { data } = await axiosClient.get<AnalysisInscriptionResponse>(
       `/inscriptions/${inscriptionId}/analytics`,
       {
         params: {
@@ -27,7 +26,7 @@ export async function getInscriptionDetails(
     };
     throw new Error(
       axiosError.response?.data?.message ||
-        "Falha ao carregar detalhes da inscrição",
+        'Falha ao carregar detalhes da inscrição',
     );
   }
 }

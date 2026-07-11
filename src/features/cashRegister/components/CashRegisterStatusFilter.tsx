@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import { cn } from '@/lib/utils';
+import { Button } from '@/shared/components/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandItem,
   CommandList,
-} from "@/shared/components/ui/command";
+} from '@/shared/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/shared/components/ui/popover";
-import { cn } from "@/shared/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
-import React from "react";
-import { CashRegisterStatus } from "../types/listCashRegisters";
+} from '@/shared/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import React from 'react';
+import { CashRegisterStatus } from '../types/listCashRegisters';
 
 export type CashRegisterStatusOption = {
   value: CashRegisterStatus;
@@ -24,8 +24,8 @@ export type CashRegisterStatusOption = {
 };
 
 export const CASH_REGISTER_STATUS_OPTIONS: CashRegisterStatusOption[] = [
-  { value: CashRegisterStatus.OPEN, label: "Abertos" },
-  { value: CashRegisterStatus.CLOSED, label: "Fechados" },
+  { value: CashRegisterStatus.OPEN, label: 'Abertos' },
+  { value: CashRegisterStatus.CLOSED, label: 'Fechados' },
 ];
 
 type CashRegisterStatusFilterProps = {
@@ -47,7 +47,8 @@ export default function CashRegisterStatusFilter({
     .filter((option) => value.includes(option.value))
     .map((option) => option.label);
 
-  const displayText = selectedLabels.length > 0 ? selectedLabels.join(", ") : "";
+  const displayText =
+    selectedLabels.length > 0 ? selectedLabels.join(', ') : '';
 
   const toggleStatus = (statusValue: CashRegisterStatus) => {
     const isSelected = value.includes(statusValue);
@@ -63,15 +64,15 @@ export default function CashRegisterStatusFilter({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className={cn("min-w-[260px] justify-between", className)}
+          className={cn('min-w-[260px] justify-between', className)}
           type="button"
         >
           <div className="text-left">
-            <p className="text-sm text-foreground truncate">
-              {displayText || "Nenhum status selecionado"}
+            <p className="text-foreground truncate text-sm">
+              {displayText || 'Nenhum status selecionado'}
             </p>
           </div>
-          <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+          <ChevronsUpDown className="text-muted-foreground h-4 w-4" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[260px] p-0" align="start">
@@ -90,8 +91,8 @@ export default function CashRegisterStatusFilter({
                     <span className="text-sm">{option.label}</span>
                     <Check
                       className={cn(
-                        "ml-auto h-4 w-4 text-blue-600 transition-opacity",
-                        isSelected ? "opacity-100" : "opacity-0",
+                        'ml-auto h-4 w-4 text-blue-600 transition-opacity',
+                        isSelected ? 'opacity-100' : 'opacity-0',
                       )}
                     />
                   </CommandItem>
@@ -104,4 +105,3 @@ export default function CashRegisterStatusFilter({
     </Popover>
   );
 }
-

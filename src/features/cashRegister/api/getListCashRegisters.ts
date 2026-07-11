@@ -1,9 +1,9 @@
-import axiosInstance from "@/shared/lib/apiClient";
-import qs from "qs";
+import { axiosClient } from '@/lib/axios/client';
+import qs from 'qs';
 import {
   CashRegisterStatus,
   ListCashRegistersResponse,
-} from "../types/listCashRegisters";
+} from '../types/listCashRegisters';
 
 export async function getListCashRegisters(
   status?: CashRegisterStatus[],
@@ -11,7 +11,7 @@ export async function getListCashRegisters(
   pageSize?: number,
 ): Promise<ListCashRegistersResponse> {
   try {
-    const { data } = await axiosInstance.get<ListCashRegistersResponse>(
+    const { data } = await axiosClient.get<ListCashRegistersResponse>(
       `cash-register`,
       {
         params: {
@@ -32,7 +32,7 @@ export async function getListCashRegisters(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }

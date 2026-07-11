@@ -165,6 +165,9 @@ export default function DetailsInscriptionTable({
     return `${hh}:${mm}`;
   });
 
+  // Função auxiliar para formatar CPF
+  const formatCPF = (value: string) => formatInput('cpf' as const, value);
+
   const [isEditingInscription, setIsEditingInscription] = useState(false);
   const [inscriptionForm, setInscriptionForm] = useState<InscriptionFormFields>(
     {

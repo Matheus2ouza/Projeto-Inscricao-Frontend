@@ -1,6 +1,5 @@
 'use client';
 
-import { ImageSwatches } from '@/features/guest/hook/guestInscription/useImagePalette';
 import {
   ExclusiveInscriptionCta,
   type SubscriptionStatus,
@@ -11,7 +10,8 @@ import {
 } from '@/features/inscriptions/types/exclusiveInscriptionLink/validateExclusiveInscriptionLink/validateExclusiveInscriptionLinkTypes';
 import { GuestInscriptionAlready } from '@/shared/components/GuestInscriptionAlready';
 import { Button } from '@/shared/components/ui/button';
-import { getGradientClass } from '@/shared/utils/getGenerateGradient';
+import { ImageSwatches } from '@/shared/hooks/useImagePalette';
+import { generateGradientClass } from '@/shared/utils/generateGradient';
 import { getWithExpiry, setWithExpiry } from '@/shared/utils/storageWithExpiry';
 import { AlertTriangle, Calendar, Loader2, MapPin, Share2 } from 'lucide-react';
 import Image from 'next/image';
@@ -207,7 +207,7 @@ export default function ValidateExclusiveInscriptionLink({
     );
   }
 
-  const gradientClass = getGradientClass(event.name);
+  const gradientClass = generateGradientClass();
   const subscriptionStatus = getSubscriptionStatus();
   const shouldShowImage = Boolean(event.image && !imageFailed);
   const hasCoordinates = !!event.location;

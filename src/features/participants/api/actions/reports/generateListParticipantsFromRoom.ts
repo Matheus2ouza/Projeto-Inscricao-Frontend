@@ -1,4 +1,4 @@
-import axiosInstance from '@/shared/lib/apiClient';
+import { axiosClient } from '@/lib/axios/client';
 
 // Tipo para participantes reais (do banco)
 export type RealParticipant = {
@@ -33,7 +33,7 @@ export async function generateParticipantsFromRoomPdf({
   listParticipants,
 }: GenerateParticipantsFromRoomPdfParams): Promise<GenerateParticipantsFromRoomPdfResponse> {
   try {
-    const { data } = await axiosInstance.post(`participants/pdf/room`, {
+    const { data } = await axiosClient.post(`participants/pdf/room`, {
       title,
       observation,
       listParticipants,

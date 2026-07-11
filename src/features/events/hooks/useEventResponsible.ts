@@ -1,8 +1,8 @@
-import { useGlobalLoading } from "@/components/GlobalLoading";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useInvalidateEventsQuery } from "../../expenses/hooks/useSelectEventsQuery";
-import { deleteEventResponsible } from "../api/manager/eventActions/deleteEventResponsible";
+import { useGlobalLoading } from '@/components/GlobalLoading';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useInvalidateEventsQuery } from '../../expenses/hooks/useSelectEventsQuery';
+import { deleteEventResponsibleAction } from '../actions/manager/deleteEventResponsible/deleteEventResponsibleAction';
 
 export function useEventResponsible() {
   const { invalidateDetail } = useInvalidateEventsQuery();
@@ -17,8 +17,8 @@ export function useEventResponsible() {
     try {
       setLoading(true);
       setGlobalLoading(true);
-      await deleteEventResponsible(eventId, accountId);
-      toast.success("Responsável removido com sucesso!");
+      await deleteEventResponsibleAction(eventId, accountId);
+      toast.success('Responsável removido com sucesso!');
 
       // Invalidar cache do evento
       invalidateDetail(eventId);
@@ -30,8 +30,8 @@ export function useEventResponsible() {
 
       return true;
     } catch (error) {
-      toast.error("Erro ao remover responsável");
-      console.error("Error removing responsible:", error);
+      toast.error('Erro ao remover responsável');
+      console.error('Error removing responsible:', error);
       return false;
     } finally {
       setLoading(false);

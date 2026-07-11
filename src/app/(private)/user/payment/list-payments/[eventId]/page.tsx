@@ -2,10 +2,10 @@
 
 import ListPayments from '@/features/payments/components/userListPayment/ListPayments';
 import { useListPayment } from '@/features/payments/hooks/listPayment/useListPayment';
+import { cn } from '@/lib/utils';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
-import { cn } from '@/shared/lib/utils';
 import { FileText, RefreshCw } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 

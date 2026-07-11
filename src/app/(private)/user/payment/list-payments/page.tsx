@@ -1,7 +1,7 @@
 'use client';
 
+import { useListEventsToPayment } from '@/features/events/hooks/listEvents/listEventsToPayment/useListEventsToPayment';
 import ListEventsForPayment from '@/features/payments/components/ListEventsForPayment';
-import { useEventsForPayment } from '@/features/payments/hooks/useEventsForPayment';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -18,7 +18,7 @@ export default function SelectEventForListPayments() {
     useState<boolean[]>(defaultStatusFilter);
   const wasClearedRef = useRef(false);
   const { events, total, page, pageCount, loading, error, setPage, refetch } =
-    useEventsForPayment({
+    useListEventsToPayment({
       pageSize: 8,
       paymentEnabled: appliedFilter.length > 0 ? appliedFilter : undefined,
     });

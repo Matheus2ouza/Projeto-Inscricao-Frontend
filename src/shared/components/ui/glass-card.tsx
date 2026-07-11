@@ -1,7 +1,7 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import * as React from 'react';
-import { cn } from '@shared/lib/utils';
 
 interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   glowEffect?: boolean;
@@ -98,9 +98,9 @@ GlassCardFooter.displayName = 'GlassCardFooter';
 
 export {
   GlassCard,
+  GlassCardContent,
+  GlassCardDescription,
+  GlassCardFooter,
   GlassCardHeader,
   GlassCardTitle,
-  GlassCardDescription,
-  GlassCardContent,
-  GlassCardFooter,
 };

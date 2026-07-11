@@ -1,11 +1,10 @@
-import { InscriptionDetails } from "@/features/guest/types/detailsInscription/detailsInscriptionType";
-import axiosInstance from "@/shared/lib/apiClient";
-
+import { InscriptionDetails } from '@/features/guest/types/detailsInscription/detailsInscriptionType';
+import { axiosClient } from '@/lib/axios';
 export async function getDetailsInscription(
   confirmationCode: string,
 ): Promise<InscriptionDetails> {
   try {
-    const { data } = await axiosInstance.get<InscriptionDetails>(
+    const { data } = await axiosClient.get<InscriptionDetails>(
       `inscription/guest/${confirmationCode}/details`,
     );
     return data;
@@ -18,7 +17,7 @@ export async function getDetailsInscription(
     throw new Error(
       axiosError.response?.data?.message ??
         axiosError.message ??
-        "Não foi possível carregar os membros.",
+        'Não foi possível carregar os membros.',
     );
   }
 }
