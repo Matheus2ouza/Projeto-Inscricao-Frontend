@@ -15,6 +15,13 @@ export const shirtTypeOptions = [
   { value: 'BABYLOOK', label: 'Babylook' },
 ];
 
+export type ParticipantFieldRule = 'required' | 'optional' | 'hidden';
+
+export type ParticipantFieldsConfig = Record<
+  'cpf' | 'preferredName' | 'shirtSize' | 'shirtType',
+  ParticipantFieldRule
+>;
+
 export enum InscriptionStatus {
   PENDING = 'PENDING',
   UNDER_REVIEW = 'UNDER_REVIEW',
@@ -58,7 +65,6 @@ export type InscriptionDetails = {
   status: InscriptionStatus;
   guestEmail: string;
   guestName: string;
-  localityId: string;
   phone: string;
   createdAt: Date;
   totalValue: number;
@@ -66,6 +72,7 @@ export type InscriptionDetails = {
   locality: Locality;
   participant: Participant;
   payments?: Payment[];
+  participanteConfig: ParticipantFieldsConfig;
 };
 
 export type TypeInscription = {
@@ -121,13 +128,14 @@ export type GuestInscriptionDetailsResponse = {
   locality: Locality;
   participant: Participant;
   payments?: Payment[];
+  participanteConfig: ParticipantFieldsConfig;
 };
 
-export type DetailsInscriptionParams = {
+export type UseDetailsInscriptionParams = {
   confirmationCode: string;
 };
 
-export type DetailsInscriptionResult = {
+export type UseDetailsInscriptionResult = {
   inscription: InscriptionDetails | null;
   participant: Participant | null;
   payments: Payment[] | null;
