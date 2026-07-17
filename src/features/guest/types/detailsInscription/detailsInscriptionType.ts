@@ -88,11 +88,12 @@ export type Locality = {
 export type Participant = {
   id: string;
   name: string;
-  birthDate: Date;
+  birthDate: string;
+  gender: GenderType;
   preferredName?: string;
   shirtSize?: ShirtSize;
   shirtType?: ShirtType;
-  gender: GenderType;
+  cpf: string;
   typeInscription: TypeInscription;
 };
 

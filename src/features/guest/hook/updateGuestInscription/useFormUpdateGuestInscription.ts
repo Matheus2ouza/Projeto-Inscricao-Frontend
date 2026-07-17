@@ -27,7 +27,7 @@ export function useFormUpdateGuestInscription(
   const form = useForm<UpdateGuestInscriptionSchemaType>({
     resolver: zodResolver(updateGuestInscriptionSchema),
     defaultValues: {
-      locality: guestInscription.localityId,
+      locality: guestInscription.locality.id,
       guestName: guestInscription.guestName,
       guestEmail: guestInscription.guestEmail,
       phone: guestInscription.phone,
