@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { UseEventsParams, UseEventsResult } from "../types/eventTypes";
+import { useState } from 'react';
+import { UseEventsParams, UseEventsResult } from '../types/eventTypes';
 import {
   useAnalysisEventsQuery,
   usePrefetchAnalysisEvents,
-} from "./useAnalysisEventsQuery";
+} from './useAnalysisEventsQuery';
 
 export function useEventsForAnalysis({
   initialPage = 1,

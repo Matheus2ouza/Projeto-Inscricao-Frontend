@@ -13,7 +13,7 @@ export type TypeInscription = {
 export type ListTypeInscriptionsToManagerResponse = TypeInscription[];
 
 export type UseListTypeInscriptionsToManagerParams = {
-  eventId: string;
+  eventId?: string;
 };
 
 export type UseListTypeInscriptionsToManagerResult = {

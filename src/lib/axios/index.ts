@@ -1,5 +1,1 @@
-import { setupInterceptors } from './interceptors';
-
-setupInterceptors();
-
-export * from './client';
+export { axiosClient } from './client';

@@ -7,11 +7,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 export const listTypeInscriptionsKeys = {
   all: ['list-type-inscriptions'] as const,
   lists: () => [...listTypeInscriptionsKeys.all, 'list'] as const,
-  list: (eventId: string) =>
+  list: (eventId?: string) =>
     [...listTypeInscriptionsKeys.lists(), eventId] as const,
 };
 
-export function useListTypeInscriptionsQuery(eventId: string) {
+export function useListTypeInscriptionsQuery(eventId?: string) {
   return useQuery<ListTypeInscriptionsResponse>({
     queryKey: listTypeInscriptionsKeys.list(eventId),
     queryFn: () => listTypeInscriptionsAction(eventId),

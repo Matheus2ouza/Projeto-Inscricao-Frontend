@@ -3,8 +3,7 @@
 import {
   Event,
   InscriptionMode,
-  UpdateEventInput,
-} from '@/features/events/types/manager/eventManagerTypes';
+} from '@/features/events/types/manager/eventDetailsManager/eventDetailsManagerTypes';
 import { useCurrentUser } from '@/shared/context/user-context';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -20,10 +19,8 @@ export function useFormEditEvent(event: Event) {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Mutations
+  // Mutations (apenas as que não são de update do evento)
   const {
-    handleUpdateEvent,
-    isUpdatingEvent,
     handleDeleteEvent,
     isDeletingEvent,
     handleUpdateAllowCard,
@@ -43,23 +40,7 @@ export function useFormEditEvent(event: Event) {
   const originalInscriptionModes = event.allowedInscriptionModes || [];
 
   const [formData, setFormData] = useState({
-    name: event.name,
-    description: event.description || '',
-    startDate: event.startDate.split('T')[0],
-    endDate: event.endDate.split('T')[0],
-    startTime: event.startDate.includes('T')
-      ? event.startDate.split('T')[1].substring(0, 5)
-      : '00:00',
-    endTime: event.endDate.includes('T')
-      ? event.endDate.split('T')[1].substring(0, 5)
-      : '00:00',
-    location: event.location || '',
-    latitude: event.latitude || 0,
-    longitude: event.longitude || 0,
-    maxParticipants: event.maxParticipants || 0,
-    ticketPrice: event.ticketPrice || 0,
     status: event.status || 'CLOSE',
-    active: event.active || false,
     responsibleIds: originalResponsibleIds,
     allowedInscriptionModes: originalInscriptionModes,
   });
@@ -73,47 +54,6 @@ export function useFormEditEvent(event: Event) {
       [name]:
         type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
-  };
-
-  const handleSave = async (newResponsibleIds?: string[]) => {
-    try {
-      setLoading(true);
-
-      // Combinar data e hora
-      const startDate = `${formData.startDate}T${formData.startTime}:00`;
-      const endDate = `${formData.endDate}T${formData.endTime}:00`;
-
-      const updateData: UpdateEventInput = {
-        name: formData.name,
-        startDate: new Date(startDate).toISOString(),
-        endDate: new Date(endDate).toISOString(),
-        location: formData.location,
-        latitude: Number(formData.latitude),
-        longitude: Number(formData.longitude),
-        maxParticipants: formData.maxParticipants || undefined,
-        ticketPrice: formData.ticketPrice || undefined,
-        status: formData.status,
-        active: formData.active,
-        responsibles:
-          newResponsibleIds && newResponsibleIds.length > 0
-            ? newResponsibleIds
-            : undefined,
-        allowedInscriptionModes: formData.allowedInscriptionModes,
-      };
-
-      await handleUpdateEvent(updateData);
-
-      // Invalidar cache do evento e da lista de eventos
-      invalidateDetail(event.id);
-      invalidateManagerList();
-      invalidateExpensesList();
-
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating event:', error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleDelete = async (): Promise<boolean> => {
@@ -178,23 +118,7 @@ export function useFormEditEvent(event: Event) {
 
   const handleCancel = () => {
     setFormData({
-      name: event.name,
-      description: event.description || '',
-      startDate: event.startDate.split('T')[0],
-      endDate: event.endDate.split('T')[0],
-      startTime: event.startDate.includes('T')
-        ? event.startDate.split('T')[1].substring(0, 5)
-        : '00:00',
-      endTime: event.endDate.includes('T')
-        ? event.endDate.split('T')[1].substring(0, 5)
-        : '00:00',
-      location: event.location || '',
-      latitude: event.latitude || 0,
-      longitude: event.longitude || 0,
-      maxParticipants: event.maxParticipants || 0,
-      ticketPrice: event.ticketPrice || 0,
       status: event.status || 'CLOSE',
-      active: event.active || false,
       responsibleIds: originalResponsibleIds,
       allowedInscriptionModes: originalInscriptionModes,
     });
@@ -234,7 +158,6 @@ export function useFormEditEvent(event: Event) {
     setIsEditing,
     loading:
       loading ||
-      isUpdatingEvent ||
       isDeletingEvent ||
       isUpdatingAllowCard ||
       isUpdatingEventPayment ||
@@ -243,7 +166,6 @@ export function useFormEditEvent(event: Event) {
     originalResponsibleIds,
     originalInscriptionModes,
     handleInputChange,
-    handleSave,
     handleDelete,
     handleCancel,
     handleUpdatePayment,

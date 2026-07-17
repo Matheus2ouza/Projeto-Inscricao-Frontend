@@ -69,8 +69,6 @@ export default function AdminManagerHome() {
       await dashboard.refetchAll();
       setLastUpdated(new Date());
       router.refresh();
-
-      toast.success('Dashboard atualizado com sucesso!');
     } catch (error) {
       const message = (error as Error | null)?.message ?? 'Erro inesperado';
       toast.error('Erro ao atualizar dashboard', {

@@ -3,10 +3,10 @@
 import {
   InscriptionStatus,
   RegisterGuestInscriptionResponse,
-} from '@/features/guest/types/guestInscription/guestInscriptionTypes';
+} from '@/features/guest/types/guestInscription/registerGuesInscriptionTypes';
 import { cn } from '@/lib/utils';
 import { Check, Copy, CreditCard } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface InscriptionSuccessModalProps {
   isOpen: boolean;
@@ -26,6 +26,40 @@ export function InscriptionSuccessModal({
   primaryColor,
 }: InscriptionSuccessModalProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+
+  // Calcular o countdown baseado no expiresAt
+  useEffect(() => {
+    if (!isOpen || !successData || successData.expiresAt === 'indefinite') {
+      setCountdown(null);
+      return;
+    }
+
+    const expiresAt = new Date(successData.expiresAt);
+    const now = new Date();
+    const remainingSeconds = Math.floor(
+      (expiresAt.getTime() - now.getTime()) / 1000,
+    );
+
+    if (remainingSeconds <= 0) {
+      setCountdown(0);
+      return;
+    }
+
+    setCountdown(remainingSeconds);
+
+    const intervalId = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === null || prev <= 0) {
+          clearInterval(intervalId);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [isOpen, successData]);
 
   if (!isOpen || !successData) return null;
 
@@ -35,8 +69,9 @@ export function InscriptionSuccessModal({
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  const isUrgent =
-    paymentCountdownSeconds !== null && paymentCountdownSeconds <= 300;
+  // Usar o countdown interno ou o recebido por prop (fallback)
+  const displayCountdown = countdown ?? paymentCountdownSeconds;
+  const isUrgent = displayCountdown !== null && displayCountdown <= 300;
   const accentColor = primaryColor || '#d97706';
 
   const handleCopyCode = () => {
@@ -46,6 +81,7 @@ export function InscriptionSuccessModal({
   };
 
   const isPending = successData.status === InscriptionStatus.PENDING;
+  const hasExpiration = successData.expiresAt !== 'indefinite';
 
   return (
     <div className="fixed inset-0 flex items-end justify-center p-0 sm:items-center sm:p-4">
@@ -120,8 +156,8 @@ export function InscriptionSuccessModal({
           )}
 
           <div className="space-y-4 px-5 pt-6 pb-8">
-            {/* Warning box — só para PENDING */}
-            {isPending && (
+            {/* Warning box — só para PENDING com expiração */}
+            {isPending && hasExpiration && (
               <div className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20">
                 <svg
                   className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400"
@@ -156,6 +192,40 @@ export function InscriptionSuccessModal({
               </div>
             )}
 
+            {/* PENDING sem expiração (vaga garantida, apenas aguardando pagamento) */}
+            {isPending && !hasExpiration && (
+              <div className="flex gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20">
+                <svg
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                >
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r="9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M10 6v5M10 13v1"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+                    Aguardando pagamento
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-amber-800 dark:text-amber-400">
+                    Sua vaga está <strong>garantida</strong>. Realize o
+                    <strong> pagamento</strong> para confirmar sua participação.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Under Review info box */}
             {!isPending && (
               <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/40 dark:bg-amber-900/20">
@@ -182,8 +252,8 @@ export function InscriptionSuccessModal({
               </div>
             )}
 
-            {/* Countdown — só para PENDING */}
-            {isPending && paymentCountdownSeconds !== null && (
+            {/* Countdown — só para PENDING com expiração */}
+            {isPending && hasExpiration && displayCountdown !== null && (
               <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900">
                 <div className="mb-2 flex items-center gap-2">
                   <span
@@ -204,10 +274,12 @@ export function InscriptionSuccessModal({
                       : 'text-gray-900 dark:text-white',
                   )}
                 >
-                  {formatCountdown(paymentCountdownSeconds)}
+                  {formatCountdown(displayCountdown)}
                 </p>
                 <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">
-                  A reserva expira se o pagamento não for efetuado
+                  {displayCountdown === 0
+                    ? 'Prazo expirado! Entre em contato com os organizadores.'
+                    : 'A reserva expira se o pagamento não for efetuado'}
                 </p>
               </div>
             )}

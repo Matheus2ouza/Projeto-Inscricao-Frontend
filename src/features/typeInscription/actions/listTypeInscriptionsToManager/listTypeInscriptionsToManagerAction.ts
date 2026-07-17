@@ -4,7 +4,7 @@ import { listTypeInscriptionsToManagerService } from '@/features/typeInscription
 import type { ListTypeInscriptionsToManagerResponse } from '@/features/typeInscription/types/listTypeInscriptionsToManager/listTypeInscriptionsManagerTypes';
 
 export async function listTypeInscriptionsToManagerAction(
-  eventId: string,
+  eventId?: string,
 ): Promise<ListTypeInscriptionsToManagerResponse> {
   const data = await listTypeInscriptionsToManagerService(eventId);
   return data;

@@ -1,9 +1,8 @@
 'use client';
 
-import { DetailsInscription } from '@/features/guest/components/detailsInscription/detailsInscription';
+import { DetailsInscription } from '@/features/guest/components/detailsInscription/DetailsInscription';
 import { useDeletePayment } from '@/features/guest/hook/detailsInscription/actions/useDeletePayment';
 import { useModifyReceiptPayment } from '@/features/guest/hook/detailsInscription/actions/useModifyReceiptPayment';
-import { useUpdateGuestInscription } from '@/features/guest/hook/detailsInscription/actions/useUpdateInscription';
 import { useUpdateGuestParticipant } from '@/features/guest/hook/detailsInscription/actions/useUpdateParticipant';
 import { useDetailsInscription } from '@/features/guest/hook/detailsInscription/useDetailsInscription';
 import { useRegisterPaymentPixAssas } from '@/features/payments/hooks/registerPayment/useRegisterPaymentPixAsaas';
@@ -69,41 +68,10 @@ export default function GuestInscriptionPage() {
     }
   }, [eventId, searchParams]);
 
-  const { inscription, participants, payments, loading, error, refetch } =
+  const { inscription, participant, payments, loading, error, refetch } =
     useDetailsInscription({
       confirmationCode: confirmationCode ?? '',
     });
-
-  const { form: updateInscriptionForm, handleUpdateInscription } =
-    useUpdateGuestInscription({
-      inscriptionId: inscription?.id ?? '',
-      initialValues: inscription
-        ? {
-            guestName: inscription.guestName,
-            guestEmail: inscription.guestEmail,
-            guestLocality: inscription.guestLocality,
-            phone: inscription.phone,
-          }
-        : undefined,
-      onSuccess: () => {
-        setIsEditingInscription(false);
-      },
-    });
-
-  const handleStartEditInscription = () => {
-    if (!inscription) return;
-    setIsEditingInscription(true);
-  };
-
-  const handleCancelEditInscription = () => {
-    setIsEditingInscription(false);
-    updateInscriptionForm.reset({
-      guestName: inscription?.guestName ?? '',
-      guestEmail: inscription?.guestEmail ?? '',
-      guestLocality: inscription?.guestLocality ?? '',
-      phone: inscription?.phone ?? '',
-    });
-  };
 
   const toDateInputValue = (value: string | Date | null | undefined) => {
     if (!value) return '';
@@ -112,8 +80,7 @@ export default function GuestInscriptionPage() {
     return date.toISOString().slice(0, 10);
   };
 
-  const participantBeingEdited =
-    participants?.find((p) => p.id === editingParticipantId) ?? null;
+  const participantBeingEdited = participant ?? null;
 
   const { form: updateParticipantForm, handleUpdateParticipant } =
     useUpdateGuestParticipant({
@@ -134,21 +101,20 @@ export default function GuestInscriptionPage() {
     });
 
   const handleStartEditParticipant = (participantId: string) => {
-    if (!participants?.length) return;
-    const exists = participants.some((p) => p.id === participantId);
-    if (!exists) return;
+    if (!participant) return;
+    if (participant.id !== participantId) return;
     setEditingParticipantId(participantId);
   };
 
   const handleCancelEditParticipant = () => {
-    const current = participants?.find((p) => p.id === editingParticipantId);
+    if (!participant) return;
     updateParticipantForm.reset({
-      name: current?.name ?? '',
-      preferredName: current?.preferredName ?? '',
-      birthDate: toDateInputValue(current?.birthDate),
-      gender: String(current?.gender ?? ''),
-      shirtSize: String(current?.shirtSize ?? ''),
-      shirtType: String(current?.shirtType ?? ''),
+      name: participant.name ?? '',
+      preferredName: participant.preferredName ?? '',
+      birthDate: toDateInputValue(participant.birthDate),
+      gender: String(participant.gender ?? ''),
+      shirtSize: String(participant.shirtSize ?? ''),
+      shirtType: String(participant.shirtType ?? ''),
     });
     setEditingParticipantId(null);
   };
@@ -172,14 +138,11 @@ export default function GuestInscriptionPage() {
   }, [searchParams, loading, inscription, error]);
 
   const handleRegisterPaymentCard = () => {
-    if (!inscription || !eventId || !participants) return;
+    if (!inscription || !eventId || !participant) return;
 
-    const participantsTotal = participants.reduce(
-      (total, participant) => total + participant.typeInscription.price,
-      0,
-    );
+    const participantTotal = participant.typeInscription.price;
     const payment = payments?.[0];
-    const totalValue = payment?.totalValue ?? participantsTotal;
+    const totalValue = payment?.totalValue ?? participantTotal;
     const totalPaid = payment?.totalPaid ?? 0;
     const remainingTotal = Math.max(totalValue - totalPaid, 0);
     const search = new URLSearchParams();
@@ -187,26 +150,6 @@ export default function GuestInscriptionPage() {
     search.set('totalValue', String(remainingTotal));
     router.push(`/guest/${eventId}/payment/card?${search.toString()}`);
   };
-
-  // const handleRegisterPaymentPix = () => {
-  //   if (!inscription || !eventId || !participants) return;
-
-  //   const participantsTotal = participants.reduce(
-  //     (total, participant) => total + participant.typeInscription.price,
-  //     0,
-  //   );
-  //   const payment = payments?.[0];
-  //   const totalValue = payment?.totalValue ?? participantsTotal;
-  //   const totalPaid = payment?.totalPaid ?? 0;
-  //   const remainingTotal = Math.max(totalValue - totalPaid, 0);
-  //   const search = new URLSearchParams();
-  //   search.set('inscriptions', inscription.id);
-  //   search.set('confirmationCode', confirmationCode ?? '');
-  //   search.set('guestName', inscription.guestName ?? '');
-  //   search.set('guestEmail', inscription.guestEmail ?? '');
-  //   search.set('totalValue', String(remainingTotal));
-  //   router.push(`/guest/${eventId}/payment/pix?${search.toString()}`);
-  // };
 
   const { mutate: registerPixAssas, isPending: isRegisteringPix } =
     useRegisterPaymentPixAssas();
@@ -223,18 +166,12 @@ export default function GuestInscriptionPage() {
     return (
       <div className="space-y-6">
         <DetailsInscription
+          eventId={eventId}
           confirmationCode={confirmationCode}
           inscription={inscription}
-          participants={participants}
+          participant={participant}
           payments={payments}
           loading={loading}
-          inscriptionEdit={{
-            isEditing: isEditingInscription,
-            form: updateInscriptionForm,
-            onStart: handleStartEditInscription,
-            onCancel: handleCancelEditInscription,
-            onSubmit: handleUpdateInscription,
-          }}
           participantEdit={{
             editingParticipantId,
             form: updateParticipantForm,

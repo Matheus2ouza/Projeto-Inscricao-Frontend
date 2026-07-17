@@ -12,12 +12,9 @@ export function useListTypeInscriptions({
   const { data, isLoading, isFetching, isFetched, error, refetch } =
     useListTypeInscriptionsQuery(eventId);
 
-  const hasData = Boolean(data?.length);
-  const loading = isLoading && !hasData;
-
   return {
     typeInscriptions: data || [],
-    loading,
+    loading: isLoading,
     fetching: isFetching,
     fetched: isFetched,
     error: error || null,

@@ -15,7 +15,7 @@ export type RespondeErrorData = {
 
 const instance = axios.create({
   baseURL: process.env.API_URL,
-  timeout: 5000,
+  timeout: 60000, // 60 segundos como padrão seguro
   headers: {
     'Content-Type': 'application/json',
   },

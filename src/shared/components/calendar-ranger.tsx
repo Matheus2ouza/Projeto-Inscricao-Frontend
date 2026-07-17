@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 
-import { Calendar } from "@shared/components/ui/calendar";
-import { ptBR } from "date-fns/locale";
-import { type DateRange } from "react-day-picker";
+import { Calendar } from '@shared/components/ui/calendar';
+import { ptBR } from 'date-fns/locale';
+import { type DateRange } from 'react-day-picker';
 
 interface CalendarRangerProps {
   dateRange?: DateRange;
@@ -16,8 +16,8 @@ export function CalendarRanger({
   onDateRangeChange,
 }: CalendarRangerProps) {
   const [dropdown, setDropdown] =
-    React.useState<React.ComponentProps<typeof Calendar>["captionLayout"]>(
-      "dropdown"
+    React.useState<React.ComponentProps<typeof Calendar>['captionLayout']>(
+      'dropdown',
     );
 
   // Estado interno apenas se as props não forem fornecidas
@@ -33,9 +33,6 @@ export function CalendarRanger({
     dateRange !== undefined ? dateRange : internalDateRange;
 
   const handleDateRangeChange = (range: DateRange | undefined) => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("[CalendarRanger] onDateRangeChange", range);
-    }
     if (onDateRangeChange) {
       // Se callback externo foi fornecido, use-o
       onDateRangeChange(range);
@@ -50,8 +47,8 @@ export function CalendarRanger({
   const toYear = currentYear + 10;
 
   return (
-    <div className="flex flex-col gap-4 w-full align-center justify-center">
-      <div className="flex justify-center align-middle w-full">
+    <div className="align-center flex w-full flex-col justify-center gap-4">
+      <div className="flex w-full justify-center align-middle">
         <Calendar
           mode="range"
           defaultMonth={currentDateRange?.from}

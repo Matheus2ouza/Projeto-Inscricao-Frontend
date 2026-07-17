@@ -1,16 +1,18 @@
+import { guestInscriptionDetailsAction } from '@/features/guest/actions/guestInscriptionDetails/guestInscriptionDetails';
+import { GuestInscriptionDetailsResponse } from '@/features/guest/types/detailsInscription/detailsInscriptionType';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getDetailsInscription } from '../../api/detailsInscription/getDetailsInscription';
 
 export const detailsGuestInscriptionKeys = {
   all: ['details-guest-inscription'] as const,
-  lists: () => [...detailsGuestInscriptionKeys.all, 'list'] as const,
-  list: (id: string) => [...detailsGuestInscriptionKeys.lists(), id] as const,
+  details: () => [...detailsGuestInscriptionKeys.all, 'detail'] as const,
+  detail: (confirmationCode?: string) =>
+    [...detailsGuestInscriptionKeys.details(), confirmationCode] as const,
 };
 
-export function useDetailsInscriptionQuery(confirmationCode: string) {
-  return useQuery({
-    queryKey: detailsGuestInscriptionKeys.list(confirmationCode),
-    queryFn: () => getDetailsInscription(confirmationCode),
+export function useDetailsInscriptionQuery(confirmationCode?: string) {
+  return useQuery<GuestInscriptionDetailsResponse>({
+    queryKey: detailsGuestInscriptionKeys.detail(confirmationCode),
+    queryFn: () => guestInscriptionDetailsAction(confirmationCode),
     enabled: !!confirmationCode,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
@@ -29,16 +31,47 @@ export function useInvalidateDetailsGuestInscriptionQuery() {
       });
     },
 
-    invalidateLists: () => {
+    invalidateDetails: () => {
       queryClient.invalidateQueries({
-        queryKey: detailsGuestInscriptionKeys.lists(),
+        queryKey: detailsGuestInscriptionKeys.details(),
       });
     },
 
-    invalidateDetail: (id: string) => {
+    invalidateLists: () => {
       queryClient.invalidateQueries({
-        queryKey: detailsGuestInscriptionKeys.list(id),
+        queryKey: detailsGuestInscriptionKeys.details(),
       });
+    },
+
+    invalidateDetail: (confirmationCode: string) => {
+      queryClient.invalidateQueries({
+        queryKey: detailsGuestInscriptionKeys.detail(confirmationCode),
+      });
+    },
+
+    removeAll: () => {
+      queryClient.removeQueries({
+        queryKey: detailsGuestInscriptionKeys.all,
+      });
+    },
+
+    removeDetails: () => {
+      queryClient.removeQueries({
+        queryKey: detailsGuestInscriptionKeys.details(),
+      });
+    },
+
+    removeDetail: (confirmationCode: string) => {
+      queryClient.removeQueries({
+        queryKey: detailsGuestInscriptionKeys.detail(confirmationCode),
+      });
+    },
+
+    setDetailData: (confirmationCode: string, data: any) => {
+      queryClient.setQueryData(
+        detailsGuestInscriptionKeys.detail(confirmationCode),
+        data,
+      );
     },
   };
 }

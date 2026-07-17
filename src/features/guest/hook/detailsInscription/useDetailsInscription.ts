@@ -1,8 +1,8 @@
 import {
   DetailsInscriptionParams,
   DetailsInscriptionResult,
-} from "../../types/detailsInscription/detailsInscriptionType";
-import { useDetailsInscriptionQuery } from "./useDetailsInscriptionQuery";
+} from '../../types/detailsInscription/detailsInscriptionType';
+import { useDetailsInscriptionQuery } from './useDetailsInscriptionQuery';
 
 export function useDetailsInscription({
   confirmationCode,
@@ -12,7 +12,7 @@ export function useDetailsInscription({
 
   return {
     inscription: data || null,
-    participants: data?.participants || [],
+    participant: data?.participant || null,
     payments: data?.payments || [],
     loading: isLoading,
     error: error?.message || null,

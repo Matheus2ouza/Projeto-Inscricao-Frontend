@@ -1,46 +1,32 @@
 'use client';
 
+import ImageCropDialog from '@/features/events/components/manager/ImageCropDialog';
 import { useFormEditEvent } from '@/features/events/hooks/manager/useFormEditEvent';
 import {
   Event,
   InscriptionMode,
-} from '@/features/events/types/manager/eventManagerTypes';
+} from '@/features/events/types/manager/eventDetailsManager/eventDetailsManagerTypes';
 import { TypeInscription } from '@/features/typeInscription/types/listTypeInscriptionsToManager/listTypeInscriptionsManagerTypes';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
-import EventMap from '@/shared/components/EventMap';
-import ImageCropDialog from '@/shared/components/ImageCropDialog';
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from '@/shared/components/ui/alert';
 import { AspectRatio } from '@/shared/components/ui/aspect-ratio';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
-import {
-  AlertCircle,
-  Calendar,
-  DollarSign,
-  Eye,
-  EyeClosed,
-  MapPin,
-  Plus,
-  User,
-  Users,
-} from 'lucide-react';
+import { DollarSign, Eye, EyeClosed, User, Users } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useInvalidateEventDetailsManagerQuery } from '../../hooks/manager/eventDetailsManager/useEventDetailsManagerQuery';
-import InscriptionModesDialog from './InscriptionModesDialog';
 
 import { deleteImageEventAction } from '../../actions/manager/deleteImageEvent/deleteImageEventAction';
 import { deleteLogoEventAction } from '../../actions/manager/deleteLogoEvent/deleteLogoEventAction';
 import { updateEventImageAction } from '../../actions/manager/updateEventImage/updateEventImageAction';
 import { updateEventLogoAction } from '../../actions/manager/updateEventLogo/updateEventLogoAction';
 import { EventActionsHeader } from './EventActionsHeader';
+import { EventInfoCard } from './EventInfoCard';
+import InscriptionModesManager from './InscriptionModesManager';
+import ParticipantFieldsManager from './ParticipantFieldsManager';
+import PaymentModesManager from './PaymentModesManager';
 import { ResponsiblesSection } from './ResponsiblesSection';
 import { TypesInscriptionSection } from './TypesInscriptionSection';
 
@@ -50,6 +36,7 @@ interface EventManagementProps {
   refreshEvent: () => void;
   refreshTypeInscriptions: () => void;
 }
+
 export default function EventManagement({
   event,
   typeInscriptions,
@@ -60,7 +47,9 @@ export default function EventManagement({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <div className="text-center">
-          <h2 className="mb-4 text-2xl font-bold">Evento não encontrado</h2>
+          <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray mb-4 text-2xl font-bold">
+            Evento não encontrado
+          </h2>
           <p className="text-muted-foreground">
             O evento que você está tentando acessar não existe ou não foi
             carregado.
@@ -72,19 +61,18 @@ export default function EventManagement({
 
   const [showAmount, setShowAmount] = useState(false);
 
+  // Hook para outras funcionalidades (delete, allow card, payment, inscriptions, etc)
   const {
     isEditing,
     setIsEditing,
     loading,
     formData,
-    handleInputChange,
     handleDelete,
     handleInscriptionModesChange,
   } = useFormEditEvent(event);
+
   const { invalidateDetail } = useInvalidateEventDetailsManagerQuery();
 
-  const [inscriptionModesDialogOpen, setInscriptionModesDialogOpen] =
-    useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [logoDialogOpen, setLogoDialogOpen] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -95,38 +83,8 @@ export default function EventManagement({
   const [isDeleteLogoOpen, setIsDeleteLogoOpen] = useState(false);
   const [isDeleteEventOpen, setIsDeleteEventOpen] = useState(false);
 
-  // Opções para os modos de inscrição
-  const inscriptionModeOptions = [
-    { value: InscriptionMode.NORMAL, label: 'Normal' },
-    { value: InscriptionMode.GUEST, label: 'Não Alocados' },
-  ];
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
-
-  const getEventStatus = () => {
-    const now = new Date();
-    const start = new Date(event.startDate);
-    const end = new Date(event.endDate);
-
-    if (now >= start && now <= end) {
-      return { label: 'Em Andamento', color: 'bg-blue-600' };
-    }
-
-    switch (event.status) {
-      case 'OPEN':
-        return { label: 'Inscrições Abertas', color: 'bg-green-600' };
-      case 'CLOSE':
-        return { label: 'Inscrições Fechadas', color: 'bg-amber-600' };
-      case 'FINALIZED':
-        return { label: 'Finalizado', color: 'bg-red-600' };
-      default:
-        return { label: 'Status desconhecido', color: 'bg-gray-600' };
-    }
-  };
-
   const handleConfirmDeleteImage = useCallback(async () => {
+    if (!event) return;
     try {
       setDeleteImage(true);
       await deleteImageEventAction(event.id);
@@ -142,9 +100,10 @@ export default function EventManagement({
     } finally {
       setDeleteImage(false);
     }
-  }, [event.id, refreshEvent]);
+  }, [event, refreshEvent]);
 
   const handleConfirmDeleteLogo = useCallback(async () => {
+    if (!event) return;
     try {
       setDeleteLogo(true);
       await deleteLogoEventAction(event.id);
@@ -160,10 +119,9 @@ export default function EventManagement({
     } finally {
       setDeleteLogo(false);
     }
-  }, [event.id, refreshEvent]);
+  }, [event, refreshEvent]);
 
-  const statusBadge = getEventStatus();
-  const totalRevenue = event.amountCollected;
+  const totalRevenue = event?.amountCollected || 0;
 
   const handleConfirmDelete = useCallback(async () => {
     const success = await handleDelete();
@@ -172,19 +130,25 @@ export default function EventManagement({
     }
   }, [handleDelete]);
 
-  if (!event) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <div className="text-center">
-          <h2 className="mb-4 text-2xl font-bold">Evento não encontrado</h2>
-          <p className="text-muted-foreground">
-            O evento que você está tentando acessar não existe ou não foi
-            carregado.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Função para adicionar um modo de inscrição
+  const handleAddInscriptionMode = (mode: InscriptionMode) => {
+    const currentModes = formData.allowedInscriptionModes || [];
+    if (!currentModes.includes(mode)) {
+      handleInscriptionModesChange([...currentModes, mode]);
+    }
+  };
+
+  // Função para remover um modo de inscrição
+  const handleRemoveInscriptionMode = (mode: InscriptionMode) => {
+    const currentModes = formData.allowedInscriptionModes || [];
+    handleInscriptionModesChange(currentModes.filter((m) => m !== mode));
+  };
+
+  // Handler para sucesso do update
+  const handleUpdateSuccess = () => {
+    invalidateDetail(event.id);
+    refreshEvent();
+  };
 
   return (
     <div className="bg-background min-h-screen rounded-lg">
@@ -192,294 +156,72 @@ export default function EventManagement({
         {/* Header com ações principais */}
         <EventActionsHeader
           event={event}
+          isEditing={isEditing}
           onEdit={() => setIsEditing(true)}
+          onCancel={() => {
+            setIsEditing(false);
+          }}
+          onSave={() => {
+            setIsEditing(false);
+            refreshEvent();
+            invalidateDetail(event.id);
+          }}
           onDelete={() => setIsDeleteEventOpen(true)}
         />
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Coluna Principal */}
           <div className="space-y-6 lg:col-span-2">
-            {/* Card de Informações Básicas */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Informações Básicas
-                </h2>
-                <Badge className={statusBadge.color + ' text-white'}>
-                  {statusBadge.label}
-                </Badge>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Nome do Evento
-                  </label>
-                  {isEditing ? (
-                    <Input
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Nome do evento"
-                    />
-                  ) : (
-                    <p className="text-lg font-medium text-gray-900 dark:text-white">
-                      {event.name}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Card de Datas e Horários */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-              <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
-                Datas e Horários
-              </h2>
-
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Data de Início
-                  </label>
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <Input
-                        type="date"
-                        name="startDate"
-                        value={formData.startDate}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(event.startDate)}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Data de Término
-                  </label>
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <Input
-                        type="date"
-                        name="endDate"
-                        value={formData.endDate}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(event.endDate)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            {/* Card de Informações do Evento - Independente */}
+            <EventInfoCard event={event} />
 
             {/* Card de Modos de Inscrição */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+            <div className="liquid-card rounded-xl p-6">
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-semibold">
                   Modos de Inscrição
                 </h2>
-                <Badge variant="outline" className="flex items-center gap-1">
+                <Badge
+                  variant="outline"
+                  className="border-riodavida/20 bg-riodavida/5 text-riodavida dark:border-riodavida/20 dark:bg-riodavida/10 dark:text-riodavida flex items-center gap-1"
+                >
                   <User className="h-3 w-3" />
                   {event.allowedInscriptionModes?.length || 0} modos
                 </Badge>
               </div>
 
-              <div className="space-y-4">
-                {!event.allowedInscriptionModes?.length ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <User className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                    <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                      Nenhum modo de inscrição configurado
-                    </h3>
-                    <p className="mb-4 text-gray-600 dark:text-gray-400">
-                      Selecione os modos de inscrição disponíveis para este
-                      evento.
-                    </p>
-                    {isEditing && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex items-center gap-2"
-                        onClick={() => setInscriptionModesDialogOpen(true)}
-                      >
-                        <Plus className="h-4 w-4" />
-                        Adicionar Modos
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <div className="space-y-2">
-                      {(() => {
-                        // Durante edição, mostrar todos os modos selecionados
-                        // No modo visualização, mostrar apenas os modos do evento
-                        const displayModes = isEditing
-                          ? formData.allowedInscriptionModes || []
-                          : event.allowedInscriptionModes || [];
-
-                        return displayModes.map((mode) => {
-                          const modeOption = inscriptionModeOptions.find(
-                            (opt) => opt.value === mode,
-                          );
-                          return (
-                            <div
-                              key={mode}
-                              className="flex items-center justify-between rounded-lg border border-gray-200/60 bg-gray-50/80 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-white/5"
-                            >
-                              <div className="flex flex-1 items-center gap-2">
-                                <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                  {modeOption?.label || mode}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-
-                    {isEditing && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="flex w-full items-center gap-2"
-                        onClick={() => setInscriptionModesDialogOpen(true)}
-                      >
-                        <Plus className="h-4 w-4" />
-                        Gerenciar Modos de Inscrição
-                      </Button>
-                    )}
-                  </>
-                )}
-              </div>
+              <InscriptionModesManager
+                eventId={event.id}
+                selectedModes={event.allowedInscriptionModes || []}
+              />
             </div>
 
-            {/* Card de Localização */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
+            {/* Card de Modos de Pagamento */}
+            <div className="liquid-card rounded-xl p-6">
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Localização
+                <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-semibold">
+                  Modos de Pagamento
                 </h2>
+                <Badge
+                  variant="outline"
+                  className="border-riodavida/20 bg-riodavida/5 text-riodavida dark:border-riodavida/20 dark:bg-riodavida/10 dark:text-riodavida flex items-center gap-1"
+                >
+                  <DollarSign className="h-3 w-3" />
+                  {event.allowedPaymentModes?.length || 0} modos
+                </Badge>
               </div>
 
-              {/* Card de Endereço */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Endereço
-                </label>
-                <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                  {isEditing ? (
-                    <Input
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      placeholder="Localização do evento"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                      <MapPin className="h-4 w-4" />
-                      <span>{event.location || 'Local não definido'}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {/* Card de Latitude */}
-                <div className="mb-4">
-                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Latitude
-                  </label>
-                  <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                    {isEditing ? (
-                      <Input
-                        name="latitude"
-                        value={formData.latitude}
-                        onChange={handleInputChange}
-                        placeholder="Latitude"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                        <MapPin className="h-4 w-4" />
-                        <span>{event.latitude || 'não definido'}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Card de Longitude */}
-                <div className="mb-4">
-                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Longitude
-                  </label>
-                  <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                    {isEditing ? (
-                      <Input
-                        name="longitude"
-                        value={formData.longitude}
-                        onChange={handleInputChange}
-                        placeholder="Longitude"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                        <MapPin className="h-4 w-4" />
-                        <span>{event.longitude || 'não definido'}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {isEditing && (
-                <Alert className="mb-4 border-yellow-500/50 bg-yellow-50 text-yellow-600 dark:border-yellow-500/30 dark:bg-yellow-950/20 dark:text-yellow-400">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Atenção</AlertTitle>
-                  <AlertDescription>
-                    Alterar a latitude e longitude afetará a posição do marcador
-                    no mapa. Certifique-se de usar coordenadas válidas. Caso
-                    tenha dúvidas sobre como obter as coordenadas, consulte no
-                    site do{' '}
-                    <a
-                      href={
-                        formData.location
-                          ? `https://www.google.com.br/maps/search/${encodeURIComponent(
-                              formData.location,
-                            )}`
-                          : 'https://www.google.com.br/maps'
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium no-underline underline-offset-4 hover:underline"
-                    >
-                      Google Maps
-                    </a>
-                  </AlertDescription>
-                </Alert>
-              )}
-              {/* Mapa do Evento - Exibir apenas se não estiver editando e houver coordenadas válidas */}
-              {!isEditing &&
-                event.latitude &&
-                event.longitude &&
-                (event.latitude !== 0 || event.longitude !== 0) && (
-                  <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 dark:border-white/10">
-                    <EventMap
-                      lat={event.latitude as number}
-                      lng={event.longitude as number}
-                      height="300px"
-                      markerTitle={event.name}
-                    />
-                  </div>
-                )}
+              <PaymentModesManager
+                eventId={event.id}
+                selectedModes={event.allowedPaymentModes || []}
+              />
             </div>
+
+            {/* Card de Campos do Participante */}
+            <ParticipantFieldsManager
+              eventId={event.id}
+              participanteConfig={event.participanteConfig}
+            />
 
             {/* Card de Responsáveis */}
             <ResponsiblesSection
@@ -501,29 +243,29 @@ export default function EventManagement({
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Card de Estatísticas */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-              <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="liquid-card rounded-xl p-6">
+              <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray mb-6 text-xl font-semibold">
                 Estatísticas
               </h2>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg border border-blue-200/60 bg-blue-50/80 p-3 backdrop-blur-sm dark:border-blue-500/10 dark:bg-blue-500/10">
+                <div className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 flex items-center justify-between rounded-lg border p-3 backdrop-blur-sm">
                   <div className="flex items-center gap-3">
-                    <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <Users className="text-riodavida h-5 w-5" />
                     <span className="text-sm font-medium">Participantes</span>
                   </div>
-                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  <span className="text-riodavida-gray-dark dark:text-riodavida-gray text-lg font-bold">
                     {event.quantityParticipants}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between rounded-lg border border-green-200/60 bg-green-50/80 p-3 backdrop-blur-sm dark:border-green-500/10 dark:bg-green-500/10">
+                <div className="border-riodavida-secondary/20 bg-riodavida-secondary/5 dark:border-riodavida-secondary/20 dark:bg-riodavida-secondary/10 flex items-center justify-between rounded-lg border p-3 backdrop-blur-sm">
                   <div className="flex items-center gap-3">
-                    <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <DollarSign className="text-riodavida-secondary h-5 w-5" />
                     <span className="text-sm font-medium">Arrecadado</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                    <span className="text-riodavida-secondary dark:text-riodavida-muted-light text-lg font-bold">
                       {showAmount ? '****' : getFormatCurrency(totalRevenue)}
                     </span>
                     <button
@@ -531,44 +273,34 @@ export default function EventManagement({
                       className="focus:outline-none"
                     >
                       {showAmount ? (
-                        <EyeClosed className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <EyeClosed className="text-riodavida-secondary h-4 w-4" />
                       ) : (
-                        <Eye className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <Eye className="text-riodavida-secondary h-4 w-4" />
                       )}
                     </button>
                   </div>
                 </div>
-
-                {event.maxParticipants && (
-                  <div className="flex items-center justify-between rounded-lg border border-purple-200/60 bg-purple-50/80 p-3 backdrop-blur-sm dark:border-purple-500/10 dark:bg-purple-500/10">
-                    <div className="flex items-center gap-3">
-                      <Users className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                      <span className="text-sm font-medium">Vagas Totais</span>
-                    </div>
-                    <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                      {event.maxParticipants}
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Card de Imagem do Evento */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="liquid-card rounded-xl p-6">
+              <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray mb-4 text-xl font-semibold">
                 Imagem do Evento
               </h2>
               <AspectRatio
                 ratio={16 / 9}
-                className="mx-auto w-full max-w-[640px] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700"
+                className="bg-riodavida/5 mx-auto w-full max-w-[640px] overflow-hidden rounded-lg"
               >
                 {event.image ? (
                   <Image
                     src={event.image}
-                    alt={event.name}
-                    width={400}
-                    height={225}
-                    className="h-full w-full object-contain"
+                    alt={`Capa do evento ${event.name}`}
+                    fill
+                    className="object-cover" // ou object-contain
+                    sizes="(max-width: 640px) 100vw, 640px"
+                    loading="eager"
+                    priority
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
@@ -578,161 +310,101 @@ export default function EventManagement({
                   </div>
                 )}
               </AspectRatio>
-              {isEditing && (
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setImageDialogOpen(true)}
-                    disabled={uploadingImage}
-                  >
-                    {uploadingImage ? 'Enviando...' : 'Alterar Imagem'}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1"
-                    onClick={() => setIsDeleteImageOpen(true)}
-                    disabled={deleteImage}
-                  >
-                    {deleteImage ? 'Deletando...' : 'Deletar Imagem'}
-                  </Button>
-                </div>
-              )}
+
+              <div className="mt-4 flex gap-2">
+                <Button
+                  variant="outline"
+                  className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark flex-1"
+                  onClick={() => setImageDialogOpen(true)}
+                  disabled={uploadingImage}
+                >
+                  {uploadingImage ? 'Enviando...' : 'Alterar Imagem'}
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => setIsDeleteImageOpen(true)}
+                  disabled={deleteImage || !event.image}
+                >
+                  {deleteImage ? 'Deletando...' : 'Deletar Imagem'}
+                </Button>
+              </div>
             </div>
 
             {/* Card de Logo do Evento */}
-            <div className="rounded-xl border border-gray-200/80 bg-white/95 p-6 shadow-md backdrop-blur-md dark:border-white/10 dark:bg-white/5">
-              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="liquid-card rounded-xl p-6">
+              <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray mb-4 text-xl font-semibold">
                 Logo do Evento
               </h2>
               <div className="flex justify-center">
                 <div className="w-[180px]">
                   <AspectRatio
                     ratio={1}
-                    className="overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700"
+                    className="bg-riodavida/5 overflow-hidden rounded-lg"
                   >
-                    {event.logoUrl ? (
-                      <div className="relative h-full w-full">
-                        <Image
-                          src={event.logoUrl}
-                          alt={`Logo do evento ${event.name}`}
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
+                    {event.logo ? (
+                      <Image
+                        src={event.logo}
+                        alt={`Logo do evento ${event.name}`}
+                        fill
+                        className="object-contain"
+                        loading="eager"
+                        priority
+                        sizes="(max-width: 768px) 100px, (max-width: 1200px) 150px, 200px"
+                      />
                     ) : (
-                      <span className="flex h-full w-full items-center justify-center text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <span className="text-riodavida-gray-dark dark:text-riodavida-gray flex h-full w-full items-center justify-center text-sm font-medium">
                         SEM LOGO
                       </span>
                     )}
                   </AspectRatio>
                 </div>
               </div>
-              {isEditing && (
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => setLogoDialogOpen(true)}
-                    disabled={uploadingLogo}
-                  >
-                    {uploadingLogo ? 'Enviando...' : 'Alterar Logo'}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1"
-                    onClick={() => setIsDeleteLogoOpen(true)}
-                    disabled={deleteLogo}
-                  >
-                    {deleteLogo ? 'Deletando...' : 'Deletar Logo'}
-                  </Button>
-                </div>
-              )}
+              <div className="mt-4 flex gap-2">
+                <Button
+                  variant="outline"
+                  className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark flex-1"
+                  onClick={() => setLogoDialogOpen(true)}
+                  disabled={uploadingLogo}
+                >
+                  {uploadingLogo ? 'Enviando...' : 'Alterar Logo'}
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => setIsDeleteLogoOpen(true)}
+                  disabled={deleteLogo || !event.logo}
+                >
+                  {deleteLogo ? 'Deletando...' : 'Deletar Logo'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Diálogo para gerenciar modos de inscrição */}
-        {isEditing && (
-          <InscriptionModesDialog
-            open={inscriptionModesDialogOpen}
-            onOpenChange={setInscriptionModesDialogOpen}
-            selectedModes={formData.allowedInscriptionModes || []}
-            onAddMode={(mode) => {
-              const currentModes = formData.allowedInscriptionModes || [];
-              if (!currentModes.includes(mode)) {
-                handleInscriptionModesChange([...currentModes, mode]);
-              }
-            }}
-            onRemoveMode={(mode) => {
-              const currentModes = formData.allowedInscriptionModes || [];
-              handleInscriptionModesChange(
-                currentModes.filter((m) => m !== mode),
-              );
-            }}
-          />
-        )}
+        <ImageCropDialog
+          open={imageDialogOpen}
+          onOpenChange={setImageDialogOpen}
+          eventId={event.id}
+          imageType="capa"
+          action={updateEventImageAction}
+          onSuccess={() => {
+            invalidateDetail(event.id);
+            refreshEvent();
+          }}
+        />
+        <ImageCropDialog
+          open={logoDialogOpen}
+          onOpenChange={setLogoDialogOpen}
+          eventId={event.id}
+          imageType="logo"
+          action={updateEventLogoAction}
+          onSuccess={() => {
+            invalidateDetail(event.id);
+            refreshEvent();
+          }}
+        />
 
-        {/* Diálogo de crop de imagem 16:9 para salvar em 1920x1080 */}
-        {isEditing && (
-          <>
-            <ImageCropDialog
-              open={imageDialogOpen}
-              onOpenChange={setImageDialogOpen}
-              aspect={16 / 9}
-              targetWidth={1920}
-              targetHeight={1080}
-              title="Alterar imagem do evento"
-              description="Arraste/solte sua imagem, ajuste o zoom e posição. Salvaremos em 1920x1080."
-              confirmLabel={uploadingImage ? 'Enviando...' : 'Salvar imagem'}
-              onConfirm={async ({ base64 }) => {
-                try {
-                  setUploadingImage(true);
-                  await updateEventImageAction({
-                    eventId: event.id,
-                    imageBase64: base64,
-                  });
-                  toast.success('Imagem atualizada com sucesso!');
-                  setImageDialogOpen(false);
-                  invalidateDetail(event.id);
-                  refreshEvent();
-                } catch (err) {
-                  toast.error('Falha ao atualizar imagem do evento');
-                } finally {
-                  setUploadingImage(false);
-                }
-              }}
-            />
-
-            <ImageCropDialog
-              open={logoDialogOpen}
-              onOpenChange={setLogoDialogOpen}
-              aspect={1}
-              targetWidth={500}
-              targetHeight={500}
-              title="Alterar logo do evento"
-              description="Faça upload da logo, ajustando no formato quadrado. Salvaremos em 500x500."
-              confirmLabel={uploadingLogo ? 'Enviando...' : 'Salvar logo'}
-              onConfirm={async ({ base64 }) => {
-                try {
-                  setUploadingLogo(true);
-                  await updateEventLogoAction({
-                    eventId: event.id,
-                    imageBase64: base64,
-                  });
-                  toast.success('Logo atualizada com sucesso!');
-                  setLogoDialogOpen(false);
-                  invalidateDetail(event.id);
-                  refreshEvent();
-                } catch (err) {
-                  toast.error('Falha ao atualizar logo do evento');
-                } finally {
-                  setUploadingLogo(false);
-                }
-              }}
-            />
-          </>
-        )}
         {/* Diálogo de confirmação para deletar imagem */}
         <ConfirmationDialog
           open={isDeleteImageOpen}
@@ -745,6 +417,7 @@ export default function EventManagement({
           isLoading={deleteImage}
           variant="destructive"
         />
+
         {/* Diálogo de confirmação para deletar logo */}
         <ConfirmationDialog
           open={isDeleteLogoOpen}
@@ -757,6 +430,7 @@ export default function EventManagement({
           isLoading={deleteLogo}
           variant="destructive"
         />
+
         {/* Diálogo de confirmação para excluir evento */}
         <ConfirmationDialog
           open={isDeleteEventOpen}

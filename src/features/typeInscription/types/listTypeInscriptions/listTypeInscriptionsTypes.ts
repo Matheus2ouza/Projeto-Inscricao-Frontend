@@ -1,13 +1,19 @@
 export type TypeInscription = {
   id: string;
   description: string;
+  rule: string | null;
   value: number;
+  specialType: boolean;
+  active: boolean;
+  participantLimit: number;
+  limitIsStrict: boolean;
+  createdAt: Date;
 };
 
 export type ListTypeInscriptionsResponse = TypeInscription[];
 
 export type UseListTypeInscriptionsParams = {
-  eventId: string;
+  eventId?: string;
 };
 
 export type UseListTypeInscriptionsResult = {

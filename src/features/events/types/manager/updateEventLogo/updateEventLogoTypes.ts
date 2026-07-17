@@ -1,6 +1,6 @@
 export type UpdateEventLogoInput = {
   eventId: string;
-  imageBase64: string;
+  file: File;
 };
 
 export type UpdateEventLogoResponse = void;

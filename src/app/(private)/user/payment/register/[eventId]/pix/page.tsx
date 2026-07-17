@@ -69,7 +69,6 @@ export default function RegisterPaymentPixPage() {
             allowCustomValue={true}
             onPaymentRegistered={(payment) => {
               // Opcional: fazer algo após o pagamento ser registrado
-              console.log('Pagamento registrado:', payment);
               // Exemplo: redirecionar para página de sucesso
               // router.push(`/user/payment/success/${payment.id}`);
             }}

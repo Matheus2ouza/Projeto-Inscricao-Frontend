@@ -33,7 +33,7 @@ export type UseDetailsEventParams = {
 export type UseDetailsEventResult = {
   event: Event | null;
   loading: boolean;
-  error: string | null;
+  error: Error | null;
   refetch: () => Promise<void>;
 };
 

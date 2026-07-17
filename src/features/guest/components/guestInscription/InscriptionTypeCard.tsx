@@ -1,5 +1,6 @@
 'use client';
 
+import { TypeInscription } from '@/features/guest/types/guestInscription/eventDetailsToGuestInscriptionTypes';
 import { cn } from '@/lib/utils';
 import { Badge } from '@shared/components/ui/badge';
 import { Button } from '@shared/components/ui/button';
@@ -11,16 +12,8 @@ import {
 import { AlertCircle, Check, Info } from 'lucide-react';
 import { useState } from 'react';
 
-interface InscriptionType {
-  id?: string;
-  description: string;
-  value: number;
-  rule?: Date;
-  specialType: boolean;
-}
-
 interface InscriptionTypeSelectorProps {
-  types: InscriptionType[];
+  types: TypeInscription[];
   selectedTypeId: string;
   onSelect: (typeId: string) => void;
   hasBirthDate: boolean;
@@ -45,7 +38,7 @@ export function InscriptionTypeSelector({
 }: InscriptionTypeSelectorProps) {
   const [popoverOpen, setPopoverOpen] = useState<Record<string, boolean>>({});
 
-  const isTypeSelectable = (type: InscriptionType) => {
+  const isTypeSelectable = (type: TypeInscription) => {
     // Se não tem data de nascimento, não pode selecionar nenhum
     if (!hasBirthDate) return false;
 
@@ -69,14 +62,14 @@ export function InscriptionTypeSelector({
     return types.filter((type) => isTypeSelectable(type));
   };
 
-  const getDescription = (type: InscriptionType) => {
+  const getDescription = (type: TypeInscription) => {
     if (!type.rule) return '';
 
-    return `Disponível para pessoas com idade máxima de ${calculateMaxAge(type.rule)} anos`;
+    return `Disponível para pessoas com idade máxima de ${calculateMaxAge(new Date(type.rule))} anos`;
   };
 
   // Cores sólidas para os cards - MOVIDO PARA ANTES DO USO
-  const getCardStyles = (type: InscriptionType, isSelected: boolean) => {
+  const getCardStyles = (type: TypeInscription, isSelected: boolean) => {
     if (type.specialType) {
       return {
         border: 'border-amber-500',

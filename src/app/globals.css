@@ -369,3 +369,165 @@
   background: linear-gradient(135deg, oklch(0.18 0.02 240 / 82%), oklch(0.15 0.02 240 / 78%));
   border-color: rgb(var(--border-rgb) / 0.10);
 }
+
+/* ============================================
+   GLASS BACKGROUND WITH RADIAL GRADIENTS
+   ============================================ */
+
+/* Base glass background com gradiente radial */
+.liquid-glass-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.20;
+  background: radial-gradient(750px circle at 18% 15%, var(--riodavida-primary) 0%, transparent 60%);
+  z-index: 0;
+}
+
+.liquid-glass-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.10;
+  background: radial-gradient(600px circle at 80% 70%, var(--riodavida-secondary) 0%, transparent 60%);
+  z-index: 0;
+}
+
+/* Com gradiente duplo (mais rico) */
+.liquid-glass-bg-double::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.20;
+  background: radial-gradient(750px circle at 15% 20%, var(--riodavida-primary) 0%, transparent 60%);
+  z-index: 0;
+}
+
+.liquid-glass-bg-double::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background: radial-gradient(600px circle at 85% 80%, var(--riodavida-secondary) 0%, transparent 60%);
+  z-index: 0;
+}
+
+/* Versão com uma única cor (mais sutil) */
+.liquid-glass-bg-single::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background: radial-gradient(800px circle at 50% 30%, var(--riodavida-primary) 0%, transparent 70%);
+  z-index: 0;
+}
+
+/* Para usar com cores dinâmicas (via inline style) */
+.liquid-glass-bg-dynamic {
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass-bg-dynamic::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.20;
+  z-index: 0;
+}
+
+.liquid-glass-bg-dynamic::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.10;
+  z-index: 0;
+}
+
+/* Garante que o conteúdo fique acima do gradiente */
+.liquid-glass-bg>*,
+.liquid-glass-bg-double>*,
+.liquid-glass-bg-single>*,
+.liquid-glass-bg-dynamic>* {
+  position: relative;
+  z-index: 1;
+}
+
+/* Dark mode ajustes */
+.dark .liquid-glass-bg::before {
+  opacity: 0.25;
+}
+
+.dark .liquid-glass-bg-double::before {
+  opacity: 0.25;
+}
+
+.dark .liquid-glass-bg-double::after {
+  opacity: 0.20;
+}
+
+.dark .liquid-glass-bg-single::before {
+  opacity: 0.20;
+}
+
+/* Variação com gradiente mais forte (para cards de destaque) */
+.liquid-glass-bg-strong::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.30;
+  background: radial-gradient(700px circle at 20% 20%, var(--riodavida-primary) 0%, transparent 55%);
+  z-index: 0;
+}
+
+.liquid-glass-bg-strong::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.20;
+  background: radial-gradient(500px circle at 75% 80%, var(--riodavida-secondary) 0%, transparent 55%);
+  z-index: 0;
+}
+
+.dark .liquid-glass-bg-strong::before {
+  opacity: 0.35;
+}
+
+.dark .liquid-glass-bg-strong::after {
+  opacity: 0.25;
+}
+
+/* Utility para posições diferentes */
+.liquid-glass-bg-top-left::before {
+  background: radial-gradient(750px circle at 10% 10%, var(--riodavida-primary) 0%, transparent 60%);
+}
+
+.liquid-glass-bg-top-right::before {
+  background: radial-gradient(750px circle at 90% 10%, var(--riodavida-primary) 0%, transparent 60%);
+}
+
+.liquid-glass-bg-bottom-left::before {
+  background: radial-gradient(750px circle at 10% 90%, var(--riodavida-primary) 0%, transparent 60%);
+}
+
+.liquid-glass-bg-bottom-right::before {
+  background: radial-gradient(750px circle at 90% 90%, var(--riodavida-primary) 0%, transparent 60%);
+}
+
+.liquid-glass-bg-center::before {
+  background: radial-gradient(750px circle at 50% 50%, var(--riodavida-primary) 0%, transparent 60%);
+}

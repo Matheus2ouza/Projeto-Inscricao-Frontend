@@ -31,9 +31,11 @@ export function useListEventsToPayment({
     setPage(initialPage);
   }, [initialPage, paymentEnabledKey]);
 
-  if (data && page < data.pageCount) {
-    prefetchNextPage(page, pageSize, paymentEnabledValue);
-  }
+  useEffect(() => {
+    if (data && page < data.pageCount) {
+      prefetchNextPage(page, pageSize, paymentEnabledValue);
+    }
+  }, [data, pageSize, paymentEnabledValue, prefetchNextPage]);
 
   return {
     events: data?.events ?? [],

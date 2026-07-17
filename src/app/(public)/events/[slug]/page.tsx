@@ -43,18 +43,6 @@ export default function EventPage() {
   const bodyColor =
     preferredSwatch?.bodyTextColor ?? (isDark ? '#B0BEC5' : '#374151');
 
-  const handleViewSubscription = (eventId: string) => {
-    router.push(`/guest/${eventId}/inscription`);
-  };
-
-  const handleSubscribe = (eventId: string) => {
-    router.push(`/guest/${eventId}`);
-  };
-
-  const handleLogin = () => {
-    router.push('/login');
-  };
-
   const renderSkeletonGrid = () => {
     return (
       <div className="space-y-6">
@@ -145,16 +133,17 @@ export default function EventPage() {
         isDark={isDark}
         swatches={swatches}
         event={event}
-        onViewSubscription={handleViewSubscription}
-        onSubscribe={handleSubscribe}
-        onLogin={handleLogin}
       />
     );
   };
 
   return (
-    <div className="relative isolate min-h-screen">
-      <BackgroundPaths palette={palette} intensity="low" />
+    <div className="relative isolate max-h-screen w-full">
+      <BackgroundPaths
+        palette={palette}
+        intensity="medium"
+        imageUrl={event?.image}
+      />
       <PageContainer
         title={event?.name.toUpperCase() ?? 'Evento'}
         description={event?.regionName ?? ''}

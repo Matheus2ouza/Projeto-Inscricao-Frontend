@@ -4,7 +4,7 @@ import ResponsiblesDialog from '@/features/accounts/components/responsiblesDialo
 import { useAccount } from '@/features/accounts/hooks/useAccount';
 import { useFormEditEvent } from '@/features/events/hooks/manager/useFormEditEvent';
 import { useEventResponsible } from '@/features/events/hooks/useEventResponsible';
-import { Event } from '@/features/events/types/manager/eventManagerTypes';
+import { Event } from '@/features/events/types/manager/eventDetailsManager/eventDetailsManagerTypes';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
