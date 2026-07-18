@@ -5,13 +5,16 @@ import { deleteEventResponsibleAction } from '@/features/events/actions/manager/
 import { deleteImageEventAction } from '@/features/events/actions/manager/deleteImageEvent/deleteImageEventAction';
 import { deleteLogoEventAction } from '@/features/events/actions/manager/deleteLogoEvent/deleteLogoEventAction';
 import { updateAllowCardAction } from '@/features/events/actions/manager/updateAllowCard/updateAllowCardAction';
-import { updateEventAction } from '@/features/events/actions/manager/updateEvent/updateEventAction';
 import { updateEventImageAction } from '@/features/events/actions/manager/updateEventImage/updateEventImageAction';
 import { updateEventInscriptionsAction } from '@/features/events/actions/manager/updateEventInscriptions/updateEventInscriptionsAction';
 import { updateEventLocationAction } from '@/features/events/actions/manager/updateEventLocation/updateEventLocationAction';
 import { updateEventLogoAction } from '@/features/events/actions/manager/updateEventLogo/updateEventLogoAction';
 import { updateEventPaymentAction } from '@/features/events/actions/manager/updateEventPayment/updateEventPaymentAction';
-import type { UpdateEventInput } from '@/features/events/types/manager/updateEvent/updateEventTypes';
+import {
+  InscriptionMode,
+  ParticipantFieldsConfig,
+  PaymentMode,
+} from '@/features/events/types/manager/eventDetailsManager/eventDetailsManagerTypes';
 import type { UpdateEventImageInput } from '@/features/events/types/manager/updateEventImage/updateEventImageTypes';
 import type { UpdateEventInscriptionsInput } from '@/features/events/types/manager/updateEventInscriptions/updateEventInscriptionsTypes';
 import type { UpdateEventLocationInput } from '@/features/events/types/manager/updateEventLocation/updateEventLocationTypes';
@@ -19,28 +22,98 @@ import type { UpdateEventLogoInput } from '@/features/events/types/manager/updat
 import type { UpdateEventPaymentInput } from '@/features/events/types/manager/updateEventPayment/updateEventPaymentTypes';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { updateInscriptionModeAction } from '../../actions/manager/updateInscriptionMode/updateInscriptionModeAction';
+import { updateParticipantFieldsConfigAction } from '../../actions/manager/updateParticipantFieldsConfig/updateParticipantFieldsConfig';
+import { updatePaymentModeAction } from '../../actions/manager/updatePaymentMode/updatePaymentModeAction';
 import { useInvalidateEventDetailsManagerQuery } from './eventDetailsManager/useEventDetailsManagerQuery';
 
 export function useEventManagerMutations(eventId: string) {
   const { invalidateDetail, invalidateDetails } =
     useInvalidateEventDetailsManagerQuery();
 
-  // Update Event
-  const { mutateAsync: updateEventMutation, isPending: isUpdatingEvent } =
-    useMutation({
-      mutationFn: (input: UpdateEventInput) =>
-        updateEventAction(eventId, input),
-      onSuccess: () => {
-        invalidateDetail(eventId);
-        invalidateDetails();
-        toast.success('Evento atualizado com sucesso!');
-      },
-      onError: (error: Error) => {
-        toast.error('Erro ao atualizar evento', {
+  type UpdateInscriptionModeVariables = {
+    eventId: string;
+    inscriptionMode: InscriptionMode[];
+  };
+
+  const {
+    mutateAsync: updateInscriptionModeMutation,
+    isPending: isUpdatingInscriptionMode,
+  } = useMutation({
+    mutationFn: ({
+      eventId,
+      inscriptionMode,
+    }: UpdateInscriptionModeVariables) =>
+      updateInscriptionModeAction(eventId, inscriptionMode),
+
+    onSuccess: (_, { eventId }) => {
+      toast.success('Métodos de inscrição atualizados com sucesso!');
+      invalidateDetail(eventId);
+    },
+
+    onError: (error: Error) => {
+      toast.error(
+        'Erro ao tentar atualizar os métodos de inscrição do evento',
+        {
           description: error.message,
-        });
-      },
-    });
+        },
+      );
+    },
+  });
+
+  type UpdatePaymentModeVariables = {
+    eventId: string;
+    paymentMode: PaymentMode[];
+  };
+
+  const {
+    mutateAsync: updatePaymentModeMutation,
+    isPending: isUpdatingPaymentMode,
+  } = useMutation({
+    mutationFn: ({ eventId, paymentMode }: UpdatePaymentModeVariables) =>
+      updatePaymentModeAction(eventId, paymentMode),
+
+    onSuccess: (_, { eventId }) => {
+      toast.success('Método de pagamento atualizado com sucesso!');
+      invalidateDetail(eventId);
+    },
+
+    onError: (error: Error) => {
+      toast.error('Erro ao tentar atualizar o método de pagamento do evento', {
+        description: error.message,
+      });
+    },
+  });
+
+  type UpdateParticipantFieldsConfigVariables = {
+    eventId: string;
+    participanteConfig: ParticipantFieldsConfig;
+  };
+
+  const {
+    mutateAsync: updateParticipantFieldsConfigMutation,
+    isPending: isUpdatingParticipantFields,
+  } = useMutation({
+    mutationFn: ({
+      eventId,
+      participanteConfig,
+    }: UpdateParticipantFieldsConfigVariables) =>
+      updateParticipantFieldsConfigAction(eventId, participanteConfig),
+
+    onSuccess: (_, { eventId }) => {
+      toast.success('Campos do participante atualizados com sucesso!');
+      invalidateDetail(eventId);
+    },
+
+    onError: (error: Error) => {
+      toast.error(
+        'Erro ao tentar atualizar os campos do participante do evento',
+        {
+          description: error.message,
+        },
+      );
+    },
+  });
 
   // Delete Event
   const { mutateAsync: deleteEventMutation, isPending: isDeletingEvent } =
@@ -225,9 +298,16 @@ export function useEventManagerMutations(eventId: string) {
   });
 
   return {
-    // Update
-    handleUpdateEvent: updateEventMutation,
-    isUpdatingEvent,
+    // update inscription mode
+    handleUpdateInscriptionMode: updateInscriptionModeMutation,
+    isUpdatingInscriptionMode,
+
+    // update payment mode
+    handleUpdatePaymentMode: updatePaymentModeMutation,
+    isUpdatingPaymentMode,
+
+    handleUpdateParticipantFields: updateParticipantFieldsConfigMutation,
+    isUpdatingParticipantFields,
 
     // Delete
     handleDeleteEvent: deleteEventMutation,

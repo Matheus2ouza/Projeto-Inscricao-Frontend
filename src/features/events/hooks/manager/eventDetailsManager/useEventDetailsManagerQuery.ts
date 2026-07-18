@@ -14,7 +14,7 @@ export const eventDetailsManagerKeys = {
 export function useEventDetailsManagerQuery(eventId?: string) {
   return useQuery<EventDetailsManagerResponse>({
     queryKey: eventDetailsManagerKeys.detail(eventId),
-    queryFn: () => eventDetailsManagerAction(eventId!),
+    queryFn: () => eventDetailsManagerAction(eventId),
     enabled: !!eventId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

@@ -4,20 +4,21 @@ type IntensityLevel = 'low' | 'medium' | 'high';
 
 interface BackgroundPathsProps {
   palette: string[];
-  intensity?: IntensityLevel; // 'low' | 'medium' | 'high'
+  intensity?: IntensityLevel;
+  imageUrl?: string;
 }
 
 export default function BackgroundPaths({
   palette,
   intensity = 'medium',
+  imageUrl,
 }: BackgroundPathsProps) {
   const hasPalette = palette.length >= 3;
 
-  // Mapeia os níveis para valores numéricos
   const intensityMap: Record<IntensityLevel, number> = {
-    low: 0.25, // 25% - bem sutil
-    medium: 0.6, // 60% - equilibrado
-    high: 1, // 100% - total
+    low: 0.25,
+    medium: 0.6,
+    high: 1,
   };
 
   const opacity = intensityMap[intensity] ?? 0.6;
@@ -30,7 +31,22 @@ export default function BackgroundPaths({
     'radial-gradient(ellipse 800px 800px at 50% -100px, #f5f5f5 0%, #ebebeb 25%, #dedede 50%, #d0d0d0 75%, #c2c2c2 100%)';
 
   return (
-    <div className="fixed inset-0 -z-3">
+    <div className="fixed inset-0 -z-10">
+      {/* Imagem de fundo borrada (se fornecida) */}
+      {imageUrl && (
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={imageUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            style={{
+              filter: 'blur(2px)',
+              opacity: 0.6,
+            }}
+          />
+        </div>
+      )}
+
       {/* Fallback — some quando a paleta chega */}
       <div
         className="absolute inset-0 transition-opacity duration-1000"
@@ -39,6 +55,7 @@ export default function BackgroundPaths({
           opacity: hasPalette ? 0 : 1,
         }}
       />
+
       {/* Paleta — aparece por cima com intensidade controlada */}
       <div
         className="absolute inset-0 transition-opacity duration-1000"

@@ -120,7 +120,7 @@ export default function DismissibleAlert({
   // Conteúdo comum (usado inline e modal)
   const renderContent = () => (
     <>
-      <div className="flex items-start gap-3">
+      <div className="-mt-4 flex items-start gap-3">
         <div className={cn('mt-0.5 flex-shrink-0', styles.icon)}>
           {IconComponent}
         </div>
@@ -156,7 +156,7 @@ export default function DismissibleAlert({
                   'w-full border-white/20 bg-white/20 text-white transition-colors hover:bg-white/30 sm:w-auto',
                   styles.hover,
                 )}
-                variant="ghost"
+                variant="primary"
               >
                 Entendi
               </Button>

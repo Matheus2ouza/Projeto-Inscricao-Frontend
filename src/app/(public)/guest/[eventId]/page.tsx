@@ -1,26 +1,33 @@
 'use client';
 
 import { RegisterGuest } from '@/features/guest/components/guestInscription/RegisterGuest';
-import { useDetailsEvent } from '@/features/guest/hook/guestInscription/useDetailsEvent';
+import { useEventDetailsToGuestInscription } from '@/features/guest/hook/guestInscription/useEventDetailsToGuestInscription';
+import { useListTypeInscriptions } from '@/features/typeInscription/hook/listTypeInscriptions/useListTypeInscriptions';
 import BackgroundPaths from '@/shared/components/BackgroundPaths';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { useImagePalette } from '@/shared/hooks/useImagePalette';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 export default function RegisterGuestInscription() {
-  const router = useRouter();
   const params = useParams();
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
-  const { event, loading, error, refetch } = useDetailsEvent({
-    eventId: eventId ?? '',
+  const { event, loading, error, refetch } = useEventDetailsToGuestInscription({
+    eventId,
   });
 
-  const { palette, isDark, swatches, ready } = useImagePalette(event?.imageUrl);
+  const {
+    typeInscriptions,
+    loading: typeLoading,
+    error: typeError,
+    refresh: typeRefresh,
+  } = useListTypeInscriptions({ eventId });
+
+  const { palette, isDark, swatches, ready } = useImagePalette(event?.image);
 
   const preferredSwatch =
     (isDark ? swatches.DarkVibrant : swatches.LightVibrant) ??
@@ -38,10 +45,6 @@ export default function RegisterGuestInscription() {
   if (!eventId) {
     return null;
   }
-
-  const handleViewInscription = () => {
-    router.push(`/guest/${eventId}/inscription?scroll=payment`);
-  };
 
   const renderSkeletonGrid = () => {
     return (
@@ -91,16 +94,50 @@ export default function RegisterGuestInscription() {
   };
 
   const renderContent = () => {
-    if (loading || !ready) {
+    if (loading || !ready || typeLoading) {
       return renderSkeletonGrid();
     }
 
-    if (error) {
+    if (error || typeError) {
+      const errorMessage =
+        error?.message ||
+        typeError?.message ||
+        'Erro ao carregar os dados. Tente novamente.';
+
       return (
         <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <p className="text-foreground mb-4">{error}</p>
-            <Button onClick={() => refetch()}>Tentar Novamente</Button>
+            <p className="text-foreground mb-4">{errorMessage}</p>
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={() => {
+                  if (error) refetch();
+                  if (typeError) typeRefresh();
+                }}
+              >
+                Tentar Novamente
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (!event) {
+      return (
+        <div className="flex min-h-[400px] items-center justify-center">
+          <div className="text-center">
+            <p className="text-foreground mb-4">Erro ao carregar os dados</p>
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={() => {
+                  refetch();
+                  typeRefresh();
+                }}
+              >
+                Tentar Novamente
+              </Button>
+            </div>
           </div>
         </div>
       );
@@ -109,21 +146,21 @@ export default function RegisterGuestInscription() {
     return (
       <RegisterGuest
         event={event}
+        typeInscriptions={typeInscriptions}
         palette={palette}
         isDark={isDark}
         swatches={swatches}
-        onViewInscription={handleViewInscription}
       />
     );
   };
 
-  const handleBack = () => {
-    router.replace(`/events/${eventId}`);
-  };
-
   return (
-    <div className="relative isolate min-h-screen">
-      <BackgroundPaths palette={palette} />
+    <div className="relative isolate max-h-screen w-full">
+      <BackgroundPaths
+        palette={palette}
+        imageUrl={event?.image}
+        intensity="medium"
+      />
 
       <PageContainer
         title="Registro de Inscrição"
@@ -131,7 +168,6 @@ export default function RegisterGuestInscription() {
         className="bg-transparent bg-none"
         titleColor={titleColor}
         descriptionColor={bodyColor}
-        backButtonAction={handleBack}
       >
         {renderContent()}
       </PageContainer>

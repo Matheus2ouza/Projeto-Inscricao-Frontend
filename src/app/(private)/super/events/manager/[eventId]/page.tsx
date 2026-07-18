@@ -1,7 +1,8 @@
 'use client';
 
 import EventManagement from '@/features/events/components/manager/EventManagement';
-import { useEventManagerData } from '@/features/events/hooks/manager/useEventManager';
+import { useEventDetailsManager } from '@/features/events/hooks/manager/eventDetailsManager/useEventDetailsManager';
+import { useListTypeInscriptionsToManager } from '@/features/typeInscription/hook/listTypeInscriptionsToManager/useListTypeInscriptionsToManager';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -14,16 +15,32 @@ export default function EventManagementSuperPage() {
   const rawEventId = params.eventId;
   const eventId = Array.isArray(rawEventId) ? rawEventId[0] : rawEventId;
 
-  if (!eventId) {
-    return null;
-  }
+  // hook que busca os dados do evento
+  const {
+    event,
+    loading: eventLoading,
+    error: eventError,
+    refresh: refreshEvent,
+  } = useEventDetailsManager({ eventId });
 
-  // Hook combinado para buscar evento e tipos de inscrição
-  const { event, typeInscriptions, loading, fetching, error, refresh } =
-    useEventManagerData(eventId);
+  // hook que busca os dados do tipos de inscrição
+  const {
+    typeInscriptions,
+    loading: typeInscriptionsLoading,
+    error: typeInscriptionsError,
+    refresh: refreshTypeInscriptions,
+  } = useListTypeInscriptionsToManager({ eventId });
+
+  const loading = eventLoading || typeInscriptionsLoading;
+  const error = eventError || typeInscriptionsError || null;
+
+  const refresh = () => {
+    refreshEvent();
+    refreshTypeInscriptions();
+  };
 
   const handleBack = () => {
-    router.replace(`/super/events/manager`);
+    router.replace(`/admin/events/manager`);
   };
 
   const renderSkeletonGrid = () => {

@@ -1,39 +1,69 @@
+export const genderOptions = [
+  { value: 'MASCULINO', label: 'Masculino' },
+  { value: 'FEMININO', label: 'Feminino' },
+];
+export const shirtSizeOptions = [
+  { value: 'PP', label: 'PP' },
+  { value: 'P', label: 'P' },
+  { value: 'M', label: 'M' },
+  { value: 'G', label: 'G' },
+  { value: 'GG', label: 'GG' },
+  { value: 'XG', label: 'XG' },
+];
+export const shirtTypeOptions = [
+  { value: 'TRADICIONAL', label: 'Tradicional' },
+  { value: 'BABYLOOK', label: 'Babylook' },
+];
+
+export type ParticipantFieldRule = 'required' | 'optional' | 'hidden';
+
+export type ParticipantFieldsConfig = Record<
+  'cpf' | 'preferredName' | 'shirtSize' | 'shirtType',
+  ParticipantFieldRule
+>;
+
 export enum InscriptionStatus {
-  PENDING = "PENDING",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  PAID = "PAID",
-  CANCELLED = "CANCELLED",
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED',
 }
 
 export enum StatusPayment {
-  APPROVED = "APPROVED",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  REFUSED = "REFUSED",
+  APPROVED = 'APPROVED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  REFUSED = 'REFUSED',
 }
 
 export enum GenderType {
-  MASCULINO = "MASCULINO",
-  FEMININO = "FEMININO",
+  MASCULINO = 'MASCULINO',
+  FEMININO = 'FEMININO',
 }
 
 export enum PaymentMethod {
-  DINHEIRO = "DINHEIRO",
-  PIX = "PIX",
-  CARTAO = "CARTAO",
+  DINHEIRO = 'DINHEIRO',
+  PIX = 'PIX',
+  CARTAO = 'CARTAO',
 }
 
 export enum ShirtSize {
-  PP = "PP",
-  P = "P",
-  M = "M",
-  G = "G",
-  GG = "GG",
-  XG = "XG",
+  PP = 'PP',
+  P = 'P',
+  M = 'M',
+  G = 'G',
+  GG = 'GG',
+  XG = 'XG',
 }
 
 export enum ShirtType {
-  TRADICIONAL = "TRADICIONAL",
-  BABYLOOK = "BABYLOOK",
+  TRADICIONAL = 'TRADICIONAL',
+  BABYLOOK = 'BABYLOOK',
+}
+
+export enum PaymentMode {
+  CARTAO = 'CARTAO',
+  PIX = 'PIX',
+  BOLETO = 'BOLETO',
 }
 
 export type InscriptionDetails = {
@@ -41,13 +71,19 @@ export type InscriptionDetails = {
   status: InscriptionStatus;
   guestEmail: string;
   guestName: string;
-  guestLocality: string;
   phone: string;
   createdAt: Date;
   totalValue: number;
   totalPaid: number;
-  participants: Participant[];
-  payments: Payment[];
+  locality: Locality;
+  participant: Participant;
+  payments?: Payment[];
+  eventConfig: EventConfig;
+};
+
+export type EventConfig = {
+  participanteConfig: ParticipantFieldsConfig;
+  allowedPaymentModes: PaymentMode[];
 };
 
 export type TypeInscription = {
@@ -55,14 +91,20 @@ export type TypeInscription = {
   price: number;
 };
 
+export type Locality = {
+  id: string;
+  name: string;
+};
+
 export type Participant = {
   id: string;
   name: string;
-  birthDate: Date;
+  birthDate: string;
+  gender: GenderType;
   preferredName?: string;
   shirtSize?: ShirtSize;
   shirtType?: ShirtType;
-  gender: GenderType;
+  cpf: string;
   typeInscription: TypeInscription;
 };
 
@@ -86,13 +128,29 @@ export type PaymentInstallment = {
   paidAt?: Date;
 };
 
-export type DetailsInscriptionParams = {
+export type GuestInscriptionDetailsResponse = {
+  id: string;
+  status: InscriptionStatus;
+  guestEmail: string;
+  guestName: string;
+  phone: string;
+  createdAt: Date;
+  totalValue: number;
+  totalPaid: number;
+  locality: Locality;
+  participant: Participant;
+  payments?: Payment[];
+  eventConfig: EventConfig;
+};
+
+export type UseDetailsInscriptionParams = {
   confirmationCode: string;
 };
 
-export type DetailsInscriptionResult = {
+export type UseDetailsInscriptionResult = {
+  eventConfig: EventConfig | null;
   inscription: InscriptionDetails | null;
-  participants: Participant[] | null;
+  participant: Participant | null;
   payments: Payment[] | null;
   loading: boolean;
   error: string | null;

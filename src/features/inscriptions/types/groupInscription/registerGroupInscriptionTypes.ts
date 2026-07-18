@@ -23,6 +23,7 @@ export interface MemberDisplayData extends MemberFormData {
 
 export interface GroupInscriptionSubmit {
   eventId: string;
+  localityId: string;
   responsible: string;
   email?: string;
   phone: string;
@@ -34,13 +35,19 @@ export interface MemberSubmit {
   typeInscriptionId: string;
 }
 
-export interface RespondeErrorData {
-  statusCode: number;
-  timeStamp: string;
-  message: string;
+export interface GroupInscriptionResponse {
+  id: string;
 }
 
-export interface GroupInscriptionResponse {
-  inscriptionId: string;
-  paymentEnabled: boolean;
-}
+export type IncompleteMember = {
+  accountParticipantId: string;
+  missingFields: string[];
+};
+
+export type GroupInscriptionActionResult =
+  | { success: true; data: GroupInscriptionResponse }
+  | {
+      success: false;
+      message: string;
+      incompleteMembers?: IncompleteMember[];
+    };

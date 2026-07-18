@@ -1,15 +1,24 @@
 'use server';
 
+import type { UpdateEventLogoInput } from '@/features/events/types/manager/updateEventLogo/updateEventLogoTypes';
 import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
-import type { UpdateEventLogoInput } from '@/features/events/types/manager/updateEventLogo/updateEventLogoTypes';
+import FormData from 'form-data';
 
 export async function updateEventLogoService(
   input: UpdateEventLogoInput,
 ): Promise<void> {
   try {
-    await axiosServer.patch(`/events/${input.eventId}/update/logo`, {
-      image: input.imageBase64,
+    const buffer = Buffer.from(await input.file.arrayBuffer());
+
+    const formData = new FormData();
+    formData.append('file', buffer, {
+      filename: input.file.name,
+      contentType: input.file.type,
+    });
+
+    await axiosServer.patch(`/events/${input.eventId}/update/logo`, formData, {
+      headers: formData.getHeaders(),
     });
   } catch (error) {
     if (axios.isAxiosError(error)) {

@@ -40,7 +40,7 @@ export default function RegisterPaymentPage() {
   const handleRegisterPaymentPix = (ids: string[], totalValue: number) => {
     const search = new URLSearchParams();
     if (ids.length > 0) search.set('inscriptions', ids.join(','));
-    search.set('totalValue', String(totalValue));
+    search.set('remainingValue', String(totalValue));
     if (allowCard) search.set('allowCard', '1');
     router.push(`/user/payment/register/${eventId}/pix?${search}`);
   };

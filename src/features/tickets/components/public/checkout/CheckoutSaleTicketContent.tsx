@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { TicketPaymentDialog } from "@/features/tickets/components/public/checkout/TicketPaymentDialog";
-import { useCheckoutSaleTicket } from "@/features/tickets/hooks/public/checkout/useCheckoutSaleTicket";
-import type { CheckoutBuyerFormValues } from "@/features/tickets/schema/public/checkout/preSale.schema";
-import type { TicketsByEventResponse } from "@/features/tickets/types/analysis/ticketsTypes";
-import { Button } from "@/shared/components/ui/button";
+import { TicketPaymentDialog } from '@/features/tickets/components/public/checkout/TicketPaymentDialog';
+import { useCheckoutSaleTicket } from '@/features/tickets/hooks/public/checkout/useCheckoutSaleTicket';
+import type { CheckoutBuyerFormValues } from '@/features/tickets/schema/public/checkout/preSale.schema';
+import type { TicketsByEventResponse } from '@/features/tickets/types/analysis/ticketsTypes';
+import { Button } from '@/shared/components/ui/button';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/shared/components/ui/card";
+} from '@/shared/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogTitle,
-} from "@/shared/components/ui/dialog";
+} from '@/shared/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -24,23 +24,23 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/shared/components/ui/form";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { Separator } from "@/shared/components/ui/separator";
-import { Check, Copy, DollarSign } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+} from '@/shared/components/ui/form';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import { Separator } from '@/shared/components/ui/separator';
+import { Check, Copy, DollarSign } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
 type CheckoutSaleTicketContentProps = {
   eventId: string;
   event: TicketsByEventResponse;
 };
 
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
 });
 
 export function CheckoutSaleTicketContent({
@@ -72,15 +72,15 @@ export function CheckoutSaleTicketContent({
   });
 
   const bankData = {
-    beneficiary: "IGREJA EM CASTANHAL",
-    bank: "Banco Bradesco",
-    agency: "6667-2",
-    account: "6779-2",
-    pixKey: "ofertaigcastanhal@gmail.com",
+    beneficiary: 'IGREJA EM CASTANHAL',
+    bank: 'Banco Bradesco',
+    agency: '6667-2',
+    account: '6779-2',
+    pixKey: 'ofertaigcastanhal@gmail.com',
   };
 
   const whatsappMessage = encodeURIComponent(
-    "Olá Matheus Furtado, preciso de ajuda com a compra dos tickets."
+    'Olá Matheus Furtado, preciso de ajuda com a compra dos tickets.',
   );
   const whatsappLink = `https://wa.me/5591992587483?text=${whatsappMessage}`;
 
@@ -92,13 +92,13 @@ export function CheckoutSaleTicketContent({
 
   const summaryCard = useMemo(() => {
     return (
-      <Card className="border border-border/40 shadow-sm">
+      <Card className="border-border/40 border shadow-sm">
         <CardHeader>
           <CardTitle>Resumo do pedido</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {summaryItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Nenhum ticket selecionado. Volte e escolha ao menos um ticket.
             </p>
           ) : (
@@ -106,26 +106,26 @@ export function CheckoutSaleTicketContent({
               {summaryItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-lg border border-border/40 p-3"
+                  className="border-border/40 flex items-center justify-between rounded-lg border p-3"
                 >
                   <div>
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-foreground text-sm font-medium">
                       {item.name}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {item.quantity}x {currencyFormatter.format(item.price)}
                     </p>
                   </div>
-                  <span className="font-semibold text-foreground">
+                  <span className="text-foreground font-semibold">
                     {currencyFormatter.format(item.quantity * item.price)}
                   </span>
                 </div>
               ))}
             </div>
           )}
-          <div className="flex items-center justify-between border-t border-border/60 pt-4">
+          <div className="border-border/60 flex items-center justify-between border-t pt-4">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              <p className="text-muted-foreground text-xs tracking-wide uppercase">
                 Total
               </p>
               <p className="text-2xl font-semibold">
@@ -133,7 +133,7 @@ export function CheckoutSaleTicketContent({
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Tickets selecionados
               </p>
               <p className="text-xl font-semibold">
@@ -142,8 +142,8 @@ export function CheckoutSaleTicketContent({
             </div>
           </div>
           <Separator className="my-3" />
-          <div className="rounded-lg border border-border/60 bg-yellow-50/90 dark:bg-yellow-900/30 p-4 text-sm text-yellow-900 dark:text-yellow-200">
-            <p className="font-semibold mb-1">Importante</p>
+          <div className="border-border/60 rounded-lg border bg-yellow-50/90 p-4 text-sm text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-200">
+            <p className="mb-1 font-semibold">Importante</p>
             Após enviar o comprovante, nossa equipe valida o pagamento. Se
             aprovado, os tickets são enviados para o e-mail informado. Caso seja
             recusado, você receberá um e-mail e, se informou telefone, poderemos
@@ -164,10 +164,10 @@ export function CheckoutSaleTicketContent({
   return (
     <div className="space-y-6">
       {showEmptySelection && (
-        <Card className="border-dashed border-border/60">
-          <CardContent className="p-6 text-center space-y-4">
+        <Card className="border-border/60 border-dashed">
+          <CardContent className="space-y-4 p-6 text-center">
             <p className="text-lg font-semibold">Nenhum ticket selecionado</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Volte para a página anterior e escolha os tickets que deseja
               comprar.
             </p>
@@ -179,11 +179,11 @@ export function CheckoutSaleTicketContent({
       )}
 
       {!!parsedSelection.length && (
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
           <div className="space-y-6">
             <Card className="border-0 shadow-sm">
-              <CardContent className="p-6 flex flex-col gap-6 md:flex-row md:items-stretch">
-                <div className="w-full md:w-1/2 relative">
+              <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-stretch">
+                <div className="relative w-full md:w-1/2">
                   {event.imageUrl ? (
                     <div className="relative h-56 w-full overflow-hidden rounded-xl">
                       <Image
@@ -198,7 +198,7 @@ export function CheckoutSaleTicketContent({
                       />
                     </div>
                   ) : (
-                    <div className="h-56 w-full rounded-xl bg-muted flex items-center justify-center">
+                    <div className="bg-muted flex h-56 w-full items-center justify-center rounded-xl">
                       <span className="text-muted-foreground text-sm">
                         Evento sem imagem
                       </span>
@@ -207,12 +207,12 @@ export function CheckoutSaleTicketContent({
                 </div>
                 <div className="flex-1 space-y-3">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    <p className="text-muted-foreground text-xs tracking-wide uppercase">
                       Checkout de tickets
                     </p>
                     <h2 className="text-2xl font-semibold">{event.name}</h2>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Revise seus dados pessoais, anexe o comprovante de pagamento
                     e finalize o pedido.
                   </p>
@@ -222,19 +222,19 @@ export function CheckoutSaleTicketContent({
 
             <div className="lg:hidden">{summaryCard}</div>
 
-            <Card className="border border-border/40 shadow-sm">
+            <Card className="border-border/40 border shadow-sm">
               <CardHeader>
                 <CardTitle>Dados para pagamento</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="rounded-lg bg-muted/40 p-3">
-                  <p className="text-xs uppercase text-muted-foreground">
+                <div className="bg-muted/40 rounded-lg p-3">
+                  <p className="text-muted-foreground text-xs uppercase">
                     Valor Final
                   </p>
                   <p className="text-2xl font-semibold">
                     {currencyFormatter.format(totalAmount)}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     Realize o pagamento na conta abaixo.
                   </p>
                 </div>
@@ -252,17 +252,17 @@ export function CheckoutSaleTicketContent({
                       size="sm"
                       variant="outline"
                       onClick={() =>
-                        handleCopy(bankData.beneficiary, "beneficiary")
+                        handleCopy(bankData.beneficiary, 'beneficiary')
                       }
                     >
-                      {copiedField === "beneficiary" ? (
+                      {copiedField === 'beneficiary' ? (
                         <Check className="h-4 w-4" />
                       ) : (
                         <Copy className="h-4 w-4" />
                       )}
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                       <Label className="text-sm">Banco</Label>
                       <p className="text-sm font-medium">{bankData.bank}</p>
@@ -275,9 +275,9 @@ export function CheckoutSaleTicketContent({
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => handleCopy(bankData.agency, "agency")}
+                          onClick={() => handleCopy(bankData.agency, 'agency')}
                         >
-                          {copiedField === "agency" ? (
+                          {copiedField === 'agency' ? (
                             <Check className="h-4 w-4" />
                           ) : (
                             <Copy className="h-4 w-4" />
@@ -296,10 +296,10 @@ export function CheckoutSaleTicketContent({
                           variant="outline"
                           size="sm"
                           onClick={() =>
-                            handleCopy(bankData.account, "account")
+                            handleCopy(bankData.account, 'account')
                           }
                         >
-                          {copiedField === "account" ? (
+                          {copiedField === 'account' ? (
                             <Check className="h-4 w-4" />
                           ) : (
                             <Copy className="h-4 w-4" />
@@ -310,7 +310,7 @@ export function CheckoutSaleTicketContent({
                     <div className="md:col-span-2">
                       <Label className="text-sm">Chave PIX</Label>
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="flex-1 min-w-0 text-sm font-medium break-all">
+                        <p className="min-w-0 flex-1 text-sm font-medium break-all">
                           {bankData.pixKey}
                         </p>
                         <Button
@@ -318,9 +318,9 @@ export function CheckoutSaleTicketContent({
                           variant="outline"
                           size="sm"
                           className="flex-shrink-0"
-                          onClick={() => handleCopy(bankData.pixKey, "pix")}
+                          onClick={() => handleCopy(bankData.pixKey, 'pix')}
                         >
-                          {copiedField === "pix" ? (
+                          {copiedField === 'pix' ? (
                             <Check className="h-4 w-4" />
                           ) : (
                             <Copy className="h-4 w-4" />
@@ -333,15 +333,15 @@ export function CheckoutSaleTicketContent({
               </CardContent>
             </Card>
 
-            <Card className="border border-border/40 shadow-sm">
+            <Card className="border-border/40 border shadow-sm">
               <CardHeader>
                 <CardTitle>Dados do comprador</CardTitle>
               </CardHeader>
               <CardContent>
                 <Form {...form}>
                   <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField<CheckoutBuyerFormValues, "firstName">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <FormField<CheckoutBuyerFormValues, 'firstName'>
                         control={form.control}
                         name="firstName"
                         render={({ field }) => (
@@ -354,7 +354,7 @@ export function CheckoutSaleTicketContent({
                           </FormItem>
                         )}
                       />
-                      <FormField<CheckoutBuyerFormValues, "lastName">
+                      <FormField<CheckoutBuyerFormValues, 'lastName'>
                         control={form.control}
                         name="lastName"
                         render={({ field }) => (
@@ -368,7 +368,7 @@ export function CheckoutSaleTicketContent({
                         )}
                       />
                     </div>
-                    <FormField<CheckoutBuyerFormValues, "email">
+                    <FormField<CheckoutBuyerFormValues, 'email'>
                       control={form.control}
                       name="email"
                       render={({ field }) => (
@@ -385,13 +385,13 @@ export function CheckoutSaleTicketContent({
                         </FormItem>
                       )}
                     />
-                    <FormField<CheckoutBuyerFormValues, "phone">
+                    <FormField<CheckoutBuyerFormValues, 'phone'>
                       control={form.control}
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            Telefone{" "}
+                            Telefone{' '}
                             <span className="text-muted-foreground text-xs">
                               (opcional)
                             </span>
@@ -404,19 +404,19 @@ export function CheckoutSaleTicketContent({
                       )}
                     />
 
-                    <div className="rounded-lg border border-dashed border-border/70 p-4 space-y-4">
+                    <div className="border-border/70 space-y-4 rounded-lg border border-dashed p-4">
                       <div className="flex flex-col gap-1">
                         <p className="text-sm font-medium">
                           Comprovante de pagamento
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           Anexe o comprovante emitido após o pagamento.
                         </p>
                       </div>
                       {receiptImage ? (
                         <div className="flex flex-col gap-3">
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                            <p className="text-sm text-green-600 font-medium">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-sm font-medium text-green-600">
                               Comprovante anexado
                             </p>
                             <div className="flex items-center gap-2">
@@ -438,12 +438,12 @@ export function CheckoutSaleTicketContent({
                               </Button>
                             </div>
                           </div>
-                          <div className="relative w-full h-48 border rounded-lg overflow-hidden">
+                          <div className="relative h-48 w-full overflow-hidden rounded-lg border">
                             <Image
                               src={receiptImage}
                               alt="Comprovante enviado"
                               fill
-                              className="object-contain bg-muted"
+                              className="bg-muted object-contain"
                               sizes="(max-width: 768px) 100vw, 50vw"
                               unoptimized
                             />
@@ -454,7 +454,6 @@ export function CheckoutSaleTicketContent({
                           type="button"
                           variant="secondary"
                           onClick={() => {
-                            console.log("Abrindo modal de comprovante");
                             setIsDialogOpen(true);
                           }}
                         >
@@ -468,7 +467,7 @@ export function CheckoutSaleTicketContent({
                       className="w-full"
                       disabled={!canSubmit}
                     >
-                      {isSubmitting ? "Enviando pedido..." : "Finalizar pedido"}
+                      {isSubmitting ? 'Enviando pedido...' : 'Finalizar pedido'}
                     </Button>
                   </form>
                 </Form>
@@ -494,9 +493,9 @@ export function CheckoutSaleTicketContent({
         open={isSuccessDialogOpen}
         onOpenChange={handleSuccessDialogChange}
       >
-        <DialogContent className="sm:max-w-md border-0 shadow-xl">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="size-14 rounded-full bg-green-50 text-green-700 flex items-center justify-center shadow-inner">
+        <DialogContent className="border-0 shadow-xl sm:max-w-md">
+          <div className="flex flex-col items-center space-y-4 text-center">
+            <div className="flex size-14 items-center justify-center rounded-full bg-green-50 text-green-700 shadow-inner">
               <DollarSign />
             </div>
             <div>
@@ -505,12 +504,12 @@ export function CheckoutSaleTicketContent({
               </DialogTitle>
             </div>
           </div>
-          <div className="space-y-4 text-sm text-muted-foreground">
+          <div className="text-muted-foreground space-y-4 text-sm">
             <p>
               Recebemos seu comprovante. Nossa equipe vai analisar e, após a
               aprovação, os tickets serão enviados para o e-mail informado em
               até
-              <span className="font-semibold text-primary"> 24 horas.</span>
+              <span className="text-primary font-semibold"> 24 horas.</span>
             </p>
             <p>
               Fique de olho no seu e-mail (inclusive na caixa de spam). Em caso
@@ -520,12 +519,12 @@ export function CheckoutSaleTicketContent({
               href={whatsappLink}
               target="_blank"
               rel="noreferrer"
-              className="text-green-600 font-bold uppercase inline-flex items-center gap-2 justify-center bg-green-50 rounded-full px-4 py-2"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-green-50 px-4 py-2 font-bold text-green-600 uppercase"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                className="w-4 h-4"
+                className="h-4 w-4"
                 fill="currentColor"
                 aria-hidden
               >

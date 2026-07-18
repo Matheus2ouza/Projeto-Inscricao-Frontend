@@ -3,6 +3,12 @@ export enum InscriptionMode {
   GUEST = 'GUEST',
 }
 
+export enum PaymentMode {
+  CARTAO = 'CARTAO',
+  PIX = 'PIX',
+  BOLETO = 'BOLETO',
+}
+
 export enum EventStatus {
   OPEN = 'OPEN',
   CLOSE = 'CLOSE',
@@ -26,6 +32,13 @@ export type TypeInscriptions = {
   createdAt: Date;
 };
 
+export type ParticipantFieldRule = 'required' | 'optional' | 'hidden';
+
+export type ParticipantFieldsConfig = Record<
+  'cpf' | 'preferredName' | 'shirtSize' | 'shirtType',
+  ParticipantFieldRule
+>;
+
 export type Event = {
   id: string;
   name: string;
@@ -33,28 +46,19 @@ export type Event = {
   endDate: string;
   quantityParticipants: number;
   amountCollected: number;
-  imageUrl?: string;
-  logoUrl?: string;
+  image?: string;
+  logo?: string;
   location?: string;
   latitude?: number;
   longitude?: number;
   status: EventStatus;
   allowedInscriptionModes: InscriptionMode[];
-  active?: boolean;
+  allowedPaymentModes: PaymentMode[];
   paymentEnebled: boolean;
-  ticketEnabled: boolean;
-  regionId: string;
-  regionName?: string;
   createdAt: string;
-  updatedAt: string;
-  countTypeInscriptions?: number;
-  typesInscriptions: TypeInscriptions[];
+  regionName?: string;
   responsibles?: Responsible[];
-  description?: string;
-  maxParticipants?: number;
-  ticketPrice?: number;
-  allowCard?: boolean;
-  address?: string;
+  participanteConfig: ParticipantFieldsConfig;
 };
 
 export type EventDetailsManagerResponse = Event;

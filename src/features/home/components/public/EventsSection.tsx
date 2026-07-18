@@ -21,7 +21,6 @@ interface EventsSectionProps {
 
 export function EventsSection({ events }: EventsSectionProps) {
   const router = useRouter();
-  console.log(events);
 
   const handleEventClick = (url: string) => {
     router.push(url);
@@ -97,7 +96,7 @@ export function EventsSection({ events }: EventsSectionProps) {
                     >
                       <Card
                         className="liquid-glass-light h-full cursor-pointer p-0 transition-all duration-300 hover:scale-[1.02]"
-                        onClick={() => handleEventClick(event.url)}
+                        onClick={() => handleEventClick(event.url!)}
                       >
                         <CardContent className="p-0">
                           <div className="relative h-62 w-full overflow-hidden rounded-t-lg">
@@ -121,7 +120,7 @@ export function EventsSection({ events }: EventsSectionProps) {
                               className="liquid-glass-button-light mt-3 w-full border-blue-400/40 bg-blue-500/10 font-medium text-blue-600 hover:bg-blue-500/20 dark:text-blue-300"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleEventClick(event.url);
+                                handleEventClick(event.url!);
                               }}
                             >
                               Ver Detalhes

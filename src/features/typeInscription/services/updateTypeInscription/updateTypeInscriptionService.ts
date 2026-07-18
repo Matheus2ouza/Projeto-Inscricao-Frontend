@@ -12,7 +12,6 @@ export async function updateTypeInscriptionService(
   input: UpdateTypeInscriptionInput,
 ): Promise<UpdateTypeInscriptionResponse> {
   try {
-    console.log('input', input);
     const { data } = await axiosServer.put<UpdateTypeInscriptionResponse>(
       `/type-inscription/${typeInscriptionId}/update`,
       input,

@@ -1,10 +1,14 @@
-import { useState } from "react";
-import { UseMembersParams, UseMembersResult } from "../types/membersType";
-import { useMembersQuery, usePrefetchMembersQuery } from "./useMembersQuery";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { UseMembersParams, UseMembersResult } from '../types/membersType';
+import { useMembersQuery, usePrefetchMembersQuery } from './useMembersQuery';
 
 export function useMembers({
+  localityId,
   initialPage = 1,
   pageSize = 20,
+  autoFetch = true,
 }: UseMembersParams): UseMembersResult {
   const [page, setPage] = useState(initialPage);
 
@@ -13,13 +17,15 @@ export function useMembers({
     isLoading: loading,
     error,
     refetch,
-  } = useMembersQuery(page, pageSize);
+  } = useMembersQuery(localityId, page, pageSize, autoFetch);
 
   const { prefetchNextPage } = usePrefetchMembersQuery();
 
-  if (data && page < data.pageCount) {
-    prefetchNextPage(page, pageSize);
-  }
+  useEffect(() => {
+    if (data && page < data.pageCount) {
+      prefetchNextPage(page, pageSize);
+    }
+  }, [page, pageSize]);
 
   return {
     members: data?.members || [],

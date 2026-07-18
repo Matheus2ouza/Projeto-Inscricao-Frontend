@@ -14,15 +14,15 @@ export type Event = {
   name: string;
   startDate: string;
   endDate: string;
-  image: string;
-  url: string;
-  regionName: string;
-  location: string;
-  latitude: number;
-  longitude: number;
+  image?: string;
+  url?: string;
+  location?: string;
+  longitude?: number | null;
+  latitude?: number | null;
   status: EventStatus;
   allowedInscriptionModes: InscriptionMode[];
-  createdAt: string;
+  createdAt: Date | string;
+  regionName: string;
 };
 
 export type UsePublicEventParams = {

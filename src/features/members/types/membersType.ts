@@ -1,7 +1,7 @@
-export type ShirtSize = "PP" | "P" | "M" | "G" | "GG" | "XG";
+export type ShirtSize = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XG';
 
-export type ShirtType = "TRADICIONAL" | "BABYLOOK";
-export type genderType = "MASCULINO" | "FEMININO";
+export type ShirtType = 'TRADICIONAL' | 'BABYLOOK';
+export type genderType = 'MASCULINO' | 'FEMININO';
 
 export type Member = {
   id: string;
@@ -20,8 +20,10 @@ export type FindAllToMembersResponse = {
 };
 
 export type UseMembersParams = {
+  localityId?: string;
   initialPage?: number;
   pageSize?: number;
+  autoFetch: boolean;
 };
 
 export type UseMembersResult = {

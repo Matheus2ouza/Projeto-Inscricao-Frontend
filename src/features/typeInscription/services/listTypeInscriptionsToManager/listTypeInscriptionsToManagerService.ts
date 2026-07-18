@@ -5,7 +5,7 @@ import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 
 export async function listTypeInscriptionsToManagerService(
-  eventId: string,
+  eventId?: string,
 ): Promise<ListTypeInscriptionsToManagerResponse> {
   try {
     const { data } =

@@ -1,18 +1,19 @@
 import {
-  DetailsInscriptionParams,
-  DetailsInscriptionResult,
-} from "../../types/detailsInscription/detailsInscriptionType";
-import { useDetailsInscriptionQuery } from "./useDetailsInscriptionQuery";
+  UseDetailsInscriptionParams,
+  UseDetailsInscriptionResult,
+} from '@/features/guest/types/detailsInscription/detailsInscriptionType';
+import { useDetailsInscriptionQuery } from './useDetailsInscriptionQuery';
 
 export function useDetailsInscription({
   confirmationCode,
-}: DetailsInscriptionParams): DetailsInscriptionResult {
+}: UseDetailsInscriptionParams): UseDetailsInscriptionResult {
   const { data, isLoading, error, refetch } =
     useDetailsInscriptionQuery(confirmationCode);
 
   return {
+    eventConfig: data?.eventConfig || null,
     inscription: data || null,
-    participants: data?.participants || [],
+    participant: data?.participant || null,
     payments: data?.payments || [],
     loading: isLoading,
     error: error?.message || null,

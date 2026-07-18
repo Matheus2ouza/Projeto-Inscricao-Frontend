@@ -2,8 +2,8 @@
 
 import { registerIndividualInscriptionService } from '@/features/inscriptions/services/individualInscription/registerIndividualInscriptionService';
 import {
+  IndividualInscriptionActionResult,
   IndividualInscriptionInput,
-  IndividualInscriptionResponse,
 } from '@/features/inscriptions/types/individualInscription/registerIndividualInscriptionTypes';
 
 /**
@@ -12,7 +12,6 @@ import {
  */
 export async function registerIndividualInscriptionAction(
   data: IndividualInscriptionInput,
-): Promise<IndividualInscriptionResponse> {
-  const result = await registerIndividualInscriptionService(data);
-  return result;
+): Promise<IndividualInscriptionActionResult> {
+  return registerIndividualInscriptionService(data);
 }

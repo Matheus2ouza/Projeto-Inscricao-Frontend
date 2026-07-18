@@ -3,7 +3,7 @@
 import Logo from '@/shared/components/ui/logo';
 import { ModeToggle } from '@/shared/components/ui/mode-toggle';
 import { generateGradientClass } from '@/shared/utils/generateGradient';
-import Link from 'next/link'; // ✅ Adicionar import
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -48,15 +48,13 @@ const PublicNavbar = () => {
     router.push('/login');
   };
 
-  // Determina se deve mostrar os links de navegação (apenas na home)
   const showNavigationLinks = pathname === '/';
 
   return (
     <>
-      <nav className="navbar-glass mx-auto mt-2 flex w-[95%] items-center justify-between overflow-hidden rounded-3xl px-2 py-3 sm:px-4 lg:px-6">
+      <nav className="navbar-glass relative z-10 mx-auto mt-2 flex w-[95%] items-center justify-between overflow-hidden rounded-3xl px-2 py-3 sm:px-4 lg:px-6">
         {/* Left Section: Menu + Logo + Título */}
         <div className="flex items-center space-x-3">
-          {/* Mobile Menu Toggle - apenas na home */}
           {showNavigationLinks && (
             <button
               className="rounded-lg p-2 transition-colors duration-200 hover:bg-white/20 lg:hidden dark:hover:bg-white/10"
@@ -83,7 +81,6 @@ const PublicNavbar = () => {
             </button>
           )}
 
-          {/* Logo + Título - usando Link para abrir em nova aba com Ctrl+Clique */}
           <Link
             href="/"
             className="flex cursor-pointer items-center space-x-3 transition-opacity duration-200 hover:opacity-90"
@@ -100,9 +97,7 @@ const PublicNavbar = () => {
           </Link>
         </div>
 
-        {/* Right Section: Desktop Navigation + Actions + Toggle de Tema */}
         <div className="flex items-center space-x-4 sm:space-x-6">
-          {/* Desktop Navigation - apenas na home */}
           {showNavigationLinks && (
             <div className="hidden items-center space-x-6 lg:flex">
               <button
@@ -115,7 +110,6 @@ const PublicNavbar = () => {
             </div>
           )}
 
-          {/* Desktop Login - apenas se não estiver na página de login */}
           {pathname !== '/login' && (
             <div className="hidden items-center md:flex">
               <button
@@ -127,14 +121,12 @@ const PublicNavbar = () => {
             </div>
           )}
 
-          {/* Toggle de Tema */}
           <ModeToggle />
         </div>
       </nav>
 
-      {/* Mobile Menu - apenas na home */}
       {showNavigationLinks && isMenuOpen && (
-        <div className="liquid-panel mx-auto mt-1 w-[95%] rounded-t-none rounded-b-3xl">
+        <div className="liquid-panel relative z-50 mx-auto mt-1 w-[95%] rounded-t-none rounded-b-3xl">
           <div className="space-y-1 px-4 py-3">
             <button
               onClick={() => handleNavigation('Eventos')}

@@ -5,7 +5,7 @@ import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 
 export async function listTypeInscriptionsService(
-  eventId: string,
+  eventId?: string,
 ): Promise<ListTypeInscriptionsResponse> {
   try {
     const { data } = await axiosServer.get<ListTypeInscriptionsResponse>(

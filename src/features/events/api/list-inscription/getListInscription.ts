@@ -4,7 +4,6 @@ import { FindAccountWithInscriptionsResponse } from '../../types/eventTypes';
 export async function getListInscription(
   eventId: string,
 ): Promise<FindAccountWithInscriptionsResponse> {
-  console.log('eventId', eventId);
   try {
     const { data } = await axiosClient.get<FindAccountWithInscriptionsResponse>(
       `/events/${eventId}/list-inscription`,

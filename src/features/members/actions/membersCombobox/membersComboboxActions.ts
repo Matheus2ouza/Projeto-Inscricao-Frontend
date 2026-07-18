@@ -8,10 +8,10 @@ import type { MembersResponse } from '@/features/members/types/membersCombobox/m
  * Passa os dados adiante sem normalização (já vem tipado do service)
  */
 export async function membersComboboxAction(
-  eventId: string,
-  accountId?: string,
+  eventId?: string,
+  localityId?: string,
 ): Promise<MembersResponse> {
-  const data = await membersComboboxService(eventId, accountId);
+  const data = await membersComboboxService(eventId, localityId);
 
   // O service já retorna o objeto tipado ou lança erro com mensagem
   // Se precisar de normalização adicional, faça aqui

@@ -2,16 +2,15 @@
 
 import {
   MemberDisplayData,
-  UseFormInscriptionGrupReturn,
+  TypeInscription,
 } from '@/features/inscriptions/types/groupInscription/inscriptionGrupTypes';
-import { TypeInscription } from '@/features/inscriptions/types/individualInscription/individualInscriptionTypes';
+import { LocalityToAccountCombobox } from '@/features/locality/components/LocalityToAccountCombobox';
 import {
   ComboboxMemberSingle,
   MemberSingleOption,
 } from '@/features/members/components/membersCombobox/ComboboxMemberSingle';
 import { ComboboxTypeInscription } from '@/features/typeInscription/components/ComboboxTypeInscription';
 import { useListTypeInscriptions } from '@/features/typeInscription/hook/listTypeInscriptions/useListTypeInscriptions';
-import { cn } from '@/lib/utils';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -21,6 +20,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/shared/components/ui/form';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import {
@@ -35,34 +42,14 @@ import { Drawer } from 'antd';
 import { HelpCircle, Phone, Plus, Trash2, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { useFormInscriptionGrup } from '../../hooks/inscriptionGrup/useFormInscriptionGrup';
+import { IncompleteMembersAlert } from './IncompleteMembersAlert';
 
 interface GroupInscriptionFormProps {
-  hookData: UseFormInscriptionGrupReturn;
   eventId: string;
 }
 
-export function GroupInscriptionForm({
-  hookData,
-  eventId,
-}: GroupInscriptionFormProps) {
-  const {
-    formData,
-    members,
-    isSubmitting,
-    formErrors,
-    handleInputChange,
-    addMember,
-    removeMember,
-    handleSubmit,
-    register,
-  } = hookData;
-
-  // Busca os tipos de inscrição para obter o nome quando selecionado
-  const { typeInscriptions } = useListTypeInscriptions({ eventId });
-
-  // IDs dos membros já adicionados à lista (para desabilitar no combobox)
-  const addedMemberIds = members.map((m) => m.accountParticipantId);
-
+export function GroupInscriptionForm({ eventId }: GroupInscriptionFormProps) {
   // Estado local para o drawer de adição de membro
   const [tempMemberId, setTempMemberId] = useState('');
   const [tempMemberData, setTempMemberData] = useState<
@@ -71,6 +58,25 @@ export function GroupInscriptionForm({
   const [tempTypeId, setTempTypeId] = useState('');
   const [tempTypeName, setTempTypeName] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Estado para armazenar o ID da localidade selecionada
+  const [selectedLocalityId, setSelectedLocalityId] = useState<string>('');
+
+  const {
+    form,
+    members,
+    addMember,
+    removeMember,
+    onSubmit,
+    isLoading,
+    incompleteMembers,
+    clearIncompleteMembers,
+  } = useFormInscriptionGrup(eventId, selectedLocalityId);
+  // Busca os tipos de inscrição para obter o nome quando selecionado
+  const { typeInscriptions } = useListTypeInscriptions({ eventId });
+
+  // IDs dos membros já adicionados à lista (para desabilitar no combobox)
+  const addedMemberIds = members.map((m) => m.accountParticipantId);
 
   const handleOpenDrawer = () => {
     setTempMemberId('');
@@ -119,8 +125,49 @@ export function GroupInscriptionForm({
     return date.toLocaleDateString('pt-BR');
   };
 
+  // Funções para máscara de telefone (apenas exibição)
+  const formatPhone = (value: string): string => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) {
+      return numbers ? `(${numbers}` : '';
+    } else if (numbers.length <= 6) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    } else if (numbers.length <= 10) {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
+    } else {
+      return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+    }
+  };
+
+  // Função para remover máscara (apenas números)
+  const unformatPhone = (value: string) => {
+    return value.replace(/\D/g, '');
+  };
+
+  // Handler customizado para submit
+  const handleFormSubmit = async (event?: React.BaseSyntheticEvent) => {
+    // Pega os valores atuais do formulário
+    const values = form.getValues();
+
+    // Remove a máscara do telefone antes de enviar
+    if (values.phone) {
+      form.setValue('phone', unformatPhone(values.phone));
+    }
+
+    // Chama o onSubmit do hook
+    await onSubmit(event);
+
+    // Restaura a máscara após o submit (opcional, pois o form pode resetar)
+  };
+
   return (
     <>
+      <IncompleteMembersAlert
+        open={!!incompleteMembers?.length}
+        incompleteMembers={incompleteMembers ?? []}
+        members={members}
+        onClose={clearIncompleteMembers}
+      />
       <div className="space-y-6">
         {/* Versão Desktop - Card com mais informações */}
         <Card className="border-riodavida/20 from-riodavida/5 dark:border-riodavida/20 dark:from-riodavida/10 dark:to-background hidden w-full bg-gradient-to-r to-white md:block">
@@ -197,85 +244,104 @@ export function GroupInscriptionForm({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-              {/* Responsável */}
-              <div className="space-y-3 sm:col-span-2">
-                <Label htmlFor="responsible" className="text-base font-medium">
-                  Nome do Responsável *
-                </Label>
-                <Input
-                  id="responsible"
-                  {...register('responsible')}
-                  value={formData.responsible}
-                  onChange={handleInputChange}
-                  placeholder="Digite o nome completo do responsável"
-                  required
-                  className={cn(
-                    'focus:border-riodavida focus:ring-riodavida/20 h-11 text-base sm:h-12',
-                    formErrors.responsible &&
-                      'border-red-500 focus:border-red-500',
-                  )}
-                />
-                {formErrors.responsible && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {formErrors.responsible.message}
-                  </p>
-                )}
-              </div>
+            <Form {...form}>
+              <form onSubmit={handleFormSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                  {/* Localidade - Seleciona a localidade para buscar membros */}
+                  <div className="space-y-3 sm:col-span-2">
+                    <Label htmlFor="locality" className="text-base font-medium">
+                      Localidade *
+                    </Label>
+                    <LocalityToAccountCombobox
+                      value={selectedLocalityId}
+                      onChange={setSelectedLocalityId}
+                      placeholder="Selecione a localidade"
+                      disabled={false}
+                    />
+                  </div>
 
-              {/* E-mail */}
-              <div className="space-y-3">
-                <Label htmlFor="email" className="text-base font-medium">
-                  E-mail do Responsável
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register('email')}
-                  value={formData.email ?? ''}
-                  onChange={handleInputChange}
-                  placeholder="exemplo@dominio.com"
-                  className={cn(
-                    'focus:border-riodavida focus:ring-riodavida/20 h-11 text-base sm:h-12',
-                    formErrors.email && 'border-red-500 focus:border-red-500',
-                  )}
-                />
-                <p className="text-muted-foreground text-xs sm:text-[13px]">
-                  Opcional — usado apenas para atualizações da inscrição.
-                </p>
-                {formErrors.email && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {formErrors.email.message}
-                  </p>
-                )}
-              </div>
+                  {/* Responsável */}
+                  <FormField
+                    control={form.control}
+                    name="responsible"
+                    render={({ field }) => (
+                      <FormItem className="sm:col-span-2">
+                        <FormLabel className="text-base font-medium">
+                          Nome do Responsável *
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Digite o nome completo do responsável"
+                            {...field}
+                            className="focus:border-riodavida focus:ring-riodavida/20 text-base"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              {/* Telefone */}
-              <div className="space-y-3">
-                <Label htmlFor="phone" className="text-base font-medium">
-                  <Phone className="text-riodavida mr-2 inline h-4 w-4" />
-                  Telefone do Responsável *
-                </Label>
-                <Input
-                  id="phone"
-                  {...register('phone')}
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="(11) 99999-9999"
-                  required
-                  maxLength={15}
-                  className={cn(
-                    'focus:border-riodavida focus:ring-riodavida/20 h-11 text-base sm:h-12',
-                    formErrors.phone && 'border-red-500 focus:border-red-500',
-                  )}
-                />
-                {formErrors.phone && (
-                  <p className="mt-1 text-sm text-red-500">
-                    {formErrors.phone.message}
-                  </p>
-                )}
-              </div>
-            </div>
+                  {/* E-mail e Telefone - Lado a lado */}
+                  <div className="sm:col-span-2">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+                      {/* E-mail */}
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">
+                              E-mail do Responsável
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder="exemplo@dominio.com"
+                                {...field}
+                                value={field.value ?? ''}
+                                className="focus:border-riodavida focus:ring-riodavida/20 text-base"
+                              />
+                            </FormControl>
+                            <p className="text-muted-foreground text-xs sm:text-[13px]">
+                              Opcional — usado apenas para atualizações da
+                              inscrição.
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Telefone */}
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">
+                              <Phone className="text-riodavida mr-2 inline h-4 w-4" />
+                              Telefone do Responsável *
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="(99) 9XXXX-XXXX"
+                                {...field}
+                                onChange={(e) => {
+                                  const formatted = formatPhone(e.target.value);
+                                  field.onChange(formatted);
+                                }}
+                                maxLength={15}
+                                className="border-glass bg-background/50 backdrop-blur-sm"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </Form>
           </CardContent>
         </Card>
 
@@ -389,6 +455,8 @@ export function GroupInscriptionForm({
                   </Label>
                   <ComboboxMemberSingle
                     eventId={eventId}
+                    localityId={selectedLocalityId}
+                    requireLocalityId={true}
                     id="memberSelect"
                     value={tempMemberId}
                     onChange={(id, member) => {
@@ -448,7 +516,6 @@ export function GroupInscriptionForm({
                     value={tempTypeId}
                     onChange={(selectedValue) => {
                       setTempTypeId(selectedValue);
-                      // Encontrar o nome do tipo selecionado para exibição na tabela
                       if (Array.isArray(typeInscriptions)) {
                         const selectedType = typeInscriptions.find(
                           (t: TypeInscription) => t.id === selectedValue,
@@ -490,7 +557,6 @@ export function GroupInscriptionForm({
               </div>
             ) : (
               <>
-                {/* Versão Desktop - Tabela Completa */}
                 <div className="border-riodavida/10 hidden rounded-md border md:block">
                   <Table>
                     <TableHeader className="bg-riodavida/5">
@@ -548,14 +614,12 @@ export function GroupInscriptionForm({
                   </Table>
                 </div>
 
-                {/* Versão Mobile - Lista Simplificada */}
                 <div className="space-y-3 md:hidden">
                   {members.map((member, index) => (
                     <div
                       key={index}
                       className="bg-card border-riodavida/10 space-y-2 rounded-lg border p-3"
                     >
-                      {/* Linha 1: Nome e Ação */}
                       <div className="flex items-start justify-between">
                         <div className="flex-1 space-y-1">
                           <p className="truncate text-sm font-medium">
@@ -580,7 +644,6 @@ export function GroupInscriptionForm({
                         </Button>
                       </div>
 
-                      {/* Linha 2: Detalhes Adicionais */}
                       <div className="text-muted-foreground border-riodavida/10 grid grid-cols-1 gap-2 border-t pt-2 text-xs sm:grid-cols-2">
                         <div>
                           <span className="font-medium">Nascimento:</span>
@@ -616,17 +679,18 @@ export function GroupInscriptionForm({
               </div>
               <div className="order-1 w-full sm:order-2 sm:w-auto">
                 <Button
-                  onClick={() => handleSubmit({} as any)}
-                  className="bg-riodavida hover:bg-riodavida-dark w-full text-white"
+                  type="button"
+                  onClick={handleFormSubmit}
+                  className="bg-riodavida hover:bg-riodavida-dark h-11 w-full text-white"
                   size={'lg'}
                   disabled={
-                    isSubmitting ||
+                    isLoading ||
                     members.length === 0 ||
-                    !!formErrors.responsible ||
-                    !!formErrors.phone
+                    !!form.formState.errors.responsible ||
+                    !!form.formState.errors.phone
                   }
                 >
-                  {isSubmitting ? (
+                  {isLoading ? (
                     <span className="flex items-center gap-2">
                       <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
                         <circle

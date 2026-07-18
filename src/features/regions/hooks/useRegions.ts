@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import { getRegions, type RegionDto } from "@/features/regions/api/getRegions";
-import { useEffect, useState } from "react";
+import { listRegionsAction } from '@/features/regions/actions/listRegions/listRegions';
+import { type RegionDto } from '@/features/regions/api/getRegions';
+import { useEffect, useState } from 'react';
 
 type UseRegionsResult = {
   regions: RegionDto[];
@@ -19,11 +20,11 @@ export function useRegions(autoFetch: boolean = true): UseRegionsResult {
     setLoading(true);
     setError(null);
     try {
-      const data = await getRegions();
+      const data = await listRegionsAction();
       setRegions(data);
     } catch (e: unknown) {
       const errorMessage =
-        e instanceof Error ? e.message : "Falha ao carregar regiões";
+        e instanceof Error ? e.message : 'Falha ao carregar regiões';
       setError(errorMessage);
     } finally {
       setLoading(false);

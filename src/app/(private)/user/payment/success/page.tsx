@@ -1,17 +1,24 @@
-import Link from "next/link";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
+import SuccessPayment from '@/features/guest/components/success-payment/SuccessPayment';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function PaymentSuccess() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const eventId = searchParams.get('eventId') ?? '';
+  const clientName = searchParams.get('clientName') ?? '';
+
+  const handleViewInscription = () => {
+    router.push(`/user/payment/register/${eventId}`);
+  };
+
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
-      <h1 className="text-2xl font-bold">Pagamento aprovado</h1>
-      <p className="text-sm text-muted-foreground">
-        Página de teste para retorno de pagamento.
-      </p>
-      <Button asChild>
-        <Link href="/user/home">Voltar para Home</Link>
-      </Button>
-    </div>
+    <SuccessPayment
+      buttonText={'Fazer novo pagamento'}
+      clientName={clientName}
+      onViewInscription={handleViewInscription}
+    />
   );
 }

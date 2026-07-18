@@ -4,7 +4,13 @@ import axios from 'axios';
 
 export async function publicEventService(slug: string): Promise<Event> {
   try {
+    const start = performance.now();
+
     const { data } = await axiosServer.get<Event>(`/events/slug/${slug}`);
+
+    const end = performance.now();
+    console.log(`Tempo da requisição: ${(end - start).toFixed(2)} ms`);
+
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

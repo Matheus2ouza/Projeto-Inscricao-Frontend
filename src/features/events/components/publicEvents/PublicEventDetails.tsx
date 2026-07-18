@@ -5,7 +5,6 @@ import {
   type SubscriptionStatus,
 } from '@/features/events/components/publicEvents/PublicEventInscriptionCta';
 import { Event } from '@/features/events/types/publicEvents/publicEventsTypes';
-import EventMap from '@/shared/components/EventMap';
 import { GuestInscriptionAlready } from '@/shared/components/GuestInscriptionAlready';
 import { Button } from '@/shared/components/ui/button';
 import { ImageSwatches } from '@/shared/hooks/useImagePalette';
@@ -20,27 +19,25 @@ import { useEffect, useMemo, useState } from 'react';
 type PublicEventDetailsProps = {
   event: Event | null;
   palette: string[];
-  isDark: boolean; // ✅ Agora é o tema
+  isDark: boolean;
   swatches?: ImageSwatches;
-  onViewSubscription: (eventId: string) => void;
-  onSubscribe: (eventId: string) => void;
-  onLogin: () => void;
 };
 
 export function PublicEventDetails({
   event,
   palette,
-  isDark, // ✅ Tema (light/dark)
+  isDark,
   swatches,
-  onViewSubscription,
-  onSubscribe,
-  onLogin,
 }: PublicEventDetailsProps) {
   const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageFailed, setImageFailed] = useState(false);
   const [alreadyDialogOpen, setAlreadyDialogOpen] = useState(false);
   const throttleKey = 'guest_inscription_already_throttle_5m';
+
+  const handleViewSubscription = (eventId: string) => {
+    router.push(`/guest/${eventId}/inscription`);
+  };
 
   useEffect(() => {
     if (!event?.id) {
@@ -204,128 +201,143 @@ export function PublicEventDetails({
         onView={() => {
           setWithExpiry(throttleKey, true, 5 * 60 * 1000);
           setAlreadyDialogOpen(false);
-          onViewSubscription(event.id);
+          handleViewSubscription(event.id);
         }}
       />
+
+      {/* Card principal */}
       <div
-        className={`relative h-48 w-full overflow-hidden rounded-2xl border shadow-sm backdrop-blur-md sm:h-56 md:h-64 ${glassSurfaceClass}`}
+        className={`relative flex flex-col gap-4 overflow-hidden rounded-2xl border p-4 shadow-sm backdrop-blur-md sm:flex-row sm:p-6 ${glassSurfaceClass}`}
       >
-        {shouldShowImage ? (
-          <>
-            {imageLoading && (
-              <div className="bg-muted/60 absolute inset-0 z-20 flex items-center justify-center dark:bg-black/40">
-                <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-20"
+          style={{
+            background: `radial-gradient(750px circle at 18% 15%, ${accent} 0%, transparent 60%)`,
+          }}
+        />
+
+        {/* Imagem */}
+        <div className="relative flex-shrink-0">
+          <div className="relative h-32 w-32 overflow-hidden rounded-2xl sm:h-40 md:h-48 md:w-48">
+            {shouldShowImage && event.image ? (
+              <>
+                {imageLoading && (
+                  <div className="bg-muted/60 absolute inset-0 z-20 flex items-center justify-center dark:bg-black/40">
+                    <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+                  </div>
+                )}
+                <Image
+                  src={event.image}
+                  alt={event.name}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 128px, 192px"
+                  className="object-cover"
+                  onLoad={() => setImageLoading(false)}
+                  onError={() => {
+                    setImageFailed(true);
+                    setImageLoading(false);
+                  }}
+                />
+              </>
+            ) : (
+              <div
+                className={`h-full w-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+              >
+                <div className="absolute inset-0 bg-black/20" />
               </div>
             )}
-            <Image
-              src={event.image}
-              alt={event.name}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-              className="object-cover"
-              onLoad={() => setImageLoading(false)}
-              onError={() => {
-                setImageFailed(true);
-                setImageLoading(false);
-              }}
-            />
-            <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-          </>
-        ) : (
-          <div
-            className={`h-full w-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
-          >
-            <div className="absolute inset-0 bg-black/20" />
           </div>
-        )}
+        </div>
 
-        <div className="absolute right-0 bottom-0 left-0 z-20 p-3 sm:p-5 md:p-6">
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <p
-              className="text-[10px] font-medium tracking-[0.3em] uppercase drop-shadow-md sm:text-sm"
-              style={{ color: recommendedBodyColor }}
-            >
-              {event.regionName || 'Evento'}
-            </p>
-            <span
-              className="hidden h-4 w-px sm:block"
-              style={{ background: `${recommendedBodyColor}30` }}
-            />
-            <div className="flex items-center gap-1.5">
+        {/* Informações */}
+        <div className="flex flex-1 flex-col justify-between space-y-3">
+          <div className="space-y-2">
+            {/* Tags */}
+            <div className="flex flex-wrap items-center gap-2">
               <span
-                className="text-[10px] font-medium drop-shadow-md sm:text-xs"
+                className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-2.5 py-0.5 text-[10px] font-medium tracking-wider uppercase backdrop-blur-sm sm:text-xs"
                 style={{ color: recommendedBodyColor }}
               >
-                {formatInput(event.startDate, 'date', { month: 'short' })}
+                {event.regionName || 'Evento'}
+              </span>
+              <span className="h-3 w-px bg-white/20" />
+              <span
+                className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-2.5 py-0.5 text-[10px] font-medium backdrop-blur-sm sm:text-xs"
+                style={{ color: recommendedBodyColor }}
+              >
+                {formatInput(event.startDate, 'date', {
+                  month: 'short',
+                  year: 'numeric',
+                })}
               </span>
             </div>
-          </div>
-          <h1
-            className="text-xl leading-tight font-bold break-words uppercase drop-shadow-md sm:text-2xl md:text-3xl"
-            style={{ color: recommendedTitleColor }}
-          >
-            {event.name}
-          </h1>
-        </div>
-      </div>
 
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-        <Button
-          variant="ghost"
-          className={`group relative flex-1 justify-center gap-2 overflow-hidden py-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
-          onClick={handleShare}
-        >
-          <span className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/0 to-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
-          <span
-            className="pointer-events-none absolute inset-0 opacity-25"
-            style={{
-              background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
-            }}
-          />
-          <span className="relative inline-flex items-center justify-center gap-2">
-            <Share2 className="h-5 w-5" style={{ color: accent }} />
-            <span style={{ color: recommendedTitleColor }}>Compartilhar</span>
-          </span>
-        </Button>
-        <Button
-          variant="outline"
-          className={`group relative flex-1 justify-center gap-2 overflow-hidden py-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
-          onClick={handleAddToCalendar}
-        >
-          <span className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/0 to-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
-          <span
-            className="pointer-events-none absolute inset-0 opacity-25"
-            style={{
-              background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
-            }}
-          />
-          <span className="relative inline-flex items-center justify-center gap-2">
-            <Calendar className="h-5 w-5" style={{ color: accent }} />
-            <span style={{ color: recommendedTitleColor }}>
-              Adicionar à Agenda
-            </span>
-          </span>
-        </Button>
-        {hasCoordinates && (
-          <Button
-            variant="outline"
-            className={`group relative flex-1 justify-center gap-2 overflow-hidden py-4 shadow-sm backdrop-blur-md transition-all hover:shadow-md active:scale-[0.99] ${glassSurfaceClass}`}
-            onClick={handleOpenRoute}
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-white/10 via-white/0 to-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
-            <span
-              className="pointer-events-none absolute inset-0 opacity-25"
-              style={{
-                background: `radial-gradient(550px circle at 20% 30%, ${accent} 0%, transparent 60%)`,
-              }}
-            />
-            <span className="relative inline-flex items-center justify-center gap-2">
-              <MapPin className="h-5 w-5" style={{ color: accent }} />
-              <span style={{ color: recommendedTitleColor }}>Traçar Rota</span>
-            </span>
-          </Button>
-        )}
+            {/* Título do evento */}
+            <h1
+              className="text-xl leading-tight font-bold tracking-tight sm:text-2xl md:text-3xl"
+              style={{ color: recommendedTitleColor }}
+            >
+              {event.name}
+            </h1>
+
+            {/* Localização resumida */}
+            {event.location && (
+              <div
+                className="flex items-center gap-1.5 text-xs opacity-70 sm:text-sm"
+                style={{ color: recommendedBodyColor }}
+              >
+                <MapPin
+                  className="h-3 w-3 sm:h-4 sm:w-4"
+                  style={{ color: accent }}
+                />
+                <span>{event.location}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Botões de ação */}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`group gap-1.5 rounded-xl border bg-white/5 px-3 py-2 text-xs backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98] sm:gap-2 sm:px-4 sm:text-sm ${glassSurfaceClass}`}
+              onClick={handleShare}
+            >
+              <Share2
+                className="h-3 w-3 sm:h-4 sm:w-4"
+                style={{ color: accent }}
+              />
+              <span style={{ color: recommendedTitleColor }}>Compartilhar</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`group gap-1.5 rounded-xl border bg-white/5 px-3 py-2 text-xs backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98] sm:gap-2 sm:px-4 sm:text-sm ${glassSurfaceClass}`}
+              onClick={handleAddToCalendar}
+            >
+              <Calendar
+                className="h-3 w-3 sm:h-4 sm:w-4"
+                style={{ color: accent }}
+              />
+              <span style={{ color: recommendedTitleColor }}>Agenda</span>
+            </Button>
+            {hasCoordinates && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`group gap-1.5 rounded-xl border bg-white/5 px-3 py-2 text-xs backdrop-blur-md transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98] sm:gap-2 sm:px-4 sm:text-sm ${glassSurfaceClass}`}
+                onClick={handleOpenRoute}
+              >
+                <MapPin
+                  className="h-3 w-3 sm:h-4 sm:w-4"
+                  style={{ color: accent }}
+                />
+                <span style={{ color: recommendedTitleColor }}>Rota</span>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -333,62 +345,12 @@ export function PublicEventDetails({
           eventId={event.id}
           allowedInscriptionModes={event.allowedInscriptionModes}
           subscriptionStatus={subscriptionStatus}
-          accentColor={accent} // ✅ Usa a cor ajustada
+          eventDate={event.startDate}
+          accentColor={accent}
           titleColor={recommendedTitleColor}
           bodyColor={recommendedBodyColor}
           glassSurfaceClass={glassSurfaceClass}
-          onSubscribe={onSubscribe}
-          onLogin={onLogin}
-          onViewSubscription={onViewSubscription}
         />
-
-        {/* Card de Localização */}
-        <div
-          className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-md transition-shadow hover:shadow-md ${glassSurfaceClass}`}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 opacity-30"
-            style={{
-              background: `radial-gradient(750px circle at 18% 15%, ${accent} 0%, transparent 60%), radial-gradient(900px circle at 85% 45%, ${accent} 0%, transparent 65%)`,
-            }}
-          />
-          <div className="relative mb-6 flex items-center gap-4">
-            <MapPin className="h-6 w-6" style={{ color: accent }} />
-            <h3
-              className="text-card-foreground text-xl font-semibold"
-              style={{ color: recommendedTitleColor }}
-            >
-              Localização
-            </h3>
-          </div>
-          <div className="relative space-y-6">
-            <div>
-              <p
-                className="text-card-foreground mb-2 text-lg font-medium"
-                style={{ color: recommendedBodyColor }}
-              >
-                Endereço
-              </p>
-              <p
-                className="text-card-foreground/80"
-                style={{ color: recommendedBodyColor }}
-              >
-                {event.location || 'Local a ser definido'}
-              </p>
-            </div>
-            {hasCoordinates && (
-              <div className="h-64 overflow-hidden rounded-2xl border border-white/10">
-                <EventMap
-                  lat={event.latitude}
-                  lng={event.longitude}
-                  height="100%"
-                  zoom={15}
-                  markerTitle={event.name}
-                />
-              </div>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );

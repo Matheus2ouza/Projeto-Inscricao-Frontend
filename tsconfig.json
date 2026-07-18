@@ -41,7 +41,8 @@
     "src/types/**/*.d.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "src/features/documentation/components/introduction/IntroductionDocumentationContent"
+    "src/features/documentation/components/introduction/IntroductionDocumentationContent",
+    "src/features/locality/hooks/listLocalities"
   ],
   "exclude": [
     "node_modules"

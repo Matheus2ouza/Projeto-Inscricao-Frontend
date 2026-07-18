@@ -1,6 +1,6 @@
 export type UpdateEventImageInput = {
   eventId: string;
-  imageBase64: string; // data URL (jpeg)
+  file: File;
 };
 
 export type UpdateEventImageResponse = void;

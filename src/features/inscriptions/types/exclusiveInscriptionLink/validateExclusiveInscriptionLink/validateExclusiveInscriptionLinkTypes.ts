@@ -25,13 +25,14 @@ export type ExclusiveInscriptionLink = {
 export type TypeInscriptionAllowed = {
   id: string;
   description: string;
+  rule: string | null;
   value: number;
   specialType: boolean;
-  rule?: Date;
   active: boolean;
   participantLimit: number;
   limitIsStrict: boolean;
   currentCount: number;
+  createdAt: Date;
 };
 
 export type useValidateExclusiveInscriptionLinkResult = {

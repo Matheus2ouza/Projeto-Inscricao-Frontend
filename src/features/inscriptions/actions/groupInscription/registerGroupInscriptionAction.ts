@@ -2,7 +2,7 @@
 
 import { registerGroupInscriptionService } from '@/features/inscriptions/services/groupInscription/registerGroupInscriptionService';
 import {
-  GroupInscriptionResponse,
+  GroupInscriptionActionResult,
   GroupInscriptionSubmit,
 } from '@/features/inscriptions/types/groupInscription/registerGroupInscriptionTypes';
 
@@ -12,7 +12,6 @@ import {
  */
 export async function registerGroupInscriptionAction(
   data: GroupInscriptionSubmit,
-): Promise<GroupInscriptionResponse> {
-  const result = await registerGroupInscriptionService(data);
-  return result;
+): Promise<GroupInscriptionActionResult> {
+  return registerGroupInscriptionService(data);
 }

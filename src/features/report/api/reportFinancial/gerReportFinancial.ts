@@ -11,7 +11,6 @@ export async function getReportFinancial(eventId: string, details: boolean) {
         },
       },
     );
-    console.log(data.spent.spentDetails);
     return data;
   } catch (error) {
     const axiosError = error as { response?: { data?: { message?: string } } };

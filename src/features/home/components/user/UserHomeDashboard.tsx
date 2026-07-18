@@ -216,7 +216,7 @@ export default function UserHomeDashboard({
         suas dúvidas sobre inscrições, pagamentos e eventos.
         <Link
           href="/documentation"
-          className="ml-1 font-semibold underline underline-offset-2"
+          className="ml-1 font-bold underline-offset-2 hover:text-white/80 hover:underline"
         >
           Acesse a documentação
         </Link>
