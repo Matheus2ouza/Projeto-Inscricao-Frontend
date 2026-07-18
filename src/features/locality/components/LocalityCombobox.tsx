@@ -35,17 +35,13 @@ interface LocalityComboboxProps {
 }
 
 export function LocalityCombobox({
-  eventId,
   form,
   name,
   placeholder = 'Selecione uma localidade',
   disabled = false,
 }: LocalityComboboxProps) {
   const [open, setOpen] = useState(false);
-  const { localities, loading } = useListLocalities({ eventId });
-
-  // Monitora o valor do campo para debug
-  const fieldValue = form.watch(name);
+  const { localities, loading } = useListLocalities();
 
   return (
     <FormField

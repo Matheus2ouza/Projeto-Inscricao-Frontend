@@ -60,6 +60,12 @@ export enum ShirtType {
   BABYLOOK = 'BABYLOOK',
 }
 
+export enum PaymentMode {
+  CARTAO = 'CARTAO',
+  PIX = 'PIX',
+  BOLETO = 'BOLETO',
+}
+
 export type InscriptionDetails = {
   id: string;
   status: InscriptionStatus;
@@ -72,7 +78,12 @@ export type InscriptionDetails = {
   locality: Locality;
   participant: Participant;
   payments?: Payment[];
+  eventConfig: EventConfig;
+};
+
+export type EventConfig = {
   participanteConfig: ParticipantFieldsConfig;
+  allowedPaymentModes: PaymentMode[];
 };
 
 export type TypeInscription = {
@@ -129,7 +140,7 @@ export type GuestInscriptionDetailsResponse = {
   locality: Locality;
   participant: Participant;
   payments?: Payment[];
-  participanteConfig: ParticipantFieldsConfig;
+  eventConfig: EventConfig;
 };
 
 export type UseDetailsInscriptionParams = {
@@ -137,6 +148,7 @@ export type UseDetailsInscriptionParams = {
 };
 
 export type UseDetailsInscriptionResult = {
+  eventConfig: EventConfig | null;
   inscription: InscriptionDetails | null;
   participant: Participant | null;
   payments: Payment[] | null;

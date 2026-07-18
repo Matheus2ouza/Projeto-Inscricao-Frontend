@@ -21,9 +21,10 @@ export type ImageUploadProps = {
   accept?: string;
   title?: string;
   onInvalidFile?: (message: string) => void;
-  onDataUrlsChange?: (dataUrls: string[] | string | null) => void; // Alterado para aceitar string | null também
+  onDataUrlsChange?: (dataUrls: string[] | string | null) => void;
+  onFileChange?: (file: File | null) => void;
   className?: string;
-  singleMode?: boolean; // Nova prop para indicar modo single
+  singleMode?: boolean;
 };
 
 export default function ImageUpload({
@@ -35,8 +36,9 @@ export default function ImageUpload({
   title = 'Adicionar imagem',
   onInvalidFile,
   onDataUrlsChange,
+  onFileChange, // Nova prop
   className,
-  singleMode = false, // Default false para manter compatibilidade
+  singleMode = false,
 }: ImageUploadProps) {
   const resolvedMaxCount = Math.max(1, maxCount);
   const multiple = resolvedMaxCount > 1;
@@ -47,6 +49,7 @@ export default function ImageUpload({
   const [previewVisible, setPreviewVisible] = React.useState(false);
   const [previewIndex, setPreviewIndex] = React.useState(0);
   const [prevUrlsRef, setPrevUrlsRef] = React.useState<string[]>([]);
+  const [currentFile, setCurrentFile] = React.useState<File | null>(null);
 
   const fileList = React.useMemo(() => {
     const list = Array.isArray(value) ? value : [];
@@ -95,6 +98,14 @@ export default function ImageUpload({
     void updatePreviews();
   }, [updatePreviews]);
 
+  // Atualiza o arquivo atual e notifica o pai
+  React.useEffect(() => {
+    const firstFile = fileList[0]?.originFileObj as File | undefined;
+    const file = firstFile || null;
+    setCurrentFile(file);
+    onFileChange?.(file);
+  }, [fileList, onFileChange]);
+
   // Só chama onDataUrlsChange quando as URLs realmente mudarem
   React.useEffect(() => {
     const urls = fileList
@@ -102,16 +113,13 @@ export default function ImageUpload({
       .filter((u): u is string => Boolean(u))
       .map(String);
 
-    // Compara com as URLs anteriores para evitar loop infinito
     if (JSON.stringify(urls) !== JSON.stringify(prevUrlsRef)) {
       setPrevUrlsRef(urls);
 
-      // Se estiver em modo single, retorna string ou null
       if (singleMode) {
         const result = urls.length > 0 ? urls[0] : null;
         onDataUrlsChange?.(result);
       } else {
-        // Modo multiple, retorna array
         onDataUrlsChange?.(urls);
       }
     }
@@ -134,6 +142,9 @@ export default function ImageUpload({
 
   const handleRemoveImage = (uid: string) => {
     onChange(fileList.filter((f) => String(f.uid) !== uid));
+    if (fileList.length <= 1) {
+      onFileChange?.(null);
+    }
   };
 
   const handlePreview = (index: number) => {
@@ -155,7 +166,7 @@ export default function ImageUpload({
       onChange={handleChange}
       disabled={disabled}
       showUploadList={false}
-      className="!m-0 h-32 w-32 rounded-lg border-2 border-dashed p-0 transition-colors hover:border-blue-500 hover:bg-blue-50/5 dark:hover:border-blue-500"
+      className="hover:border-riodavida hover:bg-riodavida/5 dark:hover:border-riodavida !m-0 h-32 w-32 rounded-lg border-2 border-dashed p-0 transition-colors"
     >
       <div className="flex h-full w-full flex-col items-center justify-center gap-1">
         <Plus className="h-6 w-6 text-slate-400 dark:text-slate-500" />

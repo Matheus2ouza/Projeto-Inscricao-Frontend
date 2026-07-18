@@ -4,13 +4,10 @@ import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 import { ListLocalitiesResponse } from '../../types/listLocalities/listLocalitiesTypes';
 
-export async function listLocalitiesService(
-  eventId?: string,
-): Promise<ListLocalitiesResponse> {
+export async function listLocalitiesService(): Promise<ListLocalitiesResponse> {
   try {
-    const { data } = await axiosServer.get<ListLocalitiesResponse>(
-      `locality/event/${eventId}`,
-    );
+    const { data } =
+      await axiosServer.get<ListLocalitiesResponse>(`locality/all`);
     return data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

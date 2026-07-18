@@ -30,13 +30,6 @@ export type RegisterGuestInscriptionInput = {
   phone: string;
   birthDate: string;
   gender: GenderType;
-  localityId: string;
-
-  // Dados dinâmicos — obrigatoriedade depende da participantFieldsConfig do evento
-  cpf?: string;
-  preferredName?: string;
-  shirtSize?: ShirtSizeType;
-  shirtType?: ShirtType;
 
   // id da inscrição
   typeInscriptionId: string;

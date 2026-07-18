@@ -5,13 +5,13 @@ import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 
 export async function membersComboboxService(
-  eventId: string,
-  accountId?: string,
+  eventId?: string,
+  localityId?: string,
 ): Promise<MembersResponse> {
   try {
     const { data } = await axiosServer.get<MembersResponse>(
       `/members/${eventId}/all-names`,
-      { params: { accountId } },
+      { params: { localityId } },
     );
     return data;
   } catch (error) {

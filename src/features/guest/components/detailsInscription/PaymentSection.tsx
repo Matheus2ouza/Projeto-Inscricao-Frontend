@@ -4,6 +4,7 @@ import {
   InscriptionStatus,
   Payment,
   PaymentInstallment,
+  PaymentMode,
   StatusPayment,
 } from '@/features/guest/types/detailsInscription/detailsInscriptionType';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
@@ -24,7 +25,7 @@ import { formatDateTime } from '@/shared/utils/formatDate';
 import { getConvertStatusPayment } from '@/shared/utils/getConvertStatus';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import { getStatusColor } from '@/shared/utils/getStatusColor';
-import { Calendar, CreditCard, FileText } from 'lucide-react';
+import { Calendar, CreditCard, FileText, QrCode } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type {
   ModifyReceiptPaymentInput,
@@ -34,11 +35,11 @@ import type {
 interface PaymentSectionProps {
   inscriptionId: string;
   inscriptionStatus: InscriptionStatus;
+  allowedPaymentModes: PaymentMode[];
   payments: Payment[];
   totalValue: number;
   onRegisterPaymentCard: () => void;
   onRegisterPaymentPix: () => void;
-  isRegisteringPix: boolean;
   onDeletePayment: (paymentId: string) => void;
   onModifyReceipt: (
     input: ModifyReceiptPaymentInput,
@@ -47,13 +48,12 @@ interface PaymentSectionProps {
 }
 
 export function PaymentSection({
-  inscriptionId,
   inscriptionStatus,
+  allowedPaymentModes = [],
   payments,
   totalValue,
   onRegisterPaymentCard,
   onRegisterPaymentPix,
-  isRegisteringPix,
   onDeletePayment,
   onModifyReceipt,
   isModifingReceipt,
@@ -74,6 +74,17 @@ export function PaymentSection({
   const modifyDialogScrollRef = useRef(0);
 
   const paymentsList = payments ?? [];
+
+  // Verifica se o modo de pagamento está habilitado
+  const isPaymentModeAllowed = (mode: PaymentMode) => {
+    return allowedPaymentModes.includes(mode);
+  };
+
+  // Verifica se o PIX está habilitado
+  const isPixAllowed = isPaymentModeAllowed(PaymentMode.PIX);
+
+  // Verifica se o Cartão está habilitado
+  const isCardAllowed = isPaymentModeAllowed(PaymentMode.CARTAO);
 
   // variavel para armazenar o valor total pago
   const paymentTotalPaid = paymentsList.reduce((total, payment) => {
@@ -106,34 +117,50 @@ export function PaymentSection({
   return (
     <>
       <div className="space-y-6">
-        <div id="guest-payment" className="liquid-panel scroll-mt-24 p-6">
+        <div id="guest-payment" className="liquid-card scroll-mt-24 p-6">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div className="flex-1 space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <CreditCard className="text-riodavida h-5 w-5" />
+                  <h3 className="text-riodavida-gray-dark dark:text-riodavida-gray text-lg font-semibold">
                     Resumo Financeiro
                   </h3>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Button
-                    type="button"
-                    onClick={onRegisterPaymentPix}
-                    disabled={paymentDebt <= 0 || isRegisteringPix}
-                  >
-                    {isRegisteringPix
-                      ? 'Redirecionando...'
-                      : 'Registrar pagamento Pix'}
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={onRegisterPaymentCard}
-                    disabled={paymentDebt <= 0}
-                    variant="outline"
-                  >
-                    Registrar pagamento Cartão
-                  </Button>
+                  {/* Botão PIX - visível apenas se habilitado */}
+                  {isPixAllowed && (
+                    <Button
+                      type="button"
+                      onClick={onRegisterPaymentPix}
+                      disabled={paymentDebt <= 0}
+                      className="bg-riodavida hover:bg-riodavida-dark gap-2 text-white"
+                    >
+                      <QrCode className="h-4 w-4" />
+                      Registrar pagamento Pix
+                    </Button>
+                  )}
+
+                  {/* Botão Cartão - visível apenas se habilitado */}
+                  {isCardAllowed && (
+                    <Button
+                      type="button"
+                      onClick={onRegisterPaymentCard}
+                      disabled={paymentDebt <= 0}
+                      variant="outline"
+                      className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark gap-2"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Registrar pagamento Cartão
+                    </Button>
+                  )}
+
+                  {/* Mensagem quando nenhum método está habilitado */}
+                  {!isPixAllowed && !isCardAllowed && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Nenhum método de pagamento disponível no momento.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -143,7 +170,11 @@ export function PaymentSection({
                     Total pago
                   </p>
                   <p
-                    className={`text-2xl font-bold ${paymentTotalPaid > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}
+                    className={`text-2xl font-bold ${
+                      paymentTotalPaid > 0
+                        ? 'text-riodavida-secondary dark:text-riodavida-muted-light'
+                        : 'text-riodavida-gray-dark dark:text-riodavida-gray'
+                    }`}
                   >
                     {getFormatCurrency(paymentTotalPaid)}
                   </p>
@@ -153,7 +184,7 @@ export function PaymentSection({
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Valor total
                   </p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-2xl font-bold">
                     {getFormatCurrency(totalValue)}
                   </p>
                 </div>
@@ -163,11 +194,7 @@ export function PaymentSection({
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Saldo pendente
                     </p>
-                    <p
-                      className={
-                        'text-2xl font-bold text-amber-600 dark:text-amber-500'
-                      }
-                    >
+                    <p className="text-2xl font-bold text-amber-600 dark:text-amber-500">
                       {getFormatCurrency(paymentDebt)}
                     </p>
                   </div>
@@ -185,7 +212,7 @@ export function PaymentSection({
                 </div>
                 <div className="bg-foreground/15 h-2 overflow-hidden rounded-full">
                   <div
-                    className="h-full rounded-full bg-green-500 transition-all duration-300"
+                    className="bg-riodavida-secondary h-full rounded-full transition-all duration-300"
                     style={{ width: `${paymentProgress}%` }}
                   />
                 </div>
@@ -216,7 +243,7 @@ export function PaymentSection({
 
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-semibold">
               Histórico de Pagamentos
             </h2>
             <p className="text-muted-foreground">
@@ -228,7 +255,7 @@ export function PaymentSection({
         </div>
 
         {paymentsList.length === 0 ? (
-          <div className="text-muted-foreground rounded-lg border px-4 py-8 text-center">
+          <div className="border-riodavida/20 text-muted-foreground rounded-lg border px-4 py-8 text-center">
             {inscriptionStatus === InscriptionStatus.UNDER_REVIEW
               ? 'Aguardando revisão'
               : 'Nenhum pagamento registrado'}
@@ -249,11 +276,11 @@ export function PaymentSection({
               );
 
               return (
-                <div key={p.id} className="liquid-panel space-y-4 p-6">
+                <div key={p.id} className="liquid-card space-y-4 p-6">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                      <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                      <FileText className="text-riodavida h-5 w-5" />
+                      <h3 className="text-riodavida-gray-dark dark:text-riodavida-gray text-base font-semibold">
                         {p.id.slice(0, 12)}...
                       </h3>
                     </div>
@@ -268,6 +295,7 @@ export function PaymentSection({
                             setPaymentIdToModify(p.id);
                             setModifyDialogOpen(true);
                           }}
+                          className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark"
                         >
                           Modificar comprovante
                         </Button>
@@ -295,8 +323,8 @@ export function PaymentSection({
                       <p
                         className={`text-xl font-bold ${
                           p.totalPaid > 0
-                            ? 'text-green-600 dark:text-green-400'
-                            : 'text-gray-900 dark:text-white'
+                            ? 'text-riodavida-secondary dark:text-riodavida-muted-light'
+                            : 'text-riodavida-gray-dark dark:text-riodavida-gray'
                         }`}
                       >
                         {getFormatCurrency(p.totalPaid)}
@@ -307,7 +335,7 @@ export function PaymentSection({
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Valor total
                       </p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
+                      <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                         {getFormatCurrency(p.totalValue)}
                       </p>
                     </div>
@@ -330,7 +358,7 @@ export function PaymentSection({
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Método
                       </p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
+                      <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                         {p.method}
                       </p>
                     </div>
@@ -341,7 +369,7 @@ export function PaymentSection({
                           <p className="text-sm text-gray-600 dark:text-gray-400">
                             Parcelas
                           </p>
-                          <p className="text-xl font-bold text-gray-900 dark:text-white">
+                          <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                             {installmentsPaid}/{installmentsTotal}
                           </p>
                         </div>
@@ -349,9 +377,9 @@ export function PaymentSection({
                   </div>
 
                   {p.rejectionReason && (
-                    <div className="grid grid-cols-1 gap-4 border-t sm:grid-cols-3">
+                    <div className="border-riodavida/10 grid grid-cols-1 gap-4 border-t sm:grid-cols-3">
                       <div className="space-y-1">
-                        <p className="mt-3 text-base font-bold text-gray-900 uppercase dark:text-gray-400">
+                        <p className="text-riodavida-gray-dark dark:text-riodavida-gray mt-3 text-base font-bold uppercase">
                           Motivo da recusa
                         </p>
                         <p className="text-base text-red-600">
@@ -365,7 +393,7 @@ export function PaymentSection({
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-fit"
+                      className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark w-fit"
                       onClick={() => openReceiptViewer(p)}
                     >
                       <FileText className="h-4 w-4" />
@@ -376,14 +404,14 @@ export function PaymentSection({
                   {isApproved && (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                        <h4 className="text-riodavida-gray-dark dark:text-riodavida-gray text-sm font-semibold">
                           Parcelas
                         </h4>
                       </div>
 
                       <div className="block sm:hidden">
                         {p.paymentInstallment.length === 0 ? (
-                          <div className="text-muted-foreground rounded-lg border px-4 py-6 text-center">
+                          <div className="border-riodavida/20 text-muted-foreground rounded-lg border px-4 py-6 text-center">
                             Nenhuma parcela registrada
                           </div>
                         ) : (
@@ -391,7 +419,7 @@ export function PaymentSection({
                             {p.paymentInstallment.map((installment) => (
                               <div
                                 key={installment.id}
-                                className="hover:bg-muted/30 rounded-lg border p-4 transition-colors"
+                                className="border-riodavida/20 hover:bg-riodavida/5 rounded-lg border p-4 transition-colors"
                               >
                                 <div className="mb-3 flex items-center justify-between">
                                   <div className="flex items-center gap-2">
@@ -409,7 +437,7 @@ export function PaymentSection({
                                     <p className="text-muted-foreground text-xs">
                                       Valor
                                     </p>
-                                    <p className="text-base font-bold text-green-600 dark:text-green-400">
+                                    <p className="text-riodavida-secondary dark:text-riodavida-muted-light text-base font-bold">
                                       {getFormatCurrency(installment.value)}
                                     </p>
                                   </div>
@@ -418,7 +446,7 @@ export function PaymentSection({
                                       Data
                                     </p>
                                     <div className="flex items-center gap-2">
-                                      <Calendar className="text-muted-foreground h-4 w-4" />
+                                      <Calendar className="text-riodavida h-4 w-4" />
                                       <p className="text-sm font-medium">
                                         {installment.paidAt
                                           ? formatDateTime(installment.paidAt)
@@ -433,17 +461,21 @@ export function PaymentSection({
                         )}
                       </div>
 
-                      <div className="hidden rounded-md border sm:block sm:w-1/2">
+                      <div className="border-riodavida/10 hidden rounded-md border sm:block sm:w-1/2">
                         <Table>
-                          <TableHeader>
+                          <TableHeader className="bg-riodavida/5">
                             <TableRow>
-                              <TableHead className="w-16">#</TableHead>
+                              <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray w-16">
+                                #
+                              </TableHead>
                               <TableHead>
-                                <div className="mx-auto w-fit text-left">
+                                <div className="text-riodavida-gray-dark dark:text-riodavida-gray mx-auto w-fit text-left">
                                   Valor
                                 </div>
                               </TableHead>
-                              <TableHead className="w-[180px]">Data</TableHead>
+                              <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray w-[180px]">
+                                Data
+                              </TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -460,12 +492,12 @@ export function PaymentSection({
                               installments.map((installment) => (
                                 <TableRow
                                   key={installment.id}
-                                  className="hover:bg-muted/50"
+                                  className="hover:bg-riodavida/5"
                                 >
                                   <TableCell className="font-medium">
                                     {installment.installmentNumber}
                                   </TableCell>
-                                  <TableCell className="font-semibold text-green-600 dark:text-green-400">
+                                  <TableCell className="text-riodavida-secondary dark:text-riodavida-muted-light font-semibold">
                                     <div className="mx-auto w-fit text-left whitespace-nowrap">
                                       {getFormatCurrency(installment.value)}
                                     </div>

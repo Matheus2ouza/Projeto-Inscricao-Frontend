@@ -39,10 +39,6 @@ export type ListLocalitiesResponse = {
   uf: UF;
 }[];
 
-export type UseListLocalitiesParams = {
-  eventId?: string;
-};
-
 export type UseListLocalitiesResult = {
   localities: Localities[];
   loading: boolean;

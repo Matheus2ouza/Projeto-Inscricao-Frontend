@@ -1,15 +1,20 @@
 'use client';
 
 import { DetailsInscription } from '@/features/guest/components/detailsInscription/DetailsInscription';
+import { SearchInscriptionCard } from '@/features/guest/components/detailsInscription/SearchInscriptionCard';
 import { useDeletePayment } from '@/features/guest/hook/detailsInscription/actions/useDeletePayment';
 import { useModifyReceiptPayment } from '@/features/guest/hook/detailsInscription/actions/useModifyReceiptPayment';
-import { useUpdateGuestParticipant } from '@/features/guest/hook/detailsInscription/actions/useUpdateParticipant';
 import { useDetailsInscription } from '@/features/guest/hook/detailsInscription/useDetailsInscription';
-import { useRegisterPaymentPixAssas } from '@/features/payments/hooks/registerPayment/useRegisterPaymentPixAsaas';
 import PageContainer from '@/shared/components/layout/PageContainer';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Skeleton,
+} from '@/shared/components/ui';
 import { Button } from '@/shared/components/ui/button';
 import { getWithExpiry } from '@/shared/utils/storageWithExpiry';
-import { Frown } from 'lucide-react';
+import { FileText, Frown } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -22,10 +27,6 @@ export default function GuestInscriptionPage() {
   const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const hasAutoScrolledRef = useRef(false);
   const persistKey = 'guest_inscription_persist';
-  const [isEditingInscription, setIsEditingInscription] = useState(false);
-  const [editingParticipantId, setEditingParticipantId] = useState<
-    string | null
-  >(null);
 
   if (!eventId) {
     return null;
@@ -68,56 +69,17 @@ export default function GuestInscriptionPage() {
     }
   }, [eventId, searchParams]);
 
-  const { inscription, participant, payments, loading, error, refetch } =
-    useDetailsInscription({
-      confirmationCode: confirmationCode ?? '',
-    });
-
-  const toDateInputValue = (value: string | Date | null | undefined) => {
-    if (!value) return '';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toISOString().slice(0, 10);
-  };
-
-  const participantBeingEdited = participant ?? null;
-
-  const { form: updateParticipantForm, handleUpdateParticipant } =
-    useUpdateGuestParticipant({
-      participantId: editingParticipantId ?? '',
-      initialValues: participantBeingEdited
-        ? {
-            name: participantBeingEdited.name ?? '',
-            preferredName: participantBeingEdited.preferredName ?? '',
-            birthDate: toDateInputValue(participantBeingEdited.birthDate),
-            gender: String(participantBeingEdited.gender ?? ''),
-            shirtSize: String(participantBeingEdited.shirtSize ?? ''),
-            shirtType: String(participantBeingEdited.shirtType ?? ''),
-          }
-        : undefined,
-      onSuccess: () => {
-        setEditingParticipantId(null);
-      },
-    });
-
-  const handleStartEditParticipant = (participantId: string) => {
-    if (!participant) return;
-    if (participant.id !== participantId) return;
-    setEditingParticipantId(participantId);
-  };
-
-  const handleCancelEditParticipant = () => {
-    if (!participant) return;
-    updateParticipantForm.reset({
-      name: participant.name ?? '',
-      preferredName: participant.preferredName ?? '',
-      birthDate: toDateInputValue(participant.birthDate),
-      gender: String(participant.gender ?? ''),
-      shirtSize: String(participant.shirtSize ?? ''),
-      shirtType: String(participant.shirtType ?? ''),
-    });
-    setEditingParticipantId(null);
-  };
+  const {
+    eventConfig,
+    inscription,
+    participant,
+    payments,
+    loading,
+    error,
+    refetch,
+  } = useDetailsInscription({
+    confirmationCode: confirmationCode ?? '',
+  });
 
   const { deletePaymentMutation } = useDeletePayment();
 
@@ -151,71 +113,181 @@ export default function GuestInscriptionPage() {
     router.push(`/guest/${eventId}/payment/card?${search.toString()}`);
   };
 
-  const { mutate: registerPixAssas, isPending: isRegisteringPix } =
-    useRegisterPaymentPixAssas();
-
-  const handleRegisterPaymentPix = () => {
-    if (!inscription) return;
-    registerPixAssas(inscription.id);
-  };
-
   const { handleModifyReceiptPayment, isModifingReceiptPayment } =
     useModifyReceiptPayment();
 
   const renderContent = () => {
-    return (
-      <div className="space-y-6">
-        <DetailsInscription
-          eventId={eventId}
-          confirmationCode={confirmationCode}
-          inscription={inscription}
-          participant={participant}
-          payments={payments}
-          loading={loading}
-          participantEdit={{
-            editingParticipantId,
-            form: updateParticipantForm,
-            onStart: handleStartEditParticipant,
-            onCancel: handleCancelEditParticipant,
-            onSubmit: handleUpdateParticipant,
-          }}
-          onSearch={(code) => setConfirmationCode(code)}
-          onClear={() => setConfirmationCode(null)}
-          onRegisterPaymentCard={handleRegisterPaymentCard}
-          onRegisterPaymentPix={handleRegisterPaymentPix}
-          isRegisteringPix={isRegisteringPix}
-          onDeletePayment={deletePaymentMutation.mutate}
-          onModifyReceipt={handleModifyReceiptPayment}
-          isModifingReceipt={isModifingReceiptPayment}
-        />
-        {error && (
-          <div className="flex min-h-[160px] items-center justify-center">
-            <div className="w-full max-w-xl rounded-xl border border-gray-200 p-6 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900/50">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                <Frown className="h-9 w-9" />
-              </div>
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                Não foi possível carregar sua inscrição
-              </p>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {error}
-              </p>
-              <Button className="mt-4" onClick={() => refetch()}>
-                Tentar Novamente
-              </Button>
+    // Remove loading state - ele será mostrado como conteúdo interno
+    if (error) {
+      return (
+        <div className="flex min-h-[160px] items-center justify-center">
+          <div className="w-full max-w-xl rounded-xl border border-gray-200 p-6 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900/50">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+              <Frown className="h-9 w-9" />
             </div>
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+              Não foi possível carregar sua inscrição
+            </p>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              {error}
+            </p>
+            <Button className="mt-4" onClick={() => refetch()}>
+              Tentar Novamente
+            </Button>
           </div>
-        )}
-      </div>
+        </div>
+      );
+    }
+
+    // Mostra loading APENAS quando estiver carregando e não houver dados ainda
+    if (loading) {
+      return (
+        <div className="w-full space-y-8">
+          {/* Skeleton do Card de Detalhes da Inscrição */}
+          <Card className="liquid-card w-full overflow-hidden border-0 shadow-none">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-48" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <Skeleton className="h-9 w-36" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-riodavida/5 border-riodavida/20 rounded-lg border p-4"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <Skeleton className="h-4 w-4 rounded-full" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                    <Skeleton className="h-6 w-32" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Skeleton do Card de Participante */}
+          <Card className="liquid-card w-full overflow-hidden border-0 shadow-none">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-9 w-36" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-riodavida/5 border-riodavida/20 rounded-lg border p-4"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <Skeleton className="h-4 w-4 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                    <Skeleton className="h-6 w-28" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Skeleton do Card de Pagamento */}
+          <Card className="liquid-card w-full overflow-hidden border-0 shadow-none">
+            <CardHeader className="pb-4">
+              <Skeleton className="h-8 w-40" />
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="bg-riodavida/5 border-riodavida/20 rounded-lg border p-4"
+                    >
+                      <div className="mb-2 flex items-center gap-2">
+                        <Skeleton className="h-4 w-4 rounded-full" />
+                        <Skeleton className="h-4 w-28" />
+                      </div>
+                      <Skeleton className="h-6 w-24" />
+                    </div>
+                  ))}
+                </div>
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    if (!eventConfig || !inscription || !participant) {
+      return (
+        <div className="flex min-h-[160px] items-center justify-center">
+          <div className="border-riodavida/20 bg-riodavida/5 w-full max-w-xl rounded-xl border p-6 text-center shadow-sm backdrop-blur-sm">
+            <div className="bg-riodavida/10 text-riodavida mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full">
+              <FileText className="h-9 w-9" />
+            </div>
+            <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-sm font-semibold">
+              Dados da inscrição não disponíveis
+            </p>
+            <p className="text-muted-foreground mt-2 text-sm">
+              Não foi possível encontrar os dados da inscrição. Tente recarregar
+              a página.
+            </p>
+            <Button
+              className="bg-riodavida hover:bg-riodavida-dark mt-4 text-white"
+              onClick={() => refetch()}
+            >
+              Recarregar Dados
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <DetailsInscription
+        eventId={eventId}
+        confirmationCode={confirmationCode}
+        eventConfig={eventConfig}
+        inscription={inscription}
+        participant={participant}
+        payments={payments}
+        loading={loading}
+        onSearch={(code) => setConfirmationCode(code)}
+        onClear={() => setConfirmationCode(null)}
+        onRegisterPaymentCard={handleRegisterPaymentCard}
+        onDeletePayment={deletePaymentMutation.mutate}
+        onModifyReceipt={handleModifyReceiptPayment}
+        isModifingReceipt={isModifingReceiptPayment}
+      />
     );
   };
 
   return (
-    <PageContainer
-      title="Minha Inscrição"
-      description="Acompanhe o status da sua inscrição"
-    >
-      {renderContent()}
-    </PageContainer>
+    <div className="relative isolate max-h-screen w-full">
+      <PageContainer
+        title="Minha Inscrição"
+        description="Acompanhe o status da sua inscrição"
+      >
+        {/* Card de Busca - SEMPRE visível */}
+        <SearchInscriptionCard
+          confirmationCode={confirmationCode}
+          onSearch={(code) => setConfirmationCode(code)}
+          onClear={() => setConfirmationCode(null)}
+          loading={loading}
+        />
+
+        {/* Conteúdo principal (loading, error, dados) */}
+        {renderContent()}
+      </PageContainer>
+    </div>
   );
 }

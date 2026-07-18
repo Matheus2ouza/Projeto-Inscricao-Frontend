@@ -7,14 +7,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 export const listLocalitiesKeys = {
   all: ['list-localities'] as const,
   lists: () => [...listLocalitiesKeys.all, 'list'] as const,
-  list: (eventId?: string) => [...listLocalitiesKeys.lists(), eventId] as const,
+  // Removeu o eventId do list
+  list: () => [...listLocalitiesKeys.lists()] as const,
 };
 
-export function useListLocalitiesQuery(eventId?: string) {
+export function useListLocalitiesQuery() {
   return useQuery<Localities[]>({
-    queryKey: listLocalitiesKeys.list(eventId),
-    queryFn: () => listLocalitiesAction(eventId),
-    enabled: !!eventId,
+    queryKey: listLocalitiesKeys.list(),
+    queryFn: () => listLocalitiesAction(),
     staleTime: 10 * 60 * 1000, // 10 minutos (localidades mudam pouco)
     gcTime: 15 * 60 * 1000, // 15 minutos
     retry: 2,
@@ -38,9 +38,10 @@ export function useInvalidateListLocalitiesQuery() {
       });
     },
 
-    invalidateList: (eventId: string) => {
+    // Removeu os métodos que dependiam de eventId
+    invalidateList: () => {
       queryClient.invalidateQueries({
-        queryKey: listLocalitiesKeys.list(eventId),
+        queryKey: listLocalitiesKeys.list(),
       });
     },
 
@@ -56,14 +57,14 @@ export function useInvalidateListLocalitiesQuery() {
       });
     },
 
-    removeList: (eventId: string) => {
+    removeList: () => {
       queryClient.removeQueries({
-        queryKey: listLocalitiesKeys.list(eventId),
+        queryKey: listLocalitiesKeys.list(),
       });
     },
 
-    setListData: (eventId: string, data: Localities[]) => {
-      queryClient.setQueryData(listLocalitiesKeys.list(eventId), data);
+    setListData: (data: Localities[]) => {
+      queryClient.setQueryData(listLocalitiesKeys.list(), data);
     },
   };
 }

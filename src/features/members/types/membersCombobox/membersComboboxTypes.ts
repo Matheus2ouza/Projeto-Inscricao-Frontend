@@ -18,7 +18,7 @@ export type MembersResponse = Member[];
 
 export type useMembersParms = {
   eventId: string;
-  accountId?: string;
+  localityId?: string;
   autoFetch: boolean;
 };
 

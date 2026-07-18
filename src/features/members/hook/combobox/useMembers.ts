@@ -8,12 +8,12 @@ import { useMembersQuery } from './useMembersQuery';
 
 export function useMember({
   eventId,
-  accountId,
+  localityId,
   autoFetch = true,
 }: useMembersParms): useMembersResult {
   const { data, isLoading, isFetching, error, refetch } = useMembersQuery(
     eventId,
-    accountId,
+    localityId,
     autoFetch,
   );
 

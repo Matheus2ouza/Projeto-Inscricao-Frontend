@@ -8,6 +8,7 @@ export type UserDataServiceInput = {
 export type UserDataServiceOutput = {
   id: string;
   username: string;
+  email?: string;
   role: string;
   createdAt: Date;
 };
@@ -29,6 +30,7 @@ export async function userDataService(
     return {
       id: data.id,
       username: data.username,
+      email: data.email,
       role: data.role,
       createdAt: data.createdAt,
     };

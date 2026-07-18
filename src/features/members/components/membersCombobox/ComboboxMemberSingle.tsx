@@ -16,8 +16,8 @@ export type MemberSingleOption = {
 
 export type ComboboxMemberSingleProps = {
   eventId: string;
-  accountId?: string;
-  requireAccountId?: boolean;
+  localityId?: string;
+  requireLocalityId?: boolean;
   id?: string;
   label?: string;
   value: string;
@@ -33,8 +33,8 @@ export type ComboboxMemberSingleProps = {
 
 export function ComboboxMemberSingle({
   eventId,
-  accountId,
-  requireAccountId = false,
+  localityId,
+  requireLocalityId = false,
   id,
   label,
   onChange,
@@ -50,9 +50,9 @@ export function ComboboxMemberSingle({
   const [open, setOpen] = useState(false);
   const toastShownRef = useRef(false);
 
-  // Verificar se pode buscar membros (precisa de eventId e accountId)
-  const canFetchMembers = requireAccountId
-    ? Boolean(eventId && accountId)
+  // Verificar se pode buscar membros (precisa de eventId e localityId)
+  const canFetchMembers = requireLocalityId
+    ? Boolean(eventId && localityId)
     : Boolean(eventId);
 
   const {
@@ -62,7 +62,7 @@ export function ComboboxMemberSingle({
     error,
   } = useMember({
     eventId,
-    accountId,
+    localityId,
     autoFetch: canFetchMembers,
   });
 
@@ -87,21 +87,21 @@ export function ComboboxMemberSingle({
   }, [eventId]);
 
   useEffect(() => {
-    if (requireAccountId && eventId && !accountId && !toastShownRef.current) {
+    if (requireLocalityId && eventId && !localityId && !toastShownRef.current) {
       toastShownRef.current = true;
       toast.warning('Selecione uma conta primeiro', {
         description: 'Escolha a conta antes de buscar membros',
       });
     }
-  }, [eventId, accountId, requireAccountId]);
+  }, [eventId, localityId, requireLocalityId]);
 
   // Resetar o controle de toast quando ambos estão presentes
   useEffect(() => {
-    const shouldReset = requireAccountId
-      ? Boolean(eventId && accountId)
+    const shouldReset = requireLocalityId
+      ? Boolean(eventId && localityId)
       : Boolean(eventId);
     if (shouldReset) toastShownRef.current = false;
-  }, [eventId, accountId, requireAccountId]);
+  }, [eventId, localityId, requireLocalityId]);
 
   // Busca sempre da API e monta dados normalizados
   const normalizedMembers = useMemo(() => {
@@ -167,7 +167,7 @@ export function ComboboxMemberSingle({
         toast.warning('Selecione um evento primeiro', {
           description: 'Escolha o evento antes de buscar membros',
         });
-      } else if (requireAccountId && !accountId) {
+      } else if (requireLocalityId && !localityId) {
         toast.warning('Selecione uma conta primeiro', {
           description: 'Escolha a conta antes de buscar membros',
         });

@@ -11,6 +11,10 @@ export type RespondeErrorData = {
   statusCode: number;
   timeStamp: string;
   message: string;
+  incompleteMembers?: {
+    accountParticipantId: string;
+    missingFields: string[];
+  }[];
 };
 
 const instance = axios.create({

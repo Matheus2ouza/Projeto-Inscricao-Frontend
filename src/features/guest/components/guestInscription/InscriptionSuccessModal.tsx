@@ -1,20 +1,30 @@
 'use client';
 
-import {
-  InscriptionStatus,
-  RegisterGuestInscriptionResponse,
-} from '@/features/guest/types/guestInscription/registerGuesInscriptionTypes';
 import { cn } from '@/lib/utils';
 import { Check, Copy, CreditCard } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+export enum InscriptionStatus {
+  PENDING = 'PENDING',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  PAID = 'PAID',
+  CANCELLED = 'CANCELLED',
+}
+
+export type SuccessData = {
+  id: string;
+  status: InscriptionStatus;
+  confirmationCode: string;
+  expiresAt?: string;
+};
 
 interface InscriptionSuccessModalProps {
   isOpen: boolean;
   onClose: () => void;
   onViewInscription: () => void;
-  successData: RegisterGuestInscriptionResponse | null;
+  successData: SuccessData | null;
   paymentCountdownSeconds: number | null;
-  primaryColor?: string;
+  primaryColor: string;
 }
 
 export function InscriptionSuccessModal({
@@ -30,7 +40,12 @@ export function InscriptionSuccessModal({
 
   // Calcular o countdown baseado no expiresAt
   useEffect(() => {
-    if (!isOpen || !successData || successData.expiresAt === 'indefinite') {
+    if (
+      !isOpen ||
+      !successData ||
+      successData.expiresAt === 'indefinite' ||
+      !successData.expiresAt
+    ) {
       setCountdown(null);
       return;
     }

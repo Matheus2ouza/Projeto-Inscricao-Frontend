@@ -1,16 +1,11 @@
 'use client';
 
-import type {
-  UseListLocalitiesParams,
-  UseListLocalitiesResult,
-} from '@/features/locality/types/listLocalities/listLocalitiesTypes';
+import type { UseListLocalitiesResult } from '@/features/locality/types/listLocalities/listLocalitiesTypes';
 import { useListLocalitiesQuery } from './useListLocalitiesQuery';
 
-export function useListLocalities({
-  eventId,
-}: UseListLocalitiesParams): UseListLocalitiesResult {
+export function useListLocalities(): UseListLocalitiesResult {
   const { data, isLoading, isFetching, isFetched, error, refetch } =
-    useListLocalitiesQuery(eventId);
+    useListLocalitiesQuery();
 
   return {
     localities: data || [],

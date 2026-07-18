@@ -11,6 +11,7 @@ export function useDetailsInscription({
     useDetailsInscriptionQuery(confirmationCode);
 
   return {
+    eventConfig: data?.eventConfig || null,
     inscription: data || null,
     participant: data?.participant || null,
     payments: data?.payments || [],

@@ -6,10 +6,7 @@ import {
   shirtTypeEnum,
   type CreateInscriptionAdminForm,
 } from '@/features/inscriptions/schema/inscriptionAdmin/createInscriptionAdminSchema';
-import {
-  ComboboxMemberSingle,
-  MemberSingleOption,
-} from '@/features/members/components/membersCombobox/ComboboxMemberSingle';
+import { MemberSingleOption } from '@/features/members/components/membersCombobox/ComboboxMemberSingle';
 import type { Member } from '@/features/members/types/membersCombobox/membersComboboxTypes';
 import {
   ComboboxTypeInscription,
@@ -144,20 +141,7 @@ export function ParticipantsStep({
         <div className="glass-surface-strong flex flex-col gap-3 rounded-lg p-4 sm:flex-row sm:items-end">
           <div className="flex-1">
             <Form.Item label="Adicionar membro existente" className="mb-0">
-              <ComboboxMemberSingle
-                key={refreshKey}
-                eventId={eventId}
-                accountId={accountId}
-                requireAccountId
-                value=""
-                onChange={handleMemberSelected}
-                placeholder="Buscar membro..."
-                disabledValues={fields.map(
-                  (field) => field.accountParticipantId || '',
-                )}
-                onRefresh={onRefreshMembers}
-                onFetchingChange={onFetchingMembersChange}
-              />
+              <Input key={refreshKey} />
             </Form.Item>
           </div>
           <Button

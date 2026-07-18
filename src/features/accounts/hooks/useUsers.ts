@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
 import {
   getUsers,
   type GetUsersResponse,
   type UserDto,
-} from "@/features/accounts/api/getUsers";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+} from '@/features/accounts/api/getUsers';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 // Chaves de cache para usuários (padrão similar a events)
 export const usersKeys = {
-  all: ["users"] as const,
-  lists: () => [...usersKeys.all, "list"] as const,
+  all: ['users'] as const,
+  lists: () => [...usersKeys.all, 'list'] as const,
   list: (page: number, pageSize: number) =>
     [...usersKeys.lists(), { page, pageSize }] as const,
-  details: () => [...usersKeys.all, "detail"] as const,
+  details: () => [...usersKeys.all, 'detail'] as const,
   detail: (id: string) => [...usersKeys.details(), id] as const,
 };
 
