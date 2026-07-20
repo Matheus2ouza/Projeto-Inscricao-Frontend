@@ -1,23 +1,25 @@
-import z from "zod";
+import { GenderType } from '@/features/members/types/createMember/createMemberTypes';
+import z from 'zod';
+
+const unformat = (value: string) => {
+  return value.replace(/\D/g, '');
+};
 
 export const membersSchema = z.object({
-  name: z.string().min(1, "Nome é obrigatório"),
-  birthDate: z.iso.date({ message: "Data de nascimento inválida" }),
-  gender: z.enum(["MASCULINO", "FEMININO"], {
-    message: "Gênero inválido",
+  name: z.string().min(1, 'Nome é obrigatório'),
+  birthDate: z.iso.date({ message: 'Data de nascimento inválida' }),
+  gender: z.enum(GenderType, {
+    message: 'Gênero inválido',
   }),
-  cpf: z.string().min(11, "CPF inválido").optional(),
-  preferredName: z.string().optional(),
-  shirtSize: z
-    .enum(["PP", "P", "M", "G", "GG", "XG"], {
-      message: "Tamanho de camiseta inválido",
+  cpf: z
+    .string()
+    .transform((val) => (val ? unformat(val) : ''))
+    .refine((val) => val === '' || val.length === 11, {
+      message: 'CPF deve conter 11 dígitos',
     })
-    .optional(),
-  shirtType: z
-    .enum(["TRADICIONAL", "BABYLOOK"], {
-      message: "Tipo de camiseta inválido",
-    })
-    .optional(),
+    .refine((val) => val === '' || /^\d+$/.test(val), {
+      message: 'CPF deve conter apenas números',
+    }),
 });
 
 export type MembersSchemaType = z.infer<typeof membersSchema>;
