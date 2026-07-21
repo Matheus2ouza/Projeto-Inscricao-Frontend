@@ -1,7 +1,7 @@
 'use client';
 
 import ResponsiblesDialog from '@/features/accounts/components/responsiblesDialog/ResponsiblesDialog';
-import { useAccount } from '@/features/accounts/hooks/useAccount';
+import { useAccount } from '@/features/accounts/hooks/listAccountsCombobox/uselistAccountsCombobox';
 import { useFormEditEvent } from '@/features/events/hooks/manager/useFormEditEvent';
 import { useEventResponsible } from '@/features/events/hooks/useEventResponsible';
 import { Event } from '@/features/events/types/manager/eventDetailsManager/eventDetailsManagerTypes';

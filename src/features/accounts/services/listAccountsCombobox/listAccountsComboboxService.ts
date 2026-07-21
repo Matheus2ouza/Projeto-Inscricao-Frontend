@@ -3,12 +3,12 @@
 import type {
   AccountRole,
   ListAccountsResponse,
-} from '@/features/accounts/types/listAccounts/listAccountsTypes';
+} from '@/features/accounts/types/listAccountsCombobox/listAccountsComboboxTypes';
 import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 import qs from 'qs';
 
-export async function listAccountsService(
+export async function listAccountsComboboxService(
   roles?: AccountRole[],
 ): Promise<ListAccountsResponse> {
   try {

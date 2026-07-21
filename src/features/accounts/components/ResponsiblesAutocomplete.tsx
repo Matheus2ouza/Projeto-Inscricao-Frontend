@@ -3,7 +3,7 @@
 import type { AutoCompleteProps } from 'antd';
 import { AutoComplete, Checkbox, Empty, Space, Spin, Tag } from 'antd';
 import { useMemo, useState } from 'react';
-import { useAccount } from '../hooks/useAccount';
+import { useAccount } from '../hooks/listAccountsCombobox/uselistAccountsCombobox';
 import type { AccountRole } from '../types/accounts.types';
 
 type ResponsiblesAutocompleteProps = {

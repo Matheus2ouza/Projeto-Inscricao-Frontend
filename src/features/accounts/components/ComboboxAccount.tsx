@@ -3,7 +3,7 @@
 import type { AutoCompleteProps } from 'antd';
 import { AutoComplete, Space, Spin, Tag } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount } from '../hooks/useAccount';
+import { useAccount } from '../hooks/listAccountsCombobox/uselistAccountsCombobox';
 
 export type AccountOption = {
   label: string;

@@ -35,9 +35,19 @@ import {
 } from '@/shared/components/ui/pagination';
 import { Switch } from '@/shared/components/ui/switch';
 import { useCurrentUser } from '@/shared/context/user-context';
-import { AlertCircle, Check, CheckCircle2, Copy } from 'lucide-react';
+import {
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Copy,
+  Eye,
+  EyeOff,
+  Search,
+  X,
+} from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
+
 const ROLE_RANK: Record<string, number> = {
   USER: 0,
   MANAGER: 1,
@@ -66,7 +76,7 @@ export default function AccountsTable({
   const [open, setOpen] = useState(false);
   const [openCreds, setOpenCreds] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  const [appliedRegions, setAppliedRegions] = useState<string[]>([]); // Filtro aplicado
+  const [appliedRegions, setAppliedRegions] = useState<string[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [hasRegion, setHasRegion] = useState(false);
   const [copiedUsername, setCopiedUsername] = useState(false);
@@ -84,7 +94,6 @@ export default function AccountsTable({
     return options.length > 0 ? options : [ROLES[ROLES.length - 1]];
   }, [currentRoleRank]);
 
-  // Transformar as regiões do hook no formato de Option
   const regionOptions = useMemo(() => {
     return regions.map((r) => ({
       label: r.name.toUpperCase(),
@@ -97,7 +106,6 @@ export default function AccountsTable({
     ROLES[ROLES.length - 1].value;
   const isSuperUser = currentRoleValue === 'SUPER';
 
-  // Criar um mapa de id para nome da região para facilitar o filtro
   const regionMap = useMemo(() => {
     const map = new Map();
     regions.forEach((region) => {
@@ -110,26 +118,22 @@ export default function AccountsTable({
     setShowPassword(!showPassword);
   };
 
-  // Aplicar o filtro quando clicar em buscar
   const handleSearch = () => {
     setAppliedRegions([...selectedRegions]);
-    onPageChange(1); // Reset para primeira página ao aplicar filtro
+    onPageChange(1);
   };
 
-  // Limpar filtros
   const clearFilters = () => {
     setSelectedRegions([]);
     setAppliedRegions([]);
-    onPageChange(1); // Reset para primeira página ao limpar filtro
+    onPageChange(1);
   };
 
-  // Filtrar usuários baseado nas regiões aplicadas
   const filteredUsers = useMemo(() => {
     if (appliedRegions.length === 0) {
       return users;
     }
 
-    // Obter os nomes das regiões aplicadas
     const appliedRegionNames = appliedRegions
       .map((regionId) => regionMap.get(regionId))
       .filter(Boolean);
@@ -146,12 +150,10 @@ export default function AccountsTable({
       ? Math.ceil(filteredUsers.length / 20)
       : pageCount;
 
-  // Verificar se há filtros não aplicados
   const hasUnsavedFilters =
     selectedRegions.length !== appliedRegions.length ||
     !selectedRegions.every((region, index) => region === appliedRegions[index]);
 
-  // Função para lidar com o submit e fechar o dialog se sucesso
   const handleSubmit = async (event: React.FormEvent) => {
     const success = await onSubmit(event);
     if (success) {
@@ -172,11 +174,25 @@ export default function AccountsTable({
     }
   }, [form, open, defaultRoleValue, isSuperUser, user?.region?.id]);
 
+  const getRoleColor = (role: string) => {
+    const colors: Record<string, string> = {
+      SUPER:
+        'bg-riodavida/20 text-riodavida dark:bg-riodavida/30 dark:text-riodavida-light',
+      ADMIN:
+        'bg-riodavida-secondary/20 text-riodavida-secondary dark:bg-riodavida-secondary/30 dark:text-riodavida-muted-light',
+      MANAGER:
+        'bg-blue-500/20 text-blue-600 dark:bg-blue-500/30 dark:text-blue-400',
+      USER: 'bg-gray-500/20 text-gray-600 dark:bg-gray-500/30 dark:text-gray-400',
+    };
+    return colors[role] || colors.USER;
+  };
+
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-7xl px-6">
+    <div className="min-h-screen bg-transparent">
+      <div className="mx-auto max-w-7xl px-6 py-8">
+        {/* Header com filtros */}
         <div
-          className={`mb-6 flex flex-wrap items-center gap-2 ${
+          className={`mb-6 flex flex-wrap items-center gap-3 ${
             user.role.toLowerCase() === 'super'
               ? 'justify-between'
               : 'justify-end'
@@ -195,21 +211,25 @@ export default function AccountsTable({
                 onClick={handleSearch}
                 type="button"
                 disabled={!hasUnsavedFilters}
+                className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark"
               >
+                <Search className="mr-2 h-4 w-4" />
                 Buscar {appliedRegions.length > 0 && `(${filteredTotal})`}
               </Button>
               <Button
                 variant="destructive"
                 onClick={clearFilters}
                 disabled={appliedRegions.length === 0}
+                className="gap-2"
               >
+                <X className="h-4 w-4" />
                 Limpar
               </Button>
             </div>
           )}
           <Button
             variant="default"
-            className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80"
+            className="bg-riodavida hover:bg-riodavida-dark text-white"
             onClick={() => setOpen(true)}
           >
             Criar Usuário
@@ -218,62 +238,72 @@ export default function AccountsTable({
 
         {/* Indicador de filtro aplicado */}
         {appliedRegions.length > 0 && (
-          <div className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+          <div className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 mb-4 rounded-lg border p-3">
+            <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-sm">
               Filtro aplicado: {appliedRegions.length} região(ões)
               selecionada(s)
             </p>
           </div>
         )}
 
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="min-w-full text-sm">
-            <thead className="bg-muted text-muted-foreground">
-              <tr>
-                <th className="w-1/4 px-2 py-2 text-left font-semibold">
-                  Username
-                </th>
-                <th className="w-1/6 px-4 py-2 text-center font-semibold">
-                  Região
-                </th>
-                <th className="w-1/6 px-4 py-2 text-center font-semibold">
-                  Role
-                </th>
-                <th className="w-1/4 px-4 py-2 text-center font-semibold">
-                  Criado em
-                </th>
-                <th className="w-1/4 px-4 py-2 text-center font-semibold">
-                  Atualizado em
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user, idx) => {
-                const roleObj = ROLES.find((r) => r.value === user.role);
-                return (
-                  <tr key={user.username + idx} className="border-t">
-                    <td className="w-1/4 px-2 py-2">{user.username}</td>
-                    <td className="w-1/6 px-4 py-2 text-center">
-                      {user.regionName?.toUpperCase() || '- -'}
-                    </td>
-                    <td className="w-1/6 px-4 py-2 text-center">
-                      <span
-                        className={`rounded px-2 py-1 text-xs font-semibold ${roleObj?.color}`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="w-1/4 px-4 py-2 text-center">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="w-1/4 px-4 py-2 text-center">
-                      {new Date(user.updatedAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        {/* Tabela */}
+        <div className="liquid-card overflow-hidden rounded-lg border-0">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-riodavida/5 dark:bg-riodavida/10">
+                <tr>
+                  <th className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/4 px-2 py-3 text-left font-semibold">
+                    Username
+                  </th>
+                  <th className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/6 px-4 py-3 text-center font-semibold">
+                    Região
+                  </th>
+                  <th className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/6 px-4 py-3 text-center font-semibold">
+                    Role
+                  </th>
+                  <th className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/4 px-4 py-3 text-center font-semibold">
+                    Criado em
+                  </th>
+                  <th className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/4 px-4 py-3 text-center font-semibold">
+                    Atualizado em
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user, idx) => {
+                  const roleObj = ROLES.find((r) => r.value === user.role);
+                  return (
+                    <tr
+                      key={user.username + idx}
+                      className="border-riodavida/10 hover:bg-riodavida/5 border-t transition-colors"
+                    >
+                      <td className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/4 px-2 py-2 font-medium">
+                        {user.username}
+                      </td>
+                      <td className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/6 px-4 py-2 text-center">
+                        {user.regionName?.toUpperCase() || '- -'}
+                      </td>
+                      <td className="w-1/6 px-4 py-2 text-center">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold ${getRoleColor(
+                            user.role,
+                          )}`}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/4 px-4 py-2 text-center">
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="text-riodavida-gray-dark dark:text-riodavida-gray w-1/4 px-4 py-2 text-center">
+                        {new Date(user.updatedAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Mensagem quando não há resultados */}
@@ -285,8 +315,11 @@ export default function AccountsTable({
           </div>
         )}
 
-        {/* Paginação para dados filtrados */}
-        <div className="mt-4 flex justify-end">
+        {/* Paginação */}
+        <div className="mt-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="text-muted-foreground text-sm">
+            Página {page} de {filteredPageCount} - {filteredTotal} usuário(s)
+          </div>
           <Pagination>
             <PaginationContent>
               <PaginationItem>
@@ -302,6 +335,11 @@ export default function AccountsTable({
                     isActive={page === i + 1}
                     href="#"
                     onClick={() => onPageChange(i + 1)}
+                    className={
+                      page === i + 1
+                        ? 'bg-riodavida hover:bg-riodavida-dark text-white'
+                        : 'text-riodavida-gray-dark dark:text-riodavida-gray hover:bg-riodavida/10'
+                    }
                   >
                     {i + 1}
                   </PaginationLink>
@@ -324,127 +362,109 @@ export default function AccountsTable({
           </Pagination>
         </div>
 
-        {/* Informações de paginação */}
-        <div className="text-muted-foreground mt-2 text-center text-sm">
-          Página {page} de {filteredPageCount} - {filteredTotal} usuário(s)
-        </div>
-
+        {/* Dialog de Criação */}
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent>
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-primary">Criar Usuário</DialogTitle>
+              <DialogTitle className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
+                Criar Usuário
+              </DialogTitle>
             </DialogHeader>
-            {/* Formulário */}
             <FormProvider {...form}>
               <form onSubmit={handleSubmit} className="mt-2 space-y-4">
-                {/* username */}
-                <div>
-                  <FormField
-                    control={form.control}
-                    name={'username'}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel
-                          htmlFor="username"
-                          className="text-transform: flex items-center text-sm font-medium text-gray-700 uppercase dark:text-gray-300"
-                        >
-                          <i className="bi bi-geo-alt text-indigo-500 dark:text-blue-500"></i>
-                          Usuário
-                        </FormLabel>
-                        <FormControl className="relative">
+                <FormField
+                  control={form.control}
+                  name={'username'}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                        Usuário <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          id="username"
+                          type="text"
+                          autoComplete="new-username"
+                          placeholder="Digite o nome de usuário"
+                          className="focus:border-riodavida focus:ring-riodavida/20"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={'password'}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                        Senha <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <div className="relative">
+                        <FormControl>
                           <Input
-                            id="username"
-                            type="text"
-                            autoComplete="new-username"
-                            placeholder="Digite sua localidade"
-                            className="focus:ring-opacity-60 w-full rounded-xl border-gray-300 bg-white/50 py-3 pr-4 pl-4 shadow-sm backdrop-blur-sm transition-all duration-300 focus:border-indigo-400 focus:shadow-md focus:ring-2 focus:ring-indigo-300 dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
+                            id="password"
+                            type={showPassword ? 'text' : 'password'}
+                            autoComplete="new-password"
+                            placeholder="Digite a senha"
+                            className="focus:border-riodavida focus:ring-riodavida/20 pr-10"
                             {...field}
                           />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                {/* password */}
-                <div className="space-y-2">
-                  <FormField
-                    control={form.control}
-                    name={'password'}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel
-                          htmlFor="password"
-                          className="text-transform: flex items-center text-sm font-medium text-gray-700 uppercase dark:text-gray-300"
+                        <button
+                          type="button"
+                          className="hover:text-riodavida absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-500 transition-colors dark:text-gray-400"
+                          onClick={togglePasswordVisibility}
                         >
-                          <i className="bi bi-lock text-indigo-500 dark:text-blue-500"></i>
-                          Senha
-                        </FormLabel>
-                        <div className="relative">
-                          <FormControl>
-                            <Input
-                              id="password"
-                              type={showPassword ? 'text' : 'password'}
-                              autoComplete="new-password"
-                              placeholder="Digite sua senha"
-                              className="focus:ring-opacity-60 w-full rounded-xl border-gray-300 bg-white/50 py-3 pr-12 pl-4 shadow-sm backdrop-blur-sm transition-all duration-300 focus:border-indigo-400 focus:shadow-md focus:ring-2 focus:ring-indigo-300 dark:border-gray-600 dark:bg-gray-800/50 dark:text-white"
-                              {...field}
-                            />
-                          </FormControl>
-                          <button
-                            type="button"
-                            className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-500 transition-colors duration-200 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400"
-                            onClick={togglePasswordVisibility}
-                          >
-                            <i
-                              className={`bi ${
-                                showPassword ? 'bi-eye-slash' : 'bi-eye'
-                              } text-lg`}
-                            ></i>
-                          </button>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                {/* Permissão (role) */}
-                <div>
-                  <FormField
-                    control={form.control}
-                    name={'role'}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel htmlFor="role" className="mb-2">
-                          PERMISSÃO
-                        </FormLabel>
-                        <FormControl>
-                          <ComboboxRole
-                            value={field.value as string}
-                            onChange={field.onChange}
-                            options={allowedRoleOptions}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                {/* Switch para adicionar região - apenas super pode alterar */}
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={'role'}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                        Permissão
+                      </FormLabel>
+                      <FormControl>
+                        <ComboboxRole
+                          value={field.value as string}
+                          onChange={field.onChange}
+                          options={allowedRoleOptions}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {isSuperUser && (
                   <>
-                    <div className="mb-2 flex items-center gap-2">
-                      <label
-                        htmlFor="hasRegion"
-                        className="cursor-pointer text-sm text-gray-700 select-none dark:text-gray-300"
-                      >
-                        Adicionar região
-                      </label>
+                    <div className="flex items-center gap-2">
                       <Switch
                         id="hasRegion"
                         checked={hasRegion}
                         onCheckedChange={setHasRegion}
                       />
+                      <label
+                        htmlFor="hasRegion"
+                        className="text-riodavida-gray-dark dark:text-riodavida-gray cursor-pointer text-sm select-none"
+                      >
+                        Adicionar região
+                      </label>
                     </div>
                     {hasRegion && (
                       <FormField
@@ -452,7 +472,7 @@ export default function AccountsTable({
                         name={'region'}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel htmlFor="region" className="mb-2">
+                            <FormLabel className="text-riodavida-gray-dark dark:text-riodavida-gray">
                               Região
                             </FormLabel>
                             <FormControl>
@@ -469,18 +489,23 @@ export default function AccountsTable({
                     )}
                   </>
                 )}
-                <DialogFooter>
-                  <Button
-                    type="submit"
-                    className="dark:bg-secondary dark:text-secondary-foreground dark:hover:bg-secondary/80"
-                  >
-                    Criar
-                  </Button>
+
+                <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <DialogClose asChild>
-                    <Button type="button" variant="outline">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark w-full sm:w-auto"
+                    >
                       Cancelar
                     </Button>
                   </DialogClose>
+                  <Button
+                    type="submit"
+                    className="bg-riodavida hover:bg-riodavida-dark w-full text-white sm:w-auto"
+                  >
+                    Criar
+                  </Button>
                 </DialogFooter>
               </form>
             </FormProvider>
@@ -502,10 +527,10 @@ export default function AccountsTable({
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <div className="mb-2 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                  <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <div className="bg-riodavida/10 flex h-10 w-10 items-center justify-center rounded-full">
+                  <CheckCircle2 className="text-riodavida h-6 w-6" />
                 </div>
-                <DialogTitle className="text-primary text-xl font-bold dark:text-white">
+                <DialogTitle className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                   Usuário Criado com Sucesso!
                 </DialogTitle>
               </div>
@@ -516,13 +541,12 @@ export default function AccountsTable({
             </DialogHeader>
 
             <div className="space-y-4 py-4">
-              {/* Campo Usuário */}
               <div className="space-y-2">
                 <label className="text-muted-foreground text-sm font-medium">
                   Usuário
                 </label>
-                <div className="bg-muted/50 dark:bg-muted/30 border-border flex items-center gap-2 rounded-lg border p-3">
-                  <code className="text-foreground flex-1 font-mono text-sm font-semibold break-all">
+                <div className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 flex items-center gap-2 rounded-lg border p-3">
+                  <code className="text-riodavida-gray-dark dark:text-riodavida-gray flex-1 font-mono text-sm font-semibold break-all">
                     {createdCredentials?.username ?? '-'}
                   </code>
                   <Button
@@ -540,8 +564,8 @@ export default function AccountsTable({
                     aria-label="Copiar usuário"
                     className={`shrink-0 transition-all duration-200 ${
                       copiedUsername
-                        ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                        : ''
+                        ? 'bg-riodavida/10 text-riodavida dark:bg-riodavida/20'
+                        : 'text-riodavida hover:bg-riodavida/10'
                     }`}
                   >
                     {copiedUsername ? (
@@ -552,20 +576,19 @@ export default function AccountsTable({
                   </Button>
                 </div>
                 {copiedUsername && (
-                  <p className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                  <p className="text-riodavida flex items-center gap-1 text-xs">
                     <Check className="h-3 w-3" />
                     Usuário copiado para a área de transferência!
                   </p>
                 )}
               </div>
 
-              {/* Campo Senha */}
               <div className="space-y-2">
                 <label className="text-muted-foreground text-sm font-medium">
                   Senha
                 </label>
-                <div className="bg-muted/50 dark:bg-muted/30 border-border flex items-center gap-2 rounded-lg border p-3">
-                  <code className="text-foreground flex-1 font-mono text-sm font-semibold break-all">
+                <div className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 flex items-center gap-2 rounded-lg border p-3">
+                  <code className="text-riodavida-gray-dark dark:text-riodavida-gray flex-1 font-mono text-sm font-semibold break-all">
                     {createdCredentials?.password ?? '-'}
                   </code>
                   <Button
@@ -583,8 +606,8 @@ export default function AccountsTable({
                     aria-label="Copiar senha"
                     className={`shrink-0 transition-all duration-200 ${
                       copiedPassword
-                        ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                        : ''
+                        ? 'bg-riodavida/10 text-riodavida dark:bg-riodavida/20'
+                        : 'text-riodavida hover:bg-riodavida/10'
                     }`}
                   >
                     {copiedPassword ? (
@@ -595,15 +618,14 @@ export default function AccountsTable({
                   </Button>
                 </div>
                 {copiedPassword && (
-                  <p className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                  <p className="text-riodavida flex items-center gap-1 text-xs">
                     <Check className="h-3 w-3" />
                     Senha copiada para a área de transferência!
                   </p>
                 )}
               </div>
 
-              {/* Aviso */}
-              <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
+              <div className="flex items-start gap-2 rounded-lg border border-amber-200/50 bg-amber-50/80 p-3 dark:border-amber-800/30 dark:bg-amber-900/20">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                 <p className="text-xs text-amber-700 dark:text-amber-300">
                   <strong>Atenção:</strong> Estas credenciais são exibidas
@@ -617,8 +639,7 @@ export default function AccountsTable({
               <DialogClose asChild>
                 <Button
                   type="button"
-                  variant="default"
-                  className="w-full sm:w-auto dark:text-white"
+                  className="bg-riodavida hover:bg-riodavida-dark w-full text-white sm:w-auto"
                 >
                   Fechar
                 </Button>

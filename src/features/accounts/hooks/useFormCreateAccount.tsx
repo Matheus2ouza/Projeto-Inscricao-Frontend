@@ -5,7 +5,7 @@ import { registerAccountAction } from '@/features/accounts/actions/registerAccou
 import {
   accountsKeys,
   useInvalidateAccountsQuery,
-} from '@/features/accounts/hooks/useAccountsQuery';
+} from '@/features/accounts/hooks/listAccountsCombobox/uselistAccountsComboboxQuery';
 import { usersKeys } from '@/features/accounts/hooks/useUsers';
 import { useQueryClient } from '@tanstack/react-query';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
