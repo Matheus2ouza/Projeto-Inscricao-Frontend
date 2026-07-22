@@ -42,7 +42,7 @@ interface IndividualInscriptionFormProps {
 export default function IndividualInscriptionForm({
   eventId,
 }: IndividualInscriptionFormProps) {
-  // Estado para armazenar o ID da localidade selecionada
+  // Estado único para armazenar o ID da localidade selecionada
   const [selectedLocalityId, setSelectedLocalityId] = useState<string>('');
 
   // Estado local para controle do membro selecionado no Combobox
@@ -365,7 +365,6 @@ export default function IndividualInscriptionForm({
               </Label>
               <ComboboxMemberSingle
                 eventId={eventId}
-                requireLocalityId={true}
                 localityId={selectedLocalityId}
                 id="memberSelect"
                 value={selectedMemberId}
