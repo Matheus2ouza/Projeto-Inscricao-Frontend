@@ -5,11 +5,14 @@ export enum RoleType {
   SUPER = 'SUPER',
 }
 
-export type AuthUser = {
-  id: string;
+export type CreateAccountInput = {
   username: string;
+  password: string;
   role: RoleType;
-  email?: string;
   regionId?: string;
-  image?: string;
+  localityIds: string[];
+};
+
+export type CreateAccountResponse = {
+  id: string;
 };

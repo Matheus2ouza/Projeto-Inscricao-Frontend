@@ -1,7 +1,7 @@
 'use client';
 
-import { AccountResponse, AccountRole } from '../types/accounts.types';
-import { useAccountsComboboxQuery } from './useAccountsQuery';
+import { AccountResponse, AccountRole } from '../../types/accounts.types';
+import { useAccountsComboboxQuery } from './uselistAccountsComboboxQuery';
 
 type UseAccountResult = {
   accounts: AccountResponse[];

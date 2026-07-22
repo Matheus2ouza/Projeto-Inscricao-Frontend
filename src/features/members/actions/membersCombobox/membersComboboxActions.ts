@@ -1,17 +1,17 @@
 'use server';
 
 import { membersComboboxService } from '@/features/members/services/membersCombobox/membersComboboxService';
-import type { MembersResponse } from '@/features/members/types/membersCombobox/membersComboboxTypes';
+import type { membersComboboxResponse } from '@/features/members/types/membersCombobox/membersComboboxTypes';
 
 /**
  * Action: Busca membros para combobox
  * Passa os dados adiante sem normalização (já vem tipado do service)
  */
 export async function membersComboboxAction(
-  eventId?: string,
   localityId?: string,
-): Promise<MembersResponse> {
-  const data = await membersComboboxService(eventId, localityId);
+  eventId?: string,
+): Promise<membersComboboxResponse> {
+  const data = await membersComboboxService(localityId, eventId);
 
   // O service já retorna o objeto tipado ou lança erro com mensagem
   // Se precisar de normalização adicional, faça aqui

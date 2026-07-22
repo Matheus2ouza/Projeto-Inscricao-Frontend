@@ -1,8 +1,8 @@
 'use client';
 
 import {
-  useMembersParms,
-  useMembersResult,
+  useMembersComboboxParms,
+  useMembersComboboxResult,
 } from '@/features/members/types/membersCombobox/membersComboboxTypes';
 import { useMembersQuery } from './useMembersQuery';
 
@@ -10,7 +10,7 @@ export function useMember({
   eventId,
   localityId,
   autoFetch = true,
-}: useMembersParms): useMembersResult {
+}: useMembersComboboxParms): useMembersComboboxResult {
   const { data, isLoading, isFetching, error, refetch } = useMembersQuery(
     eventId,
     localityId,

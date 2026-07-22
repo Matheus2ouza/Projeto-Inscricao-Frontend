@@ -1,19 +1,22 @@
 'use server';
 
-import { ListAccountsResponse } from '@/features/accounts/types/listAccounts/listAccountsTypes';
+import type {
+  AccountRole,
+  ListAccountsResponse,
+} from '@/features/accounts/types/listAccountsCombobox/listAccountsComboboxTypes';
 import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
+import qs from 'qs';
 
-export async function listAccountsService(
-  page: number,
-  pageSize: number,
+export async function listAccountsComboboxService(
+  roles?: AccountRole[],
 ): Promise<ListAccountsResponse> {
   try {
-    const { data } = await axiosServer.get<ListAccountsResponse>(`users`, {
+    const { data } = await axiosServer.get<ListAccountsResponse>('/users', {
       params: {
-        page,
-        pageSize,
+        roles,
       },
+      paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' }),
     });
     return data;
   } catch (error) {

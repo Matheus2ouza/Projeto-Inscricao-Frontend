@@ -456,7 +456,6 @@ export function GroupInscriptionForm({ eventId }: GroupInscriptionFormProps) {
                   <ComboboxMemberSingle
                     eventId={eventId}
                     localityId={selectedLocalityId}
-                    requireLocalityId={true}
                     id="memberSelect"
                     value={tempMemberId}
                     onChange={(id, member) => {

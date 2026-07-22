@@ -17,7 +17,6 @@ export type MemberSingleOption = {
 export type ComboboxMemberSingleProps = {
   eventId: string;
   localityId?: string;
-  requireLocalityId?: boolean;
   id?: string;
   label?: string;
   value: string;
@@ -34,7 +33,6 @@ export type ComboboxMemberSingleProps = {
 export function ComboboxMemberSingle({
   eventId,
   localityId,
-  requireLocalityId = false,
   id,
   label,
   onChange,
@@ -50,10 +48,8 @@ export function ComboboxMemberSingle({
   const [open, setOpen] = useState(false);
   const toastShownRef = useRef(false);
 
-  // Verificar se pode buscar membros (precisa de eventId e localityId)
-  const canFetchMembers = requireLocalityId
-    ? Boolean(eventId && localityId)
-    : Boolean(eventId);
+  // Só busca quando tem evento E localidade
+  const canFetchMembers = Boolean(eventId && localityId);
 
   const {
     members: fetched,
@@ -69,41 +65,25 @@ export function ComboboxMemberSingle({
   const loading = loadingProp ?? internalLoading;
   const fetching = fetchingProp ?? internalFetching;
 
-  // Comunicar o estado de fetching para o componente pai
   useEffect(() => {
     if (onFetchingChange) {
       onFetchingChange(fetching);
     }
   }, [fetching, onFetchingChange]);
 
-  // Mostrar toast quando não tem evento
   useEffect(() => {
-    if (!eventId && !toastShownRef.current) {
+    if (!canFetchMembers && !toastShownRef.current) {
       toastShownRef.current = true;
-      toast.warning('Selecione um evento primeiro', {
-        description: 'Escolha o evento antes de buscar membros',
+      toast.warning('Selecione um evento e uma localidade primeiro', {
+        description: 'Escolha o evento e a localidade antes de buscar membros',
       });
     }
-  }, [eventId]);
+  }, [canFetchMembers]);
 
   useEffect(() => {
-    if (requireLocalityId && eventId && !localityId && !toastShownRef.current) {
-      toastShownRef.current = true;
-      toast.warning('Selecione uma conta primeiro', {
-        description: 'Escolha a conta antes de buscar membros',
-      });
-    }
-  }, [eventId, localityId, requireLocalityId]);
+    if (canFetchMembers) toastShownRef.current = false;
+  }, [canFetchMembers]);
 
-  // Resetar o controle de toast quando ambos estão presentes
-  useEffect(() => {
-    const shouldReset = requireLocalityId
-      ? Boolean(eventId && localityId)
-      : Boolean(eventId);
-    if (shouldReset) toastShownRef.current = false;
-  }, [eventId, localityId, requireLocalityId]);
-
-  // Busca sempre da API e monta dados normalizados
   const normalizedMembers = useMemo(() => {
     if (fetched && fetched.length > 0) {
       return fetched.map((m) => ({
@@ -117,7 +97,6 @@ export function ComboboxMemberSingle({
     return [];
   }, [fetched]);
 
-  // Calcular options baseado no searchText e normalizedMembers
   const options = useMemo<AutoCompleteProps['options']>(() => {
     if (normalizedMembers.length === 0) {
       return [];
@@ -125,13 +104,9 @@ export function ComboboxMemberSingle({
 
     const query = searchText.trim().toLowerCase();
 
-    // Se não houver query, mostra todos os membros (limitado a 50 para performance)
     const membersToShow = !query
       ? normalizedMembers.slice(0, 50)
-      : normalizedMembers.filter((member) => {
-          const matchesQuery = member.nameLower.includes(query);
-          return matchesQuery;
-        });
+      : normalizedMembers.filter((member) => member.nameLower.includes(query));
 
     return membersToShow.map((member) => ({
       value: member.id,
@@ -154,39 +129,20 @@ export function ComboboxMemberSingle({
     }));
   }, [normalizedMembers, searchText, disabledValues]);
 
-  // Função para lidar com a busca em tempo real
   const handleSearch = (text: string) => {
     if (!canFetchMembers) return;
     setSearchText(text);
   };
 
-  // Função para abrir/fechar dropdown
   const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen && !canFetchMembers) {
-      if (!eventId) {
-        toast.warning('Selecione um evento primeiro', {
-          description: 'Escolha o evento antes de buscar membros',
-        });
-      } else if (requireLocalityId && !localityId) {
-        toast.warning('Selecione uma conta primeiro', {
-          description: 'Escolha a conta antes de buscar membros',
-        });
-      }
-      return;
-    }
+    if (isOpen && !canFetchMembers) return;
     setOpen(isOpen);
   };
 
-  // Lidar com a seleção de um membro
-
   const handleSelect = (selectedValue: string, option: any) => {
     const member = option?.member;
-    // Verificar se o membro selecionado não está registrado
-    if (member?.registered) {
-      return; // Não permite selecionar membros já registrados
-    }
+    if (member?.registered) return;
 
-    // Criar o objeto MemberSingleOption
     const memberOption: MemberSingleOption = {
       value: selectedValue,
       label: member?.name || '',
@@ -202,7 +158,6 @@ export function ComboboxMemberSingle({
     setOpen(false);
   };
 
-  // Lidar com a mudança de texto
   const handleChange = (text: string) => {
     setSearchText(text);
     if (!text) {
@@ -229,7 +184,7 @@ export function ComboboxMemberSingle({
           <div className="py-4 text-center text-gray-500">
             {!eventId
               ? 'Selecione um evento para buscar membros'
-              : 'Selecione uma conta para buscar membros'}
+              : 'Selecione uma localidade para buscar membros'}
           </div>
         ) : loading ? (
           <Spin size="small" />

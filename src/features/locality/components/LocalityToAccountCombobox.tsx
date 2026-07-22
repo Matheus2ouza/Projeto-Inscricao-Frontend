@@ -43,7 +43,6 @@ export function LocalityToAccountCombobox({
     }
   }, [localities, loading, value, onChange]);
 
-  // Encontra a localidade selecionada
   const selectedLocality = value
     ? localities.find((locality) => locality.id === value)
     : null;

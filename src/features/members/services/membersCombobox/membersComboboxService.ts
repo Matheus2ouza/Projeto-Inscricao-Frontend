@@ -1,17 +1,19 @@
 'use server';
 
-import type { MembersResponse } from '@/features/members/types/membersCombobox/membersComboboxTypes';
+import type { membersComboboxResponse } from '@/features/members/types/membersCombobox/membersComboboxTypes';
 import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 
 export async function membersComboboxService(
-  eventId?: string,
   localityId?: string,
-): Promise<MembersResponse> {
+  eventId?: string,
+): Promise<membersComboboxResponse> {
   try {
-    const { data } = await axiosServer.get<MembersResponse>(
+    const { data } = await axiosServer.get<membersComboboxResponse>(
       `/members/${eventId}/all-names`,
-      { params: { localityId } },
+      {
+        params: { localityId },
+      },
     );
     return data;
   } catch (error) {

@@ -31,8 +31,9 @@ export const nextAuthOptions: NextAuthOptions = {
         const authorizeUser: User = {
           id: user.id,
           username: user.username,
-          email: user.email,
           role: user.role,
+          email: user.email,
+          regionId: user.regionId,
           authToken: result.authToken,
           refreshToken: result.refreshToken,
         };
@@ -53,8 +54,9 @@ export const nextAuthOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.username = user.username;
-        token.email = user.email;
         token.role = user.role;
+        token.email = user.email;
+        token.regionId = user.regionId;
         token.authToken = user.authToken;
         token.refreshToken = user.refreshToken;
       }
@@ -98,8 +100,9 @@ export const nextAuthOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id;
         session.user.username = token.username;
-        session.user.email = token.email;
         session.user.role = token.role;
+        session.user.email = token.email;
+        session.user.regionId = token.regionId;
       }
       session.authToken = token.authToken;
       session.refreshToken = token.refreshToken;

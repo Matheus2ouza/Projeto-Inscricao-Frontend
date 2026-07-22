@@ -1,15 +1,15 @@
 import {
-  RegisterServiceInput,
-  RegisterServiceResponse,
-} from '@/features/accounts/types/registerAccount/registerAccountTypes';
+  CreateAccountInput,
+  CreateAccountResponse,
+} from '@/features/accounts/types/createAccount/createAccountTypes';
 import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 
-export async function registerAccountService(
-  input: RegisterServiceInput,
-): Promise<RegisterServiceResponse> {
+export async function createAccountService(
+  input: CreateAccountInput,
+): Promise<CreateAccountResponse> {
   try {
-    const { data } = await axiosServer.post<RegisterServiceResponse>(
+    const { data } = await axiosServer.post<CreateAccountResponse>(
       '/users/create',
       input,
     );

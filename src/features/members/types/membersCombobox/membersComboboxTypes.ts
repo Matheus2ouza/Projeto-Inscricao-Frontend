@@ -1,6 +1,14 @@
+import { UF } from '@/features/locality/types/listLocalities/listLocalitiesTypes';
+
 export type ShirtSize = 'PP' | 'P' | 'M' | 'G' | 'GG' | 'XG';
 
 export type ShirtType = 'TRADICIONAL' | 'BABYLOOK';
+
+type Locality = {
+  id: string;
+  name: string;
+  uf: UF;
+};
 
 export type Member = {
   id: string;
@@ -12,17 +20,18 @@ export type Member = {
   shirtSize?: ShirtSize;
   shirtType?: ShirtType;
   registered: boolean;
+  locality?: Locality;
 };
 
-export type MembersResponse = Member[];
+export type membersComboboxResponse = Member[];
 
-export type useMembersParms = {
-  eventId: string;
+export type useMembersComboboxParms = {
+  eventId?: string;
   localityId?: string;
   autoFetch: boolean;
 };
 
-export type useMembersResult = {
+export type useMembersComboboxResult = {
   members: Member[];
   loading: boolean;
   fetching: boolean;

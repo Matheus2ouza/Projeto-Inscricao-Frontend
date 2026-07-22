@@ -4,27 +4,27 @@ Paleta extraída da logo (símbolo "RV/S" + wordmark).
 
 ## Cores principais
 
-| Nome              | Hex       | Uso sugerido                  |
-|-------------------|-----------|--------------------------------|
-| Turquesa / Teal    | `#3FB5AE` | Cor primária (Vibrant)        |
-| Verde-oliva / Lima | `#A8BE3C` | Cor secundária (Muted)         |
+| Nome               | Hex       | Uso sugerido           |
+| ------------------ | --------- | ---------------------- |
+| Turquesa / Teal    | `#3FB5AE` | Cor primária (Vibrant) |
+| Verde-oliva / Lima | `#A8BE3C` | Cor secundária (Muted) |
 
 ## Variações (gradiente do símbolo)
 
-| Nome           | Hex       |
-|----------------|-----------|
-| Teal escuro    | `#2E8F8A` |
-| Teal claro     | `#5FCFC7` |
-| Oliva escuro   | `#8AA02E` |
-| Oliva claro    | `#C4D766` |
+| Nome         | Hex       |
+| ------------ | --------- |
+| Teal escuro  | `#2E8F8A` |
+| Teal claro   | `#5FCFC7` |
+| Oliva escuro | `#8AA02E` |
+| Oliva claro  | `#C4D766` |
 
 ## Neutros
 
-| Nome                  | Hex       | Uso sugerido                          |
-|-----------------------|-----------|-----------------------------------------|
-| Branco                | `#FFFFFF` | Texto sobre fundo escuro               |
-| Cinza claro (contorno)| `#E5E7EB` | Contornos, texto sutil sobre escuro    |
-| Cinza escuro          | `#1F2937` | Texto sobre fundo claro                |
+| Nome                   | Hex       | Uso sugerido                        |
+| ---------------------- | --------- | ----------------------------------- |
+| Branco                 | `#FFFFFF` | Texto sobre fundo escuro            |
+| Cinza claro (contorno) | `#E5E7EB` | Contornos, texto sutil sobre escuro |
+| Cinza escuro           | `#1F2937` | Texto sobre fundo claro             |
 
 ## Mapeamento tipo "Vibrant/Muted" (estilo ColorThief / useImagePalette)
 
