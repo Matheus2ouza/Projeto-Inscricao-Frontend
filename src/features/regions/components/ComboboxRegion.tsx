@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useRegions } from "@/features/regions/hooks/useRegions";
-import { Select } from "antd";
-import * as React from "react";
+import { useListRegions } from '@/features/regions/hooks/listRegions/useListRegions';
+import { Select } from 'antd';
+import * as React from 'react';
 
 export type RegionOption = { label: string; value: string };
 
@@ -24,7 +24,7 @@ export function ComboboxRegion({
     regions: fetched,
     loading: internalLoading,
     error,
-  } = useRegions(shouldFetch);
+  } = useListRegions(shouldFetch);
   const loading = loadingProp ?? internalLoading;
 
   // Preferência: props.options > API; fallback: []
@@ -40,21 +40,21 @@ export function ComboboxRegion({
   }, [options, fetched]);
 
   const placeholder = React.useMemo(() => {
-    if (loading) return "Carregando regiões...";
-    if (regions.length === 0) return "Nenhuma região encontrada";
-    return "Selecione a região...";
+    if (loading) return 'Carregando regiões...';
+    if (regions.length === 0) return 'Nenhuma região encontrada';
+    return 'Selecione a região...';
   }, [loading, regions.length]);
 
   const notFoundContent = React.useMemo(() => {
-    if (loading) return "Carregando...";
-    if (error) return "Falha ao carregar regiões.";
-    return "Nenhuma região encontrada.";
+    if (loading) return 'Carregando...';
+    if (error) return 'Falha ao carregar regiões.';
+    return 'Nenhuma região encontrada.';
   }, [loading, error]);
 
   return (
     <Select
       value={value || undefined}
-      onChange={(nextValue) => onChange(nextValue ?? "")}
+      onChange={(nextValue) => onChange(nextValue ?? '')}
       options={regions}
       placeholder={placeholder}
       loading={loading}
@@ -64,7 +64,7 @@ export function ComboboxRegion({
       className="w-full"
       optionFilterProp="label"
       filterOption={(input, option) =>
-        String(option?.label ?? "")
+        String(option?.label ?? '')
           .toLowerCase()
           .includes(input.toLowerCase())
       }

@@ -1,3 +1,4 @@
+import { useListRegions } from '@/features/regions/hooks/listRegions/useListRegions';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -15,7 +16,6 @@ import {
 } from '@/shared/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import React from 'react';
-import { useRegions } from '../hooks/useRegions';
 import { RegionOption } from './ComboboxRegion';
 
 export type ComboboxRegionProps = {
@@ -40,7 +40,7 @@ export function MultiSelectRegion({
   buttonVariant = 'outline',
 }: ComboboxRegionProps) {
   const [open, setOpen] = React.useState(false);
-  const { regions: fetched, loading, error } = useRegions();
+  const { regions: fetched, loading, error } = useListRegions();
 
   // Preferência: props.options > API; fallback: []
   const regions = React.useMemo<RegionOption[]>(() => {
