@@ -7,9 +7,8 @@ export type Member = {
   id: string;
   name: string;
   cpf?: string;
-  birthDate: Date;
   gender: genderType;
-  createdAt: Date;
+  locality?: string;
 };
 
 export type FindAllToMembersResponse = {

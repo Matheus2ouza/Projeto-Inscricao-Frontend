@@ -4,3 +4,10 @@ export type Region = {
 };
 
 export type ListRegionsResponse = Region[];
+
+export type UseListRegionsResult = {
+  regions: Region[];
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+};

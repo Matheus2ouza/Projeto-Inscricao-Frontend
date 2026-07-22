@@ -4,7 +4,7 @@ import { useGlobalLoading } from '@/components/GlobalLoading';
 import { ResponsiblesAutocomplete } from '@/features/accounts/components/ResponsiblesAutocomplete';
 import type { AccountRole } from '@/features/accounts/types/accounts.types';
 import { ComboboxRegion } from '@/features/regions/components/ComboboxRegion';
-import { useRegions } from '@/features/regions/hooks/useRegions';
+import { useListRegions } from '@/features/regions/hooks/listRegions/useListRegions';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -60,7 +60,7 @@ export default function RegisterFormEvent({
   const { user } = useCurrentUser();
   const { setLoading: setGlobalLoading } = useGlobalLoading();
   const { form, onSubmit, dateRange, setDateRange } = useFormCreateEvent();
-  const { regions: fetchedRegions, loading: regionsLoading } = useRegions();
+  const { regions: fetchedRegions, loading: regionsLoading } = useListRegions();
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

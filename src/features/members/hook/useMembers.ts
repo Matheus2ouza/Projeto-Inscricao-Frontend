@@ -23,9 +23,9 @@ export function useMembers({
 
   useEffect(() => {
     if (data && page < data.pageCount) {
-      prefetchNextPage(page, pageSize);
+      prefetchNextPage(page, pageSize, localityId);
     }
-  }, [page, pageSize]);
+  }, [page, pageSize, localityId, data]);
 
   return {
     members: data?.members || [],

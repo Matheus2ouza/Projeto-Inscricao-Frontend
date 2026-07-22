@@ -27,13 +27,13 @@ const DEFAULT_CONFIG: ParticipantFieldsConfig = {
 // Campos padrão que sempre existem (incluindo CPF)
 const DEFAULT_FIELDS = [
   { key: 'name', label: 'Nome' },
-  { key: 'cpf', label: 'CPF' },
   { key: 'birthDate', label: 'Data de Nascimento' },
   { key: 'gender', label: 'Gênero' },
 ];
 
 // Campos configuráveis (excluindo CPF)
 const CONFIG_FIELDS: { key: keyof ParticipantFieldsConfig; label: string }[] = [
+  { key: 'cpf', label: 'CPF' },
   { key: 'preferredName', label: 'Nome Preferido' },
   { key: 'shirtSize', label: 'Tamanho da Camisa' },
   { key: 'shirtType', label: 'Tipo de Camisa' },

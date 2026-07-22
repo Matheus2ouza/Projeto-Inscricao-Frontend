@@ -3,7 +3,7 @@
 import AccountsTable from '@/features/accounts/components/AccountsTable';
 import { useListAccounts } from '@/features/accounts/hooks/listAccounts/useListAccounts';
 import { AuthUser } from '@/features/auth/types/userTypes';
-import { useRegions } from '@/features/regions/hooks/useRegions';
+import { useListRegions } from '@/features/regions/hooks/listRegions/useListRegions';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -32,7 +32,7 @@ export default function AccountsPage() {
     loading: regionsLoading,
     error: regionsError,
     refetch: refetchRegions,
-  } = useRegions();
+  } = useListRegions();
 
   const handleRetry = async () => {
     await Promise.all([refetchUsers(), refetchRegions()]);
@@ -50,7 +50,7 @@ export default function AccountsPage() {
     );
   }
 
-  if (loading || status === 'loading') {
+  if (loading || status === 'loading' || regionsLoading) {
     return (
       <div className="space-y-6 p-6">
         <div className="flex items-center justify-between gap-4">
@@ -63,12 +63,13 @@ export default function AccountsPage() {
     );
   }
 
-  if (error) {
+  if (error || regionsError) {
+    const errorMessage =
+      error?.message || regionsError?.message || 'Erro ao carregar contas';
+
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-muted-foreground">
-          Erro ao carregar contas: {error.message}
-        </p>
+        <p className="text-muted-foreground">{errorMessage}</p>
         <Button onClick={handleRetry}>Tentar novamente</Button>
       </div>
     );

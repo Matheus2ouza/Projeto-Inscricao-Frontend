@@ -3,7 +3,7 @@
 import AccountsTable from '@/features/accounts/components/AccountsTable';
 import { useListAccounts } from '@/features/accounts/hooks/listAccounts/useListAccounts';
 import { AuthUser } from '@/features/auth/types/userTypes';
-import { useRegions } from '@/features/regions/hooks/useRegions';
+import { useListRegions } from '@/features/regions/hooks/listRegions/useListRegions';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { Button } from '@/shared/components/ui/button';
 import { Skeleton } from '@/shared/components/ui/skeleton';
@@ -32,7 +32,7 @@ export default function AccountsPage() {
     loading: regionsLoading,
     error: regionsError,
     refetch: refetchRegions,
-  } = useRegions();
+  } = useListRegions();
 
   const handleRetry = async () => {
     await Promise.all([refetchUsers(), refetchRegions()]);
