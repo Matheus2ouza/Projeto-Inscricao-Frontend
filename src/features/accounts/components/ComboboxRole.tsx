@@ -25,20 +25,49 @@ type ComboboxRoleProps = {
   onChange: (value: string) => void;
   options?: RoleOption[];
 };
-// Função utilitária para gradientes inline
+
+// Função utilitária para gradientes inline com cores Riodavida
 function getGradient(role: string | undefined) {
   switch (role) {
     case 'SUPER':
-      return 'linear-gradient(to right, #a21caf, #ec4899)';
+      return 'linear-gradient(135deg, #2E8F8A, #3FB5AE)'; // Teal escuro -> Turquesa
     case 'ADMIN':
-      return 'linear-gradient(to right, #3b82f6, #06b6d4)';
+      return 'linear-gradient(135deg, #8AA02E, #A8BE3C)'; // Oliva escuro -> Verde-oliva
     case 'MANAGER':
-      return 'linear-gradient(to right, #22c55e, #a3e635)';
+      return 'linear-gradient(135deg, #5FCFC7, #C4D766)'; // Teal claro -> Oliva claro
     case 'USER':
-      return 'linear-gradient(to right, #9ca3af, #4b5563)';
+      return 'linear-gradient(135deg, #6B7280, #9CA3AF)'; // Cinza
     default:
       return undefined;
   }
+}
+
+// Função para obter cores baseadas no role
+function getRoleColors(role: string) {
+  const colors: Record<string, { bg: string; text: string; border: string }> = {
+    SUPER: {
+      bg: 'bg-riodavida/20 dark:bg-riodavida/30',
+      text: 'text-riodavida dark:text-riodavida-light',
+      border: 'border-riodavida/30 dark:border-riodavida/20',
+    },
+    ADMIN: {
+      bg: 'bg-riodavida-secondary/20 dark:bg-riodavida-secondary/30',
+      text: 'text-riodavida-secondary dark:text-riodavida-muted-light',
+      border:
+        'border-riodavida-secondary/30 dark:border-riodavida-secondary/20',
+    },
+    MANAGER: {
+      bg: 'bg-riodavida-light/20 dark:bg-riodavida-light/30',
+      text: 'text-riodavida-light dark:text-riodavida-light',
+      border: 'border-riodavida-light/30 dark:border-riodavida-light/20',
+    },
+    USER: {
+      bg: 'bg-gray-500/20 dark:bg-gray-500/30',
+      text: 'text-gray-600 dark:text-gray-400',
+      border: 'border-gray-500/30 dark:border-gray-500/20',
+    },
+  };
+  return colors[role] || colors.USER;
 }
 
 export function ComboboxRole({ value, onChange, options }: ComboboxRoleProps) {
@@ -47,26 +76,26 @@ export function ComboboxRole({ value, onChange, options }: ComboboxRoleProps) {
     {
       label: 'SUPER',
       value: 'SUPER',
-      color: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
     },
     {
       label: 'ADMIN',
       value: 'ADMIN',
-      color: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white',
     },
     {
       label: 'MANAGER',
       value: 'MANAGER',
-      color: 'bg-gradient-to-r from-green-500 to-lime-400 text-white',
     },
     {
       label: 'USER',
       value: 'USER',
-      color: 'bg-gradient-to-r from-gray-400 to-gray-600 text-white',
     },
   ];
 
-  // ...existing code...
+  const selectedRole = roles.find((r) => r.value === value);
+  const roleColors = selectedRole
+    ? getRoleColors(selectedRole.value)
+    : getRoleColors('USER');
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -74,67 +103,78 @@ export function ComboboxRole({ value, onChange, options }: ComboboxRoleProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="relative w-full justify-between overflow-hidden"
+          className="border-riodavida/20 hover:border-riodavida/30 relative w-full justify-between overflow-hidden"
         >
           {value ? (
             <span
-              className="pointer-events-none absolute inset-0 z-0 rounded-md"
+              className="pointer-events-none absolute inset-0 z-0 rounded-md opacity-10"
               style={{
-                background: getGradient(
-                  roles.find((r) => r.value === value)?.value,
-                ),
+                background: getGradient(selectedRole?.value),
               }}
             />
           ) : null}
           <span
-            className={
+            className={cn(
+              'relative z-10',
               value
-                ? 'relative z-10 px-2 py-1 font-semibold text-white'
-                : 'text-gray-700 dark:text-gray-200'
-            }
+                ? cn('px-2 py-1 font-semibold', roleColors.text)
+                : 'text-riodavida-gray-dark dark:text-riodavida-gray',
+            )}
           >
-            {value
-              ? roles.find((r) => r.value === value)?.label
-              : 'Selecione o papel...'}
+            {value ? selectedRole?.label : 'Selecione o papel...'}
           </span>
           <ChevronsUpDown
-            className={
-              value ? 'relative z-10 text-white opacity-80' : 'opacity-50'
-            }
+            className={cn(
+              'relative z-10 h-4 w-4 shrink-0 opacity-50',
+              value
+                ? roleColors.text
+                : 'text-riodavida-gray-dark dark:text-riodavida-gray',
+            )}
           />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[180px] p-0">
+      <PopoverContent className="border-riodavida/20 w-[var(--radix-popover-trigger-width)] min-w-[180px] p-0">
         <Command>
           <CommandList>
-            <CommandEmpty>Nenhum papel encontrado.</CommandEmpty>
+            <CommandEmpty className="text-riodavida-gray-dark dark:text-riodavida-gray py-2 text-center text-sm">
+              Nenhum papel encontrado.
+            </CommandEmpty>
             <CommandGroup>
-              {roles.map((role) => (
-                <CommandItem
-                  key={role.value}
-                  value={role.value}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  <span
-                    className={cn(
-                      role.color,
-                      'rounded px-2 py-1 text-xs font-semibold',
-                      value === role.value ? 'ring-2 ring-pink-400' : '',
-                    )}
+              {roles.map((role) => {
+                const colors = getRoleColors(role.value);
+                return (
+                  <CommandItem
+                    key={role.value}
+                    value={role.value}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
+                      setOpen(false);
+                    }}
+                    className="hover:bg-riodavida/5 dark:hover:bg-riodavida/10 cursor-pointer"
                   >
-                    {role.label}
-                  </span>
-                  <Check
-                    className={cn(
-                      'ml-auto',
-                      value === role.value ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                </CommandItem>
-              ))}
+                    <span
+                      className={cn(
+                        'rounded-full px-3 py-1 text-xs font-semibold',
+                        colors.bg,
+                        colors.text,
+                        colors.border,
+                        'border',
+                        value === role.value ? 'ring-riodavida ring-2' : '',
+                      )}
+                    >
+                      {role.label}
+                    </span>
+                    <Check
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        value === role.value
+                          ? 'text-riodavida opacity-100'
+                          : 'opacity-0',
+                      )}
+                    />
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>
