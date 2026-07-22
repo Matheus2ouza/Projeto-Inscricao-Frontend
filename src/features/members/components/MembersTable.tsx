@@ -2,7 +2,6 @@
 
 import { LocalityToAccountCombobox } from '@/features/locality/components/LocalityToAccountCombobox';
 import { Button } from '@/shared/components/ui/button';
-import { formatDateTime } from '@/shared/utils/formatDate';
 import { Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { Eye } from 'lucide-react';
@@ -43,7 +42,7 @@ export default function MembersTable({
       initialPage: 1,
       pageSize: 10,
       localityId: selectedLocalityId || undefined,
-      autoFetch: !!selectedLocalityId,
+      autoFetch: true,
     },
   );
 
@@ -88,12 +87,15 @@ export default function MembersTable({
       onFilter: (value, record) => record.gender === value,
     },
     {
-      title: 'Criado em',
-      key: 'createdAt',
+      title: 'Localidade',
+      key: 'locality',
       align: 'center',
-      render: (_, record) => formatDateTime(record.createdAt),
-      sorter: (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      render: (_, record) => record.locality || '-',
+      sorter: (a, b) => {
+        const localityA = a.locality || '';
+        const localityB = b.locality || '';
+        return localityA.localeCompare(localityB);
+      },
     },
     {
       title: 'Ações',

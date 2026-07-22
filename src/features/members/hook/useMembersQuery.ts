@@ -2,7 +2,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { listMembersAction } from '../actions/listMembers/listMembers';
 import { FindAllToMembersResponse } from '../types/membersType';
 
-// Query keys for members
 export const membersKeys = {
   all: ['members'] as const,
   lists: () => [...membersKeys.all, 'list'] as const,
@@ -21,9 +20,9 @@ export function useMembersQuery(
   return useQuery<FindAllToMembersResponse>({
     queryKey: membersKeys.list(page, pageSize, localityId),
     queryFn: () => listMembersAction(page, pageSize, localityId),
-    enabled: autoFetch && !!localityId,
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos
+    enabled: autoFetch,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     retry: 2,
     refetchOnWindowFocus: false,
   });
@@ -53,7 +52,6 @@ export function useInvalidateMembersQuery() {
   };
 }
 
-// Hook pré-fetch for members
 export function usePrefetchMembersQuery() {
   const queryClient = useQueryClient();
 
