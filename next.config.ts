@@ -1,20 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/web-api/:path*',
-        destination: '/api/:path*',
-      },
-    ];
-  },
   experimental: {
     serverActions: {
       bodySizeLimit: '12mb',
     },
   },
   images: {
-    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -23,7 +14,9 @@ const nextConfig = {
       },
     ],
   },
-  allowedDevOrigins: ['192.168.1.4', '192.168.1.6', '192.168.1.5'],
+  ...(process.env.NODE_ENV === 'development' && {
+    allowedDevOrigins: ['192.168.1.4', '192.168.1.5', '192.168.1.6'],
+  }),
 };
 
 export default nextConfig;
