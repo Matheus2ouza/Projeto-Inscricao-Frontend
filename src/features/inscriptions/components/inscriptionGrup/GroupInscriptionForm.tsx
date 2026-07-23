@@ -39,7 +39,7 @@ import {
   TableRow,
 } from '@/shared/components/ui/table';
 import { Drawer } from 'antd';
-import { HelpCircle, Phone, Plus, Trash2, User, Users } from 'lucide-react';
+import { HelpCircle, Plus, Trash2, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useFormInscriptionGrup } from '../../hooks/inscriptionGrup/useFormInscriptionGrup';
@@ -302,10 +302,6 @@ export function GroupInscriptionForm({ eventId }: GroupInscriptionFormProps) {
                                 className="focus:border-riodavida focus:ring-riodavida/20 text-base"
                               />
                             </FormControl>
-                            <p className="text-muted-foreground text-xs sm:text-[13px]">
-                              Opcional — usado apenas para atualizações da
-                              inscrição.
-                            </p>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -318,7 +314,6 @@ export function GroupInscriptionForm({ eventId }: GroupInscriptionFormProps) {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-base font-medium">
-                              <Phone className="text-riodavida mr-2 inline h-4 w-4" />
                               Telefone do Responsável *
                             </FormLabel>
                             <FormControl>

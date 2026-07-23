@@ -5,10 +5,16 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 export const MyInscriptionsKey = {
   all: ['myInscriptions'] as const,
   lists: () => [...MyInscriptionsKey.all, 'list'] as const,
-  list: (eventId: string, page: number, pageSize: number, limitTime?: string) =>
+  list: (
+    eventId: string,
+    page: number,
+    pageSize: number,
+    localityId?: string,
+    limitTime?: string,
+  ) =>
     [
       ...MyInscriptionsKey.lists(),
-      { eventId, page, pageSize, limitTime },
+      { eventId, page, pageSize, localityId, limitTime },
     ] as const,
   details: () => [...MyInscriptionsKey.all, 'detail'] as const,
   detail: (id: string) => [...MyInscriptionsKey.details(), id] as const,
@@ -18,11 +24,19 @@ export function useMyInscriptionsQuery(
   eventId: string,
   page: number = 0,
   pageSize: number = 10,
+  localityId?: string,
   limitTime?: string,
 ) {
   return useQuery<MyInscriptionsResponse>({
-    queryKey: MyInscriptionsKey.list(eventId, page, pageSize, limitTime),
-    queryFn: () => myInscriptionsAction(eventId, page, pageSize, limitTime),
+    queryKey: MyInscriptionsKey.list(
+      eventId,
+      page,
+      pageSize,
+      localityId,
+      limitTime,
+    ),
+    queryFn: () =>
+      myInscriptionsAction(eventId, page, pageSize, localityId, limitTime),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
@@ -62,11 +76,19 @@ export function usePrefetchMyInscriptionsQuery() {
       eventId: string,
       page: number = 0,
       pageSize: number = 10,
+      localityId?: string,
       limitTime?: string,
     ) => {
       queryClient.prefetchQuery({
-        queryKey: MyInscriptionsKey.list(eventId, page, pageSize, limitTime),
-        queryFn: () => myInscriptionsAction(eventId, page, pageSize, limitTime),
+        queryKey: MyInscriptionsKey.list(
+          eventId,
+          page,
+          pageSize,
+          localityId,
+          limitTime,
+        ),
+        queryFn: () =>
+          myInscriptionsAction(eventId, page, pageSize, localityId, limitTime),
       });
     },
   };

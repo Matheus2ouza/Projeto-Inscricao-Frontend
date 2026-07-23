@@ -12,6 +12,7 @@ export function useMyInscriptions({
   eventId,
   initialPage = 1,
   pageSize = 10,
+  localityId,
   limitTime,
 }: UseMyInscriptionsParams): UseMyInscriptionsResult {
   const [page, setPage] = useState(initialPage);
@@ -23,7 +24,7 @@ export function useMyInscriptions({
     isFetched: fetched,
     error,
     refetch,
-  } = useMyInscriptionsQuery(eventId, page, pageSize, limitTime);
+  } = useMyInscriptionsQuery(eventId, page, pageSize, localityId, limitTime);
 
   const { prefetchNextPage } = usePrefetchMyInscriptionsQuery();
 

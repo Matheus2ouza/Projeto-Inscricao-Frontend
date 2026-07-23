@@ -8,6 +8,7 @@ export async function myInscriptionsService(
   eventId: string,
   page: number = 0,
   pageSize: number = 10,
+  localityId?: string,
   limitTime?: string,
 ): Promise<MyInscriptionsResponse> {
   try {
@@ -17,6 +18,7 @@ export async function myInscriptionsService(
         params: {
           page,
           pageSize,
+          localityId,
           limitTime,
         },
       },
