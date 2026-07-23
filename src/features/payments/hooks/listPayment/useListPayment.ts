@@ -6,10 +6,11 @@ import {
   UseListPaymentParams,
   UseListPaymentResult,
 } from '@/features/payments/types/listPayments/listPaymentsTypes';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useListPayment({
   eventId,
+  localityId,
   initialPage = 1,
   pageSize = 10,
 }: UseListPaymentParams): UseListPaymentResult {
@@ -22,13 +23,15 @@ export function useListPayment({
     isFetched: fetched,
     error,
     refetch,
-  } = useListPaymentQuery(eventId, page, pageSize);
+  } = useListPaymentQuery(page, pageSize, eventId, localityId);
 
   const { prefetchNextPage } = usePrefetchListPaymentQuery();
 
-  if (data && page < data.pageCount) {
-    prefetchNextPage(eventId, page, pageSize);
-  }
+  useEffect(() => {
+    if (data && page < data.pageCount) {
+      prefetchNextPage(page, pageSize, eventId, localityId);
+    }
+  }, [page, pageSize, eventId, localityId]);
 
   return {
     summary: data?.summary || {

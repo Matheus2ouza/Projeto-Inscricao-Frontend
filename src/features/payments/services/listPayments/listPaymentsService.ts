@@ -5,9 +5,10 @@ import { axiosServer, RespondeErrorData } from '@/lib/axios/server';
 import axios from 'axios';
 
 export async function listPaymentsService(
-  eventId: string,
   page: number,
   pageSize: number,
+  eventId?: string,
+  localityId?: string,
 ) {
   try {
     const { data } = await axiosServer.get<ListPaymentsResponse>(
@@ -16,6 +17,7 @@ export async function listPaymentsService(
         params: {
           page,
           pageSize,
+          localityId,
         },
       },
     );

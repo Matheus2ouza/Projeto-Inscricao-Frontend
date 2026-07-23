@@ -3,10 +3,11 @@
 import { listPaymentsService } from '@/features/payments/services/listPayments/listPaymentsService';
 
 export async function listPaymentsAction(
-  eventId: string,
   page: number,
   pageSize: number,
+  eventId?: string,
+  localityId?: string,
 ) {
-  const result = await listPaymentsService(eventId, page, pageSize);
+  const result = await listPaymentsService(page, pageSize, eventId, localityId);
   return result;
 }

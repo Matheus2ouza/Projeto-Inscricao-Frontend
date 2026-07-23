@@ -11,12 +11,14 @@ export async function myInscriptionsAction(
   eventId: string,
   page: number = 0,
   pageSize: number = 10,
+  localityId?: string,
   limitTime?: string,
 ): Promise<MyInscriptionsResponse> {
   const result = await myInscriptionsService(
     eventId,
     page,
     pageSize,
+    localityId,
     limitTime,
   );
   return result;

@@ -29,6 +29,7 @@ export type UseMyInscriptionsParams = {
   eventId: string;
   initialPage: number;
   pageSize: number;
+  localityId?: string;
   limitTime?: string;
 };
 

@@ -29,7 +29,8 @@ export type PaymentAllocation = {
 };
 
 export type UseListPaymentParams = {
-  eventId: string;
+  eventId?: string;
+  localityId?: string;
   initialPage?: number;
   pageSize?: number;
 };

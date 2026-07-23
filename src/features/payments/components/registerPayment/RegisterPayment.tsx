@@ -100,18 +100,18 @@ export default function RegisterPaymentTable({
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-transparent">
       {/* Card de Ajuda para Desktop */}
       <div className="mb-6 hidden md:block">
-        <Card className="dark:to-background w-full border-blue-100 bg-gradient-to-r from-blue-50 to-white dark:border-blue-900 dark:from-blue-950/30">
+        <Card className="border-riodavida/20 from-riodavida/5 dark:border-riodavida/20 dark:from-riodavida/10 dark:to-background w-full bg-gradient-to-r to-white">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="rounded-lg bg-blue-100 p-3 dark:bg-blue-900/50">
-                  <HelpCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <div className="bg-riodavida/10 dark:bg-riodavida/20 rounded-lg p-3">
+                  <HelpCircle className="text-riodavida dark:text-riodavida h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-300">
+                  <h3 className="text-riodavida-gray-dark dark:text-riodavida-gray text-lg font-semibold">
                     Precisa de ajuda com registro de pagamentos?
                   </h3>
                   <p className="text-muted-foreground mt-1 text-sm">
@@ -124,7 +124,7 @@ export default function RegisterPaymentTable({
                 variant="outline"
                 size="sm"
                 asChild
-                className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-950/50"
+                className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark dark:border-riodavida/30 dark:text-riodavida dark:hover:bg-riodavida/20 dark:hover:text-riodavida-light"
               >
                 <Link href="/documentation/payment/register">
                   Ver Documentação
@@ -138,12 +138,12 @@ export default function RegisterPaymentTable({
       <div className="mx-auto px-4 sm:px-6">
         {/* Card de Ajuda para Mobile */}
         <div className="mb-6 md:hidden">
-          <Card className="w-full border-blue-100 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20">
+          <Card className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 w-full">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <HelpCircle className="h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                <HelpCircle className="text-riodavida dark:text-riodavida h-5 w-5 flex-shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <p className="text-riodavida dark:text-riodavida truncate text-sm font-medium">
                     Precisa de ajuda com pagamentos?
                   </p>
                   <p className="text-muted-foreground mt-0.5 truncate text-xs">
@@ -154,7 +154,7 @@ export default function RegisterPaymentTable({
                   variant="ghost"
                   size="sm"
                   asChild
-                  className="h-auto px-2 py-1 text-blue-600 hover:bg-blue-100 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
+                  className="text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark dark:text-riodavida dark:hover:bg-riodavida/20 dark:hover:text-riodavida-light h-auto px-2 py-1"
                 >
                   <Link href="/documentation/payment/register">Ver</Link>
                 </Button>
@@ -164,12 +164,12 @@ export default function RegisterPaymentTable({
         </div>
 
         {/* Cabeçalho responsivo */}
-        <div className="mb-6 overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
+        <div className="liquid-card mb-6 overflow-hidden rounded-lg border-0">
           <div className="p-4 sm:p-6">
             {/* Layout desktop: lado a lado */}
             <div className="hidden flex-col items-start justify-between gap-6 sm:flex lg:flex-row lg:items-center">
               <div className="flex-1 space-y-2">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-2xl font-bold">
                   Inscrições Pendentes
                 </h2>
                 <p className="text-muted-foreground">
@@ -185,7 +185,7 @@ export default function RegisterPaymentTable({
                     <div className="text-muted-foreground text-sm">
                       Valor total
                     </div>
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    <div className="text-riodavida-secondary dark:text-riodavida-muted-light text-2xl font-bold">
                       {getFormatCurrency(selectedTotal)}
                     </div>
                   </div>
@@ -195,7 +195,7 @@ export default function RegisterPaymentTable({
                   <Button
                     onClick={handlePayment}
                     disabled={selectedIds.length === 0}
-                    className="w-full gap-2 sm:w-auto"
+                    className="bg-riodavida hover:bg-riodavida-dark w-full gap-2 text-white sm:w-auto"
                     size="lg"
                   >
                     <CreditCard className="h-4 w-4" />
@@ -207,7 +207,7 @@ export default function RegisterPaymentTable({
                     }
                     disabled={selectedIds.length === 0 || !allowCard}
                     variant="outline"
-                    className="w-full gap-2 sm:w-auto"
+                    className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark w-full gap-2 sm:w-auto"
                     size="lg"
                     title={
                       !allowCard
@@ -224,9 +224,8 @@ export default function RegisterPaymentTable({
 
             {/* Layout mobile: empilhado */}
             <div className="sm:hidden">
-              {/* Título e descrição */}
               <div className="mb-4">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                   Inscrições Pendentes
                 </h2>
                 <p className="text-muted-foreground mt-1 text-sm">
@@ -236,24 +235,22 @@ export default function RegisterPaymentTable({
                 </p>
               </div>
 
-              {/* Valor total (se houver seleção) */}
               {selectedIds.length > 0 && (
-                <div className="mb-4 rounded-lg border border-green-100 bg-green-50 p-3 dark:border-green-800 dark:bg-green-900/20">
-                  <p className="text-sm text-green-800 dark:text-green-300">
+                <div className="border-riodavida-secondary/20 bg-riodavida-secondary/5 dark:border-riodavida-secondary/20 dark:bg-riodavida-secondary/10 mb-4 rounded-lg border p-3">
+                  <p className="text-riodavida-secondary dark:text-riodavida-muted-light text-sm">
                     Valor total
                   </p>
-                  <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                  <p className="text-riodavida-secondary dark:text-riodavida-muted-light text-xl font-bold">
                     {getFormatCurrency(selectedTotal)}
                   </p>
                 </div>
               )}
 
-              {/* Botões de pagamento */}
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Button
                   onClick={handlePayment}
                   disabled={selectedIds.length === 0}
-                  className="w-full gap-2"
+                  className="bg-riodavida hover:bg-riodavida-dark w-full gap-2 text-white"
                   size="lg"
                 >
                   <CreditCard className="h-4 w-4" />
@@ -265,7 +262,7 @@ export default function RegisterPaymentTable({
                   }
                   disabled={selectedIds.length === 0 || !allowCard}
                   variant="outline"
-                  className="w-full gap-2"
+                  className="border-riodavida/30 text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark w-full gap-2"
                   size="lg"
                   title={
                     !allowCard
@@ -284,7 +281,7 @@ export default function RegisterPaymentTable({
         {/* Tabela de inscrições - Versão mobile com cards */}
         <div className="block sm:hidden">
           {inscriptions.length === 0 ? (
-            <div className="text-muted-foreground rounded-lg border px-4 py-8 text-center">
+            <div className="border-riodavida/20 text-muted-foreground rounded-lg border px-4 py-8 text-center">
               Nenhuma inscrição pendente encontrada
             </div>
           ) : (
@@ -294,9 +291,9 @@ export default function RegisterPaymentTable({
                 return (
                   <div
                     key={inscription.id}
-                    className={`liquid-card rounded-lg border p-4 transition-colors ${
-                      isSelected ? 'bg-primary/5 border-primary/20' : ''
-                    } ${!inscription.canPay ? 'bg-muted/20 opacity-50' : ''}`}
+                    className={`liquid-card rounded-lg border-0 p-4 transition-colors ${
+                      isSelected ? 'bg-riodavida/10 border-riodavida/20' : ''
+                    } ${!inscription.canPay ? 'opacity-50' : ''}`}
                   >
                     {/* Primeira linha: Checkbox, número e valor */}
                     <div className="mb-4 flex items-center justify-between">
@@ -308,12 +305,13 @@ export default function RegisterPaymentTable({
                           }
                           aria-label={`Selecionar inscrição ${inscription.id}`}
                           disabled={!inscription.canPay}
+                          className="border-riodavida/30 data-[state=checked]:bg-riodavida data-[state=checked]:text-white"
                         />
                         <div className="flex items-center gap-2">
                           <span className="text-muted-foreground text-sm font-medium">
                             #
                           </span>
-                          <span className="font-semibold">
+                          <span className="text-riodavida-gray-dark dark:text-riodavida-gray font-semibold">
                             {calculateGlobalIndex(idx)}
                           </span>
                         </div>
@@ -321,13 +319,13 @@ export default function RegisterPaymentTable({
                       <div className="space-y-1 text-right">
                         <div>
                           <p className="text-muted-foreground text-xs">Valor</p>
-                          <p className="text-lg font-bold">
+                          <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-lg font-bold">
                             {getFormatCurrency(inscription.totalValue)}
                           </p>
                         </div>
                         <div>
                           <p className="text-muted-foreground text-xs">Pago</p>
-                          <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                          <p className="text-riodavida-secondary dark:text-riodavida-muted-light text-sm font-medium">
                             {getFormatCurrency(inscription.totalPaid)}
                           </p>
                         </div>
@@ -350,19 +348,19 @@ export default function RegisterPaymentTable({
                         <p className="text-muted-foreground text-xs">
                           Criado em
                         </p>
-                        <p className="text-sm font-medium">
+                        <p className="text-riodavida-gray-dark dark:text-riodavida-gray text-sm font-medium">
                           {formatDateTime(inscription.createAt)}
                         </p>
                       </div>
                     </div>
 
                     {/* Terceira linha: ID da inscrição */}
-                    <div className="border-t pt-3">
+                    <div className="border-riodavida/10 border-t pt-3">
                       <p className="text-muted-foreground mb-1 text-xs">
                         ID da Inscrição
                       </p>
                       <div className="flex items-center justify-between">
-                        <code className="bg-muted rounded px-2 py-1 font-mono text-xs">
+                        <code className="bg-riodavida/5 dark:bg-riodavida/10 rounded px-2 py-1 font-mono text-xs">
                           {inscription.id.substring(0, 12)}...
                         </code>
                       </div>
@@ -370,7 +368,7 @@ export default function RegisterPaymentTable({
 
                     {/* Mensagem de pagamento indisponível */}
                     {!inscription.canPay && (
-                      <div className="mt-4 rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-300">
+                      <div className="mt-4 rounded border border-amber-200/50 bg-amber-50/80 p-2 text-xs text-amber-800 dark:border-amber-800/30 dark:bg-amber-900/20 dark:text-amber-300">
                         ⚠️ Pagamento não disponível para esta inscrição
                       </div>
                     )}
@@ -381,12 +379,12 @@ export default function RegisterPaymentTable({
           )}
         </div>
 
-        {/* Tabela de inscrições - Versão desktop usando ShadCN Table */}
-        <div className="liquid-card hidden rounded-lg border sm:block">
+        {/* Tabela de inscrições - Versão desktop */}
+        <div className="liquid-card hidden overflow-hidden rounded-lg border-0 sm:block">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-riodavida/50 dark:bg-riodavida/30">
               <TableRow>
-                <TableHead className="w-12 text-center">
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray w-12 text-center">
                   <Checkbox
                     checked={
                       inscriptions.length > 0 &&
@@ -396,18 +394,33 @@ export default function RegisterPaymentTable({
                     onCheckedChange={toggleAll}
                     aria-label="Selecionar todas as inscrições"
                     disabled={inscriptions.every((ins) => !ins.canPay)}
+                    className="border-riodavida/30 data-[state=checked]:bg-riodavida data-[state=checked]:text-white"
                   />
                 </TableHead>
-                <TableHead className="w-12 text-center">#</TableHead>
-                <TableHead>ID</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-center">Valor</TableHead>
-                <TableHead className="text-center">Total Pago</TableHead>
-                <TableHead className="text-center">Criado em</TableHead>
-                <TableHead className="text-center">Ações</TableHead>
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray w-12 text-center">
+                  #
+                </TableHead>
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray">
+                  ID
+                </TableHead>
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray text-center">
+                  Status
+                </TableHead>
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray text-center">
+                  Valor
+                </TableHead>
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray text-center">
+                  Total Pago
+                </TableHead>
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray text-center">
+                  Criado em
+                </TableHead>
+                <TableHead className="text-riodavida-gray-dark dark:text-riodavida-gray text-center">
+                  Ações
+                </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="liquid-card">
               {inscriptions.length === 0 ? (
                 <TableRow>
                   <TableCell
@@ -423,9 +436,9 @@ export default function RegisterPaymentTable({
                   return (
                     <TableRow
                       key={inscription.id}
-                      className={`${
-                        isSelected ? 'bg-primary/5' : ''
-                      } ${!inscription.canPay ? 'bg-muted/20 opacity-50' : ''}`}
+                      className={`bg-riodavida/5 dark:bg-riodavida/10 hover:bg-riodavida/20 dark:hover:bg-riodavida/30 transition-colors ${
+                        isSelected ? 'bg-riodavida/10 dark:bg-riodavida/20' : ''
+                      } ${!inscription.canPay ? 'opacity-50' : ''}`}
                     >
                       <TableCell className="text-center">
                         <Checkbox
@@ -435,12 +448,13 @@ export default function RegisterPaymentTable({
                           }
                           aria-label={`Selecionar inscrição ${inscription.id}`}
                           disabled={!inscription.canPay}
+                          className="border-riodavida/30 data-[state=checked]:bg-riodavida data-[state=checked]:text-white"
                         />
                       </TableCell>
-                      <TableCell className="text-center font-medium">
+                      <TableCell className="text-riodavida-gray-dark dark:text-riodavida-gray text-center font-medium">
                         {calculateGlobalIndex(idx)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-riodavida-gray-dark dark:text-riodavida-gray">
                         <code className="font-mono text-xs">
                           {inscription.id.substring(0, 8)}...
                         </code>
@@ -454,20 +468,20 @@ export default function RegisterPaymentTable({
                           {getConvertStatusInscription(inscription.status)}
                         </span>
                       </TableCell>
-                      <TableCell className="text-center font-medium">
+                      <TableCell className="text-riodavida-gray-dark dark:text-riodavida-gray text-center font-medium">
                         {getFormatCurrency(inscription.totalValue)}
                       </TableCell>
-                      <TableCell className="text-center font-medium text-green-600 dark:text-green-400">
+                      <TableCell className="text-riodavida-secondary dark:text-riodavida-muted-light text-center font-medium">
                         {getFormatCurrency(inscription.totalPaid)}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-riodavida-gray-dark dark:text-riodavida-gray text-center">
                         {formatDateTime(inscription.createAt)}
                       </TableCell>
                       <TableCell className="text-center">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                          className="text-riodavida hover:bg-riodavida/10 hover:text-riodavida-dark dark:text-riodavida dark:hover:bg-riodavida/20 h-8 w-8 p-0"
                           title="Visualizar"
                           onClick={() => onViewPaymentDetails(inscription.id)}
                         >
@@ -484,7 +498,10 @@ export default function RegisterPaymentTable({
 
         {/* Paginação */}
         <div className="mt-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <Pagination className="sm:order-2">
+          <div className="text-muted-foreground text-sm">
+            Página {page} de {pageCount}
+          </div>
+          <Pagination>
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
@@ -500,7 +517,7 @@ export default function RegisterPaymentTable({
                   <PaginationLink
                     isActive={true}
                     href="#"
-                    className="pointer-events-none"
+                    className="bg-riodavida hover:bg-riodavida-dark pointer-events-none text-white"
                   >
                     {page}
                   </PaginationLink>
@@ -515,6 +532,11 @@ export default function RegisterPaymentTable({
                       isActive={page === i + 1}
                       href="#"
                       onClick={() => onPageChange(i + 1)}
+                      className={
+                        page === i + 1
+                          ? 'bg-riodavida hover:bg-riodavida-dark text-white'
+                          : 'text-riodavida-gray-dark dark:text-riodavida-gray hover:bg-riodavida/5 dark:hover:bg-riodavida/10'
+                      }
                     >
                       {i + 1}
                     </PaginationLink>

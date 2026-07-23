@@ -1,9 +1,7 @@
 'use client';
 
-import {
-  Event,
-  Inscription,
-} from '@/features/inscriptions/types/myInscriptions/myInscriptionsTypes';
+import { Inscription } from '@/features/inscriptions/types/myInscriptions/myInscriptionsTypes';
+import { LocalityToAccountCombobox } from '@/features/locality/components/LocalityToAccountCombobox';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -21,6 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/shared/components/ui/pagination';
+import { Skeleton } from '@/shared/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -44,35 +43,43 @@ import {
 import Image from 'next/image';
 import { useState } from 'react';
 import { useMyInscriptionActions } from '../../hooks/myInscriptions/useMyInscriptionActions';
+import { useMyInscriptions } from '../../hooks/myInscriptions/useMyInscriptions';
 
 type MyInscriptionsProps = {
-  event: Event | null;
-  inscriptions: Inscription[];
-  total: number;
-  page: number;
-  pageCount: number;
-  onPageChange: (page: number) => void;
+  eventId: string;
   onSelectInscription: (id: string) => void;
   pageSize?: number;
-  onInscriptionDeleted?: () => void;
 };
 
+const PAGE_SIZE = 10;
 export default function MyInscriptionsTable({
-  event,
-  inscriptions,
-  total,
-  page,
-  pageCount,
-  onPageChange,
+  eventId,
   onSelectInscription,
   pageSize = 10,
-  onInscriptionDeleted,
 }: MyInscriptionsProps) {
   const [imageError, setImageError] = useState(false);
   const [inscriptionToDelete, setInscriptionToDelete] =
     useState<Inscription | null>(null);
   const [selectedInscription, setSelectedInscription] =
     useState<Inscription | null>(null);
+  const [selectedLocalityId, setSelectedLocalityId] = useState<string>('');
+
+  const {
+    event,
+    inscriptions,
+    total,
+    page,
+    pageCount,
+    loading,
+    error,
+    setPage,
+    refresh,
+  } = useMyInscriptions({
+    eventId,
+    initialPage: 1,
+    pageSize,
+    localityId: selectedLocalityId || undefined,
+  });
 
   const { handleDeleteInscription, isDeleting } = useMyInscriptionActions();
 
@@ -88,14 +95,9 @@ export default function MyInscriptionsTable({
     try {
       await handleDeleteInscription(inscriptionToDelete.id);
       setInscriptionToDelete(null);
-
-      // Chama o callback para atualizar a lista
-      if (onInscriptionDeleted) {
-        onInscriptionDeleted();
-      }
+      refresh(); // Atualiza a lista após deletar
     } catch (error) {
       console.error('Erro ao deletar inscrição:', error);
-      // O erro já é tratado no hook useMyInscriptionActions
     }
   };
 
@@ -114,6 +116,139 @@ export default function MyInscriptionsTable({
     setInscriptionToDelete(inscription);
   };
 
+  // Função para limpar o filtro de localidade
+  const handleClearLocalityFilter = () => {
+    setSelectedLocalityId('');
+  };
+
+  // Renderiza o estado de loading
+  const renderSkeletonGrid = () => {
+    return (
+      <div className="space-y-6 p-6">
+        <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-gray-800">
+          <div className="p-6">
+            <div className="flex flex-col gap-6 sm:flex-row">
+              <div className="bg-muted relative h-48 w-full flex-shrink-0 overflow-hidden rounded-lg sm:w-48">
+                <Skeleton className="h-full w-full" />
+              </div>
+              <div className="flex-1 space-y-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-7 w-64" />
+                  <div className="mt-1 flex flex-wrap gap-4">
+                    <Skeleton className="h-4 w-40" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-6 w-16" />
+                    </div>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-6 w-24" />
+                    </div>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-6 w-12" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-4">
+          <Skeleton className="h-6 w-48" />
+        </div>
+
+        <div className="space-y-4">
+          <div className="hidden rounded-md border sm:block">
+            <div className="grid grid-cols-6 gap-4 border-b px-4 py-3">
+              <Skeleton className="h-4 w-6" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-16 justify-self-end" />
+              <Skeleton className="h-4 w-16 justify-self-center" />
+            </div>
+            {[1, 2, 3].map((row) => (
+              <div
+                key={row}
+                className="grid grid-cols-6 items-center gap-4 border-t px-4 py-3"
+              >
+                <Skeleton className="h-4 w-6" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-10 justify-self-end" />
+                <Skeleton className="h-8 w-16 justify-self-center" />
+              </div>
+            ))}
+          </div>
+
+          <div className="block space-y-3 sm:hidden">
+            {[1, 2, 3].map((card) => (
+              <div key={card} className="space-y-3 rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-8" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                  </div>
+                </div>
+                <div>
+                  <Skeleton className="mb-2 h-5 w-24" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Skeleton className="mb-2 h-4 w-16" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <div>
+                    <Skeleton className="mb-2 h-4 w-10" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between border-t pt-3">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-5 w-8" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Renderiza o estado de erro
+  if (error) {
+    return (
+      <div className="flex min-h-96 items-center justify-center p-6">
+        <div className="text-destructive text-center">
+          <p className="mb-4">Erro ao carregar inscrições: {error.message}</p>
+          <Button onClick={refresh}>Tentar Novamente</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Renderiza o estado de loading
+  if (loading) {
+    return renderSkeletonGrid();
+  }
+
+  // Se não houver evento
   if (!event) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
@@ -231,10 +366,47 @@ export default function MyInscriptionsTable({
         </div>
       </div>
 
+      {/* Filtro de localidade */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="w-full max-w-sm">
+          <label className="text-riodavida-gray-dark dark:text-riodavida-gray mb-2 block text-sm font-medium">
+            Filtrar por Localidade
+          </label>
+          <LocalityToAccountCombobox
+            value={selectedLocalityId}
+            onChange={setSelectedLocalityId}
+            placeholder="Selecione uma localidade"
+          />
+          {selectedLocalityId && (
+            <button
+              onClick={handleClearLocalityFilter}
+              className="text-riodavida hover:text-riodavida-dark mt-2 text-sm font-medium"
+            >
+              Limpar filtro
+            </button>
+          )}
+          {!selectedLocalityId && (
+            <p className="text-muted-foreground mt-2 text-sm">
+              Selecione uma localidade para filtrar as inscrições.
+            </p>
+          )}
+        </div>
+        <div className="shrink-0">
+          <span className="text-muted-foreground text-sm">
+            {total > 0 && `${total} inscrições encontradas`}
+          </span>
+        </div>
+      </div>
+
       {/* Título das Inscrições */}
       <div className="pt-4">
         <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-semibold">
           Minhas Inscrições
+          {selectedLocalityId && (
+            <span className="text-muted-foreground ml-2 text-sm font-normal">
+              (filtradas por localidade)
+            </span>
+          )}
         </h2>
       </div>
 
@@ -242,7 +414,9 @@ export default function MyInscriptionsTable({
       <div className="block sm:hidden">
         {inscriptions.length === 0 ? (
           <div className="text-muted-foreground border-riodavida/20 rounded-lg border px-4 py-8 text-center">
-            Nenhuma inscrição encontrada
+            {selectedLocalityId
+              ? 'Nenhuma inscrição encontrada para esta localidade.'
+              : 'Nenhuma inscrição encontrada'}
           </div>
         ) : (
           <div className="space-y-3">
@@ -333,7 +507,9 @@ export default function MyInscriptionsTable({
       <div className="liquid-card-solid hidden rounded-md border sm:block">
         {inscriptions.length === 0 ? (
           <div className="text-muted-foreground px-6 py-12 text-center">
-            Nenhuma inscrição encontrada
+            {selectedLocalityId
+              ? 'Nenhuma inscrição encontrada para esta localidade.'
+              : 'Nenhuma inscrição encontrada'}
           </div>
         ) : (
           <Table>
@@ -435,7 +611,7 @@ export default function MyInscriptionsTable({
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious
-                    onClick={() => page > 1 && onPageChange(page - 1)}
+                    onClick={() => page > 1 && setPage(page - 1)}
                     href={page > 1 ? '#' : undefined}
                     className={
                       page === 1 ? 'pointer-events-none opacity-50' : ''
@@ -463,7 +639,7 @@ export default function MyInscriptionsTable({
                       <PaginationLink
                         isActive={page === i + 1}
                         href="#"
-                        onClick={() => onPageChange(i + 1)}
+                        onClick={() => setPage(i + 1)}
                         className={
                           page === i + 1
                             ? 'bg-riodavida hover:bg-riodavida-dark text-white'
@@ -478,7 +654,7 @@ export default function MyInscriptionsTable({
 
                 <PaginationItem>
                   <PaginationNext
-                    onClick={() => page < pageCount && onPageChange(page + 1)}
+                    onClick={() => page < pageCount && setPage(page + 1)}
                     href={page < pageCount ? '#' : undefined}
                     className={
                       page === pageCount ? 'pointer-events-none opacity-50' : ''
