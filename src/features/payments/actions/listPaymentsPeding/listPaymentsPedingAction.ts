@@ -5,7 +5,13 @@ export async function listPaymentsPedingAction(
   eventId: string,
   page: number,
   pageSize: number,
+  localityId?: string,
 ): Promise<ListPaymentsPedingResponse> {
-  const result = await listPaymentPedingService(eventId, page, pageSize);
+  const result = await listPaymentPedingService(
+    eventId,
+    page,
+    pageSize,
+    localityId,
+  );
   return result;
 }

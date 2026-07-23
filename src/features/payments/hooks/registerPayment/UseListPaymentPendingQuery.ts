@@ -5,8 +5,16 @@ import { listPaymentsPedingAction } from '../../actions/listPaymentsPeding/listP
 export const ListPaymentPendingKeys = {
   all: ['listPaymentPending'] as const,
   lists: () => [...ListPaymentPendingKeys.all, 'list'] as const,
-  list: (eventId: string, page: number, pageSize: number) =>
-    [...ListPaymentPendingKeys.lists(), { eventId, page, pageSize }] as const,
+  list: (
+    eventId: string,
+    page: number,
+    pageSize: number,
+    localityId?: string,
+  ) =>
+    [
+      ...ListPaymentPendingKeys.lists(),
+      { eventId, page, pageSize, localityId },
+    ] as const,
   details: () => [...ListPaymentPendingKeys.all, 'detail'] as const,
   detail: (id: string) => [...ListPaymentPendingKeys.details(), id] as const,
 };
@@ -15,10 +23,12 @@ export function UseListPaymentPendingQuery(
   eventId: string,
   page: number = 1,
   pageSize: number = 20,
+  localityId?: string,
 ) {
   return useQuery<ListPaymentsPedingResponse>({
-    queryKey: ListPaymentPendingKeys.list(eventId, page, pageSize),
-    queryFn: () => listPaymentsPedingAction(eventId, page, pageSize),
+    queryKey: ListPaymentPendingKeys.list(eventId, page, pageSize, localityId),
+    queryFn: () =>
+      listPaymentsPedingAction(eventId, page, pageSize, localityId),
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
     retry: 2,
@@ -55,10 +65,21 @@ export function usePrefetchListPaymentPendingQuery() {
   const queryClient = useQueryClient();
 
   return {
-    prefetchNextPage: (eventId: string, page: number, pageSize: number) => {
+    prefetchNextPage: (
+      eventId: string,
+      page: number,
+      pageSize: number,
+      localityId?: string,
+    ) => {
       queryClient.prefetchQuery({
-        queryKey: ListPaymentPendingKeys.list(eventId, page + 1, pageSize),
-        queryFn: () => listPaymentsPedingAction(eventId, page + 1, pageSize),
+        queryKey: ListPaymentPendingKeys.list(
+          eventId,
+          page + 1,
+          pageSize,
+          localityId,
+        ),
+        queryFn: () =>
+          listPaymentsPedingAction(eventId, page + 1, pageSize, localityId),
         staleTime: 5 * 60 * 1000,
       });
     },

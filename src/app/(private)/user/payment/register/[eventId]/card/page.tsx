@@ -1,6 +1,6 @@
 'use client';
 
-import RegisterPaymentCardDialog from '@/features/payments/components/registerPayment/RegisterPaymentCard';
+import RegisterPaymentCardDialog from '@/features/payments/components/registerPayment/card/RegisterPaymentCard';
 import useFormCreatePaymentCard from '@/features/payments/hooks/registerPayment/useRegisterPaymentCard';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { useCurrentUser } from '@/shared/context/user-context';

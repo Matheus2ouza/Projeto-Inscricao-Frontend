@@ -1,17 +1,11 @@
 'use client';
 
-import { Inscription } from '@/features/payments/types/registerPayment/registerPaymentTypesOld';
+import { LocalityToAccountCombobox } from '@/features/locality/components/LocalityToAccountCombobox';
+import { useListPaymentPending } from '@/features/payments/hooks/registerPayment/useListPaymentPending';
+import { CustomPagination } from '@/shared/components/CustomPagination';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Checkbox } from '@/shared/components/ui/checkbox';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/shared/components/ui/pagination';
 import {
   Table,
   TableBody,
@@ -24,35 +18,50 @@ import { formatDateTime } from '@/shared/utils/formatDate';
 import { getConvertStatusInscription } from '@/shared/utils/getConvertStatus';
 import { getFormatCurrency } from '@/shared/utils/getFormatCurrency';
 import { getStatusColor } from '@/shared/utils/getStatusColor';
+import { IconAlertTriangle } from '@tabler/icons-react';
 import { CreditCard, Eye, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { RegisterPaymentEmptyState } from './RegisterPaymentEmptyState';
+import { RegisterPaymentErrorState } from './RegisterPaymentErrorState';
+import { RegisterPaymentTableSkeleton } from './RegisterPaymentTableSkeleton';
 
 type RegisterPaymentTableProps = {
-  inscriptions: Inscription[];
-  allowCard: boolean;
-  page: number;
-  pageCount: number;
-  onPageChange: (page: number) => void;
-  pageSize?: number;
+  eventId: string;
   onViewPaymentDetails: (paymentId: string) => void;
   onRegisterPaymentPix: (inscriptionIds: string[], totalValue: number) => void;
   onRegisterPaymentCard: (inscriptionIds: string[], totalValue: number) => void;
+  pageSize?: number;
 };
 
+const PAGE_SIZE = 10;
+
 export default function RegisterPaymentTable({
-  inscriptions,
-  allowCard,
-  page,
-  pageCount,
-  onPageChange,
-  pageSize = 10,
+  eventId,
   onViewPaymentDetails,
   onRegisterPaymentPix,
   onRegisterPaymentCard,
+  pageSize = 10,
 }: RegisterPaymentTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedLocalityId, setSelectedLocalityId] = useState<string>('');
+
+  const {
+    inscriptions,
+    allowCard,
+    page,
+    pageCount,
+    loading,
+    error,
+    setPage,
+    refresh,
+  } = useListPaymentPending({
+    eventId,
+    initialPage: 1,
+    pageSize,
+    localityId: selectedLocalityId || undefined,
+  });
 
   // Calcular o total das inscrições selecionadas (Valor Total - Valor Pago)
   const selectedTotal = selectedIds.reduce((sum, id) => {
@@ -65,6 +74,12 @@ export default function RegisterPaymentTable({
   // Função para calcular o índice global
   const calculateGlobalIndex = (localIndex: number): number => {
     return (page - 1) * pageSize + localIndex + 1;
+  };
+
+  // Função para limpar o filtro de localidade
+  const handleClearLocalityFilter = () => {
+    setSelectedLocalityId('');
+    setSelectedIds([]); // Limpa seleções ao mudar o filtro
   };
 
   // Função para alternar seleção de uma inscrição
@@ -99,8 +114,28 @@ export default function RegisterPaymentTable({
     onRegisterPaymentPix(selectedIds, selectedTotal);
   };
 
+  // Renderiza o estado de erro
+  if (error) {
+    return <RegisterPaymentErrorState error={error} onRetry={refresh} />;
+  }
+
+  // Renderiza o estado de loading
+  if (loading) {
+    return <RegisterPaymentTableSkeleton />;
+  }
+
+  // Se não houver inscrições
+  if (inscriptions.length === 0) {
+    return (
+      <RegisterPaymentEmptyState
+        hasFilter={!!selectedLocalityId}
+        onClearFilter={handleClearLocalityFilter}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen">
       {/* Card de Ajuda para Desktop */}
       <div className="mb-6 hidden md:block">
         <Card className="border-riodavida/20 from-riodavida/5 dark:border-riodavida/20 dark:from-riodavida/10 dark:to-background w-full bg-gradient-to-r to-white">
@@ -161,6 +196,30 @@ export default function RegisterPaymentTable({
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Filtro de localidade */}
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="w-full max-w-sm">
+            <LocalityToAccountCombobox
+              value={selectedLocalityId}
+              onChange={(value) => {
+                setSelectedLocalityId(value);
+                setSelectedIds([]);
+              }}
+              placeholder="Selecione uma localidade"
+            />
+            {!selectedLocalityId && (
+              <p className="text-muted-foreground mt-2 text-sm">
+                Selecione uma localidade para filtrar as inscrições pendentes.
+              </p>
+            )}
+          </div>
+          {selectedLocalityId && (
+            <Button variant="primary" onClick={handleClearLocalityFilter}>
+              Limpar filtro
+            </Button>
+          )}
         </div>
 
         {/* Cabeçalho responsivo */}
@@ -227,6 +286,11 @@ export default function RegisterPaymentTable({
               <div className="mb-4">
                 <h2 className="text-riodavida-gray-dark dark:text-riodavida-gray text-xl font-bold">
                   Inscrições Pendentes
+                  {selectedLocalityId && (
+                    <span className="text-muted-foreground ml-2 text-xs font-normal">
+                      (filtradas)
+                    </span>
+                  )}
                 </h2>
                 <p className="text-muted-foreground mt-1 text-sm">
                   {selectedIds.length > 0
@@ -368,8 +432,11 @@ export default function RegisterPaymentTable({
 
                     {/* Mensagem de pagamento indisponível */}
                     {!inscription.canPay && (
-                      <div className="mt-4 rounded border border-amber-200/50 bg-amber-50/80 p-2 text-xs text-amber-800 dark:border-amber-800/30 dark:bg-amber-900/20 dark:text-amber-300">
-                        ⚠️ Pagamento não disponível para esta inscrição
+                      <div className="mt-4 flex items-center gap-2 rounded border border-amber-200/50 bg-amber-50/80 p-2 text-xs text-amber-800 dark:border-amber-800/30 dark:bg-amber-900/20 dark:text-amber-300">
+                        <IconAlertTriangle className="h-4 w-4 flex-shrink-0" />
+                        <span>
+                          Pagamento não disponível para esta inscrição
+                        </span>
                       </div>
                     )}
                   </div>
@@ -496,66 +563,14 @@ export default function RegisterPaymentTable({
           </Table>
         </div>
 
-        {/* Paginação */}
-        <div className="mt-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="text-muted-foreground text-sm">
-            Página {page} de {pageCount}
-          </div>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => page > 1 && onPageChange(page - 1)}
-                  href={page > 1 ? '#' : undefined}
-                  className={page === 1 ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-
-              {/* Versão mobile - apenas página atual */}
-              <div className="sm:hidden">
-                <PaginationItem>
-                  <PaginationLink
-                    isActive={true}
-                    href="#"
-                    className="bg-riodavida hover:bg-riodavida-dark pointer-events-none text-white"
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              </div>
-
-              {/* Versão desktop - todas as páginas */}
-              <div className="hidden sm:flex">
-                {Array.from({ length: pageCount }, (_, i) => (
-                  <PaginationItem key={i}>
-                    <PaginationLink
-                      isActive={page === i + 1}
-                      href="#"
-                      onClick={() => onPageChange(i + 1)}
-                      className={
-                        page === i + 1
-                          ? 'bg-riodavida hover:bg-riodavida-dark text-white'
-                          : 'text-riodavida-gray-dark dark:text-riodavida-gray hover:bg-riodavida/5 dark:hover:bg-riodavida/10'
-                      }
-                    >
-                      {i + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-              </div>
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => page < pageCount && onPageChange(page + 1)}
-                  href={page < pageCount ? '#' : undefined}
-                  className={
-                    page === pageCount ? 'pointer-events-none opacity-50' : ''
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        {/* Paginação com CustomPagination */}
+        <CustomPagination
+          page={page}
+          pageCount={pageCount}
+          total={inscriptions.length}
+          onPageChange={setPage}
+          label="inscrições pendentes"
+        />
       </div>
     </div>
   );
