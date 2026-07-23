@@ -5,20 +5,30 @@ import { listPaymentsAction } from '../../actions/listPayments/listPaymentsActio
 export const ListPaymentKey = {
   all: ['listPayment'] as const,
   lists: () => [...ListPaymentKey.all, 'list'] as const,
-  list: (eventId: string, page: number, pageSize: number) =>
-    [...ListPaymentKey.lists(), { eventId, page, pageSize }] as const,
+  list: (
+    page: number,
+    pageSize: number,
+    eventId?: string,
+    localityId?: string,
+  ) =>
+    [
+      ...ListPaymentKey.lists(),
+      { eventId, page, pageSize, localityId },
+    ] as const,
   details: () => [...ListPaymentKey.all, 'detail'] as const,
   detail: (id: string) => [...ListPaymentKey.details(), id] as const,
 };
 
 export function useListPaymentQuery(
-  eventId: string,
   page: number = 0,
   pageSize: number = 10,
+  eventId?: string,
+  localityId?: string,
 ) {
   return useQuery<ListPaymentsResponse>({
-    queryKey: ListPaymentKey.list(eventId, page, pageSize),
-    queryFn: () => listPaymentsAction(eventId, page, pageSize),
+    queryKey: ListPaymentKey.list(page, pageSize, eventId, localityId),
+    queryFn: () => listPaymentsAction(page, pageSize, eventId, localityId),
+    enabled: !!eventId,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
@@ -55,10 +65,16 @@ export function usePrefetchListPaymentQuery() {
   const queryClient = useQueryClient();
 
   return {
-    prefetchNextPage: (eventId: string, page: number, pageSize: number) => {
+    prefetchNextPage: (
+      page: number,
+      pageSize: number,
+      eventId?: string,
+      localityId?: string,
+    ) => {
       queryClient.prefetchQuery({
-        queryKey: ListPaymentKey.list(eventId, page + 1, pageSize),
-        queryFn: () => listPaymentsAction(eventId, page + 1, pageSize),
+        queryKey: ListPaymentKey.list(page + 1, pageSize, eventId, localityId),
+        queryFn: () =>
+          listPaymentsAction(page + 1, pageSize, eventId, localityId),
         staleTime: 5 * 60 * 1000,
       });
     },

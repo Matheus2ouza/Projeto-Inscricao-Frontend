@@ -305,10 +305,6 @@ export default function IndividualInscriptionForm({
                               className="focus:border-riodavida focus:ring-riodavida/20 text-base"
                             />
                           </FormControl>
-                          <p className="text-muted-foreground text-xs sm:text-[13px]">
-                            Opcional — usado apenas para atualizações da
-                            inscrição.
-                          </p>
                           <FormMessage />
                         </FormItem>
                       )}
