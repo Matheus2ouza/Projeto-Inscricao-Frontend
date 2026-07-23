@@ -12,6 +12,7 @@ export function useListPaymentPending({
   eventId,
   initialPage = 1,
   pageSize = 20,
+  localityId,
 }: UseListPaymentPendingParams): UseListPaymentPendingResult {
   const [page, setPage] = useState(initialPage);
 
@@ -20,7 +21,7 @@ export function useListPaymentPending({
     isLoading: loading,
     error,
     refetch,
-  } = UseListPaymentPendingQuery(eventId, page, pageSize);
+  } = UseListPaymentPendingQuery(eventId, page, pageSize, localityId);
 
   const { prefetchNextPage } = usePrefetchListPaymentPendingQuery();
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { AuthUser } from '@/features/auth/types/userTypes';
-import RegisterPaymentPix from '@/features/payments/components/registerPayment/RegisterPaymentPix';
+import RegisterPaymentPix from '@/features/payments/components/registerPayment/pix/RegisterPaymentPix';
 import PageContainer from '@/shared/components/layout/PageContainer';
 import { useSession } from 'next-auth/react';
 import { useParams, useSearchParams } from 'next/navigation';

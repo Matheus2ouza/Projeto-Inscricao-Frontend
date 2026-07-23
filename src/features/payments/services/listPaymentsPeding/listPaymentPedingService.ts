@@ -8,6 +8,7 @@ export async function listPaymentPedingService(
   eventId: string,
   page: number,
   pageSize: number,
+  localityId?: string,
 ): Promise<ListPaymentsPedingResponse> {
   try {
     const { data } = await axiosServer.get<ListPaymentsPedingResponse>(
@@ -16,6 +17,7 @@ export async function listPaymentPedingService(
         params: {
           page,
           pageSize,
+          localityId,
         },
       },
     );

@@ -56,7 +56,7 @@ export function LocalityToAccountCombobox({
           aria-expanded={open}
           type="button"
           className={cn(
-            'border-glass bg-background/50 w-full justify-between backdrop-blur-sm',
+            'border-glass liquid-card w-full justify-between backdrop-blur-sm',
             !value && 'text-muted-foreground',
           )}
           disabled={loading || disabled}

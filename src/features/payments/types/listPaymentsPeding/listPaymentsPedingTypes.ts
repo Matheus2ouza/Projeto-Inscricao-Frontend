@@ -19,6 +19,7 @@ export type UseListPaymentPendingParams = {
   eventId: string;
   initialPage?: number;
   pageSize?: number;
+  localityId?: string;
 };
 
 export type UseListPaymentPendingResult = {
