@@ -47,7 +47,11 @@ export async function registerPaymentPixService(
 
         console.error(`${timeStamp} - ${statusCode} - ${message}`);
 
-        throw new Error(message);
+        throw new Error(
+          statusCode === 500
+            ? 'Não foi possível registrar o pagamento PIX no momento. Tente novamente mais tarde.'
+            : message,
+        );
       }
 
       if (error.request) {
