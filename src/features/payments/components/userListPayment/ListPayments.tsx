@@ -7,7 +7,6 @@ import { Payment } from '@/features/payments/types/listPayments/listPaymentsType
 import { cn } from '@/lib/utils';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
 import ImagePreview from '@/shared/components/ImagePreview';
-import ImageViewerDialog from '@/shared/components/ImageViewerDialog';
 import { Button } from '@/shared/components/ui/button';
 import {
   Dialog,
@@ -48,8 +47,6 @@ type ListPaymentsProps = {
   pageSize?: number;
 };
 
-const PAGE_SIZE = 10;
-
 export default function ListPayments({
   eventId,
   onViewInscription,
@@ -57,8 +54,6 @@ export default function ListPayments({
 }: ListPaymentsProps) {
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
-  const [selectedImageUrls, setSelectedImageUrls] = useState<string[]>([]);
   const [selectedLocalityId, setSelectedLocalityId] = useState<string>('');
 
   const {
@@ -715,21 +710,6 @@ export default function ListPayments({
           )}
         </DialogContent>
       </Dialog>
-
-      <ImageViewerDialog
-        isOpen={isImageViewerOpen}
-        onClose={() => {
-          setIsImageViewerOpen(false);
-          setSelectedImageUrls([]);
-        }}
-        imageUrls={selectedImageUrls}
-        title={`Comprovante${selectedImageUrls.length > 1 ? 's' : ''} do pagamento ${selectedPayment?.id?.substring(0, 8)}`}
-        description={
-          selectedPayment
-            ? formatDateTime(selectedPayment.createdAt)
-            : undefined
-        }
-      />
     </div>
   );
 }
