@@ -2,16 +2,9 @@ import {
   Event,
   Payment,
 } from '@/features/payments/types/analysisPayment/analysisPayment';
+import { CustomPagination } from '@/shared/components/CustomPagination';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/shared/components/ui/pagination';
 import {
   Table,
   TableBody,
@@ -348,67 +341,13 @@ export default function AnalysisPayments({
       </div>
 
       {/* Paginação */}
-      {pageCount > 1 && (
-        <div className="py-4">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="text-muted-foreground text-sm">
-              Página {page} de {pageCount} • Total: {total} pagamentos
-            </div>
-
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => page > 1 && onPageChange(page - 1)}
-                    href={page > 1 ? '#' : undefined}
-                    className={
-                      page === 1 ? 'pointer-events-none opacity-50' : ''
-                    }
-                  />
-                </PaginationItem>
-
-                {/* Versão mobile - apenas página atual */}
-                <div className="sm:hidden">
-                  <PaginationItem>
-                    <PaginationLink
-                      isActive={true}
-                      href="#"
-                      className="pointer-events-none"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                </div>
-
-                {/* Versão desktop - todas as páginas */}
-                <div className="hidden sm:flex">
-                  {Array.from({ length: pageCount }, (_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink
-                        isActive={page === i + 1}
-                        href="#"
-                        onClick={() => onPageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                </div>
-
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => page < pageCount && onPageChange(page + 1)}
-                    href={page < pageCount ? '#' : undefined}
-                    className={
-                      page === pageCount ? 'pointer-events-none opacity-50' : ''
-                    }
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        </div>
-      )}
+      <CustomPagination
+        page={page}
+        pageCount={pageCount}
+        total={total}
+        onPageChange={onPageChange}
+        label="inscrições pendentes"
+      />
     </div>
   );
 }

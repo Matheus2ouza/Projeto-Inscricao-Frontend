@@ -1,8 +1,8 @@
 import {
   UseAnalysisPaymentDetailsParams,
   UseAnalysisPaymentDetailsResult,
-} from "../../types/analysisPayment/analysisPaymentDetails";
-import { useAnalysisPaymentDetailsQuery } from "./analysisPaymentDetailsQuery";
+} from '../../types/analysisPayment/analysisPaymentDetails';
+import { useAnalysisPaymentDetailsQuery } from './analysisPaymentDetailsQuery';
 
 export function useAnalysisPaymentDetails({
   paymentId,

@@ -1,3 +1,15 @@
+export enum StatusPayment {
+  APPROVED = 'APPROVED',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  REFUSED = 'REFUSED',
+}
+
+export enum PaymentMethod {
+  DINHEIRO = 'DINHEIRO',
+  PIX = 'PIX',
+  CARTAO = 'CARTAO',
+}
+
 export type Payment = {
   id: string;
   status: StatusPayment;
@@ -7,22 +19,10 @@ export type Payment = {
   totalValue: number;
   createdAt: Date;
   updatedAt: Date;
-  imageUrl: string;
+  imageUrls: string[];
   rejectionReason?: string;
   allocation?: PaymentAllocation[];
 };
-
-export enum StatusPayment {
-  APPROVED = "APPROVED",
-  UNDER_REVIEW = "UNDER_REVIEW",
-  REFUSED = "REFUSED",
-}
-
-export enum PaymentMethod {
-  DINHEIRO = "DINHEIRO",
-  PIX = "PIX",
-  CARTAO = "CARTAO",
-}
 
 export type AnalysisPaymentsDetailsResponse = Payment;
 

@@ -6,6 +6,7 @@ import { useListPayment } from '@/features/payments/hooks/listPayment/useListPay
 import { Payment } from '@/features/payments/types/listPayments/listPaymentsTypes';
 import { cn } from '@/lib/utils';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
+import ImagePreview from '@/shared/components/ImagePreview';
 import ImageViewerDialog from '@/shared/components/ImageViewerDialog';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -57,6 +58,7 @@ export default function ListPayments({
   const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [selectedImageUrls, setSelectedImageUrls] = useState<string[]>([]);
   const [selectedLocalityId, setSelectedLocalityId] = useState<string>('');
 
   const {
@@ -603,21 +605,29 @@ export default function ListPayments({
                     Comprovante
                   </span>
                   <div className="border-riodavida/20 bg-riodavida/5 dark:border-riodavida/20 dark:bg-riodavida/10 overflow-hidden rounded-md border p-3 sm:p-4">
-                    {selectedPayment.imageUrl ? (
+                    {selectedPayment.imageUrls &&
+                    selectedPayment.imageUrls.length > 0 ? (
                       <div className="flex flex-col items-center justify-center">
-                        <div className="bg-riodavida/5 dark:bg-riodavida/10 mb-3 flex h-20 w-full items-center justify-center rounded sm:h-25">
-                          <div className="p-2 text-center">
-                            <p className="text-muted-foreground mb-2 text-xs sm:mb-3 sm:text-sm">
-                              Comprovante disponível
+                        <div className="bg-riodavida/5 dark:bg-riodavida/10 mb-3 flex w-full items-center justify-center rounded p-2">
+                          <div className="w-full text-center">
+                            <p className="text-muted-foreground mb-3 text-xs sm:mb-4 sm:text-sm">
+                              {selectedPayment.imageUrls.length > 1
+                                ? `${selectedPayment.imageUrls.length} comprovantes disponíveis`
+                                : 'Comprovante disponível'}
                             </p>
-                            <Button
-                              type="button"
-                              size="sm"
-                              onClick={() => setIsImageViewerOpen(true)}
-                              className="bg-riodavida hover:bg-riodavida-dark w-full text-white sm:w-auto"
-                            >
-                              Visualizar
-                            </Button>
+
+                            {/* Substitua o botão "Visualizar" pelo ImagePreview */}
+                            <div className="flex justify-center">
+                              <ImagePreview
+                                images={selectedPayment.imageUrls}
+                                orientation="horizontal"
+                                className="w-full max-w-md"
+                                imageClassName="object-contain"
+                                containerClassName="justify-center"
+                                showPreview={true}
+                                maxDisplay={6}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -706,15 +716,20 @@ export default function ListPayments({
         </DialogContent>
       </Dialog>
 
-      {selectedPayment && selectedPayment.imageUrl && (
-        <ImageViewerDialog
-          isOpen={isImageViewerOpen}
-          onClose={() => setIsImageViewerOpen(false)}
-          imageUrl={selectedPayment.imageUrl}
-          title={`Comprovante do pagamento ${selectedPayment.id}`}
-          description={formatDateTime(selectedPayment.createdAt)}
-        />
-      )}
+      <ImageViewerDialog
+        isOpen={isImageViewerOpen}
+        onClose={() => {
+          setIsImageViewerOpen(false);
+          setSelectedImageUrls([]);
+        }}
+        imageUrls={selectedImageUrls}
+        title={`Comprovante${selectedImageUrls.length > 1 ? 's' : ''} do pagamento ${selectedPayment?.id?.substring(0, 8)}`}
+        description={
+          selectedPayment
+            ? formatDateTime(selectedPayment.createdAt)
+            : undefined
+        }
+      />
     </div>
   );
 }

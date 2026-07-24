@@ -1,22 +1,29 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
-import { Modal } from "antd";
-import { Download, Loader2, ZoomIn, ZoomOut } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { Button } from '@/shared/components/ui/button';
+import { Carousel, Modal } from 'antd';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Loader2,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 
 export enum ImageViewerDownloadExtension {
-  JPG = "jpg",
-  JPEG = "jpeg",
-  PNG = "png",
-  WEBP = "webp",
+  JPG = 'jpg',
+  JPEG = 'jpeg',
+  PNG = 'png',
+  WEBP = 'webp',
 }
 
 interface ImageViewerDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  imageUrl: string;
+  imageUrls: string | string[]; // Aceita string única ou array
   title?: string;
   description?: string;
   downloadFileName?: string;
@@ -26,8 +33,8 @@ interface ImageViewerDialogProps {
 export default function ImageViewerDialog({
   isOpen,
   onClose,
-  imageUrl,
-  title = "Visualizar Imagem",
+  imageUrls,
+  title = 'Visualizar Imagem',
   description,
   downloadFileName,
   downloadFileExtension = ImageViewerDownloadExtension.JPG,
@@ -35,17 +42,25 @@ export default function ImageViewerDialog({
   const [imageLoading, setImageLoading] = useState(true);
   const [downloadLoading, setDownloadLoading] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [imageDimensions, setImageDimensions] = useState<{
     width: number;
     height: number;
   } | null>(null);
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+  const carouselRef = useRef<any>(null);
+
+  // Normalizar para array
+  const imageArray = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
+  const currentImageUrl = imageArray[currentIndex] || '';
+  const isMultiple = imageArray.length > 1;
 
   useEffect(() => {
     if (!isOpen) return;
     setImageLoading(true);
     setImageDimensions(null);
-  }, [imageUrl, isOpen]);
+    setCurrentIndex(0);
+  }, [imageUrls, isOpen]);
 
   useEffect(() => {
     const updateViewportSize = () => {
@@ -53,8 +68,8 @@ export default function ImageViewerDialog({
     };
 
     updateViewportSize();
-    window.addEventListener("resize", updateViewportSize);
-    return () => window.removeEventListener("resize", updateViewportSize);
+    window.addEventListener('resize', updateViewportSize);
+    return () => window.removeEventListener('resize', updateViewportSize);
   }, []);
 
   const resolveDownloadFileName = () => {
@@ -78,61 +93,71 @@ export default function ImageViewerDialog({
     try {
       setDownloadLoading(true);
 
-      const response = await fetch(imageUrl);
+      const response = await fetch(currentImageUrl);
       const blob = await response.blob();
 
-      // Criar um URL temporário para o blob
       const blobUrl = URL.createObjectURL(blob);
-
-      // Criar um elemento link temporário
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = blobUrl;
-
-      // Nome do arquivo
       link.download = resolveDownloadFileName();
-
-      // Simular clique no link para iniciar o download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Liberar o URL do blob
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error("Erro ao fazer download da imagem:", error);
-      // Fallback: abrir em nova aba se o download falhar
-      window.open(imageUrl, "_blank");
+      console.error('Erro ao fazer download da imagem:', error);
+      window.open(currentImageUrl, '_blank');
     } finally {
       setDownloadLoading(false);
     }
   };
 
   const handleZoomIn = () => {
-    setZoom((prev) => Math.min(prev + 0.25, 3)); // Máximo 3x
+    setZoom((prev) => Math.min(prev + 0.25, 3));
   };
 
   const handleZoomOut = () => {
-    setZoom((prev) => Math.max(prev - 0.25, 0.5)); // Mínimo 0.5x
+    setZoom((prev) => Math.max(prev - 0.25, 0.5));
   };
 
   const handleResetZoom = () => {
     setZoom(1);
   };
 
-  // Resetar zoom quando fechar
   const handleClose = () => {
     setZoom(1);
     setImageLoading(true);
     setImageDimensions(null);
+    setCurrentIndex(0);
     onClose();
   };
 
-  // Cálculo responsivo para o dialog
+  // Navegação do carousel
+  const goToPrevious = () => {
+    const newIndex =
+      currentIndex === 0 ? imageArray.length - 1 : currentIndex - 1;
+    setCurrentIndex(newIndex);
+    setZoom(1);
+    setImageDimensions(null);
+    setImageLoading(true);
+    carouselRef.current?.goTo(newIndex);
+  };
+
+  const goToNext = () => {
+    const newIndex =
+      currentIndex === imageArray.length - 1 ? 0 : currentIndex + 1;
+    setCurrentIndex(newIndex);
+    setZoom(1);
+    setImageDimensions(null);
+    setImageLoading(true);
+    carouselRef.current?.goTo(newIndex);
+  };
+
+  // Cálculo responsivo
   const dialogWidth = (() => {
     if (!viewportSize.width) return undefined;
-
     const isMobile = viewportSize.width < 640;
-    const horizontalAllowance = isMobile ? 48 : 96; // paddings + controls
+    const horizontalAllowance = isMobile ? 48 : 96;
     const maxWidthPercentage = isMobile ? 0.98 : 0.95;
 
     if (!imageDimensions) {
@@ -149,9 +174,8 @@ export default function ImageViewerDialog({
 
   const dialogHeight = (() => {
     if (!viewportSize.height) return undefined;
-
     const isMobile = viewportSize.width < 640;
-    const verticalAllowance = isMobile ? 200 : 260; // header + actions + paddings
+    const verticalAllowance = isMobile ? 240 : 300; // Aumentado para acomodar navegação
     const maxHeightPercentage = isMobile ? 0.95 : 0.9;
 
     if (!imageDimensions) {
@@ -167,7 +191,7 @@ export default function ImageViewerDialog({
   const imageAreaMaxHeight = (() => {
     if (viewportSize.height) {
       const isMobile = viewportSize.width < 640;
-      const viewportLimit = viewportSize.height * (isMobile ? 0.65 : 0.7);
+      const viewportLimit = viewportSize.height * (isMobile ? 0.55 : 0.6);
 
       if (!imageDimensions) {
         return viewportLimit;
@@ -194,20 +218,25 @@ export default function ImageViewerDialog({
       width={dialogWidth}
       styles={{ body: { padding: 0 } }}
       title={
-        <div className="px-4 sm:px-6 pt-4 sm:pt-6 space-y-1">
-          <div className="text-lg sm:text-xl font-semibold leading-none">
+        <div className="space-y-1 px-4 pt-4 sm:px-6 sm:pt-6">
+          <div className="text-lg leading-none font-semibold sm:text-xl">
             {title}
           </div>
           {description && (
-            <div className="text-xs sm:text-sm text-muted-foreground">
+            <div className="text-muted-foreground text-xs sm:text-sm">
               {description}
+            </div>
+          )}
+          {isMultiple && (
+            <div className="text-muted-foreground mt-1 text-xs">
+              Imagem {currentIndex + 1} de {imageArray.length}
             </div>
           )}
         </div>
       }
     >
       <div
-        className="flex flex-col px-4 sm:px-6 pb-4 sm:pb-6"
+        className="flex flex-col px-4 pb-4 sm:px-6 sm:pb-6"
         style={{
           maxWidth: viewportSize.width
             ? viewportSize.width * (viewportSize.width < 640 ? 0.98 : 0.95)
@@ -216,20 +245,20 @@ export default function ImageViewerDialog({
           minWidth: viewportSize.width < 640 ? 280 : 450,
         }}
       >
-        {/* Controles de Zoom e Download */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 border-b pb-3">
+        {/* Controles */}
+        <div className="flex flex-col items-start justify-between gap-3 border-b pb-3 sm:flex-row sm:items-center sm:gap-2">
           <div className="flex flex-wrap items-center gap-1 sm:gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleZoomOut}
               disabled={zoom <= 0.5}
-              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="Reduzir zoom"
             >
               <ZoomOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <span className="text-xs sm:text-sm font-medium min-w-[50px] sm:min-w-[60px] text-center">
+            <span className="min-w-[50px] text-center text-xs font-medium sm:min-w-[60px] sm:text-sm">
               {Math.round(zoom * 100)}%
             </span>
             <Button
@@ -237,7 +266,7 @@ export default function ImageViewerDialog({
               size="sm"
               onClick={handleZoomIn}
               disabled={zoom >= 3}
-              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="Aumentar zoom"
             >
               <ZoomIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -246,7 +275,7 @@ export default function ImageViewerDialog({
               variant="outline"
               size="sm"
               onClick={handleResetZoom}
-              className="text-xs h-8 px-2 sm:h-9 sm:px-3"
+              className="h-8 px-2 text-xs sm:h-9 sm:px-3"
             >
               Resetar
             </Button>
@@ -256,65 +285,120 @@ export default function ImageViewerDialog({
             onClick={handleDownloadImage}
             disabled={downloadLoading}
             size="sm"
-            className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+            className="h-8 w-full text-xs sm:h-9 sm:w-auto sm:text-sm"
           >
             {downloadLoading ? (
-              <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 animate-spin" />
+              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin sm:mr-2 sm:h-4 sm:w-4" />
             ) : (
-              <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <Download className="mr-1 h-3.5 w-3.5 sm:mr-2 sm:h-4 sm:w-4" />
             )}
             Download
           </Button>
         </div>
 
-        {/* Container da Imagem com Scroll */}
+        {/* Container da Imagem com Carousel */}
         <div
-          className="flex-1 overflow-auto rounded-lg bg-gray-100 dark:bg-gray-800"
+          className="relative flex-1 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
           style={{
             minHeight: imageAreaMinHeight,
             maxHeight: imageAreaMaxHeight,
           }}
         >
-          <div className="flex justify-center items-start p-2 sm:p-4">
-            {imageLoading && (
-              <div className="flex items-center justify-center h-64 sm:h-96 w-full">
-                <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
-              </div>
-            )}
-            <div className="relative">
-              <Image
-                key={imageUrl}
-                src={imageUrl}
-                alt="Imagem ampliada"
-                width={imageDimensions?.width ?? 800}
-                height={imageDimensions?.height ?? 600}
-                className={`rounded-lg transition-transform duration-200 ${
-                  imageLoading ? "opacity-0" : "opacity-100"
-                }`}
-                style={{
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "top center",
-                  maxWidth: "none",
-                  cursor: zoom > 1 ? "move" : "default",
+          {imageArray.length > 0 ? (
+            <>
+              <Carousel
+                ref={carouselRef}
+                dots={isMultiple}
+                fade={true}
+                initialSlide={currentIndex}
+                afterChange={(index) => {
+                  setCurrentIndex(index);
+                  setZoom(1);
+                  setImageDimensions(null);
+                  setImageLoading(true);
                 }}
-                onLoadingComplete={(img) => {
-                  setImageDimensions({
-                    width: img.naturalWidth,
-                    height: img.naturalHeight,
-                  });
-                  setImageLoading(false);
-                }}
-                onError={() => setImageLoading(false)}
-              />
+                className="h-full w-full"
+              >
+                {imageArray.map((url, index) => (
+                  <div
+                    key={index}
+                    className="flex h-full items-center justify-center p-2 sm:p-4"
+                  >
+                    <div className="relative flex h-full w-full items-center justify-center">
+                      {imageLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Loader2 className="h-6 w-6 animate-spin sm:h-8 sm:w-8" />
+                        </div>
+                      )}
+                      <Image
+                        src={url}
+                        alt={`Imagem ${index + 1}`}
+                        width={imageDimensions?.width ?? 800}
+                        height={imageDimensions?.height ?? 600}
+                        className={`rounded-lg transition-transform duration-200 ${
+                          imageLoading ? 'opacity-0' : 'opacity-100'
+                        }`}
+                        style={{
+                          transform: `scale(${zoom})`,
+                          transformOrigin: 'top center',
+                          maxWidth: 'none',
+                          cursor: zoom > 1 ? 'move' : 'default',
+                        }}
+                        onLoadingComplete={(img) => {
+                          if (index === currentIndex) {
+                            setImageDimensions({
+                              width: img.naturalWidth,
+                              height: img.naturalHeight,
+                            });
+                            setImageLoading(false);
+                          }
+                        }}
+                        onError={() => {
+                          if (index === currentIndex) {
+                            setImageLoading(false);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </Carousel>
+
+              {/* Controles de navegação do carousel */}
+              {isMultiple && (
+                <>
+                  <button
+                    onClick={goToPrevious}
+                    className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white transition-colors hover:bg-black/70 sm:left-3 sm:p-2"
+                    aria-label="Imagem anterior"
+                  >
+                    <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </button>
+                  <button
+                    onClick={goToNext}
+                    className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white transition-colors hover:bg-black/70 sm:right-3 sm:p-2"
+                    aria-label="Próxima imagem"
+                  >
+                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </button>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <p className="text-muted-foreground text-sm">
+                Nenhuma imagem disponível
+              </p>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Instruções */}
-        <div className="text-xs text-muted-foreground text-center pt-2 border-t text-[10px] sm:text-xs">
-          Use os botões de zoom para ampliar ou reduzir a imagem
+        <div className="text-muted-foreground border-t pt-2 text-center text-xs text-[10px] sm:text-xs">
+          {isMultiple && 'Use as setas para navegar entre as imagens • '}
+          Use os botões de zoom para ampliar ou reduzir
           {viewportSize.width < 640 &&
-            " • Arraste para mover a imagem ampliada"}
+            ' • Arraste para mover a imagem ampliada'}
         </div>
       </div>
     </Modal>

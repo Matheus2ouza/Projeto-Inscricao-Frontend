@@ -1,12 +1,12 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getDetailsPayment } from "../../api/analysisPayment/getDetailsPayment";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getDetailsPayment } from '../../api/analysisPayment/getDetailsPayment';
 
 export const analysisPaymentDetailsKey = {
-  all: ["analysisPaymentKey"] as const,
-  lists: () => [...analysisPaymentDetailsKey.all, "list"] as const,
+  all: ['analysisPaymentKey'] as const,
+  lists: () => [...analysisPaymentDetailsKey.all, 'list'] as const,
   list: (paymentId: string) =>
     [...analysisPaymentDetailsKey.lists(), paymentId] as const,
-  details: () => [...analysisPaymentDetailsKey.all, "detail"] as const,
+  details: () => [...analysisPaymentDetailsKey.all, 'detail'] as const,
   detail: (paymentId: string) =>
     [...analysisPaymentDetailsKey.details(), paymentId] as const,
 };
