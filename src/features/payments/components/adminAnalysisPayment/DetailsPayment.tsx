@@ -10,6 +10,7 @@ import {
   StatusPayment,
 } from '@/features/payments/types/analysisPayment/analysisPaymentDetails';
 import { ConfirmationDialog } from '@/shared/components/ConfirmationDialog';
+import ImagePreview from '@/shared/components/ImagePreview';
 import ImageUpdateDialog from '@/shared/components/ImageUpdateDialog';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
@@ -42,14 +43,12 @@ import {
   DollarSign,
   Eye,
   FileImage,
-  ImageIcon,
   ImagePlus,
   Link,
   Receipt,
   Undo2,
   User,
 } from 'lucide-react';
-import Image from 'next/image';
 import { useState } from 'react';
 import {
   ApprovePaymentInput,
@@ -517,7 +516,7 @@ export default function DetailsPaymentTable({
         )}
 
       {/* Comprovante Visual */}
-      {payment.imageUrl && (
+      {payment.imageUrls && payment.imageUrls.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -527,40 +526,43 @@ export default function DetailsPaymentTable({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <Button variant="outline" className="mr-2 w-full sm:w-auto">
-                <Link className="h-4 w-4" />
-                Abrir em nova aba
-              </Button>
-              {onModifyReceiptPayment && (
+              <div className="flex flex-wrap gap-2">
                 <Button
-                  type="button"
                   variant="outline"
                   className="w-full sm:w-auto"
-                  onClick={() => setModifyDialogOpen(true)}
-                  disabled={!!isModifingReceiptPayment}
+                  onClick={() => {
+                    // Abre a primeira imagem em nova aba
+                    if (payment.imageUrls && payment.imageUrls.length > 0) {
+                      window.open(payment.imageUrls[0], '_blank');
+                    }
+                  }}
                 >
-                  <ImagePlus className="h-4 w-4" />
-                  Modificar comprovante
+                  <Link className="h-4 w-4" />
+                  Abrir em nova aba
                 </Button>
-              )}
-              <div className="bg-muted relative aspect-video overflow-hidden rounded-lg border">
-                {!imageError ? (
-                  <Image
-                    src={payment.imageUrl}
-                    alt="Comprovante de pagamento"
-                    fill
-                    className="object-contain"
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <ImageIcon className="text-muted-foreground h-12 w-12" />
-                    <span className="text-muted-foreground ml-2">
-                      Erro ao carregar imagem
-                    </span>
-                  </div>
+                {onModifyReceiptPayment && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={() => setModifyDialogOpen(true)}
+                    disabled={!!isModifingReceiptPayment}
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                    Modificar comprovante
+                  </Button>
                 )}
               </div>
+
+              <ImagePreview
+                images={payment.imageUrls}
+                orientation="horizontal"
+                className="w-full"
+                imageClassName="object-contain"
+                containerClassName="justify-center"
+                showPreview={true}
+                maxDisplay={6}
+              />
             </div>
           </CardContent>
         </Card>

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Button } from "@/shared/components/ui/button";
-import { Modal } from "antd";
-import { Download, Loader2, ZoomIn, ZoomOut } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { Button } from '@/shared/components/ui/button';
+import { Modal } from 'antd';
+import { Download, Loader2, ZoomIn, ZoomOut } from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export enum ImageViewerDownloadExtension {
-  JPG = "jpg",
-  JPEG = "jpeg",
-  PNG = "png",
-  WEBP = "webp",
+  JPG = 'jpg',
+  JPEG = 'jpeg',
+  PNG = 'png',
+  WEBP = 'webp',
 }
 
 interface ImageViewerDialogProps {
@@ -27,7 +27,7 @@ export default function ImageViewerDialog({
   isOpen,
   onClose,
   imageUrl,
-  title = "Visualizar Imagem",
+  title = 'Visualizar Imagem',
   description,
   downloadFileName,
   downloadFileExtension = ImageViewerDownloadExtension.JPG,
@@ -53,8 +53,8 @@ export default function ImageViewerDialog({
     };
 
     updateViewportSize();
-    window.addEventListener("resize", updateViewportSize);
-    return () => window.removeEventListener("resize", updateViewportSize);
+    window.addEventListener('resize', updateViewportSize);
+    return () => window.removeEventListener('resize', updateViewportSize);
   }, []);
 
   const resolveDownloadFileName = () => {
@@ -85,7 +85,7 @@ export default function ImageViewerDialog({
       const blobUrl = URL.createObjectURL(blob);
 
       // Criar um elemento link temporário
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = blobUrl;
 
       // Nome do arquivo
@@ -99,9 +99,9 @@ export default function ImageViewerDialog({
       // Liberar o URL do blob
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error("Erro ao fazer download da imagem:", error);
+      console.error('Erro ao fazer download da imagem:', error);
       // Fallback: abrir em nova aba se o download falhar
-      window.open(imageUrl, "_blank");
+      window.open(imageUrl, '_blank');
     } finally {
       setDownloadLoading(false);
     }
@@ -194,12 +194,12 @@ export default function ImageViewerDialog({
       width={dialogWidth}
       styles={{ body: { padding: 0 } }}
       title={
-        <div className="px-4 sm:px-6 pt-4 sm:pt-6 space-y-1">
-          <div className="text-lg sm:text-xl font-semibold leading-none">
+        <div className="space-y-1 px-4 pt-4 sm:px-6 sm:pt-6">
+          <div className="text-lg leading-none font-semibold sm:text-xl">
             {title}
           </div>
           {description && (
-            <div className="text-xs sm:text-sm text-muted-foreground">
+            <div className="text-muted-foreground text-xs sm:text-sm">
               {description}
             </div>
           )}
@@ -207,7 +207,7 @@ export default function ImageViewerDialog({
       }
     >
       <div
-        className="flex flex-col px-4 sm:px-6 pb-4 sm:pb-6"
+        className="flex flex-col px-4 pb-4 sm:px-6 sm:pb-6"
         style={{
           maxWidth: viewportSize.width
             ? viewportSize.width * (viewportSize.width < 640 ? 0.98 : 0.95)
@@ -217,19 +217,19 @@ export default function ImageViewerDialog({
         }}
       >
         {/* Controles de Zoom e Download */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 border-b pb-3">
+        <div className="flex flex-col items-start justify-between gap-3 border-b pb-3 sm:flex-row sm:items-center sm:gap-2">
           <div className="flex flex-wrap items-center gap-1 sm:gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleZoomOut}
               disabled={zoom <= 0.5}
-              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="Reduzir zoom"
             >
               <ZoomOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <span className="text-xs sm:text-sm font-medium min-w-[50px] sm:min-w-[60px] text-center">
+            <span className="min-w-[50px] text-center text-xs font-medium sm:min-w-[60px] sm:text-sm">
               {Math.round(zoom * 100)}%
             </span>
             <Button
@@ -237,7 +237,7 @@ export default function ImageViewerDialog({
               size="sm"
               onClick={handleZoomIn}
               disabled={zoom >= 3}
-              className="h-8 w-8 sm:h-9 sm:w-9 p-0"
+              className="h-8 w-8 p-0 sm:h-9 sm:w-9"
               title="Aumentar zoom"
             >
               <ZoomIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -246,7 +246,7 @@ export default function ImageViewerDialog({
               variant="outline"
               size="sm"
               onClick={handleResetZoom}
-              className="text-xs h-8 px-2 sm:h-9 sm:px-3"
+              className="h-8 px-2 text-xs sm:h-9 sm:px-3"
             >
               Resetar
             </Button>
@@ -256,12 +256,12 @@ export default function ImageViewerDialog({
             onClick={handleDownloadImage}
             disabled={downloadLoading}
             size="sm"
-            className="w-full sm:w-auto h-8 sm:h-9 text-xs sm:text-sm"
+            className="h-8 w-full text-xs sm:h-9 sm:w-auto sm:text-sm"
           >
             {downloadLoading ? (
-              <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 animate-spin" />
+              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin sm:mr-2 sm:h-4 sm:w-4" />
             ) : (
-              <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <Download className="mr-1 h-3.5 w-3.5 sm:mr-2 sm:h-4 sm:w-4" />
             )}
             Download
           </Button>
@@ -275,10 +275,10 @@ export default function ImageViewerDialog({
             maxHeight: imageAreaMaxHeight,
           }}
         >
-          <div className="flex justify-center items-start p-2 sm:p-4">
+          <div className="flex items-start justify-center p-2 sm:p-4">
             {imageLoading && (
-              <div className="flex items-center justify-center h-64 sm:h-96 w-full">
-                <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
+              <div className="flex h-64 w-full items-center justify-center sm:h-96">
+                <Loader2 className="h-6 w-6 animate-spin sm:h-8 sm:w-8" />
               </div>
             )}
             <div className="relative">
@@ -289,13 +289,13 @@ export default function ImageViewerDialog({
                 width={imageDimensions?.width ?? 800}
                 height={imageDimensions?.height ?? 600}
                 className={`rounded-lg transition-transform duration-200 ${
-                  imageLoading ? "opacity-0" : "opacity-100"
+                  imageLoading ? 'opacity-0' : 'opacity-100'
                 }`}
                 style={{
                   transform: `scale(${zoom})`,
-                  transformOrigin: "top center",
-                  maxWidth: "none",
-                  cursor: zoom > 1 ? "move" : "default",
+                  transformOrigin: 'top center',
+                  maxWidth: 'none',
+                  cursor: zoom > 1 ? 'move' : 'default',
                 }}
                 onLoadingComplete={(img) => {
                   setImageDimensions({
@@ -311,10 +311,10 @@ export default function ImageViewerDialog({
         </div>
 
         {/* Instruções */}
-        <div className="text-xs text-muted-foreground text-center pt-2 border-t text-[10px] sm:text-xs">
+        <div className="text-muted-foreground border-t pt-2 text-center text-xs text-[10px] sm:text-xs">
           Use os botões de zoom para ampliar ou reduzir a imagem
           {viewportSize.width < 640 &&
-            " • Arraste para mover a imagem ampliada"}
+            ' • Arraste para mover a imagem ampliada'}
         </div>
       </div>
     </Modal>
